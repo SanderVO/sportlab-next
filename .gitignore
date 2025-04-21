@@ -1,0 +1,54 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js
+.next/
+out/            # when using `next export`
+.next-turbo/    # used in newer Next.js versions (e.g., Next 14+)
+build/
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# OS/Editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.swn
+*.bak
+.idea/
+.vscode/
+*.code-workspace
+
+# Coverage / testing
+coverage/
+.nyc_output/
+
+# Optional: Docker
+docker-compose.override.yml
+.docker/
+*.tar
+*.img
+
+# Optional: output from various tools
+dist/
+.cache/
+turbo/
+.vercel/        # if you're not using Vercel deployment
+
+# Optional: TypeScript
+*.tsbuildinfo
