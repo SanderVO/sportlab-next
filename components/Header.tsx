@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { getClient } from "../lib/ApolloClient";
 import { getMenuItems, GetMenuItemsResponse, MenuItem } from "../lib/Query";
 
@@ -11,24 +12,25 @@ export default async function Header() {
     });
 
     return (
-        <nav>
-            <div className="w-full h-[200px] text-center">
-                <Image
-                    src="https://sportlabgroningen.nl/wp-content/uploads/2020/12/sportlab-png.png"
-                    alt="Sportlab Groningen"
-                    width={100}
-                    height={100}
-                    objectFit="fill"
-                />
-            </div>
+        <nav className="container mx-auto flex flex-row justify-between items-center bg-background text-white py-4">
+            <Image
+                src="https://sportlabgroningen.nl/wp-content/uploads/2020/12/sportlab-png.png"
+                alt="Sportlab Groningen"
+                width={200}
+                height={100}
+            />
 
-            <div className="flex flex-row justify-between items-center bg-slate-300 text-black p-4 rounded-2xl">
+            <div className="flex flex-row justify-between items-center gap-6">
                 {data.menuItems.nodes
                     .filter((item: MenuItem) => item.parentId === null)
                     .map((item: MenuItem) => (
-                        <div key={item.id} className="flex flex-col">
+                        <Link
+                            key={item.id}
+                            className="flex flex-col font-bold"
+                            href={item.uri}
+                        >
                             {item.label}
-                        </div>
+                        </Link>
                     ))}
             </div>
         </nav>
