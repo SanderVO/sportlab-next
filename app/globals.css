@@ -36,3 +36,34 @@ body {
     color: var(--foreground);
     font-family: "Montserrat", sans-serif;
 }
+
+.container {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 100%;
+}
+
+@media (min-width: 640px) {
+    .container {
+        max-width: 640px;
+    }
+}
+@media (min-width: 768px) {
+    .container {
+        max-width: 768px;
+    }
+}
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1024px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+@media (min-width: 1366px) {
+    .container {
+        max-width: 1366px;
+    }
+}

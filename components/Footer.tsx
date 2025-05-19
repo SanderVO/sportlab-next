@@ -3,10 +3,12 @@ import Image from "next/image";
 export default function Footer() {
     return (
         <footer className="container mx-auto my-20">
-            <div className="flex flex-col text-sl-beige">
+            <div className="flex flex-col text-sl-beige items-center md:items-baseline">
                 <div className="text-8xl font-sl-bebas">JOIN US!</div>
 
-                <div>Plan je proefles en begin meteen. One more.</div>
+                <div className="text-center">
+                    Plan je proefles en begin meteen. One more.
+                </div>
 
                 <div className="border-b-4 border-sl-beige w-[50px] mt-2"></div>
             </div>
