@@ -13,23 +13,24 @@ export default async function Header() {
     });
 
     return (
-        <nav className="container mx-auto flex flex-row justify-between items-center bg-background text-white py-4 relative">
-            <Image
-                priority
-                className="w-1/2 md:w-auto"
-                src="https://sportlabgroningen.nl/wp-content/uploads/2020/12/sportlab-png.png"
-                alt="Sportlab Groningen"
-                width={200}
-                height={100}
-            />
+        <nav className="container mx-auto flex flex-row justify-between items-center bg-background text-white py-6 relative">
+            <Link href="/" className="flex items-center shrink-0">
+                <Image
+                    priority
+                    src="https://sportlabgroningen.nl/wp-content/uploads/2020/12/sportlab-png.png"
+                    alt="Sportlab Groningen"
+                    width={200}
+                    height={50}
+                />
+            </Link>
 
-            <div className="flex-row justify-between items-center gap-6 hidden md:flex">
+            <div className="flex-row justify-between items-center gap-4 hidden md:flex">
                 {data.menuItems.nodes
                     .filter((item: MenuItem) => item.parentId === null)
                     .map((item: MenuItem) => (
                         <Link
                             key={item.id}
-                            className="flex flex-col font-bold"
+                            className="flex flex-col uppercase font-semibold"
                             href={item.uri}
                         >
                             {item.label}

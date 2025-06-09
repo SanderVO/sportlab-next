@@ -43,46 +43,48 @@ export default function HomeQuoteCarousel() {
         emblaApi.scrollPrev();
     };
 
-    const slideItem = (slide: Slide, index: number) => {
-        return (
-            <div key={index} className="flex-[0_0_100%] min-w-0">
-                <div className="bg-sl-beige rounded-4xl h-[250px] mx-4 flex flex-col items-center py-4 px-8 text-black gap-4 justify-center">
-                    <Image
-                        width={50}
-                        height={50}
-                        loading="lazy"
-                        className="rounded-full w-[50px] h-[50px]"
-                        alt={slide.name}
-                        src={slide.avatar}
-                    />
-
-                    <p className="font-sl-montserrat text-sm font-medium">
-                        {slide.quote}
-                    </p>
-
-                    <div className="text-lg font-bold">{slide.name}</div>
-                </div>
-            </div>
-        );
-    };
-
     return (
         <div className="flex flex-row justify-between items-center gap-10">
             <div
-                className="bg-sl-beige rounded-full w-24 h-24 text-background items-center justify-center text-4xl cursor-pointer transition-transform hover:scale-110 shrink-0 hidden md:flex"
+                className="bg-sl-beige rounded-full w-20 h-20 text-background items-center justify-center text-4xl cursor-pointer transition-transform hover:scale-110 shrink-0 hidden md:flex"
                 onClick={onPrevClick}
             >
                 <FaLongArrowAltLeft />
             </div>
 
             <div className="w-full overflow-hidden" ref={emblaRef}>
-                <div className="flex flex-row">
-                    {slides.map((slide, index) => slideItem(slide, index))}
+                <div className="flex flex-row -mx-2">
+                    {slides.map((slide, index) => (
+                        <div
+                            key={index}
+                            className="md:flex-[0_0_100%] min-w-0 w-[66.6667%] px-2 md:px-0 basis-[75%] shrink-0"
+                        >
+                            <div className="bg-sl-beige rounded-4xl h-[250px] md:mx-4 flex flex-col items-center py-4 px-8 text-black gap-4 justify-center">
+                                <Image
+                                    width={50}
+                                    height={50}
+                                    loading="lazy"
+                                    className="rounded-full w-[50px] h-[50px] shrink-0"
+                                    alt={slide.name}
+                                    src={slide.avatar}
+                                    unoptimized
+                                />
+
+                                <p className="font-sl-montserrat text-sm font-medium basis-[40%] overflow-hidden">
+                                    {slide.quote}
+                                </p>
+
+                                <div className="text-lg font-bold shrink-0">
+                                    {slide.name}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
             <div
-                className="bg-sl-beige rounded-full p-4 w-24 h-24 text-background items-center justify-center text-4xl transition-transform hover:scale-110 shrink-0 cursor-pointer hidden md:flex"
+                className="bg-sl-beige rounded-full p-4 w-20 h-20 text-background items-center justify-center text-4xl transition-transform hover:scale-110 shrink-0 cursor-pointer hidden md:flex"
                 onClick={onNextClick}
             >
                 <FaLongArrowAltRight />

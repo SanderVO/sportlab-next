@@ -64,6 +64,8 @@ export interface MenuItem {
 export interface SeoItem {
     title: string;
     metaDesc: string;
+    metaRobotsNofollow: string;
+    metaRobotsNoindex: string;
     canonical: string;
     opengraphTitle: string;
     opengraphDescription: string;
@@ -85,6 +87,7 @@ export interface Page {
     title: string;
     slug: string;
     seo: SeoItem;
+    uri?: string;
 }
 
 export interface GetPageResponse {
@@ -99,6 +102,8 @@ export const getPage = gql`
             seo {
                 title
                 metaDesc
+                metaRobotsNofollow
+                metaRobotsNoindex
                 canonical
                 opengraphTitle
                 opengraphDescription
@@ -112,6 +117,145 @@ export const getPage = gql`
                 breadcrumbs {
                     text
                     url
+                }
+            }
+        }
+    }
+`;
+
+export interface GetPagesResponse {
+    pages: {
+        nodes: Page[];
+    };
+}
+
+export const getPages = gql`
+    query getPages {
+        pages {
+            nodes {
+                uri
+                slug
+            }
+        }
+    }
+`;
+
+export interface MediaItem {
+    id: string;
+    altText: string;
+    filePath: string;
+    sourceUrl: string;
+    slug: string;
+    sizes: string;
+    srcSet: string;
+    title: string;
+    uri?: string;
+    description?: string;
+    caption?: string;
+}
+
+export interface GetMediaItemsResponse {
+    mediaItems: {
+        nodes: MediaItem[];
+    };
+}
+
+export const getMediaItems = gql`
+    query getMediaItems($categoryName: String!) {
+        mediaItems(where: { categoryName: $categoryName }) {
+            nodes {
+                id
+                altText
+                filePath
+                sourceUrl
+                slug
+                sizes
+                srcSet
+                title
+                uri
+                description
+                caption
+            }
+        }
+    }
+`;
+
+export interface Post {
+    title: string;
+    slug: string;
+    content?: string;
+    date: string;
+    excerpt: string;
+    seo: SeoItem;
+    featuredImage?: {
+        node: {
+            altText: string;
+            filePath: string;
+        };
+    };
+}
+
+export interface GetPostResponse {
+    post: Post;
+}
+
+export interface GetPostsResponse {
+    posts: {
+        nodes: Post[];
+    };
+}
+
+export const getPost = gql`
+    query getPost($id: ID!) {
+        post(id: $id, idType: URI) {
+            title
+            content
+            slug
+            date
+            excerpt
+            featuredImage {
+                node {
+                    altText
+                    filePath
+                }
+            }
+            seo {
+                title
+                metaDesc
+                metaRobotsNofollow
+                metaRobotsNoindex
+                canonical
+                opengraphTitle
+                opengraphDescription
+                twitterTitle
+                twitterDescription
+                schema {
+                    articleType
+                    pageType
+                    raw
+                }
+                breadcrumbs {
+                    text
+                    url
+                }
+            }
+        }
+    }
+`;
+
+export const getPosts = gql`
+    query getPosts($last: Int = 10) {
+        posts(last: $last) {
+            nodes {
+                title
+                slug
+                date
+                excerpt
+                featuredImage {
+                    node {
+                        altText
+                        filePath
+                    }
                 }
             }
         }

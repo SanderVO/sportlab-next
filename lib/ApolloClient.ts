@@ -10,7 +10,7 @@ export const { getClient } = registerApolloClient(() => {
             fetchOptions: {
                 mode: "cors",
                 next: {
-                    revalidate: 60,
+                    revalidate: 3600,
                 },
             },
         }),

@@ -22,7 +22,7 @@ export default function HamburgerMenu({ menuItems }: Props) {
 
             <div
                 className={clsx(
-                    "absolute top-[75px] right-0 w-full h-screen bg-background z-50 p-4 transition-[opacity]",
+                    "absolute top-[100px] right-0 w-full h-screen bg-background z-50 p-4 transition-[opacity]",
                     isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                 )}
             >
@@ -32,7 +32,7 @@ export default function HamburgerMenu({ menuItems }: Props) {
                         .map((item: MenuItem) => (
                             <Link
                                 key={item.id}
-                                className="flex flex-col font-bold text-lg"
+                                className="flex flex-col font-bold text-lg uppercase"
                                 href={item.uri}
                             >
                                 {item.label}
