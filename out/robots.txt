@@ -1,4 +1,0 @@
-User-agent: *
-Disallow:
-
-Sitemap: https://sportlabgroningen.nl/sitemap.xml

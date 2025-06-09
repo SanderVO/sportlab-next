@@ -10,6 +10,7 @@ pnpm-debug.log*
 out/            # when using `next export`
 .next-turbo/    # used in newer Next.js versions (e.g., Next 14+)
 build/
+out/*
 
 # Env files
 .env
