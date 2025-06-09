@@ -90,7 +90,7 @@ export default async function Page() {
 
                         <Link
                             className="transition-colors rounded-3xl bg-sl-orange hover:bg-sl-orange-dark mt-8 font-bold text-center py-3 px-10 w-max text-lg"
-                            href="#"
+                            href="/semi-private-personal-training"
                         >
                             Bekijk
                         </Link>
@@ -116,7 +116,7 @@ export default async function Page() {
 
                         <Link
                             className="w-max transition-colors rounded-3xl bg-sl-beige hover:bg-sl-beige-dark mt-8 font-bold text-center py-3 px-10 text-lg text-background"
-                            href="#"
+                            href="/team"
                         >
                             Over ons
                         </Link>
@@ -203,7 +203,7 @@ export default async function Page() {
 
                         <Link
                             className="transition-colors rounded-3xl bg-background mt-8 font-bold text-center py-3 px-10 w-max text-lg text-white md:self-center"
-                            href="#"
+                            href="/groepstrainingen"
                         >
                             Lees meer
                         </Link>
@@ -235,19 +235,22 @@ export default async function Page() {
                         MEET THE TEAM
                     </h2>
 
-                    <div className="flex flex-row justify-between h-[200px] md:h-2/4 gap-20">
+                    <div className="flex flex-row justify-between h-[400px] md:h-2/4 gap-20">
                         <HomeTeamCarousel items={teamItems.mediaItems.nodes} />
 
                         <div className="items-center flex-0 hidden md:flex">
-                            <div className="bg-sl-beige rounded-full p-4 w-20 h-20 text-background flex items-center justify-center text-4xl transition-transform hover:scale-110 shrink-0 cursor-pointer">
+                            <Link
+                                href="/team"
+                                className="bg-sl-beige rounded-full p-4 w-20 h-20 text-background flex items-center justify-center text-4xl transition-transform hover:scale-110 shrink-0 cursor-pointer"
+                            >
                                 <FaLongArrowAltRight />
-                            </div>
+                            </Link>
                         </div>
                     </div>
 
                     <Link
                         className="block md:hidden transition-colors rounded-3xl bg-sl-beige mt-8 font-bold text-center py-3 px-8 text-lg text-background self-center"
-                        href="#"
+                        href="/team"
                     >
                         Bekijk hele team
                     </Link>

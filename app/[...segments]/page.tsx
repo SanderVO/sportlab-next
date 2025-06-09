@@ -27,9 +27,14 @@ export async function generateStaticParams() {
         query: getPages,
     });
 
-    return data.pages.nodes.map((page: Page) => ({
-        segments: page.uri?.split("/").filter(Boolean),
-    }));
+    return [
+        ...data.pages.nodes.map((page: Page) => ({
+            segments: page.uri?.split("/").filter(Boolean),
+        })),
+        {
+            segments: ["/groepstrainingen"],
+        },
+    ];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
