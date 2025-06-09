@@ -18,6 +18,7 @@ export default async function TeamPage() {
                     <Image
                         fill
                         priority
+                        unoptimized
                         className="object-cover object-center"
                         alt="Sportlab Semi Private Training"
                         src="/images/semi-private-1.jpg"
@@ -82,6 +83,7 @@ export default async function TeamPage() {
                                                     className="border-b-4 border-black object-cover object-center"
                                                     loading="lazy"
                                                     sizes={item.sizes}
+                                                    unoptimized
                                                 />
 
                                                 <div className="absolute h-full w-full bg-sl-beige transition-transform translate-y-[440px] target group-hover:translate-y-0 p-8 text-sm opacity-95">

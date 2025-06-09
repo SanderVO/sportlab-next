@@ -8,6 +8,7 @@ export default async function SemiPrivatePage() {
                 <Image
                     fill
                     priority
+                    unoptimized
                     className="object-cover object-[0_35%]"
                     alt="Sportlab Semi Private Training"
                     src="/images/semi-private-1.jpg"
@@ -45,6 +46,7 @@ export default async function SemiPrivatePage() {
                         <Image
                             fill
                             loading="lazy"
+                            unoptimized
                             className="object-cover object-center rounded-4xl"
                             alt="Sportlab Semi Private Training"
                             src="/images/semi-private-2.jpg"
@@ -95,6 +97,7 @@ export default async function SemiPrivatePage() {
                         <Image
                             fill
                             loading="lazy"
+                            unoptimized
                             className="object-cover object-top rounded-4xl"
                             alt="Sportlab Semi Private Training"
                             src="/images/semi-private-2.jpg"
@@ -109,6 +112,7 @@ export default async function SemiPrivatePage() {
                         <Image
                             fill
                             loading="lazy"
+                            unoptimized
                             className="object-cover object-[0_15%] md:object-top rounded-4xl"
                             alt="Sportlab Semi Private Training"
                             src="/images/semi-private-3.jpg"

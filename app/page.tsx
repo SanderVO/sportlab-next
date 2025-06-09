@@ -262,6 +262,7 @@ export default async function Page() {
                                 <Image
                                     fill
                                     loading="lazy"
+                                    unoptimized
                                     className="object-cover object-top"
                                     alt="Sportlab Semi Private Training"
                                     src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
@@ -275,6 +276,7 @@ export default async function Page() {
                                     <Image
                                         fill
                                         loading="lazy"
+                                        unoptimized
                                         className="object-cover object-top"
                                         alt="Sportlab Semi Private Training"
                                         src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
@@ -289,6 +291,7 @@ export default async function Page() {
                                     <Image
                                         fill
                                         loading="lazy"
+                                        unoptimized
                                         className="object-cover object-top"
                                         alt="Sportlab Semi Private Training"
                                         src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
@@ -303,6 +306,7 @@ export default async function Page() {
                                     <Image
                                         fill
                                         loading="lazy"
+                                        unoptimized
                                         className="object-cover object-top"
                                         alt="Sportlab Semi Private Training"
                                         src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"

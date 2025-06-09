@@ -17,6 +17,7 @@ export default function Footer() {
                     alt="Sportlab Groningen"
                     width={200}
                     height={100}
+                    unoptimized
                 />
 
                 <div className="flex flex-col gap-1 items-center text-gray-500 font-montserrat">

@@ -40,6 +40,7 @@ export default async function ArticleListPage({ page }: Props) {
                                             ""
                                         }
                                         className="rounded-full object-cover object-center"
+                                        unoptimized
                                     />
                                 </div>
 

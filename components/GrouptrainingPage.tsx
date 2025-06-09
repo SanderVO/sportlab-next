@@ -53,6 +53,7 @@ export default async function GrouptrainingPage() {
                     <Image
                         fill
                         priority
+                        unoptimized
                         className="object-cover object-center md:object-bottom"
                         alt="Groepstrainingen"
                         src="/images/grouptraining-1.jpg"
@@ -122,6 +123,7 @@ export default async function GrouptrainingPage() {
                     <Image
                         fill
                         priority
+                        unoptimized
                         className="object-cover object-center"
                         alt="Groepstrainingen"
                         src="/images/grouptraining-2.jpg"
@@ -166,6 +168,7 @@ export default async function GrouptrainingPage() {
                     <Image
                         fill
                         loading="lazy"
+                        unoptimized
                         className="object-cover object-center md:object-top"
                         alt="Groepstrainingen"
                         src="/images/grouptraining-3.jpg"
@@ -210,6 +213,7 @@ export default async function GrouptrainingPage() {
                     <Image
                         fill
                         loading="lazy"
+                        unoptimized
                         className="object-cover object-top md:object-center"
                         alt="Groepstrainingen"
                         src="/images/semi-private-1.jpg"

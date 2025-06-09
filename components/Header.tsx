@@ -21,6 +21,7 @@ export default async function Header() {
                     alt="Sportlab Groningen"
                     width={200}
                     height={50}
+                    unoptimized
                 />
             </Link>
 

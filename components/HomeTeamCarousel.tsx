@@ -39,6 +39,7 @@ export default function HomeTeamCarousel({ items }: Props) {
                                 <Image
                                     fill
                                     loading="lazy"
+                                    unoptimized
                                     className="object-cover object-top rounded-3xl"
                                     alt={teamItem.altText}
                                     src={teamItem.sourceUrl}
