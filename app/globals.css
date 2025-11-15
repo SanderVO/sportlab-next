@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@plugin "@tailwindcss/typography";
+
 @theme {
     --color-sl-orange: #ff914d;
     --color-sl-orange-dark: #ff7c2c;
@@ -13,8 +15,8 @@
 }
 
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
+    --background: #0a0a0a;
+    --foreground: #0a0a0a;
 }
 
 @theme inline {
@@ -24,17 +26,10 @@
     --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
-}
-
 body {
     background: var(--background);
     color: var(--foreground);
-    font-family: "Montserrat", sans-serif;
+    font-family: var(--font-sl-montserrat);
 }
 
 .container {

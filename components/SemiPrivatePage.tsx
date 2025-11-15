@@ -1,17 +1,16 @@
-import Image from "next/image";
 import Link from "next/link";
+import OptimizedImage from "./OptimizedImage";
 
 export default async function SemiPrivatePage() {
     return (
         <>
-            <section className="bg-background w-full relative h-[75vh] md:h-[60vh]">
-                <Image
+            <section className="bg-background w-full relative h-[720px] xxl:h-[1080px]">
+                <OptimizedImage
                     fill
-                    priority
-                    unoptimized
+                    preload={true}
                     className="object-cover object-[0_35%]"
                     alt="Sportlab Semi Private Training"
-                    src="/images/semi-private-1.jpg"
+                    src="https://cdn-sportlab.sandervanooijen.dev/images/boxing-man-1.jpg"
                 />
 
                 <div className="absolute inset-0 bg-black/50 z-10" />
@@ -40,16 +39,16 @@ export default async function SemiPrivatePage() {
                 </div>
             </section>
 
-            <section className="bg-white w-full relative h-auto md:h-[75vh] flex-row">
+            <section className="bg-white w-full relative h-auto flex-row">
                 <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-10 md:gap-0 text-white py-10 h-full">
-                    <div className="h-[200px] md:h-full w-full md:w-[400px] relative flex-shrink-0 block md:hidden">
-                        <Image
-                            fill
+                    <div className="h-[200px] md:h-full w-full md:w-[400px] relative shrink-0 block md:hidden">
+                        <OptimizedImage
+                            width={400}
+                            height={200}
                             loading="lazy"
-                            unoptimized
-                            className="object-cover object-center rounded-4xl"
+                            className="object-cover object-center rounded-4xl h-[200px] w-[400px]"
                             alt="Sportlab Semi Private Training"
-                            src="/images/semi-private-2.jpg"
+                            src="https://cdn-sportlab.sandervanooijen.dev/images/boxing-man-2.jpg"
                         />
                     </div>
 
@@ -93,29 +92,29 @@ export default async function SemiPrivatePage() {
                         </Link>
                     </div>
 
-                    <div className="h-[200px] md:h-full w-full md:w-[400px] relative flex-shrink-0 hidden md:block">
-                        <Image
-                            fill
+                    <div className="h-[200px] md:h-full w-full md:w-[400px] relative shrink-0 hidden md:block">
+                        <OptimizedImage
+                            width={400}
+                            height={200}
                             loading="lazy"
-                            unoptimized
                             className="object-cover object-top rounded-4xl"
                             alt="Sportlab Semi Private Training"
-                            src="/images/semi-private-2.jpg"
+                            src="https://cdn-sportlab.sandervanooijen.dev/images/boxing-man-2.jpg"
                         />
                     </div>
                 </div>
             </section>
 
-            <section className="bg-sl-beige text-black w-full relative h-auto md:h-[75vh] flex-row">
+            <section className="bg-sl-beige text-black w-full relative h-auto flex-row">
                 <div className="container mx-auto flex flex-col md:flex-row items-center justify-start gap-10 md:gap-30 py-10 h-full">
-                    <div className="h-[200px] md:h-full w-full md:w-[400px] relative flex-shrink-0">
-                        <Image
-                            fill
+                    <div className="h-[200px] md:h-full w-full md:w-[400px] relative shrink-0">
+                        <OptimizedImage
+                            width={400}
+                            height={200}
                             loading="lazy"
-                            unoptimized
-                            className="object-cover object-[0_15%] md:object-top rounded-4xl"
+                            className="object-cover object-[0_15%] md:object-top rounded-4xl h-[200px] md:h-auto"
                             alt="Sportlab Semi Private Training"
-                            src="/images/semi-private-3.jpg"
+                            src="https://cdn-sportlab.sandervanooijen.dev/images/man-1.jpg"
                         />
                     </div>
 

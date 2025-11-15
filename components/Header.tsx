@@ -1,32 +1,31 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getClient } from "../lib/ApolloClient";
 import { getMenuItems, GetMenuItemsResponse, MenuItem } from "../lib/Query";
 import HamburgerMenu from "./HamburgerMenu";
+import OptimizedImage from "./OptimizedImage";
 
 export default async function Header() {
-    const { data } = await getClient().query<GetMenuItemsResponse>({
+    const { data } = await getClient().query<GetMenuItemsResponse | undefined>({
         query: getMenuItems,
         variables: {
-            location: "PRIMARY",
+            location: "CUSTOM_1",
         },
     });
 
     return (
         <nav className="container mx-auto flex flex-row justify-between items-center bg-background text-white py-6 relative">
             <Link href="/" className="flex items-center shrink-0">
-                <Image
-                    priority
+                <OptimizedImage
+                    preload={true}
                     src="https://sportlabgroningen.nl/wp-content/uploads/2020/12/sportlab-png.png"
                     alt="Sportlab Groningen"
                     width={200}
                     height={50}
-                    unoptimized
                 />
             </Link>
 
-            <div className="flex-row justify-between items-center gap-4 hidden md:flex">
-                {data.menuItems.nodes
+            <div className="flex-row justify-between items-center gap-8 hidden md:flex">
+                {data?.menuItems.nodes
                     .filter((item: MenuItem) => item.parentId === null)
                     .map((item: MenuItem) => (
                         <Link
@@ -40,7 +39,7 @@ export default async function Header() {
             </div>
 
             <div className="flex md:hidden text-3xl">
-                <HamburgerMenu menuItems={data.menuItems.nodes} />
+                <HamburgerMenu menuItems={data?.menuItems.nodes ?? []} />
             </div>
         </nav>
     );

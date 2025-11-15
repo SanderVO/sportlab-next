@@ -17,17 +17,17 @@ export default function HomeQuoteCarousel() {
 
     const slides: Slide[] = [
         {
-            avatar: "https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg",
+            avatar: "https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg",
             name: "Stefan",
             quote: "Een aantal jaar geleden kwam ik voor het eerst bij Sportlab. Destijds nog fanatiek aan het voetballen bij Groen Geel in de stad. Inmiddels ben ik al twee jaar gestopt met voetbal en sport ik meerdere keren per week bij Sportlab. Als teamsporter was dit best even wennen, dacht ik. Maar al snel kwam ik erachter dat Sportlab als een team voelt. Een community. Tijdens de lessen, maar ook zeker daarbuiten. De kleine groepen, kunnen trainen op je eigen niveau en onderlinge competitie vind ik fijn. Je op individueel niveau kunnen verbeteren en toch trainen samen met andere, dat maakt sporten bij Sportlab voor mij leuk.",
         },
         {
-            avatar: "https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg",
+            avatar: "https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg",
             name: "Frank",
             quote: "Sportlab is de beste sportschool in Groningen. Ik heb hier veel geleerd en ben fitter dan ooit.",
         },
         {
-            avatar: "https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg",
+            avatar: "https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg",
             name: "Sander",
             quote: "Sportlab is de beste sportschool in Groningen. Ik heb hier veel geleerd en ben fitter dan ooit.",
         },
@@ -67,7 +67,6 @@ export default function HomeQuoteCarousel() {
                                     className="rounded-full w-[50px] h-[50px] shrink-0"
                                     alt={slide.name}
                                     src={slide.avatar}
-                                    unoptimized
                                 />
 
                                 <p className="font-sl-montserrat text-sm font-medium basis-[40%] overflow-hidden">

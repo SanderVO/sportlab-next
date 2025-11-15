@@ -1,4 +1,4 @@
-import Image from "next/image";
+import OptimizedImage from "./OptimizedImage";
 
 export default function Footer() {
     return (
@@ -12,12 +12,11 @@ export default function Footer() {
             </div>
 
             <div className="flex flex-col justify-center items-center w-full gap-20 mt-20">
-                <Image
+                <OptimizedImage
                     src="https://sportlabgroningen.nl/wp-content/uploads/2020/12/sportlab-png.png"
                     alt="Sportlab Groningen"
                     width={200}
                     height={100}
-                    unoptimized
                 />
 
                 <div className="flex flex-col gap-1 items-center text-gray-500 font-montserrat">

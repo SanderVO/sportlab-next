@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getClient } from "../lib/ApolloClient";
 import { stripHtml } from "../lib/Content";
 import { getMediaItems, GetMediaItemsResponse, MediaItem } from "../lib/Query";
+import OptimizedImage from "./OptimizedImage";
 
 export default async function TeamPage() {
     const { data } = await getClient().query<GetMediaItemsResponse>({
@@ -15,13 +16,12 @@ export default async function TeamPage() {
         <>
             <section className="bg-sl-beige w-full relative h-auto md:h-[65vh] flex flex-col md:flex-row">
                 <div className="relative h-[200px] md:h-full md:basis-2/5 shrink-0 md:mb-0">
-                    <Image
+                    <OptimizedImage
                         fill
-                        priority
-                        unoptimized
+                        preload={true}
                         className="object-cover object-center"
                         alt="Sportlab Semi Private Training"
-                        src="/images/semi-private-1.jpg"
+                        src="https://cdn-sportlab.sandervanooijen.dev/images/pt-1.jpg"
                     />
                 </div>
 
@@ -83,7 +83,6 @@ export default async function TeamPage() {
                                                     className="border-b-4 border-black object-cover object-center"
                                                     loading="lazy"
                                                     sizes={item.sizes}
-                                                    unoptimized
                                                 />
 
                                                 <div className="absolute h-full w-full bg-sl-beige transition-transform translate-y-[440px] target group-hover:translate-y-0 p-8 text-sm opacity-95">

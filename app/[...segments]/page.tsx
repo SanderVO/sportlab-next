@@ -20,19 +20,25 @@ interface Props {
     }>;
 }
 
-export const revalidate = 3600;
+const apolloClient = getClient();
+
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
-    const { data } = await getClient().query<GetPagesResponse>({
+    const { data } = await apolloClient.query<GetPagesResponse>({
         query: getPages,
     });
+
+    if (!data?.pages?.nodes) {
+        return [];
+    }
 
     return [
         ...data.pages.nodes.map((page: Page) => ({
             segments: page.uri?.split("/").filter(Boolean),
         })),
         {
-            segments: ["/groepstrainingen"],
+            segments: ["groepstrainingen"],
         },
     ];
 }
@@ -40,7 +46,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const paramsValue = await params;
 
-    const { data } = await getClient().query<GetPageResponse>({
+    const { data } = await apolloClient.query<GetPageResponse>({
         query: getPage,
         variables: {
             id: paramsValue.segments?.join("/"),
@@ -78,7 +84,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function WordpressPage({ params }: Props) {
     const paramsValue = await params;
 
-    const { data } = await getClient().query<GetPageResponse>({
+    const { data } = await apolloClient.query<GetPageResponse>({
         query: getPage,
         variables: {
             id: paramsValue.segments?.join("/"),

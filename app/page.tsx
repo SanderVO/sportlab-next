@@ -1,10 +1,11 @@
 import { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import Script from "next/script";
 import { FaLongArrowAltRight } from "react-icons/fa";
 import HomeQuoteCarousel from "../components/HomeQuoteCarousel";
 import HomeTeamCarousel from "../components/HomeTeamCarousel";
+import OptimizedImage from "../components/OptimizedImage";
 import { getClient } from "../lib/ApolloClient";
 import {
     getMediaItems,
@@ -13,13 +14,19 @@ import {
     GetPageResponse,
 } from "../lib/Query";
 
+const apolloClient = getClient();
+
 export async function generateMetadata(): Promise<Metadata> {
-    const { data } = await getClient().query<GetPageResponse>({
+    const { data } = await apolloClient.query<GetPageResponse | undefined>({
         query: getPage,
         variables: {
             id: "/",
         },
     });
+
+    if (!data) {
+        return {};
+    }
 
     return {
         title: data.page.seo.title,
@@ -42,19 +49,29 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-    const { data } = await getClient().query<GetPageResponse>({
+    const { data } = await apolloClient.query<GetPageResponse | undefined>({
         query: getPage,
         variables: {
             id: "/",
         },
     });
 
-    const { data: teamItems } = await getClient().query<GetMediaItemsResponse>({
+    if (!data) {
+        return notFound();
+    }
+
+    const { data: teamItems } = await apolloClient.query<
+        GetMediaItemsResponse | undefined
+    >({
         query: getMediaItems,
         variables: {
             categoryName: "Team",
         },
     });
+
+    if (!teamItems) {
+        return notFound();
+    }
 
     return (
         <>
@@ -66,20 +83,20 @@ export default async function Page() {
                 }}
             />
 
-            <section className="bg-background w-full relative h-[75vh] md:h-[60vh]">
-                <Image
+            <section className="bg-background w-full relative h-[720px] xxl:h-[1080px]">
+                <OptimizedImage
+                    preload={true}
                     fill
-                    priority
                     className="absolute object-cover"
                     alt="Sportlab Semi Private Training"
-                    unoptimized
-                    src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
+                    src="https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg"
+                    fit="cover"
                 />
 
                 <div className="absolute inset-0 bg-black/50 z-10" />
 
                 <div className="container mx-auto z-20 flex items-center justify-start text-white h-full">
-                    <div className="flex flex-col w-full md:w-[50%] self-end md:mb-[200px] pb-8 md:pb-0">
+                    <div className="flex flex-col w-full md:w-[50%] self-end md:mb-[100px] pb-8 md:pb-0">
                         <h1 className="font-sl-bebas text-5xl md:text-7xl">
                             SEMI PRIVATE PERSONAL TRAINING
                         </h1>
@@ -98,7 +115,7 @@ export default async function Page() {
                 </div>
             </section>
 
-            <section className="bg-background w-full relative h-auto md:h-[60vh] flex-row">
+            <section className="bg-background w-full relative h-auto md:h-[720px] xxl:h-[1080px] flex-row">
                 <div className="container mx-auto flex items-center justify-start text-white py-15 md:py-0 h-full">
                     <div className="flex flex-col text-sl-beige gap-4 md:w-3/5">
                         <h2 className="text-5xl md:text-7xl font-sl-bebas">
@@ -124,28 +141,28 @@ export default async function Page() {
                 </div>
 
                 <div className="absolute right-0 bottom-0 w-1/3 h-9/10 hidden md:block">
-                    <Image
+                    <OptimizedImage
                         fill
+                        customHeight={650}
                         loading="lazy"
-                        unoptimized
                         className="object-cover object-top"
                         alt="Sportlab Semi Private Training"
-                        src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
+                        src="https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg"
                     />
                 </div>
             </section>
 
-            <section className="bg-sl-beige w-full relative h-auto md:h-[60vh] flex-row">
+            <section className="bg-sl-beige w-full relative h-auto md:h-[720px] xxl:h-[1080px] flex-row">
                 <div className="container mx-auto flex flex-col md:flex-row gap-10 md:gap-50 items-center justify-between py-8 md:py-0 h-full">
                     <div className="flex flex-col text-background gap-4 md:gap-0 w-full md:w-1/2 relative">
                         <div className="h-[175px] w-full relative mb-4">
-                            <Image
+                            <OptimizedImage
                                 fill
+                                customHeight={300}
                                 loading="lazy"
                                 className="object-cover object-center rounded-4xl"
                                 alt="Sportlab Semi Private Training"
-                                src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
-                                unoptimized
+                                src="https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg"
                             />
                         </div>
 
@@ -175,13 +192,13 @@ export default async function Page() {
 
                     <div className="flex flex-col text-background gap-4 md:gap-0 w-full md:w-1/2">
                         <div className="h-[175px] w-full relative mb-4">
-                            <Image
+                            <OptimizedImage
                                 fill
+                                customHeight={300}
                                 loading="lazy"
                                 className="object-cover object-top rounded-4xl"
                                 alt="Sportlab Semi Private Training"
-                                src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
-                                unoptimized
+                                src="https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg"
                             />
                         </div>
 
@@ -211,7 +228,7 @@ export default async function Page() {
                 </div>
             </section>
 
-            <section className="bg-white w-full relative h-auto md:h-[50vh] flex-row">
+            <section className="bg-white w-full relative h-auto md:h-[720px] xxl:h-[1080px] flex-row">
                 <div className="container mx-auto flex flex-col h-full justify-center py-15 md:py-0">
                     <div className="flex flex-col">
                         <div className="text-gray-400">eerlijke verhalen</div>
@@ -229,7 +246,7 @@ export default async function Page() {
                 </div>
             </section>
 
-            <section className="bg-background w-full relative h-auto md:h-[60vh] flex-row">
+            <section className="bg-background w-full relative h-auto md:h-[720px] xxl:h-[1080px] flex-row">
                 <div className="container mx-auto flex flex-col h-full justify-center py-15 md:py-0">
                     <h2 className="font-sl-bebas text-5xl md:text-7xl text-sl-beige mb-6">
                         MEET THE TEAM
@@ -257,18 +274,18 @@ export default async function Page() {
                 </div>
             </section>
 
-            <section className="bg-sl-beige w-full relative h-auto md:h-[60vh] flex-row">
+            <section className="bg-sl-beige w-full relative h-auto md:h-[720px] xxl:h-[1080px] flex-row">
                 <div className="container mx-auto flex flex-col h-full justify-center py-8 md:py-0 gap-6">
                     <div className="flex flex-row justify-between h-[200px] md:h-1/2 gap-10">
                         <div className="flex flex-row items-center text gap-4 h-full flex-1">
                             <div className="h-full w-full relative">
-                                <Image
+                                <OptimizedImage
                                     fill
+                                    customHeight={400}
                                     loading="lazy"
-                                    unoptimized
                                     className="object-cover object-top"
                                     alt="Sportlab Semi Private Training"
-                                    src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
+                                    src="https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg"
                                 />
                             </div>
                         </div>
@@ -276,13 +293,13 @@ export default async function Page() {
                         <div className="flex flex-row items-center text gap-4 h-full flex-1">
                             <div className="h-full flex flex-col gap-2 w-full">
                                 <div className="h-full w-full relative">
-                                    <Image
+                                    <OptimizedImage
                                         fill
+                                        customHeight={400}
                                         loading="lazy"
-                                        unoptimized
                                         className="object-cover object-top"
                                         alt="Sportlab Semi Private Training"
-                                        src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
+                                        src="https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg"
                                     />
                                 </div>
                             </div>
@@ -291,13 +308,13 @@ export default async function Page() {
                         <div className="flex flex-row items-center text gap-4 h-full flex-1">
                             <div className="h-full flex flex-col w-full">
                                 <div className="h-full w-full relative">
-                                    <Image
+                                    <OptimizedImage
                                         fill
+                                        customHeight={400}
                                         loading="lazy"
-                                        unoptimized
                                         className="object-cover object-top"
                                         alt="Sportlab Semi Private Training"
-                                        src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
+                                        src="https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg"
                                     />
                                 </div>
                             </div>
@@ -306,13 +323,13 @@ export default async function Page() {
                         <div className="flex flex-row items-center text gap-4 h-full flex-1">
                             <div className="h-full flex flex-col w-full">
                                 <div className="h-full w-full relative">
-                                    <Image
+                                    <OptimizedImage
                                         fill
+                                        customHeight={400}
                                         loading="lazy"
-                                        unoptimized
                                         className="object-cover object-top"
                                         alt="Sportlab Semi Private Training"
-                                        src="https://sportlabgroningen.nl/wp-content/uploads/2023/10/SPPT-shoot-header-scaled.jpg"
+                                        src="https://cdn-sportlab.sandervanooijen.dev/images/group-4.jpg"
                                     />
                                 </div>
                             </div>

@@ -3,6 +3,7 @@
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { stripHtml } from "../lib/Content";
 import { MediaItem } from "../lib/Query";
 
 interface Props {
@@ -32,14 +33,13 @@ export default function HomeTeamCarousel({ items }: Props) {
                 {items.map((teamItem: MediaItem, index: number) => (
                     <div
                         key={index}
-                        className="flex flex-row items-center text h-full flex-shrink-0 w-[66.6667%] md:w-[30%] px-2"
+                        className="flex flex-row items-center text h-full shrink-0 w-[66.6667%] md:w-[30%] px-2"
                     >
                         <div className="h-full flex flex-col gap-2 w-full">
                             <div className="h-full w-full relative">
                                 <Image
                                     fill
                                     loading="lazy"
-                                    unoptimized
                                     className="object-cover object-top rounded-3xl"
                                     alt={teamItem.altText}
                                     src={teamItem.sourceUrl}
@@ -48,7 +48,7 @@ export default function HomeTeamCarousel({ items }: Props) {
                             </div>
 
                             <div className="text-sl-beige text-xs">
-                                {teamItem.description}
+                                {stripHtml(teamItem.caption || "")}
                             </div>
                         </div>
                     </div>

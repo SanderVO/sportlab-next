@@ -1,6 +1,7 @@
 import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
+import { ApolloWrapper } from "../lib/ApolloWrapper";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -37,10 +38,16 @@ export default function RootLayout({
             <body>
                 <Header />
 
-                <main>{children}</main>
+                <main>
+                    <ApolloWrapper>{children}</ApolloWrapper>
+                </main>
 
                 <Footer />
             </body>
+
+            {/* {process.env.GOOGLE_ANALYTICS_ID && (
+                <GoogleAnalytics gaId={process.env.GOOGLE_ANALYTICS_ID} />
+            )} */}
         </html>
     );
 }

@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import OptimizedImage from "./OptimizedImage";
 
 export default async function GrouptrainingPage() {
     const crosstrainingList = [
@@ -48,22 +48,21 @@ export default async function GrouptrainingPage() {
 
     return (
         <>
-            <section className="bg-sl-beige w-full relative h-[75vh] md:h-[40vh]">
-                <div className="h-[100%] relative">
-                    <Image
+            <section className="bg-sl-beige w-full relative h-[480px] xxl:h-[720px]">
+                <div className="h-full relative">
+                    <OptimizedImage
                         fill
-                        priority
-                        unoptimized
-                        className="object-cover object-center md:object-bottom"
+                        preload={true}
                         alt="Groepstrainingen"
-                        src="/images/grouptraining-1.jpg"
+                        src="https://cdn-sportlab.sandervanooijen.dev/images/group-1.jpg"
+                        className="object-cover object-left md:object-bottom"
                     />
 
                     <div className="absolute inset-0 bg-black/40 z-10" />
                 </div>
             </section>
 
-            <section className="bg-sl-beige w-full relative h-auto md:h-[30vh]">
+            <section className="bg-sl-beige w-full relative h-[480px] xxl:h-[720px]">
                 <div className="container mx-auto flex items-center justify-center text-black h-full">
                     <div className="flex flex-col w-full">
                         <h1 className="font-sl-bebas text-4xl md:text-7xl md:w-[50%]">
@@ -86,14 +85,14 @@ export default async function GrouptrainingPage() {
                 </div>
             </section>
 
-            <section className="bg-white w-full relative h-auto md:h-[60vh] flex flex-col md:flex-row">
+            <section className="bg-white w-full relative h-auto sm:h-[720px] xxl:h-[1080px] flex flex-col md:flex-row">
                 <div className="container mx-auto h-full flex order-1 md:order-0 flex-col md:flex-row items-center justify-center md:justify-start text-black">
-                    <div className="flex flex-col w-full md:w-[50%]">
+                    <div className="flex flex-col w-full md:w-[50%] py-8 sm:py-0">
                         <h2 className="font-sl-bebas text-4xl md:text-7xl">
                             CROSSTRAINING
                         </h2>
 
-                        <div className="bg-black h-[4px] w-[100px] mb-4 mt-1"></div>
+                        <div className="bg-black h-1 w-[100px] mb-4 mt-1"></div>
 
                         <div className="text-md">
                             Ervaar de ultieme combinatie tussen kracht en
@@ -119,26 +118,26 @@ export default async function GrouptrainingPage() {
                     </div>
                 </div>
 
-                <div className="relative md:absolute right-0 top-0 z-10 h-[200px] md:h-full order-0 md:order-1 w-full md:w-[40%]">
-                    <Image
-                        fill
-                        priority
-                        unoptimized
-                        className="object-cover object-center"
+                <div className="relative md:absolute right-0 top-0 z-10 h-[200px] md:h-full order-0 md:order-1 w-full md:w-xl overflow-hidden">
+                    <OptimizedImage
+                        loading="lazy"
+                        height={720}
+                        width={576}
                         alt="Groepstrainingen"
-                        src="/images/grouptraining-2.jpg"
+                        src="https://cdn-sportlab.sandervanooijen.dev/images/clean-woman-1.jpg"
+                        className="object-cover object-center h-[200px] md:h-[720px]"
                     />
                 </div>
             </section>
 
-            <section className="bg-white w-full relative h-auto md:h-[60vh] flex flex-col md:flex-row">
+            <section className="bg-white w-full relative h-auto sm:h-[720px] xxl:h-[1080px] flex flex-col md:flex-row">
                 <div className="container mx-auto h-full inset-0 z-20 flex flex-col md:flex-row items-center justify-center text-black order-1 basis-[60%]">
-                    <div className="flex flex-col pb-8 md:pb-0 w-full md:w-[75%]">
+                    <div className="flex flex-col pb-8 md:pb-0 w-full md:w-[75%] py-8 sm:py-0">
                         <h2 className="font-sl-bebas text-4xl md:text-7xl">
                             POWER HIIT
                         </h2>
 
-                        <div className="bg-black h-[4px] w-[100px] mb-4 mt-1"></div>
+                        <div className="bg-black h-1 w-[100px] mb-4 mt-1"></div>
 
                         <div className="text-md">
                             Niet te lang trainen maar toch optimaal resultaat
@@ -164,26 +163,26 @@ export default async function GrouptrainingPage() {
                     </div>
                 </div>
 
-                <div className="relative order-0 h-[200px] md:h-full basis-[100%] md:basis-[40%]">
-                    <Image
-                        fill
+                <div className="relative order-0 h-auto md:h-full basis-full md:basis-[40%] overflow-hidden">
+                    <OptimizedImage
+                        width={576}
+                        height={720}
                         loading="lazy"
-                        unoptimized
-                        className="object-cover object-center md:object-top"
+                        className="object-cover object-center md:object-top h-[200px] md:h-[720px]"
                         alt="Groepstrainingen"
-                        src="/images/grouptraining-3.jpg"
+                        src="https://cdn-sportlab.sandervanooijen.dev/images/bike-man-1.jpg"
                     />
                 </div>
             </section>
 
-            <section className="bg-white w-full relative h-auto md:h-[60vh] flex flex-col md:flex-row">
+            <section className="bg-white w-full relative h-auto md:h-[720px] xxl:h-[1080px] flex flex-col md:flex-row">
                 <div className="container mx-auto h-full inset-0 order-1 md:order-0 z-20 flex flex-col md:flex-row items-center justify-center md:justify-start text-black">
-                    <div className="flex flex-col w-full md:w-[50%]">
+                    <div className="flex flex-col w-full md:w-[50%] py-8 sm:py-0">
                         <h2 className="font-sl-bebas text-4xl md:text-7xl">
                             BOX & BURN
                         </h2>
 
-                        <div className="bg-black h-[4px] w-[100px] mb-4 mt-1"></div>
+                        <div className="bg-black h-1 w-[100px] mb-4 mt-1"></div>
 
                         <div className="text-md">
                             Werken aan je bokstechnieken en met een voldaan
@@ -209,14 +208,14 @@ export default async function GrouptrainingPage() {
                     </div>
                 </div>
 
-                <div className="relative md:absolute right-0 top-0 z-10 h-[200px] order-0 md:order-1 md:h-full w-full md:w-[40%]">
-                    <Image
-                        fill
+                <div className="relative md:absolute right-0 top-0 z-10 h-[200px] md:h-full order-0 md:order-1 w-full md:w-xl overflow-hidden">
+                    <OptimizedImage
+                        width={576}
+                        height={720}
                         loading="lazy"
-                        unoptimized
-                        className="object-cover object-top md:object-center"
+                        className="object-cover object-center md:object-top h-[200px] md:h-[720px]"
                         alt="Groepstrainingen"
-                        src="/images/semi-private-1.jpg"
+                        src="https://cdn-sportlab.sandervanooijen.dev/images/boxing-man-1.jpg"
                     />
                 </div>
             </section>

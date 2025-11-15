@@ -197,6 +197,9 @@ export interface Post {
 
 export interface GetPostResponse {
     post: Post;
+    gfForm?: {
+        title: string;
+    };
 }
 
 export interface GetPostsResponse {
@@ -257,6 +260,89 @@ export const getPosts = gql`
                         filePath
                     }
                 }
+            }
+        }
+    }
+`;
+
+export interface GetContactFormField {
+    id: string;
+    type: string;
+    inputType?: string;
+    label?: string;
+    choices?: Array<{
+        text: string;
+        value: string;
+    }>;
+}
+
+export interface GetContactFormResponse {
+    gfForm: {
+        title: string;
+        formFields: {
+            nodes: GetContactFormField[];
+        };
+    };
+}
+
+export const getContactForm = gql`
+    query getContactForm {
+        gfForm(id: "10") {
+            title
+            formFields {
+                nodes {
+                    id
+                    type
+                    inputType
+                    ... on EmailField {
+                        label
+                    }
+                    ... on CaptchaField {
+                        label
+                    }
+                    ... on NameField {
+                        label
+                    }
+                    ... on SelectField {
+                        label
+                        choices {
+                            text
+                            value
+                        }
+                    }
+                    ... on PhoneField {
+                        label
+                    }
+                    ... on PostContentField {
+                        label
+                    }
+                }
+            }
+        }
+    }
+`;
+
+export interface SubmitContactFormResponse {
+    submitGfForm: {
+        confirmation: {
+            message: string;
+        };
+        errors: {
+            message: string;
+            connectedFormField?: string;
+        };
+    };
+}
+
+export const submitContactForm = gql`
+    mutation submitContactForm($input: SubmitGfFormInput!) {
+        submitGfForm(input: $input) {
+            confirmation {
+                message
+            }
+            errors {
+                message
+                connectedFormField
             }
         }
     }

@@ -15,15 +15,19 @@ interface Props {
     }>;
 }
 
-export const revalidate = 3600;
+const apolloClient = getClient();
 
 export async function generateStaticParams() {
-    const { data } = await getClient().query<GetPostsResponse>({
+    const { data } = await apolloClient.query<GetPostsResponse>({
         query: getPosts,
         variables: {
             last: 10,
         },
     });
+
+    if (!data?.posts?.nodes) {
+        return [];
+    }
 
     return data.posts.nodes.map((post: Post) => ({
         slug: post.slug,
@@ -33,7 +37,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const paramsValue = await params;
 
-    const { data } = await getClient().query<GetPostResponse>({
+    const { data } = await apolloClient.query<GetPostResponse>({
         query: getPost,
         variables: {
             id: `/blog/${paramsValue.slug}`,
@@ -71,7 +75,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function WordpressPage({ params }: Props) {
     const paramsValue = await params;
 
-    const { data } = await getClient().query<GetPostResponse>({
+    const { data } = await apolloClient.query<GetPostResponse>({
         query: getPost,
         variables: {
             id: `/blog/${paramsValue.slug}`,
@@ -91,7 +95,7 @@ export default async function WordpressPage({ params }: Props) {
                     </h1>
 
                     <div
-                        className="overflow-hidden mt-4"
+                        className="overflow-hidden mt-4 prose prose-lg"
                         dangerouslySetInnerHTML={{
                             __html: data.post.content || "",
                         }}
