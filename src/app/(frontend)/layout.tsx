@@ -1,20 +1,33 @@
-import type { Metadata } from "next";
-
-import { cn } from "@/utilities/ui";
-import { GeistMono } from "geist/font/mono";
-import { GeistSans } from "geist/font/sans";
-import React from "react";
-
 import { AdminBar } from "@/components/AdminBar";
-import { Footer } from "@/Footer/Component";
-import { Header } from "@/Header/Component";
+import { Footer } from "@/Footer/Footer";
+import { Header } from "@/Header/Header";
 import { Providers } from "@/providers";
 import { InitTheme } from "@/providers/Theme/InitTheme";
-import { mergeOpenGraph } from "@/utilities/mergeOpenGraph";
+import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import { draftMode } from "next/headers";
-
-import { getServerSideURL } from "@/utilities/getURL";
+import React from "react";
 import "./globals.css";
+
+const montserrat = Montserrat({
+    subsets: ["latin"],
+    weight: ["400", "500", "700"],
+    variable: "--font-montserrat",
+    display: "swap",
+});
+
+const bebasNeue = Bebas_Neue({
+    subsets: ["latin"],
+    weight: "400",
+    variable: "--font-bebas",
+    display: "swap",
+});
+
+const openSans = Open_Sans({
+    subsets: ["latin"],
+    weight: ["400", "700"],
+    variable: "--font-open-sans",
+    display: "swap",
+});
 
 export default async function RootLayout({
     children,
@@ -25,8 +38,8 @@ export default async function RootLayout({
 
     return (
         <html
-            className={cn(GeistSans.variable, GeistMono.variable)}
-            lang="en"
+            lang="nl"
+            className={`${montserrat.variable} ${bebasNeue.variable} ${openSans.variable}`}
             suppressHydrationWarning
         >
             <head>
@@ -43,19 +56,16 @@ export default async function RootLayout({
                     />
 
                     <Header />
+
                     {children}
+
                     <Footer />
                 </Providers>
             </body>
+
+            {/* {process.env.GOOGLE_ANALYTICS_ID && (
+                <GoogleAnalytics gaId={process.env.GOOGLE_ANALYTICS_ID} />
+            )} */}
         </html>
     );
 }
-
-export const metadata: Metadata = {
-    metadataBase: new URL(getServerSideURL()),
-    openGraph: mergeOpenGraph(),
-    twitter: {
-        card: "summary_large_image",
-        creator: "@payloadcms",
-    },
-};

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { FaLongArrowAltRight } from "react-icons/fa";
-import { getClient } from "../lib/ApolloClient";
-import { getPosts, GetPostsResponse, Page, Post } from "../lib/Query";
+import { getClient } from "../lib-old/ApolloClient";
+import { getPosts, GetPostsResponse, Page, Post } from "../lib-old/Query";
 import OptimizedImage from "./OptimizedImage";
 
 interface Props {

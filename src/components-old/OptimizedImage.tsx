@@ -1,7 +1,7 @@
 "use client";
 
 import Image, { ImageProps } from "next/image";
-import customImageLoader from "../lib/ImageLoader";
+import customImageLoader from "../lib-old/ImageLoader";
 
 interface CustomImageProps extends Omit<ImageProps, "loader"> {
     fit?: "fill" | "contain" | "cover" | "none" | "scale-down";

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { getClient } from "../lib/ApolloClient";
-import { getMenuItems, GetMenuItemsResponse, MenuItem } from "../lib/Query";
+import { getClient } from "../lib-old/ApolloClient";
+import { getMenuItems, GetMenuItemsResponse, MenuItem } from "../lib-old/Query";
 import HamburgerMenu from "./HamburgerMenu";
 import OptimizedImage from "./OptimizedImage";
 

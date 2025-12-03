@@ -1,79 +1,127 @@
-import type { Block, Field } from 'payload'
-
+import { link } from "@/fields/link";
 import {
-  FixedToolbarFeature,
-  HeadingFeature,
-  InlineToolbarFeature,
-  lexicalEditor,
-} from '@payloadcms/richtext-lexical'
-
-import { link } from '@/fields/link'
+    FixedToolbarFeature,
+    HeadingFeature,
+    InlineToolbarFeature,
+    lexicalEditor,
+} from "@payloadcms/richtext-lexical";
+import type { Block, Field } from "payload";
 
 const columnFields: Field[] = [
-  {
-    name: 'size',
-    type: 'select',
-    defaultValue: 'oneThird',
-    options: [
-      {
-        label: 'One Third',
-        value: 'oneThird',
-      },
-      {
-        label: 'Half',
-        value: 'half',
-      },
-      {
-        label: 'Two Thirds',
-        value: 'twoThirds',
-      },
-      {
-        label: 'Full',
-        value: 'full',
-      },
-    ],
-  },
-  {
-    name: 'richText',
-    type: 'richText',
-    editor: lexicalEditor({
-      features: ({ rootFeatures }) => {
-        return [
-          ...rootFeatures,
-          HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
-          FixedToolbarFeature(),
-          InlineToolbarFeature(),
-        ]
-      },
-    }),
-    label: false,
-  },
-  {
-    name: 'enableLink',
-    type: 'checkbox',
-  },
-  link({
-    overrides: {
-      admin: {
-        condition: (_data, siblingData) => {
-          return Boolean(siblingData?.enableLink)
-        },
-      },
+    {
+        name: "contentPosition",
+        type: "select",
+        defaultValue: "contentRight",
+        required: true,
+        options: [
+            {
+                label: "Afbeelding Boven, Tekst Onder",
+                value: "contentBottom",
+            },
+            {
+                label: "Afbeelding Links, Tekst Rechts",
+                value: "contentRight",
+            },
+            {
+                label: "Afbeelding Rechts, Tekst Links",
+                value: "contentLeft",
+            },
+        ],
     },
-  }),
-]
+    {
+        name: "imageSize",
+        type: "select",
+        defaultValue: "imageCenter",
+        required: false,
+        options: [
+            {
+                label: "Top Gecropt",
+                value: "imageTopCut",
+            },
+            {
+                label: "Volledig",
+                value: "imageFull",
+            },
+            {
+                label: "Gecentreerd",
+                value: "imageCenter",
+            },
+        ],
+    },
+    {
+        label: "Title",
+        name: "title",
+        type: "text",
+        required: false,
+    },
+    {
+        name: "richText",
+        type: "richText",
+        required: true,
+        editor: lexicalEditor({
+            features: ({ rootFeatures }) => {
+                return [
+                    ...rootFeatures,
+                    HeadingFeature({ enabledHeadingSizes: ["h2", "h3", "h4"] }),
+                    FixedToolbarFeature(),
+                    InlineToolbarFeature(),
+                ];
+            },
+        }),
+        label: false,
+    },
+    {
+        name: "media",
+        type: "upload",
+        relationTo: "media",
+        required: false,
+    },
+    {
+        name: "enableLink",
+        type: "checkbox",
+    },
+    link({
+        overrides: {
+            admin: {
+                condition: (_data, siblingData) => {
+                    return Boolean(siblingData?.enableLink);
+                },
+            },
+        },
+    }),
+];
 
 export const Content: Block = {
-  slug: 'content',
-  interfaceName: 'ContentBlock',
-  fields: [
-    {
-      name: 'columns',
-      type: 'array',
-      admin: {
-        initCollapsed: true,
-      },
-      fields: columnFields,
-    },
-  ],
-}
+    slug: "content",
+    interfaceName: "ContentBlock",
+    fields: [
+        {
+            name: "backgroundColor",
+            type: "select",
+            defaultValue: "backgroundDark",
+            required: true,
+            options: [
+                {
+                    label: "Zwart",
+                    value: "backgroundDark",
+                },
+                {
+                    label: "Beige",
+                    value: "backgroundLight",
+                },
+                {
+                    label: "Wit",
+                    value: "backgroundWhite",
+                },
+            ],
+        },
+        {
+            name: "columns",
+            type: "array",
+            admin: {
+                initCollapsed: true,
+            },
+            fields: columnFields,
+        },
+    ],
+};

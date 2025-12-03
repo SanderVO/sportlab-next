@@ -1,7 +1,11 @@
 import Image from "next/image";
-import { getClient } from "../lib/ApolloClient";
-import { stripHtml } from "../lib/Content";
-import { getMediaItems, GetMediaItemsResponse, MediaItem } from "../lib/Query";
+import { getClient } from "../lib-old/ApolloClient";
+import { stripHtml } from "../lib-old/Content";
+import {
+    getMediaItems,
+    GetMediaItemsResponse,
+    MediaItem,
+} from "../lib-old/Query";
 import OptimizedImage from "./OptimizedImage";
 
 export default async function TeamPage() {

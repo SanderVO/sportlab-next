@@ -1,6 +1,8 @@
 import { revalidateRedirects } from "@/hooks/revalidateRedirects";
+import { Page, Post } from "@/payload-types";
 import { beforeSyncWithSearch } from "@/search/beforeSync";
 import { searchFields } from "@/search/fieldOverrides";
+import { getServerSideURL } from "@/utilities/getURL";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
 import { nestedDocsPlugin } from "@payloadcms/plugin-nested-docs";
 import { redirectsPlugin } from "@payloadcms/plugin-redirects";
@@ -14,13 +16,8 @@ import {
 } from "@payloadcms/richtext-lexical";
 import { Plugin } from "payload";
 
-import { Page, Post } from "@/payload-types";
-import { getServerSideURL } from "@/utilities/getURL";
-
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-    return doc?.title
-        ? `${doc.title} | Payload Website Template`
-        : "Payload Website Template";
+    return doc?.title ? `${doc.title} | Sportlab` : "Sportlab";
 };
 
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
@@ -54,13 +51,30 @@ export const plugins: Plugin[] = [
         },
     }),
     nestedDocsPlugin({
-        collections: ["categories"],
+        collections: [],
         generateURL: (docs) =>
             docs.reduce((url, doc) => `${url}/${doc.slug}`, ""),
     }),
     seoPlugin({
-        generateTitle,
+        generateTitle: ({ doc }) => `${doc.title} - Sportlab Groningen`,
         generateURL,
+        fields: ({ defaultFields }) => {
+            return [
+                ...defaultFields,
+                {
+                    label: "Rich Snippets",
+                    name: "richSnippets",
+                    type: "array",
+                    fields: [
+                        {
+                            label: "Rich Snippet JSON-LD",
+                            name: "jsonLd",
+                            type: "json",
+                        },
+                    ],
+                },
+            ];
+        },
     }),
     formBuilderPlugin({
         fields: {

@@ -3,8 +3,8 @@
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { stripHtml } from "../lib/Content";
-import { MediaItem } from "../lib/Query";
+import { stripHtml } from "../lib-old/Content";
+import { MediaItem } from "../lib-old/Query";
 
 interface Props {
     items: MediaItem[];

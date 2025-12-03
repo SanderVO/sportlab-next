@@ -1,16 +1,15 @@
 "use client";
 
+import { CMSLink } from "@/components/Link";
 import clsx from "clsx";
-import Link from "next/link";
 import { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { MenuItem } from "../lib/Query";
 
 interface Props {
-    menuItems: MenuItem[];
+    navItems: any[];
 }
 
-export default function HamburgerMenu({ menuItems }: Props) {
+export default function HamburgerMenu({ navItems }: Props) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -27,18 +26,9 @@ export default function HamburgerMenu({ menuItems }: Props) {
                 )}
             >
                 <div className="flex flex-col items-center h-full gap-10">
-                    {menuItems
-                        .filter((item: MenuItem) => item.parentId === null)
-                        .map((item: MenuItem) => (
-                            <Link
-                                key={item.id}
-                                className="flex flex-col font-bold text-lg uppercase"
-                                href={item.uri}
-                                onClick={() => setIsOpen(false)}
-                            >
-                                {item.label}
-                            </Link>
-                        ))}
+                    {navItems.map((link, index: number) => (
+                        <CMSLink key={index} {...link} appearance="link" />
+                    ))}
                 </div>
             </div>
         </>

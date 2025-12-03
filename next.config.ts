@@ -2,7 +2,6 @@ import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    output: "export",
     trailingSlash: false,
     images: {
         remotePatterns: [
@@ -10,8 +9,9 @@ const nextConfig: NextConfig = {
             new URL("https://cdn.sportlab.sandervanooijen.dev/**"),
         ],
         loader: "custom",
-        loaderFile: "./lib/ImageLoader.ts",
+        loaderFile: "./src/utilities/imageLoader.ts",
         deviceSizes: [320, 480, 640, 768, 1080, 1366, 1920],
+        qualities: [75, 85, 100],
     },
 };
 

@@ -1,6 +1,5 @@
+import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import type { GlobalConfig } from "payload";
-
-import { link } from "@/fields/link";
 import { revalidateFooter } from "./hooks/revalidateFooter";
 
 export const Footer: GlobalConfig = {
@@ -10,20 +9,33 @@ export const Footer: GlobalConfig = {
     },
     fields: [
         {
-            name: "navItems",
-            type: "array",
-            fields: [
-                link({
-                    appearances: false,
-                }),
-            ],
-            maxRows: 6,
-            admin: {
-                initCollapsed: true,
-                components: {
-                    RowLabel: "@/Footer/RowLabel#RowLabel",
-                },
+            label: "Title",
+            name: "title",
+            type: "text",
+            required: true,
+        },
+        {
+            label: "Description",
+            name: "description",
+            type: "text",
+            required: true,
+        },
+        {
+            label: "Logo",
+            name: "footerLogo",
+            type: "upload",
+            relationTo: "media",
+            required: true,
+            filterOptions: {
+                mimeType: { contains: "image" },
             },
+        },
+        {
+            label: "Contact Information",
+            name: "contactText",
+            type: "richText",
+            editor: lexicalEditor({}),
+            required: false,
         },
     ],
     hooks: {

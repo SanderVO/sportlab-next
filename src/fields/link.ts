@@ -1,20 +1,23 @@
+import deepMerge from "@/utilities/deepMerge";
 import type { Field, GroupField } from "payload";
 
-import deepMerge from "@/utilities/deepMerge";
-
-export type LinkAppearances = "default" | "outline";
+export type LinkAppearances = "black" | "beige" | "orange";
 
 export const appearanceOptions: Record<
     LinkAppearances,
     { label: string; value: string }
 > = {
-    default: {
-        label: "Default",
-        value: "default",
+    black: {
+        label: "Zwart",
+        value: "black",
     },
-    outline: {
-        label: "Outline",
-        value: "outline",
+    beige: {
+        label: "Beige",
+        value: "beige",
+    },
+    orange: {
+        label: "Oranje",
+        value: "orange",
     },
 };
 
@@ -127,8 +130,9 @@ export const link: LinkType = ({
 
     if (appearances !== false) {
         let appearanceOptionsToUse = [
-            appearanceOptions.default,
-            appearanceOptions.outline,
+            appearanceOptions.black,
+            appearanceOptions.beige,
+            appearanceOptions.orange,
         ];
 
         if (appearances) {
@@ -143,7 +147,7 @@ export const link: LinkType = ({
             admin: {
                 description: "Choose how the link should be rendered.",
             },
-            defaultValue: "default",
+            defaultValue: "black",
             options: appearanceOptionsToUse,
         });
     }

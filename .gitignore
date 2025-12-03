@@ -49,7 +49,10 @@ docker-compose.override.yml
 dist/
 .cache/
 turbo/
-.vercel/        # if you're not using Vercel deployment
+.vercel/
+.wrangler/
+.open-next/
+.vscode/
 
 # Optional: TypeScript
 *.tsbuildinfo

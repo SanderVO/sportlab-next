@@ -15,6 +15,7 @@ import {
   integer,
   text,
   numeric,
+  type AnySQLiteColumn,
 } from "@payloadcms/db-d1-sqlite/drizzle/sqlite-core";
 import { sql, relations } from "@payloadcms/db-d1-sqlite/drizzle";
 
@@ -46,6 +47,7 @@ export const users = sqliteTable(
   "users",
   {
     id: integer("id").primaryKey(),
+    name: text("name"),
     updatedAt: text("updated_at")
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
@@ -99,6 +101,1387 @@ export const media = sqliteTable(
   ],
 );
 
+export const categories_breadcrumbs = sqliteTable(
+  "categories_breadcrumbs",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    doc: integer("doc_id").references(() => categories.id, {
+      onDelete: "set null",
+    }),
+    url: text("url"),
+    label: text("label"),
+  },
+  (columns) => [
+    index("categories_breadcrumbs_order_idx").on(columns._order),
+    index("categories_breadcrumbs_parent_id_idx").on(columns._parentID),
+    index("categories_breadcrumbs_doc_idx").on(columns.doc),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [categories.id],
+      name: "categories_breadcrumbs_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const categories = sqliteTable(
+  "categories",
+  {
+    id: integer("id").primaryKey(),
+    title: text("title").notNull(),
+    generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
+    slug: text("slug").notNull(),
+    parent: integer("parent_id").references(
+      (): AnySQLiteColumn => categories.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    uniqueIndex("categories_slug_idx").on(columns.slug),
+    index("categories_parent_idx").on(columns.parent),
+    index("categories_updated_at_idx").on(columns.updatedAt),
+    index("categories_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const pages_hero_links = sqliteTable(
+  "pages_hero_links",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label"),
+    link_appearance: text("link_appearance", {
+      enum: ["default", "outline"],
+    }).default("default"),
+  },
+  (columns) => [
+    index("pages_hero_links_order_idx").on(columns._order),
+    index("pages_hero_links_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_hero_links_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_cta_links = sqliteTable(
+  "pages_blocks_cta_links",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: text("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label"),
+    link_appearance: text("link_appearance", {
+      enum: ["default", "outline"],
+    }).default("default"),
+  },
+  (columns) => [
+    index("pages_blocks_cta_links_order_idx").on(columns._order),
+    index("pages_blocks_cta_links_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_cta.id],
+      name: "pages_blocks_cta_links_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_cta = sqliteTable(
+  "pages_blocks_cta",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    richText: text("rich_text", { mode: "json" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_cta_order_idx").on(columns._order),
+    index("pages_blocks_cta_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_cta_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_cta_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_content_columns = sqliteTable(
+  "pages_blocks_content_columns",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: text("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    size: text("size", {
+      enum: ["oneThird", "half", "twoThirds", "full"],
+    }).default("oneThird"),
+    richText: text("rich_text", { mode: "json" }),
+    enableLink: integer("enable_link", { mode: "boolean" }),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label"),
+    link_appearance: text("link_appearance", {
+      enum: ["default", "outline"],
+    }).default("default"),
+  },
+  (columns) => [
+    index("pages_blocks_content_columns_order_idx").on(columns._order),
+    index("pages_blocks_content_columns_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_content.id],
+      name: "pages_blocks_content_columns_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_content = sqliteTable(
+  "pages_blocks_content",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_content_order_idx").on(columns._order),
+    index("pages_blocks_content_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_content_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_content_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_media_block = sqliteTable(
+  "pages_blocks_media_block",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    media: integer("media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_media_block_order_idx").on(columns._order),
+    index("pages_blocks_media_block_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_media_block_path_idx").on(columns._path),
+    index("pages_blocks_media_block_media_idx").on(columns.media),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_media_block_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_archive = sqliteTable(
+  "pages_blocks_archive",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    introContent: text("intro_content", { mode: "json" }),
+    populateBy: text("populate_by", {
+      enum: ["collection", "selection"],
+    }).default("collection"),
+    relationTo: text("relation_to", { enum: ["posts"] }).default("posts"),
+    limit: numeric("limit", { mode: "number" }).default(10),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_archive_order_idx").on(columns._order),
+    index("pages_blocks_archive_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_archive_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_archive_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_form_block = sqliteTable(
+  "pages_blocks_form_block",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    form: integer("form_id").references(() => forms.id, {
+      onDelete: "set null",
+    }),
+    enableIntro: integer("enable_intro", { mode: "boolean" }),
+    introContent: text("intro_content", { mode: "json" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_form_block_order_idx").on(columns._order),
+    index("pages_blocks_form_block_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_form_block_path_idx").on(columns._path),
+    index("pages_blocks_form_block_form_idx").on(columns.form),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_form_block_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages = sqliteTable(
+  "pages",
+  {
+    id: integer("id").primaryKey(),
+    title: text("title"),
+    hero_type: text("hero_type", {
+      enum: ["none", "highImpact", "mediumImpact", "lowImpact"],
+    }).default("lowImpact"),
+    hero_richText: text("hero_rich_text", { mode: "json" }),
+    hero_media: integer("hero_media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    meta_title: text("meta_title"),
+    meta_image: integer("meta_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    meta_description: text("meta_description"),
+    publishedAt: text("published_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
+    slug: text("slug"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    _status: text("_status", { enum: ["draft", "published"] }).default("draft"),
+  },
+  (columns) => [
+    index("pages_hero_hero_media_idx").on(columns.hero_media),
+    index("pages_meta_meta_image_idx").on(columns.meta_image),
+    uniqueIndex("pages_slug_idx").on(columns.slug),
+    index("pages_updated_at_idx").on(columns.updatedAt),
+    index("pages_created_at_idx").on(columns.createdAt),
+    index("pages__status_idx").on(columns._status),
+  ],
+);
+
+export const pages_rels = sqliteTable(
+  "pages_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    pagesID: integer("pages_id"),
+    postsID: integer("posts_id"),
+    categoriesID: integer("categories_id"),
+  },
+  (columns) => [
+    index("pages_rels_order_idx").on(columns.order),
+    index("pages_rels_parent_idx").on(columns.parent),
+    index("pages_rels_path_idx").on(columns.path),
+    index("pages_rels_pages_id_idx").on(columns.pagesID),
+    index("pages_rels_posts_id_idx").on(columns.postsID),
+    index("pages_rels_categories_id_idx").on(columns.categoriesID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [pages.id],
+      name: "pages_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["pagesID"]],
+      foreignColumns: [pages.id],
+      name: "pages_rels_pages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "pages_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["categoriesID"]],
+      foreignColumns: [categories.id],
+      name: "pages_rels_categories_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_version_hero_links = sqliteTable(
+  "_pages_v_version_hero_links",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: integer("id").primaryKey(),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label"),
+    link_appearance: text("link_appearance", {
+      enum: ["default", "outline"],
+    }).default("default"),
+    _uuid: text("_uuid"),
+  },
+  (columns) => [
+    index("_pages_v_version_hero_links_order_idx").on(columns._order),
+    index("_pages_v_version_hero_links_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v.id],
+      name: "_pages_v_version_hero_links_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_cta_links = sqliteTable(
+  "_pages_v_blocks_cta_links",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: integer("id").primaryKey(),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label"),
+    link_appearance: text("link_appearance", {
+      enum: ["default", "outline"],
+    }).default("default"),
+    _uuid: text("_uuid"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_cta_links_order_idx").on(columns._order),
+    index("_pages_v_blocks_cta_links_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v_blocks_cta.id],
+      name: "_pages_v_blocks_cta_links_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_cta = sqliteTable(
+  "_pages_v_blocks_cta",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: integer("id").primaryKey(),
+    richText: text("rich_text", { mode: "json" }),
+    _uuid: text("_uuid"),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_cta_order_idx").on(columns._order),
+    index("_pages_v_blocks_cta_parent_id_idx").on(columns._parentID),
+    index("_pages_v_blocks_cta_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v.id],
+      name: "_pages_v_blocks_cta_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_content_columns = sqliteTable(
+  "_pages_v_blocks_content_columns",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: integer("id").primaryKey(),
+    size: text("size", {
+      enum: ["oneThird", "half", "twoThirds", "full"],
+    }).default("oneThird"),
+    richText: text("rich_text", { mode: "json" }),
+    enableLink: integer("enable_link", { mode: "boolean" }),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label"),
+    link_appearance: text("link_appearance", {
+      enum: ["default", "outline"],
+    }).default("default"),
+    _uuid: text("_uuid"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_content_columns_order_idx").on(columns._order),
+    index("_pages_v_blocks_content_columns_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v_blocks_content.id],
+      name: "_pages_v_blocks_content_columns_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_content = sqliteTable(
+  "_pages_v_blocks_content",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: integer("id").primaryKey(),
+    _uuid: text("_uuid"),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_content_order_idx").on(columns._order),
+    index("_pages_v_blocks_content_parent_id_idx").on(columns._parentID),
+    index("_pages_v_blocks_content_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v.id],
+      name: "_pages_v_blocks_content_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_media_block = sqliteTable(
+  "_pages_v_blocks_media_block",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: integer("id").primaryKey(),
+    media: integer("media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    _uuid: text("_uuid"),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_media_block_order_idx").on(columns._order),
+    index("_pages_v_blocks_media_block_parent_id_idx").on(columns._parentID),
+    index("_pages_v_blocks_media_block_path_idx").on(columns._path),
+    index("_pages_v_blocks_media_block_media_idx").on(columns.media),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v.id],
+      name: "_pages_v_blocks_media_block_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_archive = sqliteTable(
+  "_pages_v_blocks_archive",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: integer("id").primaryKey(),
+    introContent: text("intro_content", { mode: "json" }),
+    populateBy: text("populate_by", {
+      enum: ["collection", "selection"],
+    }).default("collection"),
+    relationTo: text("relation_to", { enum: ["posts"] }).default("posts"),
+    limit: numeric("limit", { mode: "number" }).default(10),
+    _uuid: text("_uuid"),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_archive_order_idx").on(columns._order),
+    index("_pages_v_blocks_archive_parent_id_idx").on(columns._parentID),
+    index("_pages_v_blocks_archive_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v.id],
+      name: "_pages_v_blocks_archive_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_form_block = sqliteTable(
+  "_pages_v_blocks_form_block",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: integer("id").primaryKey(),
+    form: integer("form_id").references(() => forms.id, {
+      onDelete: "set null",
+    }),
+    enableIntro: integer("enable_intro", { mode: "boolean" }),
+    introContent: text("intro_content", { mode: "json" }),
+    _uuid: text("_uuid"),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_form_block_order_idx").on(columns._order),
+    index("_pages_v_blocks_form_block_parent_id_idx").on(columns._parentID),
+    index("_pages_v_blocks_form_block_path_idx").on(columns._path),
+    index("_pages_v_blocks_form_block_form_idx").on(columns.form),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v.id],
+      name: "_pages_v_blocks_form_block_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v = sqliteTable(
+  "_pages_v",
+  {
+    id: integer("id").primaryKey(),
+    parent: integer("parent_id").references(() => pages.id, {
+      onDelete: "set null",
+    }),
+    version_title: text("version_title"),
+    version_hero_type: text("version_hero_type", {
+      enum: ["none", "highImpact", "mediumImpact", "lowImpact"],
+    }).default("lowImpact"),
+    version_hero_richText: text("version_hero_rich_text", { mode: "json" }),
+    version_hero_media: integer("version_hero_media_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    version_meta_title: text("version_meta_title"),
+    version_meta_image: integer("version_meta_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    version_meta_description: text("version_meta_description"),
+    version_publishedAt: text("version_published_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    version_generateSlug: integer("version_generate_slug", {
+      mode: "boolean",
+    }).default(true),
+    version_slug: text("version_slug"),
+    version_updatedAt: text("version_updated_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    version_createdAt: text("version_created_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    version__status: text("version__status", {
+      enum: ["draft", "published"],
+    }).default("draft"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    latest: integer("latest", { mode: "boolean" }),
+    autosave: integer("autosave", { mode: "boolean" }),
+  },
+  (columns) => [
+    index("_pages_v_parent_idx").on(columns.parent),
+    index("_pages_v_version_hero_version_hero_media_idx").on(
+      columns.version_hero_media,
+    ),
+    index("_pages_v_version_meta_version_meta_image_idx").on(
+      columns.version_meta_image,
+    ),
+    index("_pages_v_version_version_slug_idx").on(columns.version_slug),
+    index("_pages_v_version_version_updated_at_idx").on(
+      columns.version_updatedAt,
+    ),
+    index("_pages_v_version_version_created_at_idx").on(
+      columns.version_createdAt,
+    ),
+    index("_pages_v_version_version__status_idx").on(columns.version__status),
+    index("_pages_v_created_at_idx").on(columns.createdAt),
+    index("_pages_v_updated_at_idx").on(columns.updatedAt),
+    index("_pages_v_latest_idx").on(columns.latest),
+    index("_pages_v_autosave_idx").on(columns.autosave),
+  ],
+);
+
+export const _pages_v_rels = sqliteTable(
+  "_pages_v_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    pagesID: integer("pages_id"),
+    postsID: integer("posts_id"),
+    categoriesID: integer("categories_id"),
+  },
+  (columns) => [
+    index("_pages_v_rels_order_idx").on(columns.order),
+    index("_pages_v_rels_parent_idx").on(columns.parent),
+    index("_pages_v_rels_path_idx").on(columns.path),
+    index("_pages_v_rels_pages_id_idx").on(columns.pagesID),
+    index("_pages_v_rels_posts_id_idx").on(columns.postsID),
+    index("_pages_v_rels_categories_id_idx").on(columns.categoriesID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [_pages_v.id],
+      name: "_pages_v_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["pagesID"]],
+      foreignColumns: [pages.id],
+      name: "_pages_v_rels_pages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "_pages_v_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["categoriesID"]],
+      foreignColumns: [categories.id],
+      name: "_pages_v_rels_categories_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const posts_populated_authors = sqliteTable(
+  "posts_populated_authors",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    name: text("name"),
+  },
+  (columns) => [
+    index("posts_populated_authors_order_idx").on(columns._order),
+    index("posts_populated_authors_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [posts.id],
+      name: "posts_populated_authors_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const posts = sqliteTable(
+  "posts",
+  {
+    id: integer("id").primaryKey(),
+    title: text("title"),
+    heroImage: integer("hero_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    content: text("content", { mode: "json" }),
+    meta_title: text("meta_title"),
+    meta_image: integer("meta_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    meta_description: text("meta_description"),
+    publishedAt: text("published_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
+    slug: text("slug"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    _status: text("_status", { enum: ["draft", "published"] }).default("draft"),
+  },
+  (columns) => [
+    index("posts_hero_image_idx").on(columns.heroImage),
+    index("posts_meta_meta_image_idx").on(columns.meta_image),
+    uniqueIndex("posts_slug_idx").on(columns.slug),
+    index("posts_updated_at_idx").on(columns.updatedAt),
+    index("posts_created_at_idx").on(columns.createdAt),
+    index("posts__status_idx").on(columns._status),
+  ],
+);
+
+export const posts_rels = sqliteTable(
+  "posts_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    postsID: integer("posts_id"),
+    categoriesID: integer("categories_id"),
+    usersID: integer("users_id"),
+  },
+  (columns) => [
+    index("posts_rels_order_idx").on(columns.order),
+    index("posts_rels_parent_idx").on(columns.parent),
+    index("posts_rels_path_idx").on(columns.path),
+    index("posts_rels_posts_id_idx").on(columns.postsID),
+    index("posts_rels_categories_id_idx").on(columns.categoriesID),
+    index("posts_rels_users_id_idx").on(columns.usersID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [posts.id],
+      name: "posts_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "posts_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["categoriesID"]],
+      foreignColumns: [categories.id],
+      name: "posts_rels_categories_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "posts_rels_users_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _posts_v_version_populated_authors = sqliteTable(
+  "_posts_v_version_populated_authors",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: integer("id").primaryKey(),
+    _uuid: text("_uuid"),
+    name: text("name"),
+  },
+  (columns) => [
+    index("_posts_v_version_populated_authors_order_idx").on(columns._order),
+    index("_posts_v_version_populated_authors_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_posts_v.id],
+      name: "_posts_v_version_populated_authors_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _posts_v = sqliteTable(
+  "_posts_v",
+  {
+    id: integer("id").primaryKey(),
+    parent: integer("parent_id").references(() => posts.id, {
+      onDelete: "set null",
+    }),
+    version_title: text("version_title"),
+    version_heroImage: integer("version_hero_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    version_content: text("version_content", { mode: "json" }),
+    version_meta_title: text("version_meta_title"),
+    version_meta_image: integer("version_meta_image_id").references(
+      () => media.id,
+      {
+        onDelete: "set null",
+      },
+    ),
+    version_meta_description: text("version_meta_description"),
+    version_publishedAt: text("version_published_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    version_generateSlug: integer("version_generate_slug", {
+      mode: "boolean",
+    }).default(true),
+    version_slug: text("version_slug"),
+    version_updatedAt: text("version_updated_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    version_createdAt: text("version_created_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    version__status: text("version__status", {
+      enum: ["draft", "published"],
+    }).default("draft"),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    latest: integer("latest", { mode: "boolean" }),
+    autosave: integer("autosave", { mode: "boolean" }),
+  },
+  (columns) => [
+    index("_posts_v_parent_idx").on(columns.parent),
+    index("_posts_v_version_version_hero_image_idx").on(
+      columns.version_heroImage,
+    ),
+    index("_posts_v_version_meta_version_meta_image_idx").on(
+      columns.version_meta_image,
+    ),
+    index("_posts_v_version_version_slug_idx").on(columns.version_slug),
+    index("_posts_v_version_version_updated_at_idx").on(
+      columns.version_updatedAt,
+    ),
+    index("_posts_v_version_version_created_at_idx").on(
+      columns.version_createdAt,
+    ),
+    index("_posts_v_version_version__status_idx").on(columns.version__status),
+    index("_posts_v_created_at_idx").on(columns.createdAt),
+    index("_posts_v_updated_at_idx").on(columns.updatedAt),
+    index("_posts_v_latest_idx").on(columns.latest),
+    index("_posts_v_autosave_idx").on(columns.autosave),
+  ],
+);
+
+export const _posts_v_rels = sqliteTable(
+  "_posts_v_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    postsID: integer("posts_id"),
+    categoriesID: integer("categories_id"),
+    usersID: integer("users_id"),
+  },
+  (columns) => [
+    index("_posts_v_rels_order_idx").on(columns.order),
+    index("_posts_v_rels_parent_idx").on(columns.parent),
+    index("_posts_v_rels_path_idx").on(columns.path),
+    index("_posts_v_rels_posts_id_idx").on(columns.postsID),
+    index("_posts_v_rels_categories_id_idx").on(columns.categoriesID),
+    index("_posts_v_rels_users_id_idx").on(columns.usersID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [_posts_v.id],
+      name: "_posts_v_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "_posts_v_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["categoriesID"]],
+      foreignColumns: [categories.id],
+      name: "_posts_v_rels_categories_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "_posts_v_rels_users_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const redirects = sqliteTable(
+  "redirects",
+  {
+    id: integer("id").primaryKey(),
+    from: text("from").notNull(),
+    to_type: text("to_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    to_url: text("to_url"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    uniqueIndex("redirects_from_idx").on(columns.from),
+    index("redirects_updated_at_idx").on(columns.updatedAt),
+    index("redirects_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const redirects_rels = sqliteTable(
+  "redirects_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    pagesID: integer("pages_id"),
+    postsID: integer("posts_id"),
+  },
+  (columns) => [
+    index("redirects_rels_order_idx").on(columns.order),
+    index("redirects_rels_parent_idx").on(columns.parent),
+    index("redirects_rels_path_idx").on(columns.path),
+    index("redirects_rels_pages_id_idx").on(columns.pagesID),
+    index("redirects_rels_posts_id_idx").on(columns.postsID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [redirects.id],
+      name: "redirects_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["pagesID"]],
+      foreignColumns: [pages.id],
+      name: "redirects_rels_pages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "redirects_rels_posts_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_checkbox = sqliteTable(
+  "forms_blocks_checkbox",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    label: text("label"),
+    width: numeric("width", { mode: "number" }),
+    required: integer("required", { mode: "boolean" }),
+    defaultValue: integer("default_value", { mode: "boolean" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_checkbox_order_idx").on(columns._order),
+    index("forms_blocks_checkbox_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_checkbox_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_checkbox_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_country = sqliteTable(
+  "forms_blocks_country",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    label: text("label"),
+    width: numeric("width", { mode: "number" }),
+    required: integer("required", { mode: "boolean" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_country_order_idx").on(columns._order),
+    index("forms_blocks_country_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_country_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_country_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_email = sqliteTable(
+  "forms_blocks_email",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    label: text("label"),
+    width: numeric("width", { mode: "number" }),
+    required: integer("required", { mode: "boolean" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_email_order_idx").on(columns._order),
+    index("forms_blocks_email_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_email_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_email_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_message = sqliteTable(
+  "forms_blocks_message",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    message: text("message", { mode: "json" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_message_order_idx").on(columns._order),
+    index("forms_blocks_message_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_message_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_message_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_number = sqliteTable(
+  "forms_blocks_number",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    label: text("label"),
+    width: numeric("width", { mode: "number" }),
+    defaultValue: numeric("default_value", { mode: "number" }),
+    required: integer("required", { mode: "boolean" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_number_order_idx").on(columns._order),
+    index("forms_blocks_number_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_number_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_number_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_select_options = sqliteTable(
+  "forms_blocks_select_options",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: text("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    label: text("label").notNull(),
+    value: text("value").notNull(),
+  },
+  (columns) => [
+    index("forms_blocks_select_options_order_idx").on(columns._order),
+    index("forms_blocks_select_options_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms_blocks_select.id],
+      name: "forms_blocks_select_options_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_select = sqliteTable(
+  "forms_blocks_select",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    label: text("label"),
+    width: numeric("width", { mode: "number" }),
+    defaultValue: text("default_value"),
+    placeholder: text("placeholder"),
+    required: integer("required", { mode: "boolean" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_select_order_idx").on(columns._order),
+    index("forms_blocks_select_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_select_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_select_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_state = sqliteTable(
+  "forms_blocks_state",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    label: text("label"),
+    width: numeric("width", { mode: "number" }),
+    required: integer("required", { mode: "boolean" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_state_order_idx").on(columns._order),
+    index("forms_blocks_state_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_state_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_state_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_text = sqliteTable(
+  "forms_blocks_text",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    label: text("label"),
+    width: numeric("width", { mode: "number" }),
+    defaultValue: text("default_value"),
+    required: integer("required", { mode: "boolean" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_text_order_idx").on(columns._order),
+    index("forms_blocks_text_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_text_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_text_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_blocks_textarea = sqliteTable(
+  "forms_blocks_textarea",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    label: text("label"),
+    width: numeric("width", { mode: "number" }),
+    defaultValue: text("default_value"),
+    required: integer("required", { mode: "boolean" }),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("forms_blocks_textarea_order_idx").on(columns._order),
+    index("forms_blocks_textarea_parent_id_idx").on(columns._parentID),
+    index("forms_blocks_textarea_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_blocks_textarea_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms_emails = sqliteTable(
+  "forms_emails",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    emailTo: text("email_to"),
+    cc: text("cc"),
+    bcc: text("bcc"),
+    replyTo: text("reply_to"),
+    emailFrom: text("email_from"),
+    subject: text("subject")
+      .notNull()
+      .default("You've received a new message."),
+    message: text("message", { mode: "json" }),
+  },
+  (columns) => [
+    index("forms_emails_order_idx").on(columns._order),
+    index("forms_emails_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [forms.id],
+      name: "forms_emails_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const forms = sqliteTable(
+  "forms",
+  {
+    id: integer("id").primaryKey(),
+    title: text("title").notNull(),
+    submitButtonLabel: text("submit_button_label"),
+    confirmationType: text("confirmation_type", {
+      enum: ["message", "redirect"],
+    }).default("message"),
+    confirmationMessage: text("confirmation_message", { mode: "json" }),
+    redirect_url: text("redirect_url"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("forms_updated_at_idx").on(columns.updatedAt),
+    index("forms_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const form_submissions_submission_data = sqliteTable(
+  "form_submissions_submission_data",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    field: text("field").notNull(),
+    value: text("value").notNull(),
+  },
+  (columns) => [
+    index("form_submissions_submission_data_order_idx").on(columns._order),
+    index("form_submissions_submission_data_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [form_submissions.id],
+      name: "form_submissions_submission_data_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const form_submissions = sqliteTable(
+  "form_submissions",
+  {
+    id: integer("id").primaryKey(),
+    form: integer("form_id")
+      .notNull()
+      .references(() => forms.id, {
+        onDelete: "set null",
+      }),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("form_submissions_form_idx").on(columns.form),
+    index("form_submissions_updated_at_idx").on(columns.updatedAt),
+    index("form_submissions_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const search_categories = sqliteTable(
+  "search_categories",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    relationTo: text("relation_to"),
+    categoryID: text("category_i_d"),
+    title: text("title"),
+  },
+  (columns) => [
+    index("search_categories_order_idx").on(columns._order),
+    index("search_categories_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [search.id],
+      name: "search_categories_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const search = sqliteTable(
+  "search",
+  {
+    id: integer("id").primaryKey(),
+    title: text("title"),
+    priority: numeric("priority", { mode: "number" }),
+    slug: text("slug"),
+    meta_title: text("meta_title"),
+    meta_description: text("meta_description"),
+    meta_image: integer("meta_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("search_slug_idx").on(columns.slug),
+    index("search_meta_meta_image_idx").on(columns.meta_image),
+    index("search_updated_at_idx").on(columns.updatedAt),
+    index("search_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const search_rels = sqliteTable(
+  "search_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    postsID: integer("posts_id"),
+  },
+  (columns) => [
+    index("search_rels_order_idx").on(columns.order),
+    index("search_rels_parent_idx").on(columns.parent),
+    index("search_rels_path_idx").on(columns.path),
+    index("search_rels_posts_id_idx").on(columns.postsID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [search.id],
+      name: "search_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "search_rels_posts_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const payload_kv = sqliteTable(
   "payload_kv",
   {
@@ -107,6 +1490,75 @@ export const payload_kv = sqliteTable(
     data: text("data", { mode: "json" }).notNull(),
   },
   (columns) => [uniqueIndex("payload_kv_key_idx").on(columns.key)],
+);
+
+export const payload_jobs_log = sqliteTable(
+  "payload_jobs_log",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    executedAt: text("executed_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    completedAt: text("completed_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    taskSlug: text("task_slug", {
+      enum: ["inline", "schedulePublish"],
+    }).notNull(),
+    taskID: text("task_i_d").notNull(),
+    input: text("input", { mode: "json" }),
+    output: text("output", { mode: "json" }),
+    state: text("state", { enum: ["failed", "succeeded"] }).notNull(),
+    error: text("error", { mode: "json" }),
+  },
+  (columns) => [
+    index("payload_jobs_log_order_idx").on(columns._order),
+    index("payload_jobs_log_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [payload_jobs.id],
+      name: "payload_jobs_log_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const payload_jobs = sqliteTable(
+  "payload_jobs",
+  {
+    id: integer("id").primaryKey(),
+    input: text("input", { mode: "json" }),
+    completedAt: text("completed_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    totalTried: numeric("total_tried", { mode: "number" }).default(0),
+    hasError: integer("has_error", { mode: "boolean" }).default(false),
+    error: text("error", { mode: "json" }),
+    taskSlug: text("task_slug", { enum: ["inline", "schedulePublish"] }),
+    queue: text("queue").default("default"),
+    waitUntil: text("wait_until").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    processing: integer("processing", { mode: "boolean" }).default(false),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("payload_jobs_completed_at_idx").on(columns.completedAt),
+    index("payload_jobs_total_tried_idx").on(columns.totalTried),
+    index("payload_jobs_has_error_idx").on(columns.hasError),
+    index("payload_jobs_task_slug_idx").on(columns.taskSlug),
+    index("payload_jobs_queue_idx").on(columns.queue),
+    index("payload_jobs_wait_until_idx").on(columns.waitUntil),
+    index("payload_jobs_processing_idx").on(columns.processing),
+    index("payload_jobs_updated_at_idx").on(columns.updatedAt),
+    index("payload_jobs_created_at_idx").on(columns.createdAt),
+  ],
 );
 
 export const payload_locked_documents = sqliteTable(
@@ -137,6 +1589,13 @@ export const payload_locked_documents_rels = sqliteTable(
     path: text("path").notNull(),
     usersID: integer("users_id"),
     mediaID: integer("media_id"),
+    categoriesID: integer("categories_id"),
+    pagesID: integer("pages_id"),
+    postsID: integer("posts_id"),
+    redirectsID: integer("redirects_id"),
+    formsID: integer("forms_id"),
+    "form-submissionsID": integer("form_submissions_id"),
+    searchID: integer("search_id"),
   },
   (columns) => [
     index("payload_locked_documents_rels_order_idx").on(columns.order),
@@ -144,6 +1603,19 @@ export const payload_locked_documents_rels = sqliteTable(
     index("payload_locked_documents_rels_path_idx").on(columns.path),
     index("payload_locked_documents_rels_users_id_idx").on(columns.usersID),
     index("payload_locked_documents_rels_media_id_idx").on(columns.mediaID),
+    index("payload_locked_documents_rels_categories_id_idx").on(
+      columns.categoriesID,
+    ),
+    index("payload_locked_documents_rels_pages_id_idx").on(columns.pagesID),
+    index("payload_locked_documents_rels_posts_id_idx").on(columns.postsID),
+    index("payload_locked_documents_rels_redirects_id_idx").on(
+      columns.redirectsID,
+    ),
+    index("payload_locked_documents_rels_forms_id_idx").on(columns.formsID),
+    index("payload_locked_documents_rels_form_submissions_id_idx").on(
+      columns["form-submissionsID"],
+    ),
+    index("payload_locked_documents_rels_search_id_idx").on(columns.searchID),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [payload_locked_documents.id],
@@ -158,6 +1630,41 @@ export const payload_locked_documents_rels = sqliteTable(
       columns: [columns["mediaID"]],
       foreignColumns: [media.id],
       name: "payload_locked_documents_rels_media_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["categoriesID"]],
+      foreignColumns: [categories.id],
+      name: "payload_locked_documents_rels_categories_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["pagesID"]],
+      foreignColumns: [pages.id],
+      name: "payload_locked_documents_rels_pages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "payload_locked_documents_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["redirectsID"]],
+      foreignColumns: [redirects.id],
+      name: "payload_locked_documents_rels_redirects_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["formsID"]],
+      foreignColumns: [forms.id],
+      name: "payload_locked_documents_rels_forms_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["form-submissionsID"]],
+      foreignColumns: [form_submissions.id],
+      name: "payload_locked_documents_rels_form_submissions_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["searchID"]],
+      foreignColumns: [search.id],
+      name: "payload_locked_documents_rels_search_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -228,6 +1735,142 @@ export const payload_migrations = sqliteTable(
   ],
 );
 
+export const header_nav_items = sqliteTable(
+  "header_nav_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label").notNull(),
+  },
+  (columns) => [
+    index("header_nav_items_order_idx").on(columns._order),
+    index("header_nav_items_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [header.id],
+      name: "header_nav_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const header = sqliteTable("header", {
+  id: integer("id").primaryKey(),
+  updatedAt: text("updated_at").default(
+    sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+  ),
+  createdAt: text("created_at").default(
+    sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+  ),
+});
+
+export const header_rels = sqliteTable(
+  "header_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    pagesID: integer("pages_id"),
+    postsID: integer("posts_id"),
+  },
+  (columns) => [
+    index("header_rels_order_idx").on(columns.order),
+    index("header_rels_parent_idx").on(columns.parent),
+    index("header_rels_path_idx").on(columns.path),
+    index("header_rels_pages_id_idx").on(columns.pagesID),
+    index("header_rels_posts_id_idx").on(columns.postsID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [header.id],
+      name: "header_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["pagesID"]],
+      foreignColumns: [pages.id],
+      name: "header_rels_pages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "header_rels_posts_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const footer_nav_items = sqliteTable(
+  "footer_nav_items",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label").notNull(),
+  },
+  (columns) => [
+    index("footer_nav_items_order_idx").on(columns._order),
+    index("footer_nav_items_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [footer.id],
+      name: "footer_nav_items_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const footer = sqliteTable("footer", {
+  id: integer("id").primaryKey(),
+  updatedAt: text("updated_at").default(
+    sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+  ),
+  createdAt: text("created_at").default(
+    sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+  ),
+});
+
+export const footer_rels = sqliteTable(
+  "footer_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    pagesID: integer("pages_id"),
+    postsID: integer("posts_id"),
+  },
+  (columns) => [
+    index("footer_rels_order_idx").on(columns.order),
+    index("footer_rels_parent_idx").on(columns.parent),
+    index("footer_rels_path_idx").on(columns.path),
+    index("footer_rels_pages_id_idx").on(columns.pagesID),
+    index("footer_rels_posts_id_idx").on(columns.postsID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [footer.id],
+      name: "footer_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["pagesID"]],
+      foreignColumns: [pages.id],
+      name: "footer_rels_pages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "footer_rels_posts_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const relations_users_sessions = relations(
   users_sessions,
   ({ one }) => ({
@@ -244,7 +1887,684 @@ export const relations_users = relations(users, ({ many }) => ({
   }),
 }));
 export const relations_media = relations(media, () => ({}));
+export const relations_categories_breadcrumbs = relations(
+  categories_breadcrumbs,
+  ({ one }) => ({
+    _parentID: one(categories, {
+      fields: [categories_breadcrumbs._parentID],
+      references: [categories.id],
+      relationName: "breadcrumbs",
+    }),
+    doc: one(categories, {
+      fields: [categories_breadcrumbs.doc],
+      references: [categories.id],
+      relationName: "doc",
+    }),
+  }),
+);
+export const relations_categories = relations(categories, ({ one, many }) => ({
+  parent: one(categories, {
+    fields: [categories.parent],
+    references: [categories.id],
+    relationName: "parent",
+  }),
+  breadcrumbs: many(categories_breadcrumbs, {
+    relationName: "breadcrumbs",
+  }),
+}));
+export const relations_pages_hero_links = relations(
+  pages_hero_links,
+  ({ one }) => ({
+    _parentID: one(pages, {
+      fields: [pages_hero_links._parentID],
+      references: [pages.id],
+      relationName: "hero_links",
+    }),
+  }),
+);
+export const relations_pages_blocks_cta_links = relations(
+  pages_blocks_cta_links,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_cta, {
+      fields: [pages_blocks_cta_links._parentID],
+      references: [pages_blocks_cta.id],
+      relationName: "links",
+    }),
+  }),
+);
+export const relations_pages_blocks_cta = relations(
+  pages_blocks_cta,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_cta._parentID],
+      references: [pages.id],
+      relationName: "_blocks_cta",
+    }),
+    links: many(pages_blocks_cta_links, {
+      relationName: "links",
+    }),
+  }),
+);
+export const relations_pages_blocks_content_columns = relations(
+  pages_blocks_content_columns,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_content, {
+      fields: [pages_blocks_content_columns._parentID],
+      references: [pages_blocks_content.id],
+      relationName: "columns",
+    }),
+  }),
+);
+export const relations_pages_blocks_content = relations(
+  pages_blocks_content,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_content._parentID],
+      references: [pages.id],
+      relationName: "_blocks_content",
+    }),
+    columns: many(pages_blocks_content_columns, {
+      relationName: "columns",
+    }),
+  }),
+);
+export const relations_pages_blocks_media_block = relations(
+  pages_blocks_media_block,
+  ({ one }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_media_block._parentID],
+      references: [pages.id],
+      relationName: "_blocks_mediaBlock",
+    }),
+    media: one(media, {
+      fields: [pages_blocks_media_block.media],
+      references: [media.id],
+      relationName: "media",
+    }),
+  }),
+);
+export const relations_pages_blocks_archive = relations(
+  pages_blocks_archive,
+  ({ one }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_archive._parentID],
+      references: [pages.id],
+      relationName: "_blocks_archive",
+    }),
+  }),
+);
+export const relations_pages_blocks_form_block = relations(
+  pages_blocks_form_block,
+  ({ one }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_form_block._parentID],
+      references: [pages.id],
+      relationName: "_blocks_formBlock",
+    }),
+    form: one(forms, {
+      fields: [pages_blocks_form_block.form],
+      references: [forms.id],
+      relationName: "form",
+    }),
+  }),
+);
+export const relations_pages_rels = relations(pages_rels, ({ one }) => ({
+  parent: one(pages, {
+    fields: [pages_rels.parent],
+    references: [pages.id],
+    relationName: "_rels",
+  }),
+  pagesID: one(pages, {
+    fields: [pages_rels.pagesID],
+    references: [pages.id],
+    relationName: "pages",
+  }),
+  postsID: one(posts, {
+    fields: [pages_rels.postsID],
+    references: [posts.id],
+    relationName: "posts",
+  }),
+  categoriesID: one(categories, {
+    fields: [pages_rels.categoriesID],
+    references: [categories.id],
+    relationName: "categories",
+  }),
+}));
+export const relations_pages = relations(pages, ({ one, many }) => ({
+  hero_links: many(pages_hero_links, {
+    relationName: "hero_links",
+  }),
+  hero_media: one(media, {
+    fields: [pages.hero_media],
+    references: [media.id],
+    relationName: "hero_media",
+  }),
+  _blocks_cta: many(pages_blocks_cta, {
+    relationName: "_blocks_cta",
+  }),
+  _blocks_content: many(pages_blocks_content, {
+    relationName: "_blocks_content",
+  }),
+  _blocks_mediaBlock: many(pages_blocks_media_block, {
+    relationName: "_blocks_mediaBlock",
+  }),
+  _blocks_archive: many(pages_blocks_archive, {
+    relationName: "_blocks_archive",
+  }),
+  _blocks_formBlock: many(pages_blocks_form_block, {
+    relationName: "_blocks_formBlock",
+  }),
+  meta_image: one(media, {
+    fields: [pages.meta_image],
+    references: [media.id],
+    relationName: "meta_image",
+  }),
+  _rels: many(pages_rels, {
+    relationName: "_rels",
+  }),
+}));
+export const relations__pages_v_version_hero_links = relations(
+  _pages_v_version_hero_links,
+  ({ one }) => ({
+    _parentID: one(_pages_v, {
+      fields: [_pages_v_version_hero_links._parentID],
+      references: [_pages_v.id],
+      relationName: "version_hero_links",
+    }),
+  }),
+);
+export const relations__pages_v_blocks_cta_links = relations(
+  _pages_v_blocks_cta_links,
+  ({ one }) => ({
+    _parentID: one(_pages_v_blocks_cta, {
+      fields: [_pages_v_blocks_cta_links._parentID],
+      references: [_pages_v_blocks_cta.id],
+      relationName: "links",
+    }),
+  }),
+);
+export const relations__pages_v_blocks_cta = relations(
+  _pages_v_blocks_cta,
+  ({ one, many }) => ({
+    _parentID: one(_pages_v, {
+      fields: [_pages_v_blocks_cta._parentID],
+      references: [_pages_v.id],
+      relationName: "_blocks_cta",
+    }),
+    links: many(_pages_v_blocks_cta_links, {
+      relationName: "links",
+    }),
+  }),
+);
+export const relations__pages_v_blocks_content_columns = relations(
+  _pages_v_blocks_content_columns,
+  ({ one }) => ({
+    _parentID: one(_pages_v_blocks_content, {
+      fields: [_pages_v_blocks_content_columns._parentID],
+      references: [_pages_v_blocks_content.id],
+      relationName: "columns",
+    }),
+  }),
+);
+export const relations__pages_v_blocks_content = relations(
+  _pages_v_blocks_content,
+  ({ one, many }) => ({
+    _parentID: one(_pages_v, {
+      fields: [_pages_v_blocks_content._parentID],
+      references: [_pages_v.id],
+      relationName: "_blocks_content",
+    }),
+    columns: many(_pages_v_blocks_content_columns, {
+      relationName: "columns",
+    }),
+  }),
+);
+export const relations__pages_v_blocks_media_block = relations(
+  _pages_v_blocks_media_block,
+  ({ one }) => ({
+    _parentID: one(_pages_v, {
+      fields: [_pages_v_blocks_media_block._parentID],
+      references: [_pages_v.id],
+      relationName: "_blocks_mediaBlock",
+    }),
+    media: one(media, {
+      fields: [_pages_v_blocks_media_block.media],
+      references: [media.id],
+      relationName: "media",
+    }),
+  }),
+);
+export const relations__pages_v_blocks_archive = relations(
+  _pages_v_blocks_archive,
+  ({ one }) => ({
+    _parentID: one(_pages_v, {
+      fields: [_pages_v_blocks_archive._parentID],
+      references: [_pages_v.id],
+      relationName: "_blocks_archive",
+    }),
+  }),
+);
+export const relations__pages_v_blocks_form_block = relations(
+  _pages_v_blocks_form_block,
+  ({ one }) => ({
+    _parentID: one(_pages_v, {
+      fields: [_pages_v_blocks_form_block._parentID],
+      references: [_pages_v.id],
+      relationName: "_blocks_formBlock",
+    }),
+    form: one(forms, {
+      fields: [_pages_v_blocks_form_block.form],
+      references: [forms.id],
+      relationName: "form",
+    }),
+  }),
+);
+export const relations__pages_v_rels = relations(_pages_v_rels, ({ one }) => ({
+  parent: one(_pages_v, {
+    fields: [_pages_v_rels.parent],
+    references: [_pages_v.id],
+    relationName: "_rels",
+  }),
+  pagesID: one(pages, {
+    fields: [_pages_v_rels.pagesID],
+    references: [pages.id],
+    relationName: "pages",
+  }),
+  postsID: one(posts, {
+    fields: [_pages_v_rels.postsID],
+    references: [posts.id],
+    relationName: "posts",
+  }),
+  categoriesID: one(categories, {
+    fields: [_pages_v_rels.categoriesID],
+    references: [categories.id],
+    relationName: "categories",
+  }),
+}));
+export const relations__pages_v = relations(_pages_v, ({ one, many }) => ({
+  parent: one(pages, {
+    fields: [_pages_v.parent],
+    references: [pages.id],
+    relationName: "parent",
+  }),
+  version_hero_links: many(_pages_v_version_hero_links, {
+    relationName: "version_hero_links",
+  }),
+  version_hero_media: one(media, {
+    fields: [_pages_v.version_hero_media],
+    references: [media.id],
+    relationName: "version_hero_media",
+  }),
+  _blocks_cta: many(_pages_v_blocks_cta, {
+    relationName: "_blocks_cta",
+  }),
+  _blocks_content: many(_pages_v_blocks_content, {
+    relationName: "_blocks_content",
+  }),
+  _blocks_mediaBlock: many(_pages_v_blocks_media_block, {
+    relationName: "_blocks_mediaBlock",
+  }),
+  _blocks_archive: many(_pages_v_blocks_archive, {
+    relationName: "_blocks_archive",
+  }),
+  _blocks_formBlock: many(_pages_v_blocks_form_block, {
+    relationName: "_blocks_formBlock",
+  }),
+  version_meta_image: one(media, {
+    fields: [_pages_v.version_meta_image],
+    references: [media.id],
+    relationName: "version_meta_image",
+  }),
+  _rels: many(_pages_v_rels, {
+    relationName: "_rels",
+  }),
+}));
+export const relations_posts_populated_authors = relations(
+  posts_populated_authors,
+  ({ one }) => ({
+    _parentID: one(posts, {
+      fields: [posts_populated_authors._parentID],
+      references: [posts.id],
+      relationName: "populatedAuthors",
+    }),
+  }),
+);
+export const relations_posts_rels = relations(posts_rels, ({ one }) => ({
+  parent: one(posts, {
+    fields: [posts_rels.parent],
+    references: [posts.id],
+    relationName: "_rels",
+  }),
+  postsID: one(posts, {
+    fields: [posts_rels.postsID],
+    references: [posts.id],
+    relationName: "posts",
+  }),
+  categoriesID: one(categories, {
+    fields: [posts_rels.categoriesID],
+    references: [categories.id],
+    relationName: "categories",
+  }),
+  usersID: one(users, {
+    fields: [posts_rels.usersID],
+    references: [users.id],
+    relationName: "users",
+  }),
+}));
+export const relations_posts = relations(posts, ({ one, many }) => ({
+  heroImage: one(media, {
+    fields: [posts.heroImage],
+    references: [media.id],
+    relationName: "heroImage",
+  }),
+  meta_image: one(media, {
+    fields: [posts.meta_image],
+    references: [media.id],
+    relationName: "meta_image",
+  }),
+  populatedAuthors: many(posts_populated_authors, {
+    relationName: "populatedAuthors",
+  }),
+  _rels: many(posts_rels, {
+    relationName: "_rels",
+  }),
+}));
+export const relations__posts_v_version_populated_authors = relations(
+  _posts_v_version_populated_authors,
+  ({ one }) => ({
+    _parentID: one(_posts_v, {
+      fields: [_posts_v_version_populated_authors._parentID],
+      references: [_posts_v.id],
+      relationName: "version_populatedAuthors",
+    }),
+  }),
+);
+export const relations__posts_v_rels = relations(_posts_v_rels, ({ one }) => ({
+  parent: one(_posts_v, {
+    fields: [_posts_v_rels.parent],
+    references: [_posts_v.id],
+    relationName: "_rels",
+  }),
+  postsID: one(posts, {
+    fields: [_posts_v_rels.postsID],
+    references: [posts.id],
+    relationName: "posts",
+  }),
+  categoriesID: one(categories, {
+    fields: [_posts_v_rels.categoriesID],
+    references: [categories.id],
+    relationName: "categories",
+  }),
+  usersID: one(users, {
+    fields: [_posts_v_rels.usersID],
+    references: [users.id],
+    relationName: "users",
+  }),
+}));
+export const relations__posts_v = relations(_posts_v, ({ one, many }) => ({
+  parent: one(posts, {
+    fields: [_posts_v.parent],
+    references: [posts.id],
+    relationName: "parent",
+  }),
+  version_heroImage: one(media, {
+    fields: [_posts_v.version_heroImage],
+    references: [media.id],
+    relationName: "version_heroImage",
+  }),
+  version_meta_image: one(media, {
+    fields: [_posts_v.version_meta_image],
+    references: [media.id],
+    relationName: "version_meta_image",
+  }),
+  version_populatedAuthors: many(_posts_v_version_populated_authors, {
+    relationName: "version_populatedAuthors",
+  }),
+  _rels: many(_posts_v_rels, {
+    relationName: "_rels",
+  }),
+}));
+export const relations_redirects_rels = relations(
+  redirects_rels,
+  ({ one }) => ({
+    parent: one(redirects, {
+      fields: [redirects_rels.parent],
+      references: [redirects.id],
+      relationName: "_rels",
+    }),
+    pagesID: one(pages, {
+      fields: [redirects_rels.pagesID],
+      references: [pages.id],
+      relationName: "pages",
+    }),
+    postsID: one(posts, {
+      fields: [redirects_rels.postsID],
+      references: [posts.id],
+      relationName: "posts",
+    }),
+  }),
+);
+export const relations_redirects = relations(redirects, ({ many }) => ({
+  _rels: many(redirects_rels, {
+    relationName: "_rels",
+  }),
+}));
+export const relations_forms_blocks_checkbox = relations(
+  forms_blocks_checkbox,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_checkbox._parentID],
+      references: [forms.id],
+      relationName: "_blocks_checkbox",
+    }),
+  }),
+);
+export const relations_forms_blocks_country = relations(
+  forms_blocks_country,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_country._parentID],
+      references: [forms.id],
+      relationName: "_blocks_country",
+    }),
+  }),
+);
+export const relations_forms_blocks_email = relations(
+  forms_blocks_email,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_email._parentID],
+      references: [forms.id],
+      relationName: "_blocks_email",
+    }),
+  }),
+);
+export const relations_forms_blocks_message = relations(
+  forms_blocks_message,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_message._parentID],
+      references: [forms.id],
+      relationName: "_blocks_message",
+    }),
+  }),
+);
+export const relations_forms_blocks_number = relations(
+  forms_blocks_number,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_number._parentID],
+      references: [forms.id],
+      relationName: "_blocks_number",
+    }),
+  }),
+);
+export const relations_forms_blocks_select_options = relations(
+  forms_blocks_select_options,
+  ({ one }) => ({
+    _parentID: one(forms_blocks_select, {
+      fields: [forms_blocks_select_options._parentID],
+      references: [forms_blocks_select.id],
+      relationName: "options",
+    }),
+  }),
+);
+export const relations_forms_blocks_select = relations(
+  forms_blocks_select,
+  ({ one, many }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_select._parentID],
+      references: [forms.id],
+      relationName: "_blocks_select",
+    }),
+    options: many(forms_blocks_select_options, {
+      relationName: "options",
+    }),
+  }),
+);
+export const relations_forms_blocks_state = relations(
+  forms_blocks_state,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_state._parentID],
+      references: [forms.id],
+      relationName: "_blocks_state",
+    }),
+  }),
+);
+export const relations_forms_blocks_text = relations(
+  forms_blocks_text,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_text._parentID],
+      references: [forms.id],
+      relationName: "_blocks_text",
+    }),
+  }),
+);
+export const relations_forms_blocks_textarea = relations(
+  forms_blocks_textarea,
+  ({ one }) => ({
+    _parentID: one(forms, {
+      fields: [forms_blocks_textarea._parentID],
+      references: [forms.id],
+      relationName: "_blocks_textarea",
+    }),
+  }),
+);
+export const relations_forms_emails = relations(forms_emails, ({ one }) => ({
+  _parentID: one(forms, {
+    fields: [forms_emails._parentID],
+    references: [forms.id],
+    relationName: "emails",
+  }),
+}));
+export const relations_forms = relations(forms, ({ many }) => ({
+  _blocks_checkbox: many(forms_blocks_checkbox, {
+    relationName: "_blocks_checkbox",
+  }),
+  _blocks_country: many(forms_blocks_country, {
+    relationName: "_blocks_country",
+  }),
+  _blocks_email: many(forms_blocks_email, {
+    relationName: "_blocks_email",
+  }),
+  _blocks_message: many(forms_blocks_message, {
+    relationName: "_blocks_message",
+  }),
+  _blocks_number: many(forms_blocks_number, {
+    relationName: "_blocks_number",
+  }),
+  _blocks_select: many(forms_blocks_select, {
+    relationName: "_blocks_select",
+  }),
+  _blocks_state: many(forms_blocks_state, {
+    relationName: "_blocks_state",
+  }),
+  _blocks_text: many(forms_blocks_text, {
+    relationName: "_blocks_text",
+  }),
+  _blocks_textarea: many(forms_blocks_textarea, {
+    relationName: "_blocks_textarea",
+  }),
+  emails: many(forms_emails, {
+    relationName: "emails",
+  }),
+}));
+export const relations_form_submissions_submission_data = relations(
+  form_submissions_submission_data,
+  ({ one }) => ({
+    _parentID: one(form_submissions, {
+      fields: [form_submissions_submission_data._parentID],
+      references: [form_submissions.id],
+      relationName: "submissionData",
+    }),
+  }),
+);
+export const relations_form_submissions = relations(
+  form_submissions,
+  ({ one, many }) => ({
+    form: one(forms, {
+      fields: [form_submissions.form],
+      references: [forms.id],
+      relationName: "form",
+    }),
+    submissionData: many(form_submissions_submission_data, {
+      relationName: "submissionData",
+    }),
+  }),
+);
+export const relations_search_categories = relations(
+  search_categories,
+  ({ one }) => ({
+    _parentID: one(search, {
+      fields: [search_categories._parentID],
+      references: [search.id],
+      relationName: "categories",
+    }),
+  }),
+);
+export const relations_search_rels = relations(search_rels, ({ one }) => ({
+  parent: one(search, {
+    fields: [search_rels.parent],
+    references: [search.id],
+    relationName: "_rels",
+  }),
+  postsID: one(posts, {
+    fields: [search_rels.postsID],
+    references: [posts.id],
+    relationName: "posts",
+  }),
+}));
+export const relations_search = relations(search, ({ one, many }) => ({
+  meta_image: one(media, {
+    fields: [search.meta_image],
+    references: [media.id],
+    relationName: "meta_image",
+  }),
+  categories: many(search_categories, {
+    relationName: "categories",
+  }),
+  _rels: many(search_rels, {
+    relationName: "_rels",
+  }),
+}));
 export const relations_payload_kv = relations(payload_kv, () => ({}));
+export const relations_payload_jobs_log = relations(
+  payload_jobs_log,
+  ({ one }) => ({
+    _parentID: one(payload_jobs, {
+      fields: [payload_jobs_log._parentID],
+      references: [payload_jobs.id],
+      relationName: "log",
+    }),
+  }),
+);
+export const relations_payload_jobs = relations(payload_jobs, ({ many }) => ({
+  log: many(payload_jobs_log, {
+    relationName: "log",
+  }),
+}));
 export const relations_payload_locked_documents_rels = relations(
   payload_locked_documents_rels,
   ({ one }) => ({
@@ -262,6 +2582,41 @@ export const relations_payload_locked_documents_rels = relations(
       fields: [payload_locked_documents_rels.mediaID],
       references: [media.id],
       relationName: "media",
+    }),
+    categoriesID: one(categories, {
+      fields: [payload_locked_documents_rels.categoriesID],
+      references: [categories.id],
+      relationName: "categories",
+    }),
+    pagesID: one(pages, {
+      fields: [payload_locked_documents_rels.pagesID],
+      references: [pages.id],
+      relationName: "pages",
+    }),
+    postsID: one(posts, {
+      fields: [payload_locked_documents_rels.postsID],
+      references: [posts.id],
+      relationName: "posts",
+    }),
+    redirectsID: one(redirects, {
+      fields: [payload_locked_documents_rels.redirectsID],
+      references: [redirects.id],
+      relationName: "redirects",
+    }),
+    formsID: one(forms, {
+      fields: [payload_locked_documents_rels.formsID],
+      references: [forms.id],
+      relationName: "forms",
+    }),
+    "form-submissionsID": one(form_submissions, {
+      fields: [payload_locked_documents_rels["form-submissionsID"]],
+      references: [form_submissions.id],
+      relationName: "form-submissions",
+    }),
+    searchID: one(search, {
+      fields: [payload_locked_documents_rels.searchID],
+      references: [search.id],
+      relationName: "search",
     }),
   }),
 );
@@ -300,26 +2655,206 @@ export const relations_payload_migrations = relations(
   payload_migrations,
   () => ({}),
 );
+export const relations_header_nav_items = relations(
+  header_nav_items,
+  ({ one }) => ({
+    _parentID: one(header, {
+      fields: [header_nav_items._parentID],
+      references: [header.id],
+      relationName: "navItems",
+    }),
+  }),
+);
+export const relations_header_rels = relations(header_rels, ({ one }) => ({
+  parent: one(header, {
+    fields: [header_rels.parent],
+    references: [header.id],
+    relationName: "_rels",
+  }),
+  pagesID: one(pages, {
+    fields: [header_rels.pagesID],
+    references: [pages.id],
+    relationName: "pages",
+  }),
+  postsID: one(posts, {
+    fields: [header_rels.postsID],
+    references: [posts.id],
+    relationName: "posts",
+  }),
+}));
+export const relations_header = relations(header, ({ many }) => ({
+  navItems: many(header_nav_items, {
+    relationName: "navItems",
+  }),
+  _rels: many(header_rels, {
+    relationName: "_rels",
+  }),
+}));
+export const relations_footer_nav_items = relations(
+  footer_nav_items,
+  ({ one }) => ({
+    _parentID: one(footer, {
+      fields: [footer_nav_items._parentID],
+      references: [footer.id],
+      relationName: "navItems",
+    }),
+  }),
+);
+export const relations_footer_rels = relations(footer_rels, ({ one }) => ({
+  parent: one(footer, {
+    fields: [footer_rels.parent],
+    references: [footer.id],
+    relationName: "_rels",
+  }),
+  pagesID: one(pages, {
+    fields: [footer_rels.pagesID],
+    references: [pages.id],
+    relationName: "pages",
+  }),
+  postsID: one(posts, {
+    fields: [footer_rels.postsID],
+    references: [posts.id],
+    relationName: "posts",
+  }),
+}));
+export const relations_footer = relations(footer, ({ many }) => ({
+  navItems: many(footer_nav_items, {
+    relationName: "navItems",
+  }),
+  _rels: many(footer_rels, {
+    relationName: "_rels",
+  }),
+}));
 
 type DatabaseSchema = {
   users_sessions: typeof users_sessions;
   users: typeof users;
   media: typeof media;
+  categories_breadcrumbs: typeof categories_breadcrumbs;
+  categories: typeof categories;
+  pages_hero_links: typeof pages_hero_links;
+  pages_blocks_cta_links: typeof pages_blocks_cta_links;
+  pages_blocks_cta: typeof pages_blocks_cta;
+  pages_blocks_content_columns: typeof pages_blocks_content_columns;
+  pages_blocks_content: typeof pages_blocks_content;
+  pages_blocks_media_block: typeof pages_blocks_media_block;
+  pages_blocks_archive: typeof pages_blocks_archive;
+  pages_blocks_form_block: typeof pages_blocks_form_block;
+  pages: typeof pages;
+  pages_rels: typeof pages_rels;
+  _pages_v_version_hero_links: typeof _pages_v_version_hero_links;
+  _pages_v_blocks_cta_links: typeof _pages_v_blocks_cta_links;
+  _pages_v_blocks_cta: typeof _pages_v_blocks_cta;
+  _pages_v_blocks_content_columns: typeof _pages_v_blocks_content_columns;
+  _pages_v_blocks_content: typeof _pages_v_blocks_content;
+  _pages_v_blocks_media_block: typeof _pages_v_blocks_media_block;
+  _pages_v_blocks_archive: typeof _pages_v_blocks_archive;
+  _pages_v_blocks_form_block: typeof _pages_v_blocks_form_block;
+  _pages_v: typeof _pages_v;
+  _pages_v_rels: typeof _pages_v_rels;
+  posts_populated_authors: typeof posts_populated_authors;
+  posts: typeof posts;
+  posts_rels: typeof posts_rels;
+  _posts_v_version_populated_authors: typeof _posts_v_version_populated_authors;
+  _posts_v: typeof _posts_v;
+  _posts_v_rels: typeof _posts_v_rels;
+  redirects: typeof redirects;
+  redirects_rels: typeof redirects_rels;
+  forms_blocks_checkbox: typeof forms_blocks_checkbox;
+  forms_blocks_country: typeof forms_blocks_country;
+  forms_blocks_email: typeof forms_blocks_email;
+  forms_blocks_message: typeof forms_blocks_message;
+  forms_blocks_number: typeof forms_blocks_number;
+  forms_blocks_select_options: typeof forms_blocks_select_options;
+  forms_blocks_select: typeof forms_blocks_select;
+  forms_blocks_state: typeof forms_blocks_state;
+  forms_blocks_text: typeof forms_blocks_text;
+  forms_blocks_textarea: typeof forms_blocks_textarea;
+  forms_emails: typeof forms_emails;
+  forms: typeof forms;
+  form_submissions_submission_data: typeof form_submissions_submission_data;
+  form_submissions: typeof form_submissions;
+  search_categories: typeof search_categories;
+  search: typeof search;
+  search_rels: typeof search_rels;
   payload_kv: typeof payload_kv;
+  payload_jobs_log: typeof payload_jobs_log;
+  payload_jobs: typeof payload_jobs;
   payload_locked_documents: typeof payload_locked_documents;
   payload_locked_documents_rels: typeof payload_locked_documents_rels;
   payload_preferences: typeof payload_preferences;
   payload_preferences_rels: typeof payload_preferences_rels;
   payload_migrations: typeof payload_migrations;
+  header_nav_items: typeof header_nav_items;
+  header: typeof header;
+  header_rels: typeof header_rels;
+  footer_nav_items: typeof footer_nav_items;
+  footer: typeof footer;
+  footer_rels: typeof footer_rels;
   relations_users_sessions: typeof relations_users_sessions;
   relations_users: typeof relations_users;
   relations_media: typeof relations_media;
+  relations_categories_breadcrumbs: typeof relations_categories_breadcrumbs;
+  relations_categories: typeof relations_categories;
+  relations_pages_hero_links: typeof relations_pages_hero_links;
+  relations_pages_blocks_cta_links: typeof relations_pages_blocks_cta_links;
+  relations_pages_blocks_cta: typeof relations_pages_blocks_cta;
+  relations_pages_blocks_content_columns: typeof relations_pages_blocks_content_columns;
+  relations_pages_blocks_content: typeof relations_pages_blocks_content;
+  relations_pages_blocks_media_block: typeof relations_pages_blocks_media_block;
+  relations_pages_blocks_archive: typeof relations_pages_blocks_archive;
+  relations_pages_blocks_form_block: typeof relations_pages_blocks_form_block;
+  relations_pages_rels: typeof relations_pages_rels;
+  relations_pages: typeof relations_pages;
+  relations__pages_v_version_hero_links: typeof relations__pages_v_version_hero_links;
+  relations__pages_v_blocks_cta_links: typeof relations__pages_v_blocks_cta_links;
+  relations__pages_v_blocks_cta: typeof relations__pages_v_blocks_cta;
+  relations__pages_v_blocks_content_columns: typeof relations__pages_v_blocks_content_columns;
+  relations__pages_v_blocks_content: typeof relations__pages_v_blocks_content;
+  relations__pages_v_blocks_media_block: typeof relations__pages_v_blocks_media_block;
+  relations__pages_v_blocks_archive: typeof relations__pages_v_blocks_archive;
+  relations__pages_v_blocks_form_block: typeof relations__pages_v_blocks_form_block;
+  relations__pages_v_rels: typeof relations__pages_v_rels;
+  relations__pages_v: typeof relations__pages_v;
+  relations_posts_populated_authors: typeof relations_posts_populated_authors;
+  relations_posts_rels: typeof relations_posts_rels;
+  relations_posts: typeof relations_posts;
+  relations__posts_v_version_populated_authors: typeof relations__posts_v_version_populated_authors;
+  relations__posts_v_rels: typeof relations__posts_v_rels;
+  relations__posts_v: typeof relations__posts_v;
+  relations_redirects_rels: typeof relations_redirects_rels;
+  relations_redirects: typeof relations_redirects;
+  relations_forms_blocks_checkbox: typeof relations_forms_blocks_checkbox;
+  relations_forms_blocks_country: typeof relations_forms_blocks_country;
+  relations_forms_blocks_email: typeof relations_forms_blocks_email;
+  relations_forms_blocks_message: typeof relations_forms_blocks_message;
+  relations_forms_blocks_number: typeof relations_forms_blocks_number;
+  relations_forms_blocks_select_options: typeof relations_forms_blocks_select_options;
+  relations_forms_blocks_select: typeof relations_forms_blocks_select;
+  relations_forms_blocks_state: typeof relations_forms_blocks_state;
+  relations_forms_blocks_text: typeof relations_forms_blocks_text;
+  relations_forms_blocks_textarea: typeof relations_forms_blocks_textarea;
+  relations_forms_emails: typeof relations_forms_emails;
+  relations_forms: typeof relations_forms;
+  relations_form_submissions_submission_data: typeof relations_form_submissions_submission_data;
+  relations_form_submissions: typeof relations_form_submissions;
+  relations_search_categories: typeof relations_search_categories;
+  relations_search_rels: typeof relations_search_rels;
+  relations_search: typeof relations_search;
   relations_payload_kv: typeof relations_payload_kv;
+  relations_payload_jobs_log: typeof relations_payload_jobs_log;
+  relations_payload_jobs: typeof relations_payload_jobs;
   relations_payload_locked_documents_rels: typeof relations_payload_locked_documents_rels;
   relations_payload_locked_documents: typeof relations_payload_locked_documents;
   relations_payload_preferences_rels: typeof relations_payload_preferences_rels;
   relations_payload_preferences: typeof relations_payload_preferences;
   relations_payload_migrations: typeof relations_payload_migrations;
+  relations_header_nav_items: typeof relations_header_nav_items;
+  relations_header_rels: typeof relations_header_rels;
+  relations_header: typeof relations_header;
+  relations_footer_nav_items: typeof relations_footer_nav_items;
+  relations_footer_rels: typeof relations_footer_rels;
+  relations_footer: typeof relations_footer;
 };
 
 declare module "@payloadcms/db-d1-sqlite" {

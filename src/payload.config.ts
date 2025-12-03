@@ -5,20 +5,23 @@ import {
 import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { r2Storage } from "@payloadcms/storage-r2";
+import { s3Storage } from "@payloadcms/storage-s3";
+import { nl } from "@payloadcms/translations/languages/nl";
 import path from "path";
 import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import { GetPlatformProxyOptions } from "wrangler";
-
-import { Categories } from "./collections/Categories";
 import { Media } from "./collections/Media";
 import { Pages } from "./collections/Pages";
 import { Posts } from "./collections/Posts";
+import { TeamMembers } from "./collections/TeamMembers";
 import { Users } from "./collections/Users";
 import { Footer } from "./Footer/config";
 import { Header } from "./Header/config";
 import { plugins } from "./plugins";
 import { getServerSideURL } from "./utilities/getURL";
+
+const isWorker = process.env.RUNTIME === "worker";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -29,6 +32,34 @@ const cloudflare =
     !cloudflareRemoteBindings
         ? await getCloudflareContextFromWrangler()
         : await getCloudflareContext({ async: true });
+
+const r2DevStorage = () =>
+    s3Storage({
+        bucket: process.env.R2_BUCKET ?? "",
+        collections: {
+            media: {
+                disableLocalStorage: true,
+                prefix: "images_dev/",
+                generateFileURL: ({ filename }) =>
+                    `${process.env.R2_PUBLIC_URL}/images_dev/${filename}`,
+            },
+        },
+        config: {
+            region: "weur",
+            endpoint: process.env.R2_ENDPOINT,
+            credentials: {
+                accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
+                secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
+            },
+        },
+    });
+
+const r2StoragePlugin = isWorker
+    ? r2Storage({
+          bucket: cloudflare.env.R2,
+          collections: { media: { prefix: "images/" } },
+      })
+    : r2DevStorage();
 
 export default buildConfig({
     admin: {
@@ -59,7 +90,7 @@ export default buildConfig({
             ],
         },
     },
-    collections: [Users, Media, Categories, Pages, Posts],
+    collections: [Users, Media, TeamMembers, Pages, Posts],
     globals: [Header, Footer],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
@@ -68,13 +99,11 @@ export default buildConfig({
         outputFile: path.resolve(dirname, "payload-types.ts"),
     },
     db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
-    plugins: [
-        ...plugins,
-        r2Storage({
-            bucket: cloudflare.env.R2,
-            collections: { media: true },
-        }),
-    ],
+    plugins: [...plugins, r2StoragePlugin],
+    i18n: {
+        supportedLanguages: { nl },
+        fallbackLanguage: "en",
+    },
 });
 
 // Adapted from https://github.com/opennextjs/opennextjs-cloudflare/blob/d00b3a13e42e65aad76fba41774815726422cc39/packages/cloudflare/src/api/cloudflare-context.ts#L328C36-L328C46
