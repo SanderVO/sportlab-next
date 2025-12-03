@@ -69,7 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    'team-members': TeamMember;
+    members: Member;
     pages: Page;
     posts: Post;
     redirects: Redirect;
@@ -86,7 +86,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    'team-members': TeamMembersSelect<false> | TeamMembersSelect<true>;
+    members: MembersSelect<false> | MembersSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -191,13 +191,15 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "team-members".
+ * via the `definition` "members".
  */
-export interface TeamMember {
+export interface Member {
   id: number;
   name: string;
+  role: 'sporter' | 'coach';
+  status: 'active' | 'inactive';
+  order?: number | null;
   subtitle: string;
-  Status: 'active' | 'inactive';
   /**
    * Korte beschrijving van het teamlid
    */
@@ -215,7 +217,21 @@ export interface Page {
   title: string;
   hero: {
     title: string;
-    subtitle: string;
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
     type: 'background' | 'left';
     backgroundColor: 'black' | 'beige' | 'white';
     color?: ('black' | 'beige' | 'white') | null;
@@ -403,6 +419,7 @@ export interface CarouselBlock {
  */
 export interface TeamBlock {
   title: string;
+  limit?: number | null;
   type: 'carousel' | 'grid';
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
   enableLink?: boolean | null;
@@ -425,12 +442,6 @@ export interface TeamBlock {
      */
     appearance?: ('black' | 'beige' | 'orange') | null;
   };
-  teamItems?:
-    | {
-        teamMember: number | TeamMember;
-        id?: string | null;
-      }[]
-    | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'team';
@@ -813,8 +824,8 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'team-members';
-        value: number | TeamMember;
+        relationTo: 'members';
+        value: number | Member;
       } | null)
     | ({
         relationTo: 'pages';
@@ -926,12 +937,14 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "team-members_select".
+ * via the `definition` "members_select".
  */
-export interface TeamMembersSelect<T extends boolean = true> {
+export interface MembersSelect<T extends boolean = true> {
   name?: T;
+  role?: T;
+  status?: T;
+  order?: T;
   subtitle?: T;
-  Status?: T;
   about?: T;
   media?: T;
   updatedAt?: T;
@@ -947,7 +960,7 @@ export interface PagesSelect<T extends boolean = true> {
     | T
     | {
         title?: T;
-        subtitle?: T;
+        text?: T;
         type?: T;
         backgroundColor?: T;
         color?: T;
@@ -1047,6 +1060,7 @@ export interface CarouselBlockSelect<T extends boolean = true> {
  */
 export interface TeamBlockSelect<T extends boolean = true> {
   title?: T;
+  limit?: T;
   type?: T;
   backgroundColor?: T;
   enableLink?: T;
@@ -1059,12 +1073,6 @@ export interface TeamBlockSelect<T extends boolean = true> {
         url?: T;
         label?: T;
         appearance?: T;
-      };
-  teamItems?:
-    | T
-    | {
-        teamMember?: T;
-        id?: T;
       };
   id?: T;
   blockName?: T;

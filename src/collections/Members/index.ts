@@ -2,8 +2,12 @@ import type { CollectionConfig } from "payload";
 import { anyone } from "../../access/anyone";
 import { authenticated } from "../../access/authenticated";
 
-export const TeamMembers: CollectionConfig = {
-    slug: "team-members",
+export const Members: CollectionConfig = {
+    slug: "members",
+    labels: {
+        singular: "Lid",
+        plural: "Leden",
+    },
     access: {
         create: authenticated,
         delete: authenticated,
@@ -12,6 +16,7 @@ export const TeamMembers: CollectionConfig = {
     },
     admin: {
         useAsTitle: "name",
+        defaultColumns: ["media", "name", "role", "active"],
     },
     fields: [
         {
@@ -21,13 +26,24 @@ export const TeamMembers: CollectionConfig = {
             required: true,
         },
         {
-            label: "Ondertitel",
-            name: "subtitle",
-            type: "text",
+            label: "Rol",
+            name: "role",
+            type: "select",
+            defaultValue: "sporter",
             required: true,
+            options: [
+                {
+                    label: "Sporter",
+                    value: "sporter",
+                },
+                {
+                    label: "Coach",
+                    value: "coach",
+                },
+            ],
         },
         {
-            name: "Status",
+            name: "status",
             type: "select",
             defaultValue: "active",
             required: true,
@@ -41,6 +57,18 @@ export const TeamMembers: CollectionConfig = {
                     value: "inactive",
                 },
             ],
+        },
+        {
+            label: "Sortering",
+            name: "order",
+            type: "number",
+            defaultValue: 0,
+        },
+        {
+            label: "Ondertitel",
+            name: "subtitle",
+            type: "text",
+            required: true,
         },
         {
             label: "Over",

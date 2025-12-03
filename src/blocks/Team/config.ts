@@ -1,15 +1,5 @@
 import { link } from "@/fields/link";
-import type { Block, Field } from "payload";
-
-const teamBlockItems: Field[] = [
-    {
-        label: "Teamlid",
-        name: "teamMember",
-        type: "relationship",
-        relationTo: "team-members",
-        required: true,
-    },
-];
+import type { Block } from "payload";
 
 export const Team: Block = {
     slug: "team",
@@ -20,6 +10,12 @@ export const Team: Block = {
             name: "title",
             type: "text",
             required: true,
+        },
+        {
+            label: "Limiet",
+            name: "limit",
+            type: "number",
+            defaultValue: 0,
         },
         {
             label: "Type",
@@ -72,13 +68,5 @@ export const Team: Block = {
                 },
             },
         }),
-        {
-            name: "teamItems",
-            type: "array",
-            admin: {
-                initCollapsed: true,
-            },
-            fields: teamBlockItems,
-        },
     ],
 };

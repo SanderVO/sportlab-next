@@ -1,4 +1,4 @@
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { defaultLexical } from "@/fields/defaultLexical";
 import type { GlobalConfig } from "payload";
 import { revalidateFooter } from "./hooks/revalidateFooter";
 
@@ -34,7 +34,7 @@ export const Footer: GlobalConfig = {
             label: "Contact Information",
             name: "contactText",
             type: "richText",
-            editor: lexicalEditor({}),
+            editor: defaultLexical,
             required: false,
         },
     ],

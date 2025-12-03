@@ -12,9 +12,9 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import { GetPlatformProxyOptions } from "wrangler";
 import { Media } from "./collections/Media";
+import { Members } from "./collections/Members";
 import { Pages } from "./collections/Pages";
 import { Posts } from "./collections/Posts";
-import { TeamMembers } from "./collections/TeamMembers";
 import { Users } from "./collections/Users";
 import { Footer } from "./Footer/config";
 import { Header } from "./Header/config";
@@ -90,7 +90,7 @@ export default buildConfig({
             ],
         },
     },
-    collections: [Users, Media, TeamMembers, Pages, Posts],
+    collections: [Users, Media, Members, Pages, Posts],
     globals: [Header, Footer],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),

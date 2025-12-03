@@ -4,9 +4,9 @@ import Link from "next/link";
 import React from "react";
 
 export const CMSLinkAppearance = {
-    beige: "transition-colors rounded-3xl bg-sl-beige hover:bg-sl-beige-dark mt-8 font-bold text-center py-3 px-10 w-max text-lg text-background",
-    black: "transition-colors rounded-3xl bg-background hover:bg-background/90 mt-8 font-bold text-center py-3 px-10 w-max text-lg text-white md:self-center",
-    orange: "transition-colors rounded-3xl bg-sl-orange hover:bg-sl-orange-dark mt-8 font-bold text-center py-3 px-10 w-max text-lg",
+    beige: "transition-colors rounded-3xl bg-sl-beige hover:bg-sl-beige-dark mt-8 font-bold text-center py-3 px-10 w-max text-lg text-background self-baseline",
+    black: "transition-colors rounded-3xl bg-background hover:bg-background/90 mt-8 font-bold text-center py-3 px-10 w-max text-lg text-white self-baseline",
+    orange: "transition-colors rounded-3xl bg-sl-orange hover:bg-sl-orange-dark mt-8 font-bold text-center py-3 px-10 w-max text-lg text-white self-baseline",
 };
 
 export type CMSLinkType = {

@@ -1,5 +1,6 @@
 import { CMSLink } from "@/components/Link";
 import { Media } from "@/components/Media";
+import RichText from "@/components/RichText";
 import type { Page } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import React from "react";
@@ -63,9 +64,15 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
                         {props.title}
                     </h1>
 
-                    <div className="font-sl-open-sans italic text-lg md:w-4/5">
-                        {props.subtitle}
-                    </div>
+                    {props.text && (
+                        <div className="font-sl-open-sans text-lg md:w-4/5">
+                            <RichText
+                                data={props.text}
+                                enableGutter={false}
+                                enableProse={false}
+                            />
+                        </div>
+                    )}
 
                     {link && <CMSLink {...link} />}
                 </div>

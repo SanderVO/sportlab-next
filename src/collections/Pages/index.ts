@@ -20,15 +20,16 @@ import { revalidateDelete, revalidatePage } from "./hooks/revalidatePage";
 
 export const Pages: CollectionConfig<"pages"> = {
     slug: "pages",
+    labels: {
+        singular: "Pagina",
+        plural: "Pagina's",
+    },
     access: {
         create: authenticated,
         delete: authenticated,
         read: authenticatedOrPublished,
         update: authenticated,
     },
-    // This config controls what's populated by default when a page is referenced
-    // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
-    // Type safe if the collection slug generic is passed to `CollectionConfig` - `CollectionConfig<'pages'>
     defaultPopulate: {
         title: true,
         slug: true,
@@ -67,6 +68,7 @@ export const Pages: CollectionConfig<"pages"> = {
     },
     fields: [
         {
+            label: "Titel",
             name: "title",
             type: "text",
             required: true,

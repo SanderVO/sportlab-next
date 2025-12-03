@@ -8,17 +8,13 @@ import { nestedDocsPlugin } from "@payloadcms/plugin-nested-docs";
 import { redirectsPlugin } from "@payloadcms/plugin-redirects";
 import { searchPlugin } from "@payloadcms/plugin-search";
 import { seoPlugin } from "@payloadcms/plugin-seo";
-import { GenerateTitle, GenerateURL } from "@payloadcms/plugin-seo/types";
+import { GenerateURL } from "@payloadcms/plugin-seo/types";
 import {
     FixedToolbarFeature,
     HeadingFeature,
     lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 import { Plugin } from "payload";
-
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-    return doc?.title ? `${doc.title} | Sportlab` : "Sportlab";
-};
 
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
     const url = getServerSideURL();
@@ -80,7 +76,17 @@ export const plugins: Plugin[] = [
         fields: {
             payment: false,
         },
+        formSubmissionOverrides: {
+            labels: {
+                singular: "Formulier Submissie",
+                plural: "Formulier Submissies",
+            },
+        },
         formOverrides: {
+            labels: {
+                singular: "Formulier",
+                plural: "Formulieren",
+            },
             fields: ({ defaultFields }) => {
                 return defaultFields.map((field) => {
                     if (
@@ -116,6 +122,10 @@ export const plugins: Plugin[] = [
         collections: ["posts"],
         beforeSync: beforeSyncWithSearch,
         searchOverrides: {
+            labels: {
+                singular: "Zoekresultaat",
+                plural: "Zoekresultaten",
+            },
             fields: ({ defaultFields }) => {
                 return [...defaultFields, ...searchFields];
             },

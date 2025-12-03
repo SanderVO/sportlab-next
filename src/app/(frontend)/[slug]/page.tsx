@@ -76,7 +76,6 @@ export default async function Page({ params: paramsPromise }: Args) {
                                 <script
                                     key={index}
                                     type="application/ld+json"
-                                    // eslint-disable-next-line react/no-danger
                                     dangerouslySetInnerHTML={{
                                         __html: JSON.stringify(
                                             snippet.jsonLd

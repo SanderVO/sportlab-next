@@ -1,14 +1,22 @@
 "use client";
 
 import { Media } from "@/components/Media";
-import type { TeamBlock as TeamBlockProps, TeamMember } from "@/payload-types";
+import type { Member } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import { useIsMobile } from "@/utilities/useIsMobile";
 import useEmblaCarousel from "embla-carousel-react";
 
-export const TeamBlockCarousel: React.FC<TeamBlockProps> = (props) => {
-    const { teamItems, backgroundColor, type } = props;
+interface Props {
+    type: string;
+    backgroundColor: string;
+    members: Member[];
+}
 
+export const TeamBlockCarousel: React.FC<Props> = ({
+    type,
+    backgroundColor,
+    members,
+}: Props) => {
     const isMobile = useIsMobile();
 
     const [emblaRef] = useEmblaCarousel({
@@ -20,11 +28,9 @@ export const TeamBlockCarousel: React.FC<TeamBlockProps> = (props) => {
 
     const teamItemContent = () => (
         <>
-            {teamItems &&
-                teamItems.map((teamItem, index: number) => {
-                    const teamMember = teamItem?.teamMember as TeamMember;
-
-                    if (!teamMember) {
+            {members &&
+                members.map((member: Member, index: number) => {
+                    if (!member) {
                         return null;
                     }
 
@@ -45,7 +51,7 @@ export const TeamBlockCarousel: React.FC<TeamBlockProps> = (props) => {
                                 <div className="h-full w-full relative">
                                     <Media
                                         fill
-                                        resource={teamMember?.media}
+                                        resource={member?.media}
                                         imgClassName="object-cover object-top rounded-3xl"
                                     />
                                 </div>
@@ -61,7 +67,7 @@ export const TeamBlockCarousel: React.FC<TeamBlockProps> = (props) => {
                                             "text-background"
                                     )}
                                 >
-                                    {teamMember?.name}
+                                    {member?.name}
                                 </div>
                             </div>
                         </div>
@@ -82,7 +88,7 @@ export const TeamBlockCarousel: React.FC<TeamBlockProps> = (props) => {
 
             {type === "grid" && (
                 <div className="w-full overflow-hidden h-full">
-                    <div className="h-full grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8">
+                    <div className="h-full grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-8">
                         {teamItemContent()}
                     </div>
                 </div>

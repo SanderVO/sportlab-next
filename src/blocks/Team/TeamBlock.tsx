@@ -1,12 +1,30 @@
 import { CMSLink } from "@/components/Link";
 import type { TeamBlock as TeamBlockProps } from "@/payload-types";
 import { cn } from "@/utilities/ui";
+import configPromise from "@payload-config";
 import { ArrowRightIcon } from "lucide-react";
+import { getPayload } from "payload";
 import React from "react";
 import { TeamBlockCarousel } from "./TeamBlockCarousel";
 
-export const TeamBlock: React.FC<TeamBlockProps> = (props) => {
-    const { title, link, type } = props;
+export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
+    const { title, link, type, limit } = props;
+
+    const payload = await getPayload({ config: configPromise });
+
+    const { docs: members } = await payload.find({
+        collection: "members",
+        page: 0,
+        limit: type === "carousel" ? limit : 0,
+        where: {
+            status: {
+                equals: "active",
+            },
+            role: {
+                equals: "coach",
+            },
+        },
+    });
 
     return (
         <div className="container mx-auto flex flex-col h-full justify-center py-15 md:py-0">
@@ -19,7 +37,11 @@ export const TeamBlock: React.FC<TeamBlockProps> = (props) => {
                     type === "carousel" && "h-[400px] gap-20"
                 )}
             >
-                <TeamBlockCarousel {...props} />
+                <TeamBlockCarousel
+                    backgroundColor={props.backgroundColor}
+                    type={props.type}
+                    members={members}
+                />
 
                 <div className="items-center flex-0 hidden md:flex">
                     <CMSLink

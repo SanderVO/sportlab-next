@@ -1,3 +1,4 @@
+import { defaultLexical } from "@/fields/defaultLexical";
 import { link } from "@/fields/link";
 import type { Field } from "payload";
 
@@ -7,16 +8,16 @@ export const hero: Field = {
     label: false,
     fields: [
         {
-            label: "Title",
+            label: "Titel",
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Subtitle",
-            name: "subtitle",
-            type: "text",
-            required: true,
+            label: "Tekst",
+            name: "text",
+            type: "richText",
+            editor: defaultLexical,
         },
         {
             label: "Type",

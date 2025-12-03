@@ -3,8 +3,8 @@
 import { CMSLink } from "@/components/Link";
 import { Header } from "@/payload-types";
 import clsx from "clsx";
+import { MenuIcon } from "lucide-react";
 import { useState } from "react";
-import { GiHamburgerMenu } from "react-icons/gi";
 
 interface Props {
     navItems: Header["navItems"];
@@ -15,10 +15,7 @@ export default function HamburgerMenu({ navItems }: Props) {
 
     return (
         <>
-            <GiHamburgerMenu
-                className="text-3xl"
-                onClick={() => setIsOpen(!isOpen)}
-            />
+            <MenuIcon className="text-3xl" onClick={() => setIsOpen(!isOpen)} />
 
             <div
                 className={clsx(
