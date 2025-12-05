@@ -69,7 +69,6 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    members: Member;
     pages: Page;
     posts: Post;
     redirects: Redirect;
@@ -86,7 +85,6 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    members: MembersSelect<false> | MembersSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -151,6 +149,17 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name?: string | null;
+  status: 'active' | 'inactive';
+  roles: ('admin' | 'editor' | 'user' | 'coach')[];
+  avatar?: (number | null) | Media;
+  /**
+   * Rol van het lid bij sportlab in 1 zin
+   */
+  subtitle?: string | null;
+  /**
+   * Achtergrond beschrijving van het lid
+   */
+  about?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -188,25 +197,6 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "members".
- */
-export interface Member {
-  id: number;
-  name: string;
-  role: 'sporter' | 'coach';
-  status: 'active' | 'inactive';
-  order?: number | null;
-  subtitle: string;
-  /**
-   * Korte beschrijving van het teamlid
-   */
-  about?: string | null;
-  media: number | Media;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -297,6 +287,8 @@ export interface Page {
 export interface Post {
   id: number;
   title: string;
+  intro: string;
+  thumbnailImage: number | Media;
   heroImage?: (number | null) | Media;
   content: {
     root: {
@@ -824,10 +816,6 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'members';
-        value: number | Member;
-      } | null)
-    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -899,6 +887,11 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  status?: T;
+  roles?: T;
+  avatar?: T;
+  subtitle?: T;
+  about?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -934,21 +927,6 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "members_select".
- */
-export interface MembersSelect<T extends boolean = true> {
-  name?: T;
-  role?: T;
-  status?: T;
-  order?: T;
-  subtitle?: T;
-  about?: T;
-  media?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1095,6 +1073,8 @@ export interface InstagramBlockSelect<T extends boolean = true> {
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
+  intro?: T;
+  thumbnailImage?: T;
   heroImage?: T;
   content?: T;
   relatedPosts?: T;

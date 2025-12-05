@@ -1,16 +1,20 @@
-import type { CollectionConfig } from 'payload'
+import { isAdmin } from "@/access/admin";
+import type { CollectionConfig } from "payload";
 
 export const Media: CollectionConfig = {
-  slug: 'media',
-  access: {
-    read: () => true,
-  },
-  fields: [
-    {
-      name: 'alt',
-      type: 'text',
-      required: true,
+    slug: "media",
+    access: {
+        create: isAdmin,
+        delete: isAdmin,
+        read: () => true,
+        update: isAdmin,
     },
-  ],
-  upload: true,
-}
+    fields: [
+        {
+            name: "alt",
+            type: "text",
+            required: true,
+        },
+    ],
+    upload: true,
+};

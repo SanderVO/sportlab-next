@@ -12,7 +12,6 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import { GetPlatformProxyOptions } from "wrangler";
 import { Media } from "./collections/Media";
-import { Members } from "./collections/Members";
 import { Pages } from "./collections/Pages";
 import { Posts } from "./collections/Posts";
 import { Users } from "./collections/Users";
@@ -90,7 +89,7 @@ export default buildConfig({
             ],
         },
     },
-    collections: [Users, Media, Members, Pages, Posts],
+    collections: [Users, Media, Pages, Posts],
     globals: [Header, Footer],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),

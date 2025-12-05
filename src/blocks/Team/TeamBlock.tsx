@@ -1,3 +1,4 @@
+import { RolesEnum } from "@/collections/Users";
 import { CMSLink } from "@/components/Link";
 import type { TeamBlock as TeamBlockProps } from "@/payload-types";
 import { cn } from "@/utilities/ui";
@@ -12,16 +13,16 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
 
     const payload = await getPayload({ config: configPromise });
 
-    const { docs: members } = await payload.find({
-        collection: "members",
+    const { docs: users } = await payload.find({
+        collection: "users",
         page: 0,
-        limit: type === "carousel" ? limit : 0,
+        limit: type === "carousel" ? limit ?? 0 : 0,
         where: {
             status: {
                 equals: "active",
             },
-            role: {
-                equals: "coach",
+            roles: {
+                contains: RolesEnum.COACH,
             },
         },
     });
@@ -40,7 +41,7 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
                 <TeamBlockCarousel
                     backgroundColor={props.backgroundColor}
                     type={props.type}
-                    members={members}
+                    users={users}
                 />
 
                 <div className="items-center flex-0 hidden md:flex">

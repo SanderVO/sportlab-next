@@ -3,6 +3,7 @@ import { Footer } from "@/Footer/Footer";
 import { Header } from "@/Header/Header";
 import { Providers } from "@/providers";
 import { InitTheme } from "@/providers/Theme/InitTheme";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import { draftMode } from "next/headers";
 import React from "react";
@@ -63,9 +64,9 @@ export default async function RootLayout({
                 </Providers>
             </body>
 
-            {/* {process.env.GOOGLE_ANALYTICS_ID && (
-                <GoogleAnalytics gaId={process.env.GOOGLE_ANALYTICS_ID} />
-            )} */}
+            {process.env.GTM_ID && (
+                <GoogleTagManager gtmId={process.env.GTM_ID} />
+            )}
         </html>
     );
 }

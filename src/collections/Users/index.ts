@@ -1,5 +1,13 @@
+import { authenticated } from "@/access/authenticated";
 import type { CollectionConfig } from "payload";
-import { authenticated } from "../../access/authenticated";
+import { User } from "../../payload-types";
+
+export enum RolesEnum {
+    ADMIN = "admin",
+    EDITOR = "editor",
+    USER = "user",
+    COACH = "coach",
+}
 
 export const Users: CollectionConfig = {
     slug: "users",
@@ -8,22 +16,79 @@ export const Users: CollectionConfig = {
         plural: "Gebruikers",
     },
     timestamps: true,
+    admin: {
+        defaultColumns: ["avatar", "name", "email"],
+        useAsTitle: "name",
+    },
     access: {
-        admin: authenticated,
+        admin: ({ req }: { req: { user: User | null } }) =>
+            req?.user?.roles.includes(RolesEnum.ADMIN) ?? false,
         create: authenticated,
         delete: authenticated,
         read: authenticated,
         update: authenticated,
-    },
-    admin: {
-        defaultColumns: ["name", "email"],
-        useAsTitle: "name",
     },
     auth: true,
     fields: [
         {
             name: "name",
             type: "text",
+        },
+        {
+            name: "status",
+            type: "select",
+            defaultValue: "active",
+            required: true,
+            options: [
+                {
+                    label: "Actief",
+                    value: "active",
+                },
+                {
+                    label: "Inactief",
+                    value: "inactive",
+                },
+            ],
+        },
+        {
+            name: "roles",
+            type: "select",
+            hasMany: true,
+            defaultValue: "user",
+            saveToJWT: true,
+            required: true,
+            options: [
+                { label: "Admin", value: RolesEnum.ADMIN },
+                { label: "Content Manager", value: RolesEnum.EDITOR },
+                { label: "Lid", value: RolesEnum.USER },
+                { label: "Coach", value: RolesEnum.COACH },
+            ],
+        },
+        {
+            label: "Foto",
+            name: "avatar",
+            type: "upload",
+            relationTo: "media",
+            required: false,
+        },
+        {
+            label: "Ondertitel",
+            name: "subtitle",
+            type: "text",
+            required: false,
+            admin: {
+                description: "Rol van het lid bij sportlab in 1 zin",
+            },
+        },
+        {
+            label: "Over",
+            name: "about",
+            type: "textarea",
+            required: false,
+            admin: {
+                description: "Achtergrond beschrijving van het lid",
+                rows: 4,
+            },
         },
     ],
 };

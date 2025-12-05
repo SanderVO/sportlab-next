@@ -1,3 +1,4 @@
+import { isAdmin } from "@/access/admin";
 import { Carousel } from "@/blocks/Carousel/config";
 import { Instagram } from "@/blocks/Instagram/config";
 import { Team } from "@/blocks/Team/config";
@@ -11,7 +12,6 @@ import {
 } from "@payloadcms/plugin-seo/fields";
 import type { CollectionConfig } from "payload";
 import { slugField } from "payload";
-import { authenticated } from "../../access/authenticated";
 import { authenticatedOrPublished } from "../../access/authenticatedOrPublished";
 import { Content } from "../../blocks/Content/config";
 import { populatePublishedAt } from "../../hooks/populatePublishedAt";
@@ -25,10 +25,10 @@ export const Pages: CollectionConfig<"pages"> = {
         plural: "Pagina's",
     },
     access: {
-        create: authenticated,
-        delete: authenticated,
+        create: isAdmin,
+        delete: isAdmin,
         read: authenticatedOrPublished,
-        update: authenticated,
+        update: isAdmin,
     },
     defaultPopulate: {
         title: true,

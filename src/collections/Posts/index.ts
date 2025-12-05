@@ -1,5 +1,11 @@
-import type { CollectionConfig } from "payload";
-
+import { editorOrAdmin } from "@/access/editorOrAdmin";
+import {
+    MetaDescriptionField,
+    MetaImageField,
+    MetaTitleField,
+    OverviewField,
+    PreviewField,
+} from "@payloadcms/plugin-seo/fields";
 import {
     BlocksFeature,
     FixedToolbarFeature,
@@ -8,37 +14,24 @@ import {
     InlineToolbarFeature,
     lexicalEditor,
 } from "@payloadcms/richtext-lexical";
-
-import { authenticated } from "../../access/authenticated";
+import type { CollectionConfig } from "payload";
+import { slugField } from "payload";
 import { authenticatedOrPublished } from "../../access/authenticatedOrPublished";
 import { generatePreviewPath } from "../../utilities/generatePreviewPath";
 import { populateAuthors } from "./hooks/populateAuthors";
 import { revalidateDelete, revalidatePost } from "./hooks/revalidatePost";
 
-import {
-    MetaDescriptionField,
-    MetaImageField,
-    MetaTitleField,
-    OverviewField,
-    PreviewField,
-} from "@payloadcms/plugin-seo/fields";
-import { slugField } from "payload";
-
 export const Posts: CollectionConfig<"posts"> = {
     slug: "posts",
     access: {
-        create: authenticated,
-        delete: authenticated,
+        create: editorOrAdmin,
+        delete: editorOrAdmin,
         read: authenticatedOrPublished,
-        update: authenticated,
+        update: editorOrAdmin,
     },
-    // This config controls what's populated by default when a post is referenced
-    // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
-    // Type safe if the collection slug generic is passed to `CollectionConfig` - `CollectionConfig<'posts'>
     defaultPopulate: {
         title: true,
         slug: true,
-        categories: true,
         meta: {
             image: true,
             description: true,
@@ -64,7 +57,14 @@ export const Posts: CollectionConfig<"posts"> = {
     },
     fields: [
         {
+            label: "Titel",
             name: "title",
+            type: "text",
+            required: true,
+        },
+        {
+            label: "Intro",
+            name: "intro",
             type: "text",
             required: true,
         },
@@ -73,6 +73,13 @@ export const Posts: CollectionConfig<"posts"> = {
             tabs: [
                 {
                     fields: [
+                        {
+                            label: "Thumbnail",
+                            name: "thumbnailImage",
+                            type: "upload",
+                            relationTo: "media",
+                            required: true,
+                        },
                         {
                             name: "heroImage",
                             type: "upload",

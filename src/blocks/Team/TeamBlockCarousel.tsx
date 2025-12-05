@@ -1,7 +1,7 @@
 "use client";
 
 import { Media } from "@/components/Media";
-import type { Member } from "@/payload-types";
+import type { User } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import { useIsMobile } from "@/utilities/useIsMobile";
 import useEmblaCarousel from "embla-carousel-react";
@@ -9,13 +9,13 @@ import useEmblaCarousel from "embla-carousel-react";
 interface Props {
     type: string;
     backgroundColor: string;
-    members: Member[];
+    users: User[];
 }
 
 export const TeamBlockCarousel: React.FC<Props> = ({
     type,
     backgroundColor,
-    members,
+    users,
 }: Props) => {
     const isMobile = useIsMobile();
 
@@ -28,9 +28,9 @@ export const TeamBlockCarousel: React.FC<Props> = ({
 
     const teamItemContent = () => (
         <>
-            {members &&
-                members.map((member: Member, index: number) => {
-                    if (!member) {
+            {users &&
+                users.map((user: User, index: number) => {
+                    if (!user) {
                         return null;
                     }
 
@@ -51,7 +51,7 @@ export const TeamBlockCarousel: React.FC<Props> = ({
                                 <div className="h-full w-full relative">
                                     <Media
                                         fill
-                                        resource={member?.media}
+                                        resource={user?.avatar}
                                         imgClassName="object-cover object-top rounded-3xl"
                                     />
                                 </div>
@@ -67,7 +67,7 @@ export const TeamBlockCarousel: React.FC<Props> = ({
                                             "text-background"
                                     )}
                                 >
-                                    {member?.name}
+                                    {user?.name}
                                 </div>
                             </div>
                         </div>
