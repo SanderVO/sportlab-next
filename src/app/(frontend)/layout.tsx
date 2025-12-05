@@ -1,7 +1,6 @@
 import { AdminBar } from "@/components/AdminBar";
 import { Footer } from "@/Footer/Footer";
 import { Header } from "@/Header/Header";
-import { InitTheme } from "@/providers/Theme/InitTheme";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import { draftMode } from "next/headers";
@@ -43,7 +42,6 @@ export default async function RootLayout({
             suppressHydrationWarning
         >
             <head>
-                <InitTheme />
                 <link href="/favicon.ico" rel="icon" sizes="32x32" />
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
             </head>
