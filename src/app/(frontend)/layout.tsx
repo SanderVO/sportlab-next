@@ -1,7 +1,6 @@
 import { AdminBar } from "@/components/AdminBar";
 import { Footer } from "@/Footer/Footer";
 import { Header } from "@/Header/Header";
-import { Providers } from "@/providers";
 import { InitTheme } from "@/providers/Theme/InitTheme";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
@@ -48,20 +47,19 @@ export default async function RootLayout({
                 <link href="/favicon.ico" rel="icon" sizes="32x32" />
                 <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
             </head>
+
             <body>
-                <Providers>
-                    <AdminBar
-                        adminBarProps={{
-                            preview: isEnabled,
-                        }}
-                    />
+                <AdminBar
+                    adminBarProps={{
+                        preview: isEnabled,
+                    }}
+                />
 
-                    <Header />
+                <Header />
 
-                    {children}
+                {children}
 
-                    <Footer />
-                </Providers>
+                <Footer />
             </body>
 
             {process.env.GTM_ID && (
