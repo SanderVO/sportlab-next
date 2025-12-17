@@ -1,6 +1,6 @@
 import { AdminBar } from "@/components/AdminBar";
-import { Footer } from "@/Footer/Footer";
-import { Header } from "@/Header/Header";
+import { Footer } from "@/components/Footer/Footer";
+import { Header } from "@/components/Header/Header";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import { draftMode } from "next/headers";

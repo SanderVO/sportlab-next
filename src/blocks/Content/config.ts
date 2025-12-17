@@ -1,6 +1,12 @@
-import { defaultLexical } from "@/fields/defaultLexical";
 import { link } from "@/fields/link";
+import {
+    BlocksFeature,
+    FixedToolbarFeature,
+    InlineToolbarFeature,
+    lexicalEditor,
+} from "@payloadcms/richtext-lexical";
 import type { Block, Field } from "payload";
+import { FormBlock } from "../Form/config";
 
 const columnFields: Field[] = [
     {
@@ -53,7 +59,18 @@ const columnFields: Field[] = [
         name: "richText",
         type: "richText",
         required: true,
-        editor: defaultLexical,
+        editor: lexicalEditor({
+            features: ({ rootFeatures }) => {
+                return [
+                    ...rootFeatures,
+                    BlocksFeature({
+                        blocks: [FormBlock],
+                    }),
+                    FixedToolbarFeature(),
+                    InlineToolbarFeature(),
+                ];
+            },
+        }),
         label: false,
     },
     {

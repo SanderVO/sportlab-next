@@ -31,14 +31,17 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                     } = col;
 
                     return (
-                        <>
+                        <div
+                            key={index}
+                            className="flex w-full h-full justify-between self-center"
+                        >
                             {media && contentPosition === "contentRight" && (
                                 <div
                                     className={cn(
                                         imageSize === "imageTopCut" &&
                                             "absolute left-0 bottom-0 w-1/3 hidden md:block h-9/10",
                                         imageSize === "imageFull" &&
-                                            "h-[200px] md:h-auto w-full md:w-[400px] relative shrink-0 hidden md:block"
+                                            "h-[200px] md:h-auto md:min-h-[600px] w-full md:w-[400px] relative shrink-0 hidden md:block"
                                     )}
                                 >
                                     <Media
@@ -55,7 +58,8 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
 
                             <div
                                 className={cn(
-                                    "flex flex-col gap-4 md:gap-0 w-full md:w-1/2 relative self-center"
+                                    "flex flex-col gap-4 md:gap-0 w-full relative self-center",
+                                    columns.length == 1 && "md:w-1/2"
                                 )}
                                 key={col.id || index}
                             >
@@ -92,7 +96,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         imageSize === "imageTopCut" &&
                                             "absolute right-0 bottom-0 w-1/3 hidden md:block h-9/10",
                                         imageSize === "imageFull" &&
-                                            "h-[200px] md:h-auto w-full md:w-[400px] relative shrink-0 hidden md:block"
+                                            "h-[200px] md:h-auto md:min-h-[600px] w-full md:w-[400px] relative shrink-0 hidden md:block"
                                     )}
                                 >
                                     <Media
@@ -106,7 +110,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                     />
                                 </div>
                             )}
-                        </>
+                        </div>
                     );
                 })}
         </div>

@@ -1,7 +1,7 @@
 import { RenderBlocks } from "@/blocks/RenderBlocks";
+import { Hero } from "@/components/Hero/Hero";
 import { LivePreviewListener } from "@/components/LivePreviewListener";
 import { PayloadRedirects } from "@/components/PayloadRedirects";
-import { Hero } from "@/Hero/Hero";
 import { generateMeta } from "@/utilities/generateMeta";
 import configPromise from "@payload-config";
 import type { Metadata } from "next";
@@ -54,7 +54,7 @@ export default async function Page({ params: paramsPromise }: Args) {
         return <PayloadRedirects url={url} />;
     }
 
-    const { hero, layout, meta } = page;
+    const { hero, layout, meta, hasHero } = page;
 
     return (
         <>
@@ -64,7 +64,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 
             {draft && <LivePreviewListener />}
 
-            {hero && <Hero {...hero} />}
+            {hasHero && <Hero {...hero} />}
 
             <RenderBlocks blocks={layout} />
 

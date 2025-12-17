@@ -1,6 +1,8 @@
+import { FormBlock } from "@/blocks/Form/FormBlock";
 import { cn } from "@/utilities/ui";
 import {
     DefaultNodeTypes,
+    SerializedBlockNode,
     SerializedLinkNode,
     type DefaultTypedEditorState,
 } from "@payloadcms/richtext-lexical";
@@ -9,6 +11,7 @@ import {
     JSXConvertersFunction,
     LinkJSXConverter,
 } from "@payloadcms/richtext-lexical/react";
+import { FormBlockType } from "../../blocks/Form/FormBlock";
 
 type NodeTypes = DefaultNodeTypes;
 
@@ -26,6 +29,11 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
 }) => ({
     ...defaultConverters,
     ...LinkJSXConverter({ internalDocToHref }),
+    blocks: {
+        formBlock: ({ node }: { node: SerializedBlockNode<FormBlockType> }) => (
+            <FormBlock {...node.fields} />
+        ),
+    },
 });
 
 type Props = {

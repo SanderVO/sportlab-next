@@ -1,5 +1,6 @@
 import { CarouselBlock } from "@/blocks/Carousel/CarouselBlock";
 import { ContentBlock } from "@/blocks/Content/ContentBlock";
+import { FormBlock } from "@/blocks/Form/FormBlock";
 import { InstagramBlock } from "@/blocks/Instagram/InstagramBlock";
 import { TeamBlock } from "@/blocks/Team/TeamBlock";
 import type { Page } from "@/payload-types";
@@ -11,6 +12,7 @@ const blockComponents = {
     carousel: CarouselBlock,
     team: TeamBlock,
     instagram: InstagramBlock,
+    form: FormBlock,
 };
 
 export const RenderBlocks: React.FC<{

@@ -3,32 +3,46 @@ import {
     getCloudflareContext,
 } from "@opennextjs/cloudflare";
 import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
+import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { r2Storage } from "@payloadcms/storage-r2";
 import { s3Storage } from "@payloadcms/storage-s3";
-import { nl } from "@payloadcms/translations/languages/nl";
+import { nl as baseNl } from "@payloadcms/translations/languages/nl";
 import path from "path";
 import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import { GetPlatformProxyOptions } from "wrangler";
+import { Documents } from "./collections/Documents";
 import { Media } from "./collections/Media";
 import { Pages } from "./collections/Pages";
 import { Posts } from "./collections/Posts";
 import { Users } from "./collections/Users";
-import { Footer } from "./Footer/config";
-import { Header } from "./Header/config";
+import { Footer } from "./components/Footer/config";
+import { Header } from "./components/Header/config";
 import { plugins } from "./plugins";
 import { getServerSideURL } from "./utilities/getURL";
 
-const isWorker = process.env.RUNTIME === "worker";
+const nl = {
+    ...baseNl,
+    translations: {
+        ...baseNl.translations,
+        general: {
+            ...baseNl.translations.general,
+            lock: "Vergrendelen",
+            unlock: "Ontgrendelen",
+        },
+    },
+};
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const cloudflareRemoteBindings = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "production";
+const smtpEnabled = process.env.SMTP_ENABLED === "true";
+
 const cloudflare =
     process.argv.find((value) => value.match(/^(generate|migrate):?/)) ||
-    !cloudflareRemoteBindings
+    !isProduction
         ? await getCloudflareContextFromWrangler()
         : await getCloudflareContext({ async: true });
 
@@ -42,6 +56,12 @@ const r2DevStorage = () =>
                 generateFileURL: ({ filename }) =>
                     `${process.env.R2_PUBLIC_URL}/images_dev/${filename}`,
             },
+            documents: {
+                disableLocalStorage: true,
+                prefix: "documents_dev/",
+                generateFileURL: ({ filename }) =>
+                    `${process.env.R2_PUBLIC_URL}/documents_dev/${filename}`,
+            },
         },
         config: {
             region: "weur",
@@ -53,12 +73,42 @@ const r2DevStorage = () =>
         },
     });
 
-const r2StoragePlugin = isWorker
+const r2StoragePlugin = isProduction
     ? r2Storage({
           bucket: cloudflare.env.R2,
-          collections: { media: { prefix: "images/" } },
+          collections: {
+              media: {
+                  disableLocalStorage: true,
+                  prefix: "images/",
+                  generateFileURL: ({ filename }) =>
+                      `${process.env.R2_PUBLIC_URL}/images/${filename}`,
+              },
+              documents: {
+                  disableLocalStorage: true,
+                  prefix: "documents/",
+                  generateFileURL: ({ filename }) =>
+                      `${process.env.R2_PUBLIC_URL}/documents/${filename}`,
+              },
+          },
       })
     : r2DevStorage();
+
+const emailAdapter = isProduction
+    ? nodemailerAdapter({
+          defaultFromAddress: "noreply@sportlabgroningen.nl",
+          defaultFromName: "Sportlab Groningen",
+          transportOptions: {
+              host: process.env.SMTP_HOST,
+              port: 465,
+              secure: true,
+              requireTLS: true,
+              auth: {
+                  user: process.env.SMTP_USER,
+                  pass: process.env.SMTP_PASS,
+              },
+          },
+      })
+    : nodemailerAdapter();
 
 export default buildConfig({
     admin: {
@@ -89,7 +139,8 @@ export default buildConfig({
             ],
         },
     },
-    collections: [Users, Media, Pages, Posts],
+    email: smtpEnabled ? emailAdapter : undefined,
+    collections: [Users, Media, Documents, Pages, Posts],
     globals: [Header, Footer],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
@@ -112,7 +163,7 @@ function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
     ).then(({ getPlatformProxy }) =>
         getPlatformProxy({
             environment: process.env.CLOUDFLARE_ENV,
-            remoteBindings: cloudflareRemoteBindings,
+            remoteBindings: isProduction,
         } satisfies GetPlatformProxyOptions)
     );
 }

@@ -2,7 +2,7 @@ import { isAdmin } from "@/access/admin";
 import { Carousel } from "@/blocks/Carousel/config";
 import { Instagram } from "@/blocks/Instagram/config";
 import { Team } from "@/blocks/Team/config";
-import { hero } from "@/Hero/config";
+import { hero } from "@/components/Hero/config";
 import {
     MetaDescriptionField,
     MetaImageField,
@@ -74,11 +74,22 @@ export const Pages: CollectionConfig<"pages"> = {
             required: true,
         },
         {
+            label: "Met Hero",
+            name: "hasHero",
+            type: "checkbox",
+            required: true,
+        },
+        {
             type: "tabs",
             tabs: [
                 {
                     fields: [hero],
                     label: "Hero",
+                    admin: {
+                        condition: (_, siblingData) => {
+                            return siblingData?.hasHero === true;
+                        },
+                    },
                 },
                 {
                     fields: [

@@ -89,7 +89,10 @@ export const FormBlock: React.FC<
                         }
                     );
 
-                    const res = await req.json();
+                    const res: {
+                        errors: { message: string }[];
+                        status: string;
+                    } = await req.json();
 
                     clearTimeout(loadingTimerID);
 
@@ -131,7 +134,7 @@ export const FormBlock: React.FC<
     );
 
     return (
-        <div className="container lg:max-w-[48rem]">
+        <div className="w-full">
             {enableIntro && introContent && !hasSubmitted && (
                 <RichText
                     className="mb-8 lg:mb-12"
@@ -139,21 +142,25 @@ export const FormBlock: React.FC<
                     enableGutter={false}
                 />
             )}
-            <div className="p-4 lg:p-6 border border-border rounded-[0.8rem]">
+            <div className="p-4 lg:p-6 shadow-gray-300 shadow-sm text-background">
                 <FormProvider {...formMethods}>
                     {!isLoading &&
                         hasSubmitted &&
                         confirmationType === "message" && (
-                            <RichText data={confirmationMessage} />
+                            <RichText
+                                data={confirmationMessage}
+                                enableProse={false}
+                            />
                         )}
-                    {isLoading && !hasSubmitted && (
-                        <p>Loading, please wait...</p>
-                    )}
+
+                    {isLoading && !hasSubmitted && <p>Verzenden...</p>}
+
                     {error && (
                         <div>{`${error.status || "500"}: ${
                             error.message || ""
                         }`}</div>
                     )}
+
                     {!hasSubmitted && (
                         <form id={formID} onSubmit={handleSubmit(onSubmit)}>
                             <div className="mb-4 last:mb-0">

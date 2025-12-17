@@ -1,17 +1,13 @@
 import { revalidateRedirects } from "@/hooks/revalidateRedirects";
 import { Page, Post } from "@/payload-types";
-import { beforeSyncWithSearch } from "@/search/beforeSync";
-import { searchFields } from "@/search/fieldOverrides";
 import { getServerSideURL } from "@/utilities/getURL";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
 import { nestedDocsPlugin } from "@payloadcms/plugin-nested-docs";
 import { redirectsPlugin } from "@payloadcms/plugin-redirects";
-import { searchPlugin } from "@payloadcms/plugin-search";
 import { seoPlugin } from "@payloadcms/plugin-seo";
 import { GenerateURL } from "@payloadcms/plugin-seo/types";
 import {
     FixedToolbarFeature,
-    HeadingFeature,
     lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 import { Plugin } from "payload";
@@ -75,6 +71,42 @@ export const plugins: Plugin[] = [
     formBuilderPlugin({
         fields: {
             payment: false,
+            text: {
+                labels: {
+                    singular: "Tekstveld",
+                    plural: "Tekstvelden",
+                },
+            },
+            textarea: {
+                labels: {
+                    singular: "Tekstgebied",
+                    plural: "Tekstgebieden",
+                },
+            },
+            email: {
+                labels: {
+                    singular: "E-mailveld",
+                    plural: "E-mailvelden",
+                },
+            },
+            select: {
+                labels: {
+                    singular: "Selectievakje",
+                    plural: "Selectievakjes",
+                },
+            },
+            checkbox: {
+                labels: {
+                    singular: "Checkbox veld",
+                    plural: "Checkbox velden",
+                },
+            },
+            date: {
+                labels: {
+                    singular: "Datumveld",
+                    plural: "Datumvelden",
+                },
+            },
         },
         formSubmissionOverrides: {
             labels: {
@@ -87,48 +119,80 @@ export const plugins: Plugin[] = [
                 singular: "Formulier",
                 plural: "Formulieren",
             },
-            fields: ({ defaultFields }) => {
-                return defaultFields.map((field) => {
+            // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
+            fields: ({ defaultFields }) => ({
+                ...defaultFields.map((field) => {
+                    if ("name" in field && field.name === "title") {
+                        return {
+                            ...field,
+                            label: "Titel",
+                        };
+                    }
+
+                    if ("name" in field && field.name === "title") {
+                        return {
+                            ...field,
+                            label: "Titel",
+                        };
+                    }
+
+                    if ("name" in field && field.name === "submitButton") {
+                        return {
+                            ...field,
+                            label: "Bevestigknop tekst",
+                        };
+                    }
+
+                    if ("name" in field && field.name === "submitButtonLabel") {
+                        return {
+                            ...field,
+                            label: "Bevestigknop tekst",
+                        };
+                    }
+
+                    if ("name" in field && field.name === "confirmationType") {
+                        return {
+                            ...field,
+                            label: "Bevestig type",
+                            admin: {
+                                ...field.admin,
+                                description:
+                                    "Geef aan wat voor type bevestiging de gebruiker moet krijgen",
+                            },
+                        };
+                    }
+
                     if (
                         "name" in field &&
                         field.name === "confirmationMessage"
                     ) {
                         return {
                             ...field,
+                            label: "Bevestigingsbericht",
                             editor: lexicalEditor({
                                 features: ({ rootFeatures }) => {
                                     return [
                                         ...rootFeatures,
                                         FixedToolbarFeature(),
-                                        HeadingFeature({
-                                            enabledHeadingSizes: [
-                                                "h1",
-                                                "h2",
-                                                "h3",
-                                                "h4",
-                                            ],
-                                        }),
                                     ];
                                 },
                             }),
                         };
                     }
+
+                    if ("name" in field && field.name === "emails") {
+                        return {
+                            ...field,
+                            admin: {
+                                ...field.admin,
+                                description:
+                                    "Stuur aangepaste e-mails wanneer het formulier wordt ingediend. Gebruik komma-gescheiden lijsten om dezelfde e-mail naar meerdere ontvangers te sturen. Om een waarde uit deze vorm te verwijzen, wikkel je de naam van dat veld in met dubbele krulhaken, bijvoorbeeld {{firstName}}. Je kunt een wildcard {{*}} gebruiken om alle data uit te voeren en {{*:table}} om het als een HTML-tabel in de e-mail te formatteren.",
+                            },
+                        };
+                    }
                     return field;
-                });
-            },
-        },
-    }),
-    searchPlugin({
-        collections: ["posts"],
-        beforeSync: beforeSyncWithSearch,
-        searchOverrides: {
-            labels: {
-                singular: "Zoekresultaat",
-                plural: "Zoekresultaten",
-            },
-            fields: ({ defaultFields }) => {
-                return [...defaultFields, ...searchFields];
-            },
+                }),
+            }),
         },
     }),
 ];

@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     trailingSlash: false,
+    experimental: {
+        serverActions: {
+            bodySizeLimit: "2mb",
+        },
+    },
     images: {
         remotePatterns: [
             new URL("https://sportlabgroningen.nl/**"),
