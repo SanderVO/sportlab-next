@@ -13,6 +13,10 @@ build/
 out/*
 next-env.d.ts
 
+# Payload
+.payload/
+./src/payload-generated-schema.ts
+
 # Env files
 .env
 .env.local

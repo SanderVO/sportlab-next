@@ -7,7 +7,7 @@
         "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
         "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
         "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
-        "payload:generate": "pnpm run generate:db && pnpm run generate:importmap && pnpm run generate:types && pnpm run generate:types:cloudflare",
+        "payload:generate": "pnpm run generate:types && pnpm run generate:types:cloudflare && pnpm run generate:db && pnpm run generate:importmap",
         "generate:db": "cross-env NODE_OPTIONS=--no-deprecation payload generate:db-schema",
         "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
         "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",

@@ -120,8 +120,8 @@ export const plugins: Plugin[] = [
                 plural: "Formulieren",
             },
             // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
-            fields: ({ defaultFields }) => ({
-                ...defaultFields.map((field) => {
+            fields: ({ defaultFields }) => {
+                return defaultFields.map((field) => {
                     if ("name" in field && field.name === "title") {
                         return {
                             ...field,
@@ -191,8 +191,8 @@ export const plugins: Plugin[] = [
                         };
                     }
                     return field;
-                }),
-            }),
+                });
+            },
         },
     }),
 ];
