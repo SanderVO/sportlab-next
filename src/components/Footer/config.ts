@@ -9,13 +9,13 @@ export const Footer: GlobalConfig = {
     },
     fields: [
         {
-            label: "Title",
+            label: "Titel",
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Description",
+            label: "Subtitel",
             name: "description",
             type: "text",
             required: true,
@@ -31,7 +31,7 @@ export const Footer: GlobalConfig = {
             },
         },
         {
-            label: "Contact Information",
+            label: "Contact Informatie",
             name: "contactText",
             type: "richText",
             editor: defaultLexical,

@@ -15,7 +15,8 @@ next-env.d.ts
 
 # Payload
 .payload/
-./src/payload-generated-schema.ts
+src/payload-generated-schema.ts
+src/payload-types.ts
 
 # Env files
 .env

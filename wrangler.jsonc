@@ -20,7 +20,8 @@
             "binding": "D1",
             "database_id": "712e8cbd-d164-4f33-ae4d-777321518490",
             "database_name": "sportlab",
-            "remote": true
+            "remote": true,
+            "migrations_dir": "./src/migrations"
         }
     ],
     "r2_buckets": [
@@ -31,5 +32,28 @@
             "jurisdiction": "eu",
             "remote": true
         }
-    ]
+    ],
+    "env": {
+        "preview": {
+            "name": "sportlab-preview",
+            "d1_databases": [
+                {
+                    "binding": "D1",
+                    "database_name": "sportlab-preview",
+                    "database_id": "31be5e9e-8189-4d1a-b8b4-79d090bc6d10",
+                    "remote": true,
+                    "migrations_dir": "./src/migrations"
+                }
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "R2",
+                    "bucket_name": "sportlab",
+                    "preview_bucket_name": "sportlab",
+                    "jurisdiction": "eu",
+                    "remote": true
+                }
+            ]
+        }
+    }
 }

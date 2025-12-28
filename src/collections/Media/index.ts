@@ -18,5 +18,7 @@ export const Media: CollectionConfig = {
     ],
     upload: {
         mimeTypes: ["image/*"],
+        crop: false,
+        focalPoint: false,
     },
 };

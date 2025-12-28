@@ -52,15 +52,15 @@ const r2DevStorage = () =>
         collections: {
             media: {
                 disableLocalStorage: true,
-                prefix: "images_dev/",
+                prefix: cloudflare.env.R2_IMAGES_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/images_dev/${filename}`,
+                    `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}/${filename}`,
             },
             documents: {
                 disableLocalStorage: true,
-                prefix: "documents_dev/",
+                prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/documents_dev/${filename}`,
+                    `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}/${filename}`,
             },
         },
         config: {
@@ -79,15 +79,15 @@ const r2StoragePlugin = isProduction
           collections: {
               media: {
                   disableLocalStorage: true,
-                  prefix: "images/",
+                  prefix: cloudflare.env.R2_IMAGES_PREFIX,
                   generateFileURL: ({ filename }) =>
-                      `${process.env.R2_PUBLIC_URL}/images/${filename}`,
+                      `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}/${filename}`,
               },
               documents: {
                   disableLocalStorage: true,
-                  prefix: "documents/",
+                  prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
                   generateFileURL: ({ filename }) =>
-                      `${process.env.R2_PUBLIC_URL}/documents/${filename}`,
+                      `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}/${filename}`,
               },
           },
       })
@@ -95,8 +95,8 @@ const r2StoragePlugin = isProduction
 
 const emailAdapter = isProduction
     ? nodemailerAdapter({
-          defaultFromAddress: "noreply@sportlabgroningen.nl",
-          defaultFromName: "Sportlab Groningen",
+          defaultFromAddress: process.env.SMTP_FROM_ADDRESS || "",
+          defaultFromName: process.env.SMTP_FROM_NAME || "",
           transportOptions: {
               host: process.env.SMTP_HOST,
               port: 465,

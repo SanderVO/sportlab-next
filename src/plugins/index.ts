@@ -101,12 +101,6 @@ export const plugins: Plugin[] = [
                     plural: "Checkbox velden",
                 },
             },
-            date: {
-                labels: {
-                    singular: "Datumveld",
-                    plural: "Datumvelden",
-                },
-            },
         },
         formSubmissionOverrides: {
             labels: {

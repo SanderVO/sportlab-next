@@ -1,4 +1,27 @@
-import type { Block } from "payload";
+import { link } from "@/fields/link";
+import type { Block, Field } from "payload";
+
+const fields: Field[] = [
+    {
+        name: "media",
+        type: "upload",
+        relationTo: "media",
+        required: false,
+    },
+    {
+        name: "enableLink",
+        type: "checkbox",
+    },
+    link({
+        overrides: {
+            admin: {
+                condition: (_data, siblingData) => {
+                    return Boolean(siblingData?.enableLink);
+                },
+            },
+        },
+    }),
+];
 
 export const Instagram: Block = {
     slug: "instagram",
@@ -53,6 +76,15 @@ export const Instagram: Block = {
                     value: "backgroundWhite",
                 },
             ],
+        },
+        {
+            label: "Foto's",
+            name: "images",
+            type: "array",
+            admin: {
+                initCollapsed: true,
+            },
+            fields: fields,
         },
     ],
 };

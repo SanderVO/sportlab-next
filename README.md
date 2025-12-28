@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sportlab
 
-## Getting Started
+A website for Sportlab Groningen made in Next 15 and PayloadCMS. It deploys to Cloudflare Workers and works completely serverless.
 
-First, run the development server:
+## Development
+
+Before you begin, you must generate some schema's and type files for correct typehinting. To do this, run the following command:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm payload:generate
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+After that, you should make a `.env.local` and a `.env.production.local` file with env variables. For the production file, it should contain env variables for the preview deployment.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Then, to run the development server locally, run the following commands:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm i
+pnpm dev
+```
 
-## Learn More
+To run a production build version of the application locally, run the following command:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm dev:prod
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Cloudflare Preview
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+You can also deploy a preview version to Cloudflare to test the application in Worker environments and remote bindings. To do this, run the following command:
 
-## Deploy on Vercel
+```bash
+pnpm db:generate
+pnpm deploy:database:preview
+pnpm preview
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This will setup a preview version of the application in Cloudflare Workers for you to test on, with the remote D1 preview database.
