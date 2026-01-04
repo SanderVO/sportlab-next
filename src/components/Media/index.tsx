@@ -8,6 +8,7 @@ export const Media: React.FC<Props> = (props) => {
 
     const isVideo =
         typeof resource === "object" && resource?.mimeType?.includes("video");
+
     const Tag = htmlElement || Fragment;
 
     return (
@@ -17,6 +18,7 @@ export const Media: React.FC<Props> = (props) => {
                       className,
                   }
                 : {})}
+            aria-hidden={isVideo ? "true" : undefined}
         >
             {isVideo ? <VideoMedia {...props} /> : <ImageMedia {...props} />}
         </Tag>

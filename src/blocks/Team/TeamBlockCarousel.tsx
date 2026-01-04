@@ -52,7 +52,7 @@ export const TeamBlockCarousel: React.FC<Props> = ({
                                     <Media
                                         fill
                                         resource={user?.avatar}
-                                        imgClassName="object-cover object-top rounded-3xl"
+                                        imgClassName="object-cover object-top"
                                     />
                                 </div>
 

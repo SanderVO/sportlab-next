@@ -10,6 +10,7 @@ export const FormBlock: Block = {
     interfaceName: "FormBlock",
     fields: [
         {
+            label: "Formulier",
             name: "form",
             type: "relationship",
             relationTo: "forms",

@@ -48,9 +48,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         resource={media}
                                         fill
                                         imgClassName={cn(
-                                            "object-cover object-center",
-                                            imageSize === "imageFull" &&
-                                                "rounded-4xl"
+                                            "object-cover object-center"
                                         )}
                                     />
                                 </div>
@@ -69,7 +67,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                             resource={media}
                                             fill
                                             className="h-[175px] w-full relative mb-4"
-                                            imgClassName="object-cover object-center rounded-4xl"
+                                            imgClassName="object-cover object-center"
                                         />
                                     )}
 
@@ -103,9 +101,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         resource={media}
                                         fill
                                         imgClassName={cn(
-                                            "object-cover object-center",
-                                            imageSize === "imageFull" &&
-                                                "rounded-4xl"
+                                            "object-cover object-center"
                                         )}
                                     />
                                 </div>

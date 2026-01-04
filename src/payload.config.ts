@@ -54,13 +54,13 @@ const r2DevStorage = () =>
                 disableLocalStorage: true,
                 prefix: cloudflare.env.R2_IMAGES_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}/${filename}`,
+                    `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}${filename}`,
             },
             documents: {
                 disableLocalStorage: true,
                 prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}/${filename}`,
+                    `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}${filename}`,
             },
         },
         config: {
@@ -81,13 +81,13 @@ const r2StoragePlugin = isProduction
                   disableLocalStorage: true,
                   prefix: cloudflare.env.R2_IMAGES_PREFIX,
                   generateFileURL: ({ filename }) =>
-                      `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}/${filename}`,
+                      `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}${filename}`,
               },
               documents: {
                   disableLocalStorage: true,
                   prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
                   generateFileURL: ({ filename }) =>
-                      `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}/${filename}`,
+                      `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}${filename}`,
               },
           },
       })
@@ -100,8 +100,6 @@ const emailAdapter = isProduction
           transportOptions: {
               host: process.env.SMTP_HOST,
               port: 465,
-              secure: true,
-              requireTLS: true,
               auth: {
                   user: process.env.SMTP_USER,
                   pass: process.env.SMTP_PASS,
@@ -137,6 +135,11 @@ export default buildConfig({
                     height: 900,
                 },
             ],
+        },
+        components: {
+            graphics: {
+                Logo: "./components/Logo/Logo",
+            },
         },
     },
     email: smtpEnabled ? emailAdapter : undefined,

@@ -8,6 +8,7 @@ import type {
     Form as FormType,
 } from "@payloadcms/plugin-form-builder/types";
 import type { DefaultTypedEditorState } from "@payloadcms/richtext-lexical";
+import { Turnstile } from "next-turnstile";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -49,6 +50,7 @@ export const FormBlock: React.FC<
         register,
     } = formMethods;
 
+    const [token, setToken] = useState<string>();
     const [isLoading, setIsLoading] = useState(false);
     const [hasSubmitted, setHasSubmitted] = useState<boolean>();
     const [error, setError] = useState<
@@ -59,7 +61,10 @@ export const FormBlock: React.FC<
     const onSubmit = useCallback(
         (data: FormFieldBlock[]) => {
             let loadingTimerID: ReturnType<typeof setTimeout>;
+
             const submitForm = async () => {
+                if (!token) return;
+
                 setError(undefined);
 
                 const dataToSend = Object.entries(data).map(
@@ -69,7 +74,6 @@ export const FormBlock: React.FC<
                     })
                 );
 
-                // delay loading indicator by 1s
                 loadingTimerID = setTimeout(() => {
                     setIsLoading(true);
                 }, 1000);
@@ -121,16 +125,18 @@ export const FormBlock: React.FC<
                     }
                 } catch (err) {
                     console.warn(err);
+
                     setIsLoading(false);
+
                     setError({
-                        message: "Something went wrong.",
+                        message: "Er ging wat fout bij het verzenden.",
                     });
                 }
             };
 
             void submitForm();
         },
-        [router, formID, redirect, confirmationType]
+        [router, formID, redirect, confirmationType, token]
     );
 
     return (
@@ -142,6 +148,7 @@ export const FormBlock: React.FC<
                     enableGutter={false}
                 />
             )}
+
             <div className="p-4 lg:p-6 shadow-gray-300 shadow-sm text-background">
                 <FormProvider {...formMethods}>
                     {!isLoading &&
@@ -195,7 +202,21 @@ export const FormBlock: React.FC<
                                     )}
                             </div>
 
-                            <Button form={formID} type="submit" variant="black">
+                            <Turnstile
+                                siteKey={
+                                    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!
+                                }
+                                theme="light"
+                                sandbox={process.env.NODE_ENV === "development"}
+                                onVerify={setToken}
+                            />
+
+                            <Button
+                                form={formID}
+                                type="submit"
+                                variant="black"
+                                disabled={!token}
+                            >
                                 {submitButtonLabel}
                             </Button>
                         </form>

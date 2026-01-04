@@ -186,6 +186,7 @@ export const Posts: CollectionConfig<"posts"> = {
             },
         },
         {
+            label: "Auteurs",
             name: "authors",
             type: "relationship",
             admin: {

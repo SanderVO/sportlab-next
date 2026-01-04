@@ -1,11 +1,14 @@
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare/cloudflare-context";
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
+
+initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
     trailingSlash: false,
     experimental: {
         serverActions: {
-            bodySizeLimit: "2mb",
+            bodySizeLimit: "5mb",
         },
     },
     images: {

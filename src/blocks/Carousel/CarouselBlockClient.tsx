@@ -45,7 +45,7 @@ export const CarouselBlockClient: React.FC<CarouselBlockProps> = (props) => {
                                         fill
                                         resource={carouselItem.media}
                                         className="w-[50px] h-[50px] relative"
-                                        imgClassName="rounded-full object-cover object-center"
+                                        imgClassName="object-cover object-center"
                                     />
 
                                     <p className="font-sl-montserrat text-sm font-medium basis-[40%] overflow-hidden">

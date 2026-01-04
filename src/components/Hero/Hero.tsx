@@ -15,7 +15,8 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
                 backgroundColor === "beige" && "bg-sl-beige",
                 backgroundColor === "white" && "bg-white",
                 backgroundColor === "black" && "bg-background",
-                type === "background" && "justify-end min-h-[720px]",
+                type === "background" &&
+                    "justify-end min-h-[calc(100svh-250px)] sm:min-h-[720px]",
                 type === "left" && "sm:h-[720px] sm:min-h-[720px]"
             )}
         >
@@ -25,10 +26,11 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
                         fill
                         resource={media}
                         imgClassName="absolute object-cover"
+                        videoClassName="absolute object-cover h-full w-full"
                         priority={true}
                     />
 
-                    <div className="absolute inset-0 bg-black/50 z-10" />
+                    <div className="absolute inset-0 bg-black/70 z-10" />
                 </>
             )}
 
@@ -38,6 +40,7 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
                         fill
                         resource={media}
                         imgClassName="absolute object-cover h-full"
+                        videoClassName="absolute object-cover h-full w-full"
                         priority={true}
                     />
                 </div>

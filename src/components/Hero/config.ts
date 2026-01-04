@@ -9,6 +9,13 @@ export const hero: Field = {
     required: false,
     fields: [
         {
+            label: "Afbeelding / Video",
+            name: "media",
+            type: "upload",
+            relationTo: "media",
+            required: true,
+        },
+        {
             label: "Titel",
             name: "title",
             type: "text",
@@ -92,11 +99,5 @@ export const hero: Field = {
                 },
             },
         }),
-        {
-            name: "media",
-            type: "upload",
-            relationTo: "media",
-            required: true,
-        },
     ],
 };

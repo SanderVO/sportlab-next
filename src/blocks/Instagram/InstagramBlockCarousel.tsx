@@ -1,5 +1,6 @@
 "use client";
 
+import { CMSLink } from "@/components/Link";
 import { Media } from "@/components/Media";
 import type { InstagramBlock as InstagramBlockProps } from "@/payload-types";
 import { useIsMobile } from "@/utilities/useIsMobile";
@@ -28,13 +29,28 @@ export const InstagramBlockCarousel: React.FC<InstagramBlockProps> = ({
                             className="flex flex-row items-center text h-full shrink-0 w-[66.6667%] md:w-[25%] px-2"
                         >
                             <div className="h-full flex flex-col w-full relative">
-                                <div className="h-[400px]">
-                                    <Media
-                                        fill
-                                        imgClassName="object-cover object-top"
-                                        resource={image.media}
-                                    />
-                                </div>
+                                {image.enableLink && (
+                                    <CMSLink
+                                        {...image.link}
+                                        className="h-[400px]"
+                                    >
+                                        <Media
+                                            fill
+                                            imgClassName="object-cover object-top"
+                                            resource={image.media}
+                                        />
+                                    </CMSLink>
+                                )}
+
+                                {!image.enableLink && (
+                                    <div className="h-[400px]">
+                                        <Media
+                                            fill
+                                            imgClassName="object-cover object-top"
+                                            resource={image.media}
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}

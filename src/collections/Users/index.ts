@@ -46,10 +46,12 @@ export const Users: CollectionConfig = {
     },
     fields: [
         {
+            label: "Naam",
             name: "name",
             type: "text",
         },
         {
+            label: "Status",
             name: "status",
             type: "select",
             defaultValue: "active",
@@ -66,6 +68,7 @@ export const Users: CollectionConfig = {
             ],
         },
         {
+            label: "Rollen",
             name: "roles",
             type: "select",
             hasMany: true,
