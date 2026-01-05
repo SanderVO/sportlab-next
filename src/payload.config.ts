@@ -52,15 +52,15 @@ const r2DevStorage = () =>
         collections: {
             media: {
                 disableLocalStorage: true,
-                prefix: cloudflare.env.R2_IMAGES_PREFIX,
+                prefix: process.env.R2_IMAGES_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}${filename}`,
+                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_IMAGES_PREFIX}${filename}`,
             },
             documents: {
                 disableLocalStorage: true,
-                prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
+                prefix: process.env.R2_DOCUMENTS_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}${filename}`,
+                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_DOCUMENTS_PREFIX}${filename}`,
             },
         },
         config: {
@@ -73,25 +73,26 @@ const r2DevStorage = () =>
         },
     });
 
-const r2StoragePlugin = isProduction
-    ? r2Storage({
-          bucket: cloudflare.env.R2,
-          collections: {
-              media: {
-                  disableLocalStorage: true,
-                  prefix: cloudflare.env.R2_IMAGES_PREFIX,
-                  generateFileURL: ({ filename }) =>
-                      `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}${filename}`,
-              },
-              documents: {
-                  disableLocalStorage: true,
-                  prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
-                  generateFileURL: ({ filename }) =>
-                      `${process.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}${filename}`,
-              },
-          },
-      })
-    : r2DevStorage();
+const r2ProductionStorage = () =>
+    r2Storage({
+        bucket: cloudflare.env.R2,
+        collections: {
+            media: {
+                disableLocalStorage: true,
+                prefix: process.env.R2_IMAGES_PREFIX,
+                generateFileURL: ({ filename }) =>
+                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_IMAGES_PREFIX}${filename}`,
+            },
+            documents: {
+                disableLocalStorage: true,
+                prefix: process.env.R2_DOCUMENTS_PREFIX,
+                generateFileURL: ({ filename }) =>
+                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_DOCUMENTS_PREFIX}${filename}`,
+            },
+        },
+    });
+
+const r2StoragePlugin = isProduction ? r2ProductionStorage() : r2DevStorage();
 
 const emailAdapter = nodemailerAdapter({
     defaultFromAddress: process.env.SMTP_FROM_ADDRESS || "",
