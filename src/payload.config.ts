@@ -146,7 +146,7 @@ export default buildConfig({
     globals: [Header, Footer],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
-    secret: process.env.PAYLOAD_SECRET || "",
+    secret: process.env.PAYLOAD_SECRET || "ignore",
     typescript: {
         outputFile: path.resolve(dirname, "payload-types.ts"),
     },
