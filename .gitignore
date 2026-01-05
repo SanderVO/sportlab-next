@@ -43,9 +43,6 @@ Thumbs.db
 coverage/
 .nyc_output/
 
-# Cloudflare
-cloudflare-env.d.ts
-
 # Optional: Docker
 docker-compose.override.yml
 .docker/
