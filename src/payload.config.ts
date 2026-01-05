@@ -38,7 +38,6 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 const isProduction = process.env.NODE_ENV === "production";
-const smtpEnabled = process.env.SMTP_ENABLED === "true";
 
 const cloudflare =
     process.argv.find((value) => value.match(/^(generate|migrate):?/)) ||
@@ -79,15 +78,15 @@ const r2ProductionStorage = () =>
         collections: {
             media: {
                 disableLocalStorage: true,
-                prefix: process.env.R2_IMAGES_PREFIX,
+                prefix: cloudflare.env.R2_IMAGES_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_IMAGES_PREFIX}${filename}`,
+                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}${filename}`,
             },
             documents: {
                 disableLocalStorage: true,
-                prefix: process.env.R2_DOCUMENTS_PREFIX,
+                prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_DOCUMENTS_PREFIX}${filename}`,
+                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}${filename}`,
             },
         },
     });
@@ -128,25 +127,26 @@ export default buildConfig({
             },
         },
     },
-    email: smtpEnabled
-        ? nodemailerAdapter({
-              defaultFromAddress: process.env.SMTP_FROM_ADDRESS || "",
-              defaultFromName: process.env.SMTP_FROM_NAME || "",
-              transportOptions: {
-                  host: process.env.SMTP_HOST,
-                  port: 465,
-                  auth: {
-                      user: process.env.SMTP_USER,
-                      pass: process.env.SMTP_PASS,
+    email:
+        cloudflare.env.SMTP_HOST === "true"
+            ? nodemailerAdapter({
+                  defaultFromAddress: cloudflare.env.SMTP_FROM_ADDRESS || "",
+                  defaultFromName: cloudflare.env.SMTP_FROM_NAME || "",
+                  transportOptions: {
+                      host: cloudflare.env.SMTP_HOST,
+                      port: 465,
+                      auth: {
+                          user: cloudflare.env.SMTP_USER,
+                          pass: cloudflare.env.SMTP_PASS,
+                      },
                   },
-              },
-          })
-        : undefined,
+              })
+            : undefined,
     collections: [Users, Media, Documents, Pages, Posts],
     globals: [Header, Footer],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
-    secret: process.env.PAYLOAD_SECRET || "ignore",
+    secret: cloudflare.env.PAYLOAD_SECRET || "ignore",
     typescript: {
         outputFile: path.resolve(dirname, "payload-types.ts"),
     },
