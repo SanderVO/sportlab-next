@@ -94,19 +94,6 @@ const r2ProductionStorage = () =>
 
 const r2StoragePlugin = isProduction ? r2ProductionStorage() : r2DevStorage();
 
-const emailAdapter = nodemailerAdapter({
-    defaultFromAddress: process.env.SMTP_FROM_ADDRESS || "",
-    defaultFromName: process.env.SMTP_FROM_NAME || "",
-    transportOptions: {
-        host: process.env.SMTP_HOST,
-        port: 465,
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
-    },
-});
-
 export default buildConfig({
     admin: {
         user: Users.slug,
@@ -141,7 +128,20 @@ export default buildConfig({
             },
         },
     },
-    email: smtpEnabled ? emailAdapter : undefined,
+    email: smtpEnabled
+        ? nodemailerAdapter({
+              defaultFromAddress: process.env.SMTP_FROM_ADDRESS || "",
+              defaultFromName: process.env.SMTP_FROM_NAME || "",
+              transportOptions: {
+                  host: process.env.SMTP_HOST,
+                  port: 465,
+                  auth: {
+                      user: process.env.SMTP_USER,
+                      pass: process.env.SMTP_PASS,
+                  },
+              },
+          })
+        : undefined,
     collections: [Users, Media, Documents, Pages, Posts],
     globals: [Header, Footer],
     cors: [getServerSideURL()].filter(Boolean),
