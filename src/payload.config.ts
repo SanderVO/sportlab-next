@@ -38,37 +38,40 @@ const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
 const isProduction = process.env.NODE_ENV === "production";
-const smtpEnabled = process.env.SMTP_ENABLED === "true";
+const isCLI = process.argv.some((value) =>
+    value.match(/^(generate|migrate):?/)
+);
 
 const cloudflare =
-    process.argv.find((value) => value.match(/^(generate|migrate):?/)) ||
-    !isProduction
+    isCLI || !isProduction
         ? await getCloudflareContextFromWrangler()
         : await getCloudflareContext({ async: true });
 
+const smtpEnabled = cloudflare.env.SMTP_ENABLED === "true";
+
 const r2DevStorage = () =>
     s3Storage({
-        bucket: process.env.R2_BUCKET ?? "",
+        bucket: cloudflare.env.R2_BUCKET ?? "",
         collections: {
             media: {
                 disableLocalStorage: true,
-                prefix: process.env.R2_IMAGES_PREFIX,
+                prefix: cloudflare.env.R2_IMAGES_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_IMAGES_PREFIX}${filename}`,
+                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}${filename}`,
             },
             documents: {
                 disableLocalStorage: true,
-                prefix: process.env.R2_DOCUMENTS_PREFIX,
+                prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_DOCUMENTS_PREFIX}${filename}`,
+                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}${filename}`,
             },
         },
         config: {
             region: "weur",
-            endpoint: process.env.R2_ENDPOINT,
+            endpoint: cloudflare.env.R2_ENDPOINT,
             credentials: {
-                accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
-                secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
+                accessKeyId: cloudflare.env.R2_ACCESS_KEY_ID ?? "",
+                secretAccessKey: cloudflare.env.R2_SECRET_ACCESS_KEY ?? "",
             },
         },
     });
@@ -79,15 +82,15 @@ const r2ProductionStorage = () =>
         collections: {
             media: {
                 disableLocalStorage: true,
-                prefix: process.env.R2_IMAGES_PREFIX,
+                prefix: cloudflare.env.R2_IMAGES_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_IMAGES_PREFIX}${filename}`,
+                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}${filename}`,
             },
             documents: {
                 disableLocalStorage: true,
-                prefix: process.env.R2_DOCUMENTS_PREFIX,
+                prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_DOCUMENTS_PREFIX}${filename}`,
+                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}${filename}`,
             },
         },
     });
@@ -95,14 +98,14 @@ const r2ProductionStorage = () =>
 const r2StoragePlugin = isProduction ? r2ProductionStorage() : r2DevStorage();
 
 const emailAdapter = nodemailerAdapter({
-    defaultFromAddress: process.env.SMTP_FROM_ADDRESS || "",
-    defaultFromName: process.env.SMTP_FROM_NAME || "",
+    defaultFromAddress: cloudflare.env.SMTP_FROM_ADDRESS || "",
+    defaultFromName: cloudflare.env.SMTP_FROM_NAME || "",
     transportOptions: {
-        host: process.env.SMTP_HOST,
+        host: cloudflare.env.SMTP_HOST,
         port: 465,
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            user: cloudflare.env.SMTP_USER,
+            pass: cloudflare.env.SMTP_PASS,
         },
     },
 });
@@ -146,7 +149,7 @@ export default buildConfig({
     globals: [Header, Footer],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
-    secret: process.env.PAYLOAD_SECRET || "",
+    secret: cloudflare.env.PAYLOAD_SECRET || "",
     typescript: {
         outputFile: path.resolve(dirname, "payload-types.ts"),
     },
