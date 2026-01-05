@@ -2,8 +2,6 @@ import { authenticated } from "@/access/authenticated";
 import type { CollectionConfig } from "payload";
 import { User } from "../../payload-types";
 
-const smtpEnabled = process.env.SMTP_ENABLED === "true";
-
 export enum RolesEnum {
     ADMIN = "admin",
     EDITOR = "editor",
@@ -13,20 +11,7 @@ export enum RolesEnum {
 
 export const Users: CollectionConfig = {
     slug: "users",
-    auth: smtpEnabled
-        ? {
-              verify: {
-                  generateEmailSubject: ({ user }) => {
-                      return `Hey ${user.email}, verifieer je account!`;
-                  },
-              },
-              forgotPassword: {
-                  generateEmailSubject: (req) => {
-                      return `Hey ${req?.user.email}, reset je wachtwoord!`;
-                  },
-              },
-          }
-        : true,
+    auth: true,
     labels: {
         singular: "Gebruiker",
         plural: "Gebruikers",
@@ -38,7 +23,9 @@ export const Users: CollectionConfig = {
     },
     access: {
         admin: ({ req }: { req: { user: User | null } }) =>
-            req?.user?.roles.includes(RolesEnum.ADMIN) ?? false,
+            (req?.user?.roles.includes(RolesEnum.ADMIN) ||
+                req.user?.roles.includes(RolesEnum.EDITOR)) ??
+            false,
         create: authenticated,
         delete: authenticated,
         read: authenticated,

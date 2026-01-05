@@ -24,7 +24,7 @@
         "deploy:upload": "opennextjs-cloudflare build --env=production && opennextjs-cloudflare upload --env=production",
         "deploy:app": "opennextjs-cloudflare build --env=production && opennextjs-cloudflare deploy --env=production",
         "deploy:database:preview": "cross-env NODE_ENV=production CLOUDFLARE_ENV=preview PAYLOAD_SECRET=ignore payload migrate && wrangler d1 execute D1 --command 'PRAGMA optimize' --env=preview --remote",
-        "deploy:database:production": "cross-env NODE_ENV=production PAYLOAD_SECRET=ignore payload migrate && wrangler d1 execute D1 --command 'PRAGMA optimize' --env=$CLOUDFLARE_ENV --remote"
+        "deploy:database:production": "cross-env NODE_ENV=production CLOUDFLARE_ENV=production PAYLOAD_SECRET=ignore payload migrate && wrangler d1 execute D1 --command 'PRAGMA optimize' --env=$CLOUDFLARE_ENV --remote"
     },
     "dependencies": {
         "@aws-sdk/client-s3": "^3.940.0",
