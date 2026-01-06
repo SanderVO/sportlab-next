@@ -403,12 +403,6 @@ export const pages = sqliteTable(
     }),
     hero_title: text("hero_title"),
     hero_text: text("hero_text", { mode: "json" }),
-    hero_type: text("hero_type", { enum: ["background", "left"] }).default(
-      "background",
-    ),
-    hero_backgroundColor: text("hero_background_color", {
-      enum: ["black", "beige", "white"],
-    }).default("black"),
     hero_color: text("hero_color", {
       enum: ["black", "beige", "white"],
     }).default("black"),
@@ -752,12 +746,6 @@ export const _pages_v = sqliteTable(
     ),
     version_hero_title: text("version_hero_title"),
     version_hero_text: text("version_hero_text", { mode: "json" }),
-    version_hero_type: text("version_hero_type", {
-      enum: ["background", "left"],
-    }).default("background"),
-    version_hero_backgroundColor: text("version_hero_background_color", {
-      enum: ["black", "beige", "white"],
-    }).default("black"),
     version_hero_color: text("version_hero_color", {
       enum: ["black", "beige", "white"],
     }).default("black"),
@@ -1180,31 +1168,6 @@ export const forms_blocks_checkbox = sqliteTable(
   ],
 );
 
-export const forms_blocks_country = sqliteTable(
-  "forms_blocks_country",
-  {
-    _order: integer("_order").notNull(),
-    _parentID: integer("_parent_id").notNull(),
-    _path: text("_path").notNull(),
-    id: text("id").primaryKey(),
-    name: text("name").notNull(),
-    label: text("label"),
-    width: numeric("width", { mode: "number" }),
-    required: integer("required", { mode: "boolean" }),
-    blockName: text("block_name"),
-  },
-  (columns) => [
-    index("forms_blocks_country_order_idx").on(columns._order),
-    index("forms_blocks_country_parent_id_idx").on(columns._parentID),
-    index("forms_blocks_country_path_idx").on(columns._path),
-    foreignKey({
-      columns: [columns["_parentID"]],
-      foreignColumns: [forms.id],
-      name: "forms_blocks_country_parent_id_fk",
-    }).onDelete("cascade"),
-  ],
-);
-
 export const forms_blocks_email = sqliteTable(
   "forms_blocks_email",
   {
@@ -1321,31 +1284,6 @@ export const forms_blocks_select = sqliteTable(
       columns: [columns["_parentID"]],
       foreignColumns: [forms.id],
       name: "forms_blocks_select_parent_id_fk",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const forms_blocks_state = sqliteTable(
-  "forms_blocks_state",
-  {
-    _order: integer("_order").notNull(),
-    _parentID: integer("_parent_id").notNull(),
-    _path: text("_path").notNull(),
-    id: text("id").primaryKey(),
-    name: text("name").notNull(),
-    label: text("label"),
-    width: numeric("width", { mode: "number" }),
-    required: integer("required", { mode: "boolean" }),
-    blockName: text("block_name"),
-  },
-  (columns) => [
-    index("forms_blocks_state_order_idx").on(columns._order),
-    index("forms_blocks_state_parent_id_idx").on(columns._parentID),
-    index("forms_blocks_state_path_idx").on(columns._path),
-    foreignKey({
-      columns: [columns["_parentID"]],
-      foreignColumns: [forms.id],
-      name: "forms_blocks_state_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -2328,16 +2266,6 @@ export const relations_forms_blocks_checkbox = relations(
     }),
   }),
 );
-export const relations_forms_blocks_country = relations(
-  forms_blocks_country,
-  ({ one }) => ({
-    _parentID: one(forms, {
-      fields: [forms_blocks_country._parentID],
-      references: [forms.id],
-      relationName: "_blocks_country",
-    }),
-  }),
-);
 export const relations_forms_blocks_email = relations(
   forms_blocks_email,
   ({ one }) => ({
@@ -2391,16 +2319,6 @@ export const relations_forms_blocks_select = relations(
     }),
   }),
 );
-export const relations_forms_blocks_state = relations(
-  forms_blocks_state,
-  ({ one }) => ({
-    _parentID: one(forms, {
-      fields: [forms_blocks_state._parentID],
-      references: [forms.id],
-      relationName: "_blocks_state",
-    }),
-  }),
-);
 export const relations_forms_blocks_text = relations(
   forms_blocks_text,
   ({ one }) => ({
@@ -2432,9 +2350,6 @@ export const relations_forms = relations(forms, ({ many }) => ({
   _blocks_checkbox: many(forms_blocks_checkbox, {
     relationName: "_blocks_checkbox",
   }),
-  _blocks_country: many(forms_blocks_country, {
-    relationName: "_blocks_country",
-  }),
   _blocks_email: many(forms_blocks_email, {
     relationName: "_blocks_email",
   }),
@@ -2446,9 +2361,6 @@ export const relations_forms = relations(forms, ({ many }) => ({
   }),
   _blocks_select: many(forms_blocks_select, {
     relationName: "_blocks_select",
-  }),
-  _blocks_state: many(forms_blocks_state, {
-    relationName: "_blocks_state",
   }),
   _blocks_text: many(forms_blocks_text, {
     relationName: "_blocks_text",
@@ -2667,13 +2579,11 @@ type DatabaseSchema = {
   redirects: typeof redirects;
   redirects_rels: typeof redirects_rels;
   forms_blocks_checkbox: typeof forms_blocks_checkbox;
-  forms_blocks_country: typeof forms_blocks_country;
   forms_blocks_email: typeof forms_blocks_email;
   forms_blocks_message: typeof forms_blocks_message;
   forms_blocks_number: typeof forms_blocks_number;
   forms_blocks_select_options: typeof forms_blocks_select_options;
   forms_blocks_select: typeof forms_blocks_select;
-  forms_blocks_state: typeof forms_blocks_state;
   forms_blocks_text: typeof forms_blocks_text;
   forms_blocks_textarea: typeof forms_blocks_textarea;
   forms_emails: typeof forms_emails;
@@ -2726,13 +2636,11 @@ type DatabaseSchema = {
   relations_redirects_rels: typeof relations_redirects_rels;
   relations_redirects: typeof relations_redirects;
   relations_forms_blocks_checkbox: typeof relations_forms_blocks_checkbox;
-  relations_forms_blocks_country: typeof relations_forms_blocks_country;
   relations_forms_blocks_email: typeof relations_forms_blocks_email;
   relations_forms_blocks_message: typeof relations_forms_blocks_message;
   relations_forms_blocks_number: typeof relations_forms_blocks_number;
   relations_forms_blocks_select_options: typeof relations_forms_blocks_select_options;
   relations_forms_blocks_select: typeof relations_forms_blocks_select;
-  relations_forms_blocks_state: typeof relations_forms_blocks_state;
   relations_forms_blocks_text: typeof relations_forms_blocks_text;
   relations_forms_blocks_textarea: typeof relations_forms_blocks_textarea;
   relations_forms_emails: typeof relations_forms_emails;

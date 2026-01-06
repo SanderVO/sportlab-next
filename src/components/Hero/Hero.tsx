@@ -6,61 +6,35 @@ import { cn } from "@/utilities/ui";
 import React from "react";
 
 export const Hero: React.FC<Page["hero"]> = (props) => {
-    const { color, link, type, backgroundColor, media } = props;
+    const { color, link, media } = props;
 
     return (
         <section
             className={cn(
-                "flex flex-col sm:flex-row w-full relative h-auto xxl:h-[1080px]",
-                backgroundColor === "beige" && "bg-sl-beige",
-                backgroundColor === "white" && "bg-white",
-                backgroundColor === "black" && "bg-background",
-                type === "background" &&
-                    "justify-end min-h-[calc(100svh-250px)] sm:min-h-[720px]",
-                type === "left" && "sm:h-[720px] sm:min-h-[720px]"
+                "flex flex-col sm:flex-row w-full relative h-auto xxl:h-[1080px] justify-end min-h-[calc(100svh-250px)] sm:min-h-[720px]"
             )}
         >
-            {type === "background" && (
-                <>
-                    <Media
-                        fill
-                        resource={media}
-                        imgClassName="absolute object-cover"
-                        videoClassName="absolute object-cover h-full w-full"
-                        priority={true}
-                    />
+            <Media
+                fill
+                resource={media}
+                imgClassName="absolute object-cover"
+                videoClassName="absolute object-cover h-full w-full"
+                priority={true}
+            />
 
-                    <div className="absolute inset-0 bg-black/70 z-10" />
-                </>
-            )}
-
-            {type === "left" && (
-                <div className="relative h-[200px] md:h-full md:basis-2/5 shrink-0 md:mb-0">
-                    <Media
-                        fill
-                        resource={media}
-                        imgClassName="absolute object-cover h-full"
-                        videoClassName="absolute object-cover h-full w-full"
-                        priority={true}
-                    />
-                </div>
-            )}
+            <div className="absolute inset-0 bg-black/70 z-10" />
 
             <div
                 className={cn(
-                    "container mx-auto z-20 flex items-center justify-start h-full",
+                    "container mx-auto z-20 flex items-center justify-start h-full self-end",
                     color === "beige" && "text-sl-beige",
                     color === "white" && "text-white",
-                    color === "black" && "text-background",
-                    type === "background" && "self-end"
+                    color === "black" && "text-background"
                 )}
             >
                 <div
                     className={cn(
-                        "flex flex-col w-full",
-                        type === "background" &&
-                            "self-end sm:w-[50%] sm:mb-[100px] pb-8 md:pb-0",
-                        type === "left" && "my-10 sm:ml-6 sm:my-0"
+                        "flex flex-col w-full self-end sm:w-[50%] sm:mb-[100px] pb-8 md:pb-0"
                     )}
                 >
                     <h1 className="font-sl-bebas text-5xl md:text-7xl">
