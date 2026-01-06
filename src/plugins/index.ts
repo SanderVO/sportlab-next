@@ -57,6 +57,10 @@ export const plugins: Plugin[] = [
                     label: "Rich Snippets",
                     name: "richSnippets",
                     type: "array",
+                    admin: {
+                        description:
+                            "Voeg JSON-LD rich snippets toe voor deze pagina om zoekmachines te helpen de inhoud van uw pagina beter te begrijpen.",
+                    },
                     fields: [
                         {
                             label: "Rich Snippet JSON-LD",
@@ -71,6 +75,9 @@ export const plugins: Plugin[] = [
     formBuilderPlugin({
         fields: {
             payment: false,
+            state: false,
+            country: false,
+            date: false,
             text: {
                 labels: {
                     singular: "Tekstveld",
@@ -123,13 +130,6 @@ export const plugins: Plugin[] = [
                         };
                     }
 
-                    if ("name" in field && field.name === "title") {
-                        return {
-                            ...field,
-                            label: "Titel",
-                        };
-                    }
-
                     if ("name" in field && field.name === "submitButton") {
                         return {
                             ...field,
@@ -153,6 +153,26 @@ export const plugins: Plugin[] = [
                                 description:
                                     "Geef aan wat voor type bevestiging de gebruiker moet krijgen",
                             },
+                        };
+                    }
+
+                    if (
+                        "name" in field &&
+                        field.name === "confirmationType-message"
+                    ) {
+                        return {
+                            ...field,
+                            label: "Bericht",
+                        };
+                    }
+
+                    if (
+                        "name" in field &&
+                        field.name === "confirmationType-redirect"
+                    ) {
+                        return {
+                            ...field,
+                            label: "Verwijzing URL",
                         };
                     }
 

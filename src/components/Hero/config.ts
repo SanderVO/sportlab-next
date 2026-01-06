@@ -28,44 +28,6 @@ export const hero: Field = {
             editor: defaultLexical,
         },
         {
-            label: "Type",
-            name: "type",
-            type: "select",
-            defaultValue: "background",
-            required: true,
-            options: [
-                {
-                    label: "Afbeelding achtergrond",
-                    value: "background",
-                },
-                {
-                    label: "Afbeelding links",
-                    value: "left",
-                },
-            ],
-        },
-        {
-            label: "Achtergrondkleur",
-            name: "backgroundColor",
-            type: "select",
-            defaultValue: "black",
-            required: true,
-            options: [
-                {
-                    label: "Zwart",
-                    value: "black",
-                },
-                {
-                    label: "Beige",
-                    value: "beige",
-                },
-                {
-                    label: "Wit",
-                    value: "white",
-                },
-            ],
-        },
-        {
             label: "Tekstkleur",
             name: "color",
             type: "select",
@@ -87,6 +49,7 @@ export const hero: Field = {
             ],
         },
         {
+            label: "Heeft een link",
             name: "enableLink",
             type: "checkbox",
         },

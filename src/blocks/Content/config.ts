@@ -10,6 +10,7 @@ import { FormBlock } from "../Form/config";
 
 const columnFields: Field[] = [
     {
+        label: "Content Type",
         name: "contentPosition",
         type: "select",
         defaultValue: "contentRight",
@@ -30,13 +31,14 @@ const columnFields: Field[] = [
         ],
     },
     {
+        label: "Afbeeldingsgrootte",
         name: "imageSize",
         type: "select",
         defaultValue: "imageCenter",
         required: false,
         options: [
             {
-                label: "Top Gecropt",
+                label: "Volledig (Top Gecropt)",
                 value: "imageTopCut",
             },
             {
@@ -56,6 +58,7 @@ const columnFields: Field[] = [
         required: false,
     },
     {
+        label: "Content",
         name: "richText",
         type: "richText",
         required: true,
@@ -71,15 +74,16 @@ const columnFields: Field[] = [
                 ];
             },
         }),
-        label: false,
     },
     {
+        label: "Afbeelding",
         name: "media",
         type: "upload",
         relationTo: "media",
         required: false,
     },
     {
+        label: "Heeft een link",
         name: "enableLink",
         type: "checkbox",
     },
@@ -99,6 +103,7 @@ export const Content: Block = {
     interfaceName: "ContentBlock",
     fields: [
         {
+            label: "Achtergrondkleur",
             name: "backgroundColor",
             type: "select",
             defaultValue: "backgroundDark",
@@ -119,6 +124,7 @@ export const Content: Block = {
             ],
         },
         {
+            label: "Kolommen",
             name: "columns",
             type: "array",
             admin: {

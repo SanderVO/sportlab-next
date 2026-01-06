@@ -3,12 +3,14 @@ import type { Block, Field } from "payload";
 
 const fields: Field[] = [
     {
+        label: "Afbeelding",
         name: "media",
         type: "upload",
         relationTo: "media",
         required: false,
     },
     {
+        label: "Heeft een link",
         name: "enableLink",
         type: "checkbox",
     },

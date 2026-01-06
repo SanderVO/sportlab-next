@@ -25,6 +25,15 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
 
         return (
             <>
+                {videoPoster && (
+                    <link
+                        rel="preload"
+                        as="image"
+                        href={videoPoster}
+                        fetchPriority="high"
+                    />
+                )}
+
                 {url && (
                     <video
                         autoPlay

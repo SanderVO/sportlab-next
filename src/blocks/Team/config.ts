@@ -56,6 +56,7 @@ export const Team: Block = {
             ],
         },
         {
+            label: "Heeft een link",
             name: "enableLink",
             type: "checkbox",
         },

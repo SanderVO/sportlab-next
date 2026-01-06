@@ -33,7 +33,9 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                     return (
                         <div
                             key={index}
-                            className="flex w-full h-full justify-between self-center"
+                            className={cn(
+                                "flex w-full h-full justify-between self-center"
+                            )}
                         >
                             {media && contentPosition === "contentRight" && (
                                 <div
@@ -41,6 +43,8 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         imageSize === "imageTopCut" &&
                                             "absolute left-0 bottom-0 w-1/3 hidden md:block h-9/10",
                                         imageSize === "imageFull" &&
+                                            "absolute left-0 bottom-0 w-1/3 hidden md:block h-full",
+                                        imageSize === "imageCenter" &&
                                             "h-[200px] md:h-auto md:min-h-[600px] w-full md:w-[400px] relative shrink-0 hidden md:block"
                                     )}
                                 >
@@ -57,7 +61,9 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                             <div
                                 className={cn(
                                     "flex flex-col gap-4 md:gap-0 w-full relative self-center",
-                                    columns.length == 1 && "md:w-1/2"
+                                    columns.length == 1 && "md:w-1/2",
+                                    contentPosition === "contentRight" &&
+                                        "md:pl-[40%]"
                                 )}
                                 key={col.id || index}
                             >
@@ -94,6 +100,8 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         imageSize === "imageTopCut" &&
                                             "absolute right-0 bottom-0 w-1/3 hidden md:block h-9/10",
                                         imageSize === "imageFull" &&
+                                            "absolute right-0 bottom-0 w-1/3 hidden md:block h-full",
+                                        imageSize === "imageCenter" &&
                                             "h-[200px] md:h-auto md:min-h-[600px] w-full md:w-[400px] relative shrink-0 hidden md:block"
                                     )}
                                 >
