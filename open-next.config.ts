@@ -1,11 +1,7 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare/config";
 import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
-import { withRegionalCache } from "@opennextjs/cloudflare/overrides/incremental-cache/regional-cache";
 
 export default defineCloudflareConfig({
-    incrementalCache: withRegionalCache(r2IncrementalCache, {
-        mode: "long-lived",
-        bypassTagCacheOnCacheHit: true,
-    }),
+    incrementalCache: r2IncrementalCache,
     enableCacheInterception: true,
 });
