@@ -38,7 +38,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         imageSize === "imageFull" &&
                                             "absolute left-0 bottom-0 w-1/3 hidden sm:block h-full",
                                         imageSize === "imageCenter" &&
-                                            "h-[200px] sm:h-auto sm:min-h-[600px] w-full sm:w-[400px] relative shrink-0 hidden sm:block",
+                                            "h-[300px] sm:h-auto sm:min-h-[600px] w-full sm:w-[400px] relative shrink-0 hidden sm:block",
                                     )}
                                 >
                                     <Media
@@ -100,7 +100,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         imageSize === "imageFull" &&
                                             "absolute right-0 bottom-0 w-1/3 hidden sm:block h-full",
                                         imageSize === "imageCenter" &&
-                                            "h-[200px] sm:h-auto sm:min-h-[600px] w-full sm:w-[400px] relative shrink-0 hidden sm:block",
+                                            "h-[300px] sm:h-auto sm:min-h-[600px] w-full sm:w-[400px] relative shrink-0 hidden sm:block",
                                     )}
                                 >
                                     <Media
