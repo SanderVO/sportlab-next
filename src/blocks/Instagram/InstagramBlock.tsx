@@ -1,9 +1,10 @@
+import RichText from "@/components/RichText";
 import type { InstagramBlock as InstagramBlockProps } from "@/payload-types";
 import React from "react";
 import { InstagramBlockCarousel } from "./InstagramBlockCarousel";
 
 export const InstagramBlock: React.FC<InstagramBlockProps> = (props) => {
-    const { title, subtitle } = props;
+    const { title, content } = props;
 
     return (
         <div className="container mx-auto flex flex-col h-full justify-center py-8 md:py-0 gap-6">
@@ -18,8 +19,12 @@ export const InstagramBlock: React.FC<InstagramBlockProps> = (props) => {
                     {title}
                 </h2>
 
-                <div className="text-gray-400 text-sm md:text-md">
-                    {subtitle}
+                <div className="text-sm md:text-md">
+                    <RichText
+                        data={content}
+                        enableProse={false}
+                        enableGutter={false}
+                    />
                 </div>
             </div>
         </div>

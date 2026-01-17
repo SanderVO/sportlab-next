@@ -1,12 +1,5 @@
-import { link } from "@/fields/link";
-import {
-    BlocksFeature,
-    FixedToolbarFeature,
-    InlineToolbarFeature,
-    lexicalEditor,
-} from "@payloadcms/richtext-lexical";
+import { defaultLexical } from "@/fields/defaultLexical";
 import type { Block, Field } from "payload";
-import { FormBlock } from "../Form/config";
 
 const columnFields: Field[] = [
     {
@@ -16,6 +9,10 @@ const columnFields: Field[] = [
         defaultValue: "contentRight",
         required: true,
         options: [
+            {
+                label: "Alleen content",
+                value: "contentOnly",
+            },
             {
                 label: "Afbeelding Boven, Tekst Onder",
                 value: "contentBottom",
@@ -31,11 +28,23 @@ const columnFields: Field[] = [
         ],
     },
     {
+        label: "Afbeelding",
+        name: "media",
+        type: "upload",
+        relationTo: "media",
+        required: true,
+        admin: {
+            condition: (_data, siblingData) => {
+                return siblingData?.contentPosition !== "contentOnly";
+            },
+        },
+    },
+    {
         label: "Afbeeldingsgrootte",
         name: "imageSize",
         type: "select",
         defaultValue: "imageCenter",
-        required: false,
+        required: true,
         options: [
             {
                 label: "Volledig (Top Gecropt)",
@@ -50,52 +59,19 @@ const columnFields: Field[] = [
                 value: "imageCenter",
             },
         ],
-    },
-    {
-        label: "Title",
-        name: "title",
-        type: "text",
-        required: false,
+        admin: {
+            condition: (_data, siblingData) => {
+                return siblingData?.contentPosition !== "contentOnly";
+            },
+        },
     },
     {
         label: "Content",
         name: "richText",
         type: "richText",
         required: true,
-        editor: lexicalEditor({
-            features: ({ rootFeatures }) => {
-                return [
-                    ...rootFeatures,
-                    BlocksFeature({
-                        blocks: [FormBlock],
-                    }),
-                    FixedToolbarFeature(),
-                    InlineToolbarFeature(),
-                ];
-            },
-        }),
+        editor: defaultLexical,
     },
-    {
-        label: "Afbeelding",
-        name: "media",
-        type: "upload",
-        relationTo: "media",
-        required: false,
-    },
-    {
-        label: "Heeft een link",
-        name: "enableLink",
-        type: "checkbox",
-    },
-    link({
-        overrides: {
-            admin: {
-                condition: (_data, siblingData) => {
-                    return Boolean(siblingData?.enableLink);
-                },
-            },
-        },
-    }),
 ];
 
 export const Content: Block = {

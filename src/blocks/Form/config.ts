@@ -1,8 +1,4 @@
-import {
-    FixedToolbarFeature,
-    InlineToolbarFeature,
-    lexicalEditor,
-} from "@payloadcms/richtext-lexical";
+import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import type { Block } from "payload";
 
 export const FormBlock: Block = {
@@ -28,15 +24,7 @@ export const FormBlock: Block = {
             admin: {
                 condition: (_, { enableIntro }) => Boolean(enableIntro),
             },
-            editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                    return [
-                        ...rootFeatures,
-                        FixedToolbarFeature(),
-                        InlineToolbarFeature(),
-                    ];
-                },
-            }),
+            editor: lexicalEditor(),
         },
     ],
     graphQL: {

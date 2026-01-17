@@ -2,6 +2,7 @@
 
 import RichText from "@/components/RichText";
 import { Button } from "@/components/ui/button";
+import { getEnv } from "@/lib/Env";
 import { getClientSideURL } from "@/utilities/getURL";
 import type {
     FormFieldBlock,
@@ -56,7 +57,10 @@ export const FormBlock: React.FC<
     const [error, setError] = useState<
         { message: string; status?: string } | undefined
     >();
+
     const router = useRouter();
+
+    const env = getEnv();
 
     const onSubmit = useCallback(
         (data: FormFieldBlock[]) => {
@@ -71,7 +75,7 @@ export const FormBlock: React.FC<
                     ([name, value]) => ({
                         field: name,
                         value,
-                    })
+                    }),
                 );
 
                 loadingTimerID = setTimeout(() => {
@@ -90,7 +94,7 @@ export const FormBlock: React.FC<
                                 "Content-Type": "application/json",
                             },
                             method: "POST",
-                        }
+                        },
                     );
 
                     const res: {
@@ -136,7 +140,7 @@ export const FormBlock: React.FC<
 
             void submitForm();
         },
-        [router, formID, redirect, confirmationType, token]
+        [router, formID, redirect, confirmationType, token],
     );
 
     return (
@@ -149,80 +153,74 @@ export const FormBlock: React.FC<
                 />
             )}
 
-            <div className="p-4 lg:p-6 shadow-gray-300 shadow-sm text-background">
-                <FormProvider {...formMethods}>
-                    {!isLoading &&
-                        hasSubmitted &&
-                        confirmationType === "message" && (
-                            <RichText
-                                data={confirmationMessage}
-                                enableProse={false}
-                            />
-                        )}
-
-                    {isLoading && !hasSubmitted && <p>Verzenden...</p>}
-
-                    {error && (
-                        <div>{`${error.status || "500"}: ${
-                            error.message || ""
-                        }`}</div>
+            <FormProvider {...formMethods}>
+                {!isLoading &&
+                    hasSubmitted &&
+                    confirmationType === "message" && (
+                        <RichText
+                            data={confirmationMessage}
+                            enableProse={false}
+                        />
                     )}
 
-                    {!hasSubmitted && (
-                        <form id={formID} onSubmit={handleSubmit(onSubmit)}>
-                            <div className="mb-4 last:mb-0">
-                                {formFromProps &&
-                                    formFromProps.fields &&
-                                    formFromProps.fields?.map(
-                                        (field, index) => {
-                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                            const Field: React.FC<any> =
-                                                fields?.[
-                                                    field.blockType as keyof typeof fields
-                                                ];
-                                            if (Field) {
-                                                return (
-                                                    <div
-                                                        className="mb-6 last:mb-0"
-                                                        key={index}
-                                                    >
-                                                        <Field
-                                                            form={formFromProps}
-                                                            {...field}
-                                                            {...formMethods}
-                                                            control={control}
-                                                            errors={errors}
-                                                            register={register}
-                                                        />
-                                                    </div>
-                                                );
-                                            }
-                                            return null;
-                                        }
-                                    )}
-                            </div>
+                {isLoading && !hasSubmitted && <p>Verzenden...</p>}
 
-                            <Turnstile
-                                siteKey={
-                                    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!
-                                }
-                                theme="light"
-                                sandbox={process.env.NODE_ENV === "development"}
-                                onVerify={setToken}
-                            />
+                {error && (
+                    <div>{`${error.status || "500"}: ${
+                        error.message || ""
+                    }`}</div>
+                )}
 
-                            <Button
-                                form={formID}
-                                type="submit"
-                                variant="black"
-                                disabled={!token}
-                            >
-                                {submitButtonLabel}
-                            </Button>
-                        </form>
-                    )}
-                </FormProvider>
-            </div>
+                {!hasSubmitted && (
+                    <form id={formID} onSubmit={handleSubmit(onSubmit)}>
+                        <div className="mb-4 last:mb-0">
+                            {formFromProps &&
+                                formFromProps.fields &&
+                                formFromProps.fields?.map((field, index) => {
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    const Field: React.FC<any> =
+                                        fields?.[
+                                            field.blockType as keyof typeof fields
+                                        ];
+                                    if (Field) {
+                                        return (
+                                            <div
+                                                className="mb-6 last:mb-0"
+                                                key={index}
+                                            >
+                                                <Field
+                                                    form={formFromProps}
+                                                    {...field}
+                                                    {...formMethods}
+                                                    control={control}
+                                                    errors={errors}
+                                                    register={register}
+                                                />
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })}
+                        </div>
+
+                        <Turnstile
+                            siteKey={env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                            theme="light"
+                            sandbox={env.NODE_ENV === "development"}
+                            onVerify={setToken}
+                        />
+
+                        <Button
+                            form={formID}
+                            type="submit"
+                            variant="black"
+                            disabled={!token}
+                        >
+                            {submitButtonLabel}
+                        </Button>
+                    </form>
+                )}
+            </FormProvider>
         </div>
     );
 };

@@ -1,12 +1,22 @@
 import { type ButtonProps } from "@/components/ui/button";
 import type { Page, Post } from "@/payload-types";
+import { cn } from "@/utilities/ui";
 import Link from "next/link";
 import React from "react";
 
+const DefaultAppearanceClass =
+    "block transition-colors rounded-3xl font-bold text-center py-3 px-10 w-max text-lg self-baseline no-underline";
+
 export const CMSLinkAppearance = {
-    beige: "transition-colors rounded-3xl bg-sl-beige hover:bg-sl-beige-dark mt-8 font-bold text-center py-3 px-10 w-max text-lg text-background self-baseline",
-    black: "transition-colors rounded-3xl bg-background hover:bg-background/90 mt-8 font-bold text-center py-3 px-10 w-max text-lg text-white self-baseline",
-    orange: "transition-colors rounded-3xl bg-sl-orange hover:bg-sl-orange-dark mt-8 font-bold text-center py-3 px-10 w-max text-lg text-white self-baseline",
+    beige:
+        DefaultAppearanceClass +
+        " bg-sl-beige hover:bg-sl-beige-dark text-background",
+    black:
+        DefaultAppearanceClass +
+        " bg-background hover:bg-background/90 text-white",
+    orange:
+        DefaultAppearanceClass +
+        " bg-sl-orange hover:bg-sl-orange-dark text-white",
 };
 
 export type CMSLinkType = {
@@ -55,13 +65,10 @@ export const CMSLink: React.FC<CMSLinkType> = (props) => {
 
     return (
         <Link
-            className={
+            className={cn(
+                appearance ? CMSLinkAppearance[appearance] : undefined,
                 className
-                    ? className
-                    : appearance
-                    ? CMSLinkAppearance[appearance]
-                    : ""
-            }
+            )}
             href={href || url || ""}
             {...newTabProps}
         >

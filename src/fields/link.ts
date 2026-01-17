@@ -142,10 +142,11 @@ export const link: LinkType = ({
         }
 
         linkResult.fields.push({
+            label: "Type",
             name: "appearance",
             type: "select",
             admin: {
-                description: "Choose how the link should be rendered.",
+                description: "Kies hoe de link eruitziet.",
             },
             defaultValue: "black",
             options: appearanceOptionsToUse,

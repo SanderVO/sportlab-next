@@ -168,26 +168,15 @@ export const pages_blocks_content_columns = sqliteTable(
     _parentID: text("_parent_id").notNull(),
     id: text("id").primaryKey(),
     contentPosition: text("content_position", {
-      enum: ["contentBottom", "contentRight", "contentLeft"],
+      enum: ["contentOnly", "contentBottom", "contentRight", "contentLeft"],
     }).default("contentRight"),
-    imageSize: text("image_size", {
-      enum: ["imageTopCut", "imageFull", "imageCenter"],
-    }).default("imageCenter"),
-    title: text("title"),
-    richText: text("rich_text", { mode: "json" }),
     media: integer("media_id").references(() => media.id, {
       onDelete: "set null",
     }),
-    enableLink: integer("enable_link", { mode: "boolean" }),
-    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
-      "reference",
-    ),
-    link_newTab: integer("link_new_tab", { mode: "boolean" }),
-    link_url: text("link_url"),
-    link_label: text("link_label"),
-    link_appearance: text("link_appearance", {
-      enum: ["black", "beige", "orange"],
-    }).default("black"),
+    imageSize: text("image_size", {
+      enum: ["imageTopCut", "imageFull", "imageCenter"],
+    }).default("imageCenter"),
+    richText: text("rich_text", { mode: "json" }),
   },
   (columns) => [
     index("pages_blocks_content_columns_order_idx").on(columns._order),
@@ -236,6 +225,7 @@ export const pages_blocks_carousel_carousel_items = sqliteTable(
     }),
     text: text("text"),
     name: text("name"),
+    google_url: text("google_url"),
   },
   (columns) => [
     index("pages_blocks_carousel_carousel_items_order_idx").on(columns._order),
@@ -354,7 +344,7 @@ export const pages_blocks_instagram = sqliteTable(
     _path: text("_path").notNull(),
     id: text("id").primaryKey(),
     title: text("title"),
-    subtitle: text("subtitle"),
+    content: text("content", { mode: "json" }),
     type: text("type", { enum: ["carousel", "grid"] }).default("carousel"),
     backgroundColor: text("background_color", {
       enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
@@ -396,26 +386,15 @@ export const pages = sqliteTable(
   "pages",
   {
     id: integer("id").primaryKey(),
+    parent: integer("parent_id").references((): AnySQLiteColumn => pages.id, {
+      onDelete: "set null",
+    }),
     title: text("title"),
     hasHero: integer("has_hero", { mode: "boolean" }).default(false),
     hero_media: integer("hero_media_id").references(() => media.id, {
       onDelete: "set null",
     }),
-    hero_title: text("hero_title"),
     hero_text: text("hero_text", { mode: "json" }),
-    hero_color: text("hero_color", {
-      enum: ["black", "beige", "white"],
-    }).default("black"),
-    hero_enableLink: integer("hero_enable_link", { mode: "boolean" }),
-    hero_link_type: text("hero_link_type", {
-      enum: ["reference", "custom"],
-    }).default("reference"),
-    hero_link_newTab: integer("hero_link_new_tab", { mode: "boolean" }),
-    hero_link_url: text("hero_link_url"),
-    hero_link_label: text("hero_link_label"),
-    hero_link_appearance: text("hero_link_appearance", {
-      enum: ["black", "beige", "orange"],
-    }).default("black"),
     meta_title: text("meta_title"),
     meta_image: integer("meta_image_id").references(() => media.id, {
       onDelete: "set null",
@@ -435,6 +414,7 @@ export const pages = sqliteTable(
     _status: text("_status", { enum: ["draft", "published"] }).default("draft"),
   },
   (columns) => [
+    index("pages_parent_idx").on(columns.parent),
     index("pages_hero_hero_media_idx").on(columns.hero_media),
     index("pages_meta_meta_image_idx").on(columns.meta_image),
     uniqueIndex("pages_slug_idx").on(columns.slug),
@@ -485,26 +465,15 @@ export const _pages_v_blocks_content_columns = sqliteTable(
     _parentID: integer("_parent_id").notNull(),
     id: integer("id").primaryKey(),
     contentPosition: text("content_position", {
-      enum: ["contentBottom", "contentRight", "contentLeft"],
+      enum: ["contentOnly", "contentBottom", "contentRight", "contentLeft"],
     }).default("contentRight"),
-    imageSize: text("image_size", {
-      enum: ["imageTopCut", "imageFull", "imageCenter"],
-    }).default("imageCenter"),
-    title: text("title"),
-    richText: text("rich_text", { mode: "json" }),
     media: integer("media_id").references(() => media.id, {
       onDelete: "set null",
     }),
-    enableLink: integer("enable_link", { mode: "boolean" }),
-    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
-      "reference",
-    ),
-    link_newTab: integer("link_new_tab", { mode: "boolean" }),
-    link_url: text("link_url"),
-    link_label: text("link_label"),
-    link_appearance: text("link_appearance", {
-      enum: ["black", "beige", "orange"],
-    }).default("black"),
+    imageSize: text("image_size", {
+      enum: ["imageTopCut", "imageFull", "imageCenter"],
+    }).default("imageCenter"),
+    richText: text("rich_text", { mode: "json" }),
     _uuid: text("_uuid"),
   },
   (columns) => [
@@ -557,6 +526,7 @@ export const _pages_v_blocks_carousel_carousel_items = sqliteTable(
     }),
     text: text("text"),
     name: text("name"),
+    google_url: text("google_url"),
     _uuid: text("_uuid"),
   },
   (columns) => [
@@ -685,7 +655,7 @@ export const _pages_v_blocks_instagram = sqliteTable(
     _path: text("_path").notNull(),
     id: integer("id").primaryKey(),
     title: text("title"),
-    subtitle: text("subtitle"),
+    content: text("content", { mode: "json" }),
     type: text("type", { enum: ["carousel", "grid"] }).default("carousel"),
     backgroundColor: text("background_color", {
       enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
@@ -734,6 +704,9 @@ export const _pages_v = sqliteTable(
     parent: integer("parent_id").references(() => pages.id, {
       onDelete: "set null",
     }),
+    version_parent: integer("version_parent_id").references(() => pages.id, {
+      onDelete: "set null",
+    }),
     version_title: text("version_title"),
     version_hasHero: integer("version_has_hero", { mode: "boolean" }).default(
       false,
@@ -744,25 +717,7 @@ export const _pages_v = sqliteTable(
         onDelete: "set null",
       },
     ),
-    version_hero_title: text("version_hero_title"),
     version_hero_text: text("version_hero_text", { mode: "json" }),
-    version_hero_color: text("version_hero_color", {
-      enum: ["black", "beige", "white"],
-    }).default("black"),
-    version_hero_enableLink: integer("version_hero_enable_link", {
-      mode: "boolean",
-    }),
-    version_hero_link_type: text("version_hero_link_type", {
-      enum: ["reference", "custom"],
-    }).default("reference"),
-    version_hero_link_newTab: integer("version_hero_link_new_tab", {
-      mode: "boolean",
-    }),
-    version_hero_link_url: text("version_hero_link_url"),
-    version_hero_link_label: text("version_hero_link_label"),
-    version_hero_link_appearance: text("version_hero_link_appearance", {
-      enum: ["black", "beige", "orange"],
-    }).default("black"),
     version_meta_title: text("version_meta_title"),
     version_meta_image: integer("version_meta_image_id").references(
       () => media.id,
@@ -798,6 +753,7 @@ export const _pages_v = sqliteTable(
   },
   (columns) => [
     index("_pages_v_parent_idx").on(columns.parent),
+    index("_pages_v_version_version_parent_idx").on(columns.version_parent),
     index("_pages_v_version_hero_version_hero_media_idx").on(
       columns.version_hero_media,
     ),
@@ -1694,6 +1650,9 @@ export const header_nav_items = sqliteTable(
     link_newTab: integer("link_new_tab", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label").notNull(),
+    link_appearance: text("link_appearance", {
+      enum: ["black", "beige", "orange"],
+    }).default("black"),
   },
   (columns) => [
     index("header_nav_items_order_idx").on(columns._order),
@@ -1759,6 +1718,28 @@ export const header_rels = sqliteTable(
   ],
 );
 
+export const footer_social_media_links = sqliteTable(
+  "footer_social_media_links",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    platform: text("platform", {
+      enum: ["facebook", "twitter", "instagram", "youtube", "tiktok"],
+    }).notNull(),
+    url: text("url").notNull(),
+  },
+  (columns) => [
+    index("footer_social_media_links_order_idx").on(columns._order),
+    index("footer_social_media_links_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [footer.id],
+      name: "footer_social_media_links_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const footer = sqliteTable(
   "footer",
   {
@@ -1780,6 +1761,19 @@ export const footer = sqliteTable(
   },
   (columns) => [index("footer_footer_logo_idx").on(columns.footerLogo)],
 );
+
+export const whats_app = sqliteTable("whats_app", {
+  id: integer("id").primaryKey(),
+  phoneNumber: text("phone_number").notNull(),
+  textPreFilled: text("text_pre_filled").notNull(),
+  buttonText: text("button_text").notNull(),
+  updatedAt: text("updated_at").default(
+    sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+  ),
+  createdAt: text("created_at").default(
+    sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+  ),
+});
 
 export const relations_users_roles = relations(users_roles, ({ one }) => ({
   parent: one(users, {
@@ -1941,6 +1935,11 @@ export const relations_pages_rels = relations(pages_rels, ({ one }) => ({
   }),
 }));
 export const relations_pages = relations(pages, ({ one, many }) => ({
+  parent: one(pages, {
+    fields: [pages.parent],
+    references: [pages.id],
+    relationName: "parent",
+  }),
   hero_media: one(media, {
     fields: [pages.hero_media],
     references: [media.id],
@@ -2096,6 +2095,11 @@ export const relations__pages_v = relations(_pages_v, ({ one, many }) => ({
     fields: [_pages_v.parent],
     references: [pages.id],
     relationName: "parent",
+  }),
+  version_parent: one(pages, {
+    fields: [_pages_v.version_parent],
+    references: [pages.id],
+    relationName: "version_parent",
   }),
   version_hero_media: one(media, {
     fields: [_pages_v.version_hero_media],
@@ -2536,13 +2540,27 @@ export const relations_header = relations(header, ({ one, many }) => ({
     relationName: "_rels",
   }),
 }));
-export const relations_footer = relations(footer, ({ one }) => ({
+export const relations_footer_social_media_links = relations(
+  footer_social_media_links,
+  ({ one }) => ({
+    _parentID: one(footer, {
+      fields: [footer_social_media_links._parentID],
+      references: [footer.id],
+      relationName: "socialMediaLinks",
+    }),
+  }),
+);
+export const relations_footer = relations(footer, ({ one, many }) => ({
   footerLogo: one(media, {
     fields: [footer.footerLogo],
     references: [media.id],
     relationName: "footerLogo",
   }),
+  socialMediaLinks: many(footer_social_media_links, {
+    relationName: "socialMediaLinks",
+  }),
 }));
+export const relations_whats_app = relations(whats_app, () => ({}));
 
 type DatabaseSchema = {
   users_roles: typeof users_roles;
@@ -2601,7 +2619,9 @@ type DatabaseSchema = {
   header_nav_items: typeof header_nav_items;
   header: typeof header;
   header_rels: typeof header_rels;
+  footer_social_media_links: typeof footer_social_media_links;
   footer: typeof footer;
+  whats_app: typeof whats_app;
   relations_users_roles: typeof relations_users_roles;
   relations_users_sessions: typeof relations_users_sessions;
   relations_users: typeof relations_users;
@@ -2658,7 +2678,9 @@ type DatabaseSchema = {
   relations_header_nav_items: typeof relations_header_nav_items;
   relations_header_rels: typeof relations_header_rels;
   relations_header: typeof relations_header;
+  relations_footer_social_media_links: typeof relations_footer_social_media_links;
   relations_footer: typeof relations_footer;
+  relations_whats_app: typeof relations_whats_app;
 };
 
 declare module "@payloadcms/db-d1-sqlite" {

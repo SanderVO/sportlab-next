@@ -20,6 +20,12 @@ const carouselItemFields: Field[] = [
         type: "text",
         required: true,
     },
+    {
+        label: "Google Review URL",
+        name: "google_url",
+        type: "text",
+        required: false,
+    },
 ];
 
 export const Carousel: Block = {

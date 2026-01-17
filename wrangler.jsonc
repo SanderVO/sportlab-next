@@ -9,11 +9,11 @@
         "nodejs_compat",
         // Allow to fetch URLs in your app
         // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#global-fetch-strictly-public
-        "global_fetch_strictly_public"
+        "global_fetch_strictly_public",
     ],
     "assets": {
         "directory": ".open-next/assets",
-        "binding": "ASSETS"
+        "binding": "ASSETS",
     },
     "observability": {
         "enabled": false,
@@ -22,13 +22,13 @@
             "enabled": true,
             "head_sampling_rate": 1,
             "persist": true,
-            "invocation_logs": true
+            "invocation_logs": true,
         },
         "traces": {
             "enabled": false,
             "persist": true,
-            "head_sampling_rate": 1
-        }
+            "head_sampling_rate": 1,
+        },
     },
     "vars": {
         "NEXTJS_EN": "development",
@@ -39,7 +39,7 @@
         "R2_DOCUMENTS_PREFIX": "documents_dev/",
         "SMTP_FROM_ADDRESS": "info@sportlabgroningen.nl",
         "SMTP_FROM_NAME": "Sportlab Groningen",
-        "SMTP_ENABLED": true
+        "SMTP_ENABLED": true,
     },
     "d1_databases": [
         {
@@ -47,8 +47,8 @@
             "database_id": "712e8cbd-d164-4f33-ae4d-777321518490",
             "database_name": "sportlab",
             "remote": true,
-            "migrations_dir": "./src/migrations"
-        }
+            "migrations_dir": "./src/migrations",
+        },
     ],
     "r2_buckets": [
         {
@@ -56,8 +56,15 @@
             "bucket_name": "sportlab",
             "preview_bucket_name": "sportlab",
             "jurisdiction": "eu",
-            "remote": true
-        }
+            "remote": true,
+        },
+        {
+            "binding": "NEXT_INC_CACHE_R2_BUCKET",
+            "bucket_name": "sportlab",
+            "preview_bucket_name": "sportlab",
+            "jurisdiction": "eu",
+            "remote": true,
+        },
     ],
     "env": {
         "production": {
@@ -71,7 +78,7 @@
                 "R2_DOCUMENTS_PREFIX": "documents/",
                 "SMTP_FROM_ADDRESS": "info@sportlabgroningen.nl",
                 "SMTP_FROM_NAME": "Sportlab Groningen",
-                "SMTP_ENABLED": true
+                "SMTP_ENABLED": true,
             },
             "d1_databases": [
                 {
@@ -79,8 +86,8 @@
                     "database_name": "sportlab",
                     "database_id": "712e8cbd-d164-4f33-ae4d-777321518490",
                     "remote": true,
-                    "migrations_dir": "./src/migrations"
-                }
+                    "migrations_dir": "./src/migrations",
+                },
             ],
             "r2_buckets": [
                 {
@@ -88,9 +95,16 @@
                     "bucket_name": "sportlab",
                     "preview_bucket_name": "sportlab",
                     "jurisdiction": "eu",
-                    "remote": true
-                }
-            ]
+                    "remote": true,
+                },
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "sportlab",
+                    "preview_bucket_name": "sportlab",
+                    "jurisdiction": "eu",
+                    "remote": true,
+                },
+            ],
         },
         "preview": {
             "name": "sportlab-preview",
@@ -103,7 +117,7 @@
                 "R2_DOCUMENTS_PREFIX": "documents_preview/",
                 "SMTP_FROM_ADDRESS": "info@sportlabgroningen.nl",
                 "SMTP_FROM_NAME": "Sportlab Groningen",
-                "SMTP_ENABLED": true
+                "SMTP_ENABLED": true,
             },
             "d1_databases": [
                 {
@@ -111,8 +125,8 @@
                     "database_name": "sportlab-preview",
                     "database_id": "31be5e9e-8189-4d1a-b8b4-79d090bc6d10",
                     "remote": true,
-                    "migrations_dir": "./src/migrations"
-                }
+                    "migrations_dir": "./src/migrations",
+                },
             ],
             "r2_buckets": [
                 {
@@ -120,9 +134,16 @@
                     "bucket_name": "sportlab",
                     "preview_bucket_name": "sportlab",
                     "jurisdiction": "eu",
-                    "remote": true
-                }
-            ]
-        }
-    }
+                    "remote": true,
+                },
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "sportlab",
+                    "preview_bucket_name": "sportlab",
+                    "jurisdiction": "eu",
+                    "remote": true,
+                },
+            ],
+        },
+    },
 }

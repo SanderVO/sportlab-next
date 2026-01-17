@@ -1,9 +1,13 @@
 import { AdminBar } from "@/components/AdminBar";
+import CookieBanner from "@/components/CookieBanner/CookieBanner";
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
+import { WhatsappButton } from "@/components/WhatsApp/WhatsappButton";
+import { getEnv } from "@/lib/Env";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import { draftMode } from "next/headers";
+import Script from "next/script";
 import React from "react";
 import "./globals.css";
 
@@ -35,6 +39,8 @@ export default async function RootLayout({
 }) {
     const { isEnabled } = await draftMode();
 
+    const env = getEnv();
+
     return (
         <html
             lang="nl"
@@ -55,14 +61,31 @@ export default async function RootLayout({
 
                 <Header />
 
-                {children}
+                <main>{children}</main>
 
                 <Footer />
-            </body>
 
-            {process.env.GTM_ID && (
-                <GoogleTagManager gtmId={process.env.GTM_ID} />
-            )}
+                <CookieBanner />
+
+                <WhatsappButton />
+
+                <Script id="google-consent" strategy="beforeInteractive">
+                    {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+
+                gtag('consent', 'default', {
+                ad_storage: 'denied',
+                analytics_storage: 'denied',
+                ad_user_data: 'denied',
+                ad_personalization: 'denied',
+                wait_for_update: 500
+                });
+            `}
+                </Script>
+
+                {env.GTM_ID && <GoogleTagManager gtmId={env.GTM_ID} />}
+            </body>
         </html>
     );
 }

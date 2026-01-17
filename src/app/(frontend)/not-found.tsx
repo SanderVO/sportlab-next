@@ -3,15 +3,20 @@ import Link from "next/link";
 
 export default function NotFound() {
     return (
-        <div className="container py-28">
-            <div className="prose max-w-none">
-                <h1 style={{ marginBottom: 0 }}>404</h1>
-                <p className="mb-4">This page could not be found.</p>
-            </div>
+        <div className="bg-sl-beige">
+            <div className="container py-28">
+                <div className="prose max-w-none">
+                    <h1>404</h1>
 
-            <Button asChild variant="black">
-                <Link href="/">Go home</Link>
-            </Button>
+                    <p className="mb-4">
+                        Deze pagina kon niet worden gevonden.
+                    </p>
+                </div>
+
+                <Button asChild variant="black">
+                    <Link href="/">Naar de homepagina</Link>
+                </Button>
+            </div>
         </div>
     );
 }

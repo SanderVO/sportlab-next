@@ -25,7 +25,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
 
         return (
             <>
-                {videoPoster && (
+                {videoPoster && videoPoster !== "" && (
                     <link
                         rel="preload"
                         as="image"

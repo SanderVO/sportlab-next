@@ -1,10 +1,9 @@
 "use client";
 
-import { Media } from "@/components/Media";
 import type { User } from "@/payload-types";
-import { cn } from "@/utilities/ui";
 import { useIsMobile } from "@/utilities/useIsMobile";
 import useEmblaCarousel from "embla-carousel-react";
+import { TeamBlockCarouselItem } from "./TeamBlockCarouselItem";
 
 interface Props {
     type: string;
@@ -29,50 +28,15 @@ export const TeamBlockCarousel: React.FC<Props> = ({
     const teamItemContent = () => (
         <>
             {users &&
-                users.map((user: User, index: number) => {
-                    if (!user) {
-                        return null;
-                    }
-
-                    return (
-                        <div
-                            key={index}
-                            className={cn(
-                                type === "carousel" &&
-                                    "flex flex-row items-center text h-full shrink-0 w-[66.6667%] md:w-[30%] px-2"
-                            )}
-                        >
-                            <div
-                                className={cn(
-                                    "h-full flex flex-col gap-2 w-full",
-                                    type === "grid" && "h-[400px]"
-                                )}
-                            >
-                                <div className="h-full w-full relative">
-                                    <Media
-                                        fill
-                                        resource={user?.avatar}
-                                        imgClassName="object-cover object-top"
-                                    />
-                                </div>
-
-                                <div
-                                    className={cn(
-                                        "text-xs",
-                                        backgroundColor === "backgroundLight" &&
-                                            "text-background",
-                                        backgroundColor === "backgroundDark" &&
-                                            "text-white",
-                                        backgroundColor === "backgroundWhite" &&
-                                            "text-background"
-                                    )}
-                                >
-                                    {user?.name}
-                                </div>
-                            </div>
-                        </div>
-                    );
-                })}
+                users.map((user: User, index: number) => (
+                    <TeamBlockCarouselItem
+                        key={index}
+                        index={index}
+                        type={type === "carousel" ? "carousel" : "grid"}
+                        backgroundColor={backgroundColor}
+                        user={user}
+                    />
+                ))}
         </>
     );
 

@@ -16,9 +16,7 @@
         "migrate:fresh": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:fresh",
         "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
         "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-        "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
-        "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation next lint --fix",
-        "preview": "cross-env NODE_OPTIONS=--no-deprecation opennextjs-cloudflare build && opennextjs-cloudflare preview --env=preview",
+        "preview": "cross-env NODE_OPTIONS=--no-deprecation CLOUDFLARE_ENV=preview opennextjs-cloudflare build && opennextjs-cloudflare preview --env=preview",
         "deploy": "pnpm run deploy:database:production && pnpm run deploy:build && pnpm run deploy:app",
         "deploy:version": "pnpm run deploy:database:production && pnpm run deploy:build && pnpm run deploy:upload",
         "deploy:build": "opennextjs-cloudflare build --env=production",
@@ -51,6 +49,7 @@
         "@radix-ui/react-label": "^2.1.8",
         "@radix-ui/react-select": "^2.2.6",
         "@radix-ui/react-slot": "^1.2.4",
+        "ahooks": "^3.9.6",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cross-env": "^10.1.0",
@@ -69,6 +68,7 @@
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
+        "@next/eslint-plugin-next": "^15.5.9",
         "@tailwindcss/postcss": "^4",
         "@tailwindcss/typography": "^0.5.19",
         "@types/he": "^1.2.3",
@@ -76,12 +76,14 @@
         "@types/react": "^19.2.3",
         "@types/react-dom": "^19.2.3",
         "autoprefixer": "^10.4.21",
+        "baseline-browser-mapping": "^2.9.14",
         "eslint": "^9",
-        "eslint-config-next": "15.3.1",
+        "eslint-config-next": "15.5.9",
+        "eslint-plugin-react-hooks": "^7.0.1",
         "postcss": "^8.5.3",
         "serve": "^14.2.5",
         "tailwindcss": "^4.1.4",
         "typescript": "^5",
-        "wrangler": "^4.49.1"
+        "wrangler": "^4.59.2"
     }
 }

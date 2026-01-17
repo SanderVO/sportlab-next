@@ -13,13 +13,23 @@ export default function OptimizedImage({
     customHeight,
     ...props
 }: CustomImageProps) {
+    const { src } = props;
+
     return (
-        <Image
-            {...props}
-            alt={props.alt || "Optimized Image"}
-            loader={(args) =>
-                customImageLoader({ ...args, fit, height: customHeight })
-            }
-        />
+        <>
+            {src && (
+                <Image
+                    {...props}
+                    alt={props.alt || "Optimized Image"}
+                    loader={(args) =>
+                        customImageLoader({
+                            ...args,
+                            fit,
+                            height: customHeight,
+                        })
+                    }
+                />
+            )}
+        </>
     );
 }

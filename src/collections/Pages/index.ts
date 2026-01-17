@@ -35,7 +35,7 @@ export const Pages: CollectionConfig<"pages"> = {
         slug: true,
     },
     admin: {
-        defaultColumns: ["title", "slug", "updatedAt"],
+        defaultColumns: ["title", "slug", "parent", "updatedAt"],
         livePreview: {
             url: ({ data, req }) =>
                 generatePreviewPath({
@@ -67,6 +67,21 @@ export const Pages: CollectionConfig<"pages"> = {
         maxPerDoc: 50,
     },
     fields: [
+        {
+            label: "Valt onder",
+            name: "parent",
+            type: "relationship",
+            relationTo: "pages",
+            hasMany: false,
+            required: false,
+            filterOptions: {
+                publishedAt: { not_equals: null },
+            },
+            admin: {
+                description:
+                    "Kies hier een bovenliggende pagina, indien van toepassing.",
+            },
+        },
         {
             label: "Titel",
             name: "title",

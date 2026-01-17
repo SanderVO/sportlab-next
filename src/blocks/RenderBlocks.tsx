@@ -6,6 +6,8 @@ import { TeamBlock } from "@/blocks/Team/TeamBlock";
 import type { Page } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import React, { Fragment } from "react";
+import { CallToActionBlock } from "./CallToAction/config";
+import { ColumnsBlock } from "./Columns/config";
 
 const blockComponents = {
     content: ContentBlock,
@@ -13,6 +15,8 @@ const blockComponents = {
     team: TeamBlock,
     instagram: InstagramBlock,
     form: FormBlock,
+    callToAction: CallToActionBlock,
+    columns: ColumnsBlock,
 };
 
 export const RenderBlocks: React.FC<{

@@ -1,3 +1,4 @@
+import { defaultLexical } from "@/fields/defaultLexical";
 import { link } from "@/fields/link";
 import type { Block, Field } from "payload";
 
@@ -36,9 +37,10 @@ export const Instagram: Block = {
             required: true,
         },
         {
-            label: "Subtitel",
-            name: "subtitle",
-            type: "text",
+            label: "Content",
+            name: "content",
+            type: "richText",
+            editor: defaultLexical,
             required: true,
         },
         {

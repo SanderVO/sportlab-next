@@ -1,26 +1,22 @@
-import canUseDOM from './canUseDOM'
+import { getEnv } from "@/lib/Env";
+import canUseDOM from "./canUseDOM";
 
 export const getServerSideURL = () => {
-  return (
-    process.env.NEXT_PUBLIC_SERVER_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : 'http://localhost:3000')
-  )
-}
+    const env = getEnv();
+
+    return env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+};
 
 export const getClientSideURL = () => {
-  if (canUseDOM) {
-    const protocol = window.location.protocol
-    const domain = window.location.hostname
-    const port = window.location.port
+    const env = getEnv();
 
-    return `${protocol}//${domain}${port ? `:${port}` : ''}`
-  }
+    if (canUseDOM) {
+        const protocol = window.location.protocol;
+        const domain = window.location.hostname;
+        const port = window.location.port;
 
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
-    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  }
+        return `${protocol}//${domain}${port ? `:${port}` : ""}`;
+    }
 
-  return process.env.NEXT_PUBLIC_SERVER_URL || ''
-}
+    return env.NEXT_PUBLIC_SERVER_URL || "";
+};

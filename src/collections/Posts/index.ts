@@ -6,14 +6,7 @@ import {
     OverviewField,
     PreviewField,
 } from "@payloadcms/plugin-seo/fields";
-import {
-    BlocksFeature,
-    FixedToolbarFeature,
-    HeadingFeature,
-    HorizontalRuleFeature,
-    InlineToolbarFeature,
-    lexicalEditor,
-} from "@payloadcms/richtext-lexical";
+import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import type { CollectionConfig } from "payload";
 import { slugField } from "payload";
 import { authenticatedOrPublished } from "../../access/authenticatedOrPublished";
@@ -88,27 +81,7 @@ export const Posts: CollectionConfig<"posts"> = {
                         {
                             name: "content",
                             type: "richText",
-                            editor: lexicalEditor({
-                                features: ({ rootFeatures }) => {
-                                    return [
-                                        ...rootFeatures,
-                                        HeadingFeature({
-                                            enabledHeadingSizes: [
-                                                "h1",
-                                                "h2",
-                                                "h3",
-                                                "h4",
-                                            ],
-                                        }),
-                                        BlocksFeature({
-                                            blocks: [],
-                                        }),
-                                        FixedToolbarFeature(),
-                                        InlineToolbarFeature(),
-                                        HorizontalRuleFeature(),
-                                    ];
-                                },
-                            }),
+                            editor: lexicalEditor(),
                             label: false,
                             required: true,
                         },

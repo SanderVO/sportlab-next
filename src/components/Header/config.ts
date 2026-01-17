@@ -22,11 +22,7 @@ export const Header: GlobalConfig = {
             label: "Navigatie items",
             name: "navItems",
             type: "array",
-            fields: [
-                link({
-                    appearances: false,
-                }),
-            ],
+            fields: [link()],
             maxRows: 6,
             admin: {
                 description: "Voeg navigatie items toe aan de header",

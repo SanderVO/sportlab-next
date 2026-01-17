@@ -3,20 +3,17 @@
 import { CMSLink } from "@/components/Link";
 import { Media } from "@/components/Media";
 import type { InstagramBlock as InstagramBlockProps } from "@/payload-types";
-import { useIsMobile } from "@/utilities/useIsMobile";
 import useEmblaCarousel from "embla-carousel-react";
 import React from "react";
 
 export const InstagramBlockCarousel: React.FC<InstagramBlockProps> = ({
     images,
 }) => {
-    const isMobile = useIsMobile();
-
     const [emblaRef] = useEmblaCarousel({
         loop: true,
         align: "start",
         containScroll: "trimSnaps",
-        active: isMobile,
+        active: true,
     });
 
     return (

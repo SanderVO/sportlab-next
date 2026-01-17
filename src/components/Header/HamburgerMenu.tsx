@@ -4,21 +4,14 @@ import { CMSLink } from "@/components/Link";
 import { Header } from "@/payload-types";
 import clsx from "clsx";
 import { MenuIcon } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface Props {
     navItems: Header["navItems"];
 }
 
 export default function HamburgerMenu({ navItems }: Props) {
-    const pathname = usePathname();
-
     const [isOpen, setIsOpen] = useState(false);
-
-    useEffect(() => {
-        setIsOpen(false);
-    }, [pathname]);
 
     return (
         <>
@@ -27,12 +20,16 @@ export default function HamburgerMenu({ navItems }: Props) {
             <div
                 className={clsx(
                     "absolute top-[95px] right-0 w-full h-screen bg-background z-50 p-4 transition-opacity",
-                    isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+                    isOpen ? "opacity-100" : "opacity-0 pointer-events-none",
                 )}
             >
-                <nav className="flex flex-col items-center h-full gap-10">
+                <nav className="flex flex-col items-center h-full gap-8">
                     {navItems?.map(({ link }, index: number) => (
-                        <CMSLink key={index} {...link} />
+                        <CMSLink
+                            key={index}
+                            className="self-center"
+                            {...link}
+                        />
                     ))}
                 </nav>
             </div>

@@ -1,3 +1,4 @@
+import { getEnv } from "@/lib/Env";
 import { CollectionSlug, PayloadRequest } from "payload";
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
@@ -12,19 +13,19 @@ type Props = {
 };
 
 export const generatePreviewPath = ({ collection, slug }: Props) => {
-    // Allow empty strings, e.g. for the homepage
     if (slug === undefined || slug === null) {
         return null;
     }
 
-    // Encode to support slugs with special characters
     const encodedSlug = encodeURIComponent(slug);
+
+    const env = getEnv();
 
     const encodedParams = new URLSearchParams({
         slug: encodedSlug,
         collection,
         path: `${collectionPrefixMap[collection]}/${encodedSlug}`,
-        previewSecret: process.env.PREVIEW_SECRET || "",
+        previewSecret: env.PREVIEW_SECRET || "",
     });
 
     const url = `/next/preview?${encodedParams.toString()}`;

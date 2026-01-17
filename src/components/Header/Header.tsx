@@ -17,11 +17,12 @@ export async function Header() {
                     resource={headerData?.headerLogo}
                     priority
                     fill
-                    className="h-[50px] w-[200px] relative"
+                    htmlElement={null}
+                    pictureClassName="h-10 w-[175px] sm:h-[50px] sm:w-[200px] relative"
                 />
             </Link>
 
-            <nav className="flex-row justify-between items-center gap-8 hidden md:flex">
+            <nav className="flex-row justify-between items-center gap-4 hidden md:flex">
                 {navItems.map(({ link }, index: number) => (
                     <CMSLink
                         key={index}

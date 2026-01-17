@@ -1,9 +1,11 @@
 "use client";
 
 import { Media } from "@/components/Media";
+import { GoogleIcon } from "@/components/Social/Icons";
 import type { CarouselBlock as CarouselBlockProps } from "@/payload-types";
 import useEmblaCarousel from "embla-carousel-react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Star } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 export const CarouselBlockClient: React.FC<CarouselBlockProps> = (props) => {
@@ -40,21 +42,67 @@ export const CarouselBlockClient: React.FC<CarouselBlockProps> = (props) => {
                                 key={carouselItem.id || index}
                                 className="md:flex-[0_0_100%] min-w-0 w-[66.6667%] px-2 md:px-0 basis-[75%] shrink-0"
                             >
-                                <div className="bg-sl-beige rounded-4xl h-[250px] md:mx-4 flex flex-col items-center py-4 px-8 text-black gap-4 justify-center">
-                                    <Media
-                                        fill
-                                        resource={carouselItem.media}
-                                        className="w-[50px] h-[50px] relative"
-                                        imgClassName="object-cover object-center"
-                                    />
+                                <div className="bg-sl-beige rounded-4xl h-[300px] sm:h-[250px] md:mx-4 flex flex-col py-6 px-8 text-black gap-4">
+                                    <div className="flex flex-row items-center justify-between">
+                                        <div className="flex flex-row items-center gap-4">
+                                            <Media
+                                                fill
+                                                resource={carouselItem.media}
+                                                className="w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] relative"
+                                                imgClassName="object-cover object-center rounded-full"
+                                            />
 
-                                    <p className="font-sl-montserrat text-sm font-medium basis-[40%] overflow-hidden">
+                                            <div className="flex flex-col justify-between gap-1">
+                                                <div className="text-lg font-bold shrink-0">
+                                                    {carouselItem.name}
+                                                </div>
+
+                                                <div className="text-sl-orange flex flex-row gap-1">
+                                                    {[1, 2, 3, 4, 5].map(
+                                                        (star) => (
+                                                            <div
+                                                                key={
+                                                                    "star-" +
+                                                                    star
+                                                                }
+                                                            >
+                                                                <Star
+                                                                    className="hidden sm:block"
+                                                                    height={20}
+                                                                    width={20}
+                                                                    fill="#ff914d"
+                                                                />
+
+                                                                <Star
+                                                                    className="block sm:hidden"
+                                                                    height={15}
+                                                                    width={15}
+                                                                    fill="#ff914d"
+                                                                />
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {carouselItem.google_url && (
+                                            <Link
+                                                href={carouselItem.google_url}
+                                                target="_blank"
+                                                className="text-black"
+                                            >
+                                                <GoogleIcon
+                                                    width={30}
+                                                    height={30}
+                                                />
+                                            </Link>
+                                        )}
+                                    </div>
+
+                                    <p className="font-sl-montserrat text-sm font-medium overflow-hidden">
                                         {carouselItem.text}
                                     </p>
-
-                                    <div className="text-lg font-bold shrink-0">
-                                        {carouselItem.name}
-                                    </div>
                                 </div>
                             </div>
                         ))}

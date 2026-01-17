@@ -54,6 +54,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
                 placeholder="blur"
                 blurDataURL={placeholderBlur}
                 priority={priority}
+                fetchPriority={priority ? "high" : "auto"}
                 quality={85}
                 loading={loading}
                 sizes={sizes}

@@ -1,5 +1,4 @@
 import { defaultLexical } from "@/fields/defaultLexical";
-import { link } from "@/fields/link";
 import type { Field } from "payload";
 
 export const hero: Field = {
@@ -16,51 +15,10 @@ export const hero: Field = {
             required: true,
         },
         {
-            label: "Titel",
-            name: "title",
-            type: "text",
-            required: true,
-        },
-        {
-            label: "Tekst",
+            label: "Content",
             name: "text",
             type: "richText",
             editor: defaultLexical,
         },
-        {
-            label: "Tekstkleur",
-            name: "color",
-            type: "select",
-            defaultValue: "black",
-            required: false,
-            options: [
-                {
-                    label: "Zwart",
-                    value: "black",
-                },
-                {
-                    label: "Beige",
-                    value: "beige",
-                },
-                {
-                    label: "Wit",
-                    value: "white",
-                },
-            ],
-        },
-        {
-            label: "Heeft een link",
-            name: "enableLink",
-            type: "checkbox",
-        },
-        link({
-            overrides: {
-                admin: {
-                    condition: (_data, siblingData) => {
-                        return Boolean(siblingData?.enableLink);
-                    },
-                },
-            },
-        }),
     ],
 };

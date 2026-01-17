@@ -104,10 +104,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    whatsApp: WhatsApp;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    whatsApp: WhatsAppSelect<false> | WhatsAppSelect<true>;
   };
   locale: null;
   user: User & {
@@ -226,11 +228,14 @@ export interface Document {
  */
 export interface Page {
   id: number;
+  /**
+   * Kies hier een bovenliggende pagina, indien van toepassing.
+   */
+  parent?: (number | null) | Page;
   title: string;
   hasHero: boolean;
   hero: {
     media: number | Media;
-    title: string;
     text?: {
       root: {
         type: string;
@@ -246,27 +251,6 @@ export interface Page {
       };
       [k: string]: unknown;
     } | null;
-    color?: ('black' | 'beige' | 'white') | null;
-    enableLink?: boolean | null;
-    link?: {
-      type?: ('reference' | 'custom') | null;
-      newTab?: boolean | null;
-      reference?:
-        | ({
-            relationTo: 'pages';
-            value: number | Page;
-          } | null)
-        | ({
-            relationTo: 'posts';
-            value: number | Post;
-          } | null);
-      url?: string | null;
-      label: string;
-      /**
-       * Choose how the link should be rendered.
-       */
-      appearance?: ('black' | 'beige' | 'orange') | null;
-    };
   };
   layout: (ContentBlock | CarouselBlock | TeamBlock | InstagramBlock)[];
   meta?: {
@@ -300,6 +284,93 @@ export interface Page {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ContentBlock".
+ */
+export interface ContentBlock {
+  backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
+  columns?:
+    | {
+        contentPosition: 'contentOnly' | 'contentBottom' | 'contentRight' | 'contentLeft';
+        media?: (number | null) | Media;
+        imageSize?: ('imageTopCut' | 'imageFull' | 'imageCenter') | null;
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'content';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CarouselBlock".
+ */
+export interface CarouselBlock {
+  title: string;
+  subtitle: string;
+  backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
+  carouselItems?:
+    | {
+        media?: (number | null) | Media;
+        text: string;
+        name: string;
+        google_url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'carousel';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TeamBlock".
+ */
+export interface TeamBlock {
+  title: string;
+  limit?: number | null;
+  type: 'carousel' | 'grid';
+  backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
+  enableLink?: boolean | null;
+  link?: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+    /**
+     * Kies hoe de link eruitziet.
+     */
+    appearance?: ('black' | 'beige' | 'orange') | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'team';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -354,118 +425,25 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ContentBlock".
- */
-export interface ContentBlock {
-  backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
-  columns?:
-    | {
-        contentPosition: 'contentBottom' | 'contentRight' | 'contentLeft';
-        imageSize?: ('imageTopCut' | 'imageFull' | 'imageCenter') | null;
-        title?: string | null;
-        richText: {
-          root: {
-            type: string;
-            children: {
-              type: any;
-              version: number;
-              [k: string]: unknown;
-            }[];
-            direction: ('ltr' | 'rtl') | null;
-            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-            indent: number;
-            version: number;
-          };
-          [k: string]: unknown;
-        };
-        media?: (number | null) | Media;
-        enableLink?: boolean | null;
-        link?: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: number | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: number | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-          /**
-           * Choose how the link should be rendered.
-           */
-          appearance?: ('black' | 'beige' | 'orange') | null;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'content';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CarouselBlock".
- */
-export interface CarouselBlock {
-  title: string;
-  subtitle: string;
-  backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
-  carouselItems?:
-    | {
-        media?: (number | null) | Media;
-        text: string;
-        name: string;
-        id?: string | null;
-      }[]
-    | null;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'carousel';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "TeamBlock".
- */
-export interface TeamBlock {
-  title: string;
-  limit?: number | null;
-  type: 'carousel' | 'grid';
-  backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
-  enableLink?: boolean | null;
-  link?: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null);
-    url?: string | null;
-    label: string;
-    /**
-     * Choose how the link should be rendered.
-     */
-    appearance?: ('black' | 'beige' | 'orange') | null;
-  };
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'team';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "InstagramBlock".
  */
 export interface InstagramBlock {
   title: string;
-  subtitle: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
   type: 'carousel' | 'grid';
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
   images?:
@@ -487,7 +465,7 @@ export interface InstagramBlock {
           url?: string | null;
           label: string;
           /**
-           * Choose how the link should be rendered.
+           * Kies hoe de link eruitziet.
            */
           appearance?: ('black' | 'beige' | 'orange') | null;
         };
@@ -957,26 +935,14 @@ export interface DocumentsSelect<T extends boolean = true> {
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
+  parent?: T;
   title?: T;
   hasHero?: T;
   hero?:
     | T
     | {
         media?: T;
-        title?: T;
         text?: T;
-        color?: T;
-        enableLink?: T;
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-              appearance?: T;
-            };
       };
   layout?:
     | T
@@ -1016,21 +982,9 @@ export interface ContentBlockSelect<T extends boolean = true> {
     | T
     | {
         contentPosition?: T;
-        imageSize?: T;
-        title?: T;
-        richText?: T;
         media?: T;
-        enableLink?: T;
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-              appearance?: T;
-            };
+        imageSize?: T;
+        richText?: T;
         id?: T;
       };
   id?: T;
@@ -1050,6 +1004,7 @@ export interface CarouselBlockSelect<T extends boolean = true> {
         media?: T;
         text?: T;
         name?: T;
+        google_url?: T;
         id?: T;
       };
   id?: T;
@@ -1084,7 +1039,7 @@ export interface TeamBlockSelect<T extends boolean = true> {
  */
 export interface InstagramBlockSelect<T extends boolean = true> {
   title?: T;
-  subtitle?: T;
+  content?: T;
   type?: T;
   backgroundColor?: T;
   images?:
@@ -1381,6 +1336,10 @@ export interface Header {
               } | null);
           url?: string | null;
           label: string;
+          /**
+           * Kies hoe de link eruitziet.
+           */
+          appearance?: ('black' | 'beige' | 'orange') | null;
         };
         id?: string | null;
       }[]
@@ -1412,6 +1371,28 @@ export interface Footer {
     };
     [k: string]: unknown;
   } | null;
+  socialMediaLinks?:
+    | {
+        platform: 'facebook' | 'twitter' | 'instagram' | 'youtube' | 'tiktok';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "whatsApp".
+ */
+export interface WhatsApp {
+  id: number;
+  /**
+   * Voer het telefoonnummer in in internationaal formaat, bijvoorbeeld: +31612345678
+   */
+  phoneNumber: string;
+  textPreFilled: string;
+  buttonText: string;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1432,6 +1413,7 @@ export interface HeaderSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              appearance?: T;
             };
         id?: T;
       };
@@ -1448,6 +1430,25 @@ export interface FooterSelect<T extends boolean = true> {
   description?: T;
   footerLogo?: T;
   contactText?: T;
+  socialMediaLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "whatsApp_select".
+ */
+export interface WhatsAppSelect<T extends boolean = true> {
+  phoneNumber?: T;
+  textPreFilled?: T;
+  buttonText?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -1499,6 +1500,122 @@ export interface FormBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'formBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CallToActionBlock".
+ */
+export interface CallToActionBlock {
+  link: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null);
+    url?: string | null;
+    label: string;
+    /**
+     * Kies hoe de link eruitziet.
+     */
+    appearance?: ('black' | 'beige' | 'orange') | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'callToActionBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ColumnsBlock".
+ */
+export interface ColumnsBlock {
+  columns?:
+    | {
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'columnsBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "VirtuagymRosterBlock".
+ */
+export interface VirtuagymRosterBlock {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'virtuagymRosterBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServiceCardBlock".
+ */
+export interface ServiceCardBlock {
+  columns: {
+    backgroundColor: 'white' | 'beige' | 'black';
+    image: number | Media;
+    content: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    priceType: string;
+    price: number;
+    link: {
+      type?: ('reference' | 'custom') | null;
+      newTab?: boolean | null;
+      reference?:
+        | ({
+            relationTo: 'pages';
+            value: number | Page;
+          } | null)
+        | ({
+            relationTo: 'posts';
+            value: number | Post;
+          } | null);
+      url?: string | null;
+      label: string;
+      /**
+       * Kies hoe de link eruitziet.
+       */
+      appearance?: ('black' | 'beige' | 'orange') | null;
+    };
+    id?: string | null;
+  }[];
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'serviceCardBlock';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
