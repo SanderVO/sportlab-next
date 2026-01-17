@@ -31,7 +31,7 @@
         },
     },
     "vars": {
-        "NEXTJS_EN": "development",
+        "NEXTJS_ENV": "development",
         "NEXT_PUBLIC_SERVER_URL": "http://localhost:3000",
         "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "1x00000000000000000000AA",
         "R2_PUBLIC_URL": "https://cdn-sportlab.sandervanooijen.dev",
@@ -70,7 +70,7 @@
         "production": {
             "name": "sportlab",
             "vars": {
-                "NEXTJS_EN": "production",
+                "NEXTJS_ENV": "production",
                 "NEXT_PUBLIC_SERVER_URL": "https://sportlab.sandervanooijen.dev",
                 "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACBFLKYGDAzSPBOB",
                 "R2_PUBLIC_URL": "https://cdn-sportlab.sandervanooijen.dev",
@@ -109,7 +109,7 @@
         "preview": {
             "name": "sportlab-preview",
             "vars": {
-                "NEXTJS_EN": "production",
+                "NEXTJS_ENV": "production",
                 "NEXT_PUBLIC_SERVER_URL": "https://localhost:8787",
                 "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACBFLKYGDAzSPBOB",
                 "R2_PUBLIC_URL": "https://cdn-sportlab.sandervanooijen.dev",
