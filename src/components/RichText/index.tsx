@@ -119,7 +119,7 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
 
         const className = firstChild?.$?.className;
 
-        let colorClass = "text-white";
+        let colorClass = "text-black";
 
         switch (firstChild?.$?.color) {
             case "white":
@@ -131,11 +131,8 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
             case "orange":
                 colorClass = "text-sl-orange";
                 break;
-            case "black":
-                colorClass = "text-sl-orange";
-                break;
             default:
-                colorClass = "text-white";
+                colorClass = "text-black";
                 break;
         }
 

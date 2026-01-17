@@ -13,7 +13,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                 "container m-auto flex py-15 sm:py-0 h-full",
                 columns && columns.length > 1
                     ? "flex-col sm:flex-row gap-10 sm:gap-50 justify-between"
-                    : "justify-between static!"
+                    : "justify-between static!",
             )}
         >
             {columns &&
@@ -27,7 +27,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                             className={cn(
                                 "flex h-full justify-between self-center",
                                 columns.length > 1 && "w-full",
-                                columns.length === 1 && "w-full"
+                                columns.length === 1 && "w-full",
                             )}
                         >
                             {media && contentPosition === "contentRight" && (
@@ -38,14 +38,14 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         imageSize === "imageFull" &&
                                             "absolute left-0 bottom-0 w-1/3 hidden sm:block h-full",
                                         imageSize === "imageCenter" &&
-                                            "h-[200px] sm:h-auto sm:min-h-[600px] w-full sm:w-[400px] relative shrink-0 hidden sm:block"
+                                            "h-[200px] sm:h-auto sm:min-h-[600px] w-full sm:w-[400px] relative shrink-0 hidden sm:block",
                                     )}
                                 >
                                     <Media
                                         resource={media}
                                         fill
                                         imgClassName={cn(
-                                            "object-cover object-center"
+                                            "object-cover object-center",
                                         )}
                                     />
                                 </div>
@@ -55,8 +55,10 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                 className={cn(
                                     "flex flex-col gap-4 sm:gap-0 w-full relative self-center",
                                     columns.length == 1 && "sm:w-full",
+                                    contentPosition === "contentLeft" &&
+                                        "max-w-[60%]",
                                     contentPosition === "contentRight" &&
-                                        "sm:pl-[40%]"
+                                        "sm:pl-[40%]",
                                 )}
                                 key={col.id || index}
                             >
@@ -64,10 +66,11 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                     <Media
                                         resource={media}
                                         fill
-                                        className={cn(
-                                            "sm:hidden h-[200px] w-full relative mb-4",
+                                        htmlElement={null}
+                                        pictureClassName={cn(
+                                            "h-[200px] w-full relative mb-4",
                                             contentPosition !==
-                                                "contentBottom" && "sm:hidden"
+                                                "contentBottom" && "sm:hidden",
                                         )}
                                         imgClassName={cn(
                                             "object-cover",
@@ -75,7 +78,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                                 "contentBottom" && "object-top",
                                             contentPosition ===
                                                 "contentBottom" &&
-                                                "object-center"
+                                                "object-center",
                                         )}
                                     />
                                 )}
@@ -97,14 +100,14 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         imageSize === "imageFull" &&
                                             "absolute right-0 bottom-0 w-1/3 hidden sm:block h-full",
                                         imageSize === "imageCenter" &&
-                                            "h-[200px] sm:h-auto sm:min-h-[600px] w-full sm:w-[400px] relative shrink-0 hidden sm:block"
+                                            "h-[200px] sm:h-auto sm:min-h-[600px] w-full sm:w-[400px] relative shrink-0 hidden sm:block",
                                     )}
                                 >
                                     <Media
                                         resource={media}
                                         fill
                                         imgClassName={cn(
-                                            "object-cover object-center"
+                                            "object-cover object-center",
                                         )}
                                     />
                                 </div>
