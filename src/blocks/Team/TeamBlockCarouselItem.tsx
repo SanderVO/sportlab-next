@@ -35,19 +35,21 @@ export const TeamBlockCarouselItem = ({
                 )}
             >
                 <div
-                    className="h-full w-full relative"
+                    className="h-full w-full relative overflow-hidden cursor-pointer"
                     onMouseEnter={() => setIsHover(true)}
                     onMouseLeave={() => setIsHover(false)}
-                    onTouchStart={() => setIsHover(!!isHover)}
+                    onTouchStart={() => setIsHover(true)}
+                    onTouchEnd={() => setIsHover(false)}
                 >
                     <Media
                         fill
                         resource={user.avatar}
+                        htmlElement={null}
                         imgClassName="object-cover object-top"
                     />
 
                     {isHover && (
-                        <div className="absolute top-0 py-2 px-4 bg-black/50 text-white text-sm h-full w-full flex items-center justify-center italic">
+                        <div className="absolute top-0 py-2 px-4 bg-black/65 text-white text-sm h-full w-full flex items-center justify-center italic">
                             &ldquo;{user.about}&rdquo;
                         </div>
                     )}

@@ -56,7 +56,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                     "flex flex-col gap-4 sm:gap-0 w-full relative self-center",
                                     columns.length == 1 && "sm:w-full",
                                     contentPosition === "contentLeft" &&
-                                        "max-w-[60%]",
+                                        "sm:max-w-[60%]",
                                     contentPosition === "contentRight" &&
                                         "sm:pl-[40%]",
                                 )}
@@ -68,7 +68,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         fill
                                         htmlElement={null}
                                         pictureClassName={cn(
-                                            "h-[200px] w-full relative mb-4",
+                                            "h-[300px] w-full relative mb-4",
                                             contentPosition !==
                                                 "contentBottom" && "sm:hidden",
                                         )}
@@ -87,7 +87,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                     <RichText
                                         data={richText}
                                         enableGutter={false}
-                                        enableProse={false}
+                                        enableProse={true}
                                     />
                                 )}
                             </div>
