@@ -204,7 +204,12 @@ export const FormBlock: React.FC<
                         </div>
 
                         <Turnstile
-                            siteKey={env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                            siteKey={
+                                env.NODE_ENV === "development"
+                                    ? (env.NEXT_PUBLIC_TURNSTILE_SITE_KEY! ??
+                                      "")
+                                    : "0x4AAAAAACBFLKYGDAzSPBOB"
+                            }
                             theme="light"
                             sandbox={env.NODE_ENV === "development"}
                             onVerify={setToken}

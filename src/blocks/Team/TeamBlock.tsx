@@ -16,7 +16,7 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
     const { docs: users } = await payload.find({
         collection: "users",
         page: 0,
-        limit: type === "carousel" ? limit ?? 0 : 0,
+        limit: type === "carousel" ? (limit ?? 0) : 0,
         where: {
             status: {
                 equals: "active",
@@ -35,7 +35,7 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
                 className={cn(
                     "flex flex-row justify-between my-10",
                     type === "grid" && "h-full gap-0",
-                    type === "carousel" && "h-[400px] gap-20"
+                    type === "carousel" && "h-[400px] gap-20 items-center",
                 )}
             >
                 <TeamBlockCarousel
