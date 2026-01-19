@@ -12,6 +12,7 @@ out/            # when using `next export`
 build/
 out/*
 next-env.d.ts
+*.sql
 
 # Payload
 .payload/

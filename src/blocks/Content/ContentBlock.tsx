@@ -68,7 +68,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         fill
                                         htmlElement={null}
                                         pictureClassName={cn(
-                                            "h-[300px] w-full relative mb-4",
+                                            "h-[300px] sm:h-[200px] w-full relative mb-4",
                                             contentPosition !==
                                                 "contentBottom" && "sm:hidden",
                                         )}
@@ -87,7 +87,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                     <RichText
                                         data={richText}
                                         enableGutter={false}
-                                        enableProse={true}
+                                        enableProse={false}
                                     />
                                 )}
                             </div>

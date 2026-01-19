@@ -28,18 +28,11 @@ export const TeamBlockCarouselItem = ({
                     "flex flex-row items-center text h-full shrink-0 w-[66.6667%] md:w-[25%] px-2",
             )}
         >
-            <div
-                className={cn(
-                    "h-full flex flex-col gap-2 w-full",
-                    type === "grid" && "h-[400px]",
-                )}
-            >
+            <div className="h-full flex flex-col gap-2 w-full">
                 <div
-                    className="h-full w-full relative overflow-hidden cursor-pointer"
-                    onMouseEnter={() => setIsHover(true)}
-                    onMouseLeave={() => setIsHover(false)}
-                    onTouchStart={() => setIsHover(true)}
-                    onTouchEnd={() => setIsHover(false)}
+                    className="h-[440px] w-full relative overflow-hidden cursor-pointer"
+                    onPointerUp={() => setIsHover(true)}
+                    onPointerDown={() => setIsHover(false)}
                 >
                     <Media
                         fill

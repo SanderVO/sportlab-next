@@ -1,5 +1,6 @@
 import {
     BoldFeature,
+    defaultEditorFeatures,
     FixedToolbarFeature,
     HeadingFeature,
     HorizontalRuleFeature,
@@ -12,8 +13,10 @@ import {
     UnderlineFeature,
 } from "@payloadcms/richtext-lexical";
 import { TextFieldSingleValidation } from "payload";
+import { textState } from "./textState";
 
 export const defaultLexicalFeatures = [
+    ...defaultEditorFeatures,
     FixedToolbarFeature(),
     InlineToolbarFeature(),
     HorizontalRuleFeature(),
@@ -85,21 +88,6 @@ export const defaultLexicalFeatures = [
         },
     }),
     TextStateFeature({
-        state: {
-            color: {
-                black: {
-                    label: "Zwart",
-                    css: { color: "black" },
-                },
-                beige: {
-                    label: "Beige",
-                    css: { color: "#e4dbc7" },
-                },
-                orange: {
-                    label: "Oranje",
-                    css: { color: "#ff914d" },
-                },
-            },
-        },
+        state: textState,
     }),
 ];

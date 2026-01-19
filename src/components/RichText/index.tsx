@@ -1,6 +1,7 @@
 import { FormBlock } from "@/blocks/Form/FormBlock";
 import { ServiceCardBlock } from "@/blocks/ServiceCard/ServiceCardBlock";
 import { VirtuagymRosterBlock } from "@/blocks/VirtuagymRoster/VirtuagymRoster";
+import { textState } from "@/fields/textState";
 import {
     CallToActionBlock,
     ColumnsBlock,
@@ -10,14 +11,19 @@ import { cn } from "@/utilities/ui";
 import {
     DefaultNodeTypes,
     SerializedBlockNode,
+    SerializedHeadingNode,
     SerializedLinkNode,
+    SerializedTextNode,
     type DefaultTypedEditorState,
 } from "@payloadcms/richtext-lexical";
 import {
     RichText as ConvertRichText,
+    JSXConverter,
     JSXConvertersFunction,
     LinkJSXConverter,
+    SerializedLexicalNodeWithParent,
 } from "@payloadcms/richtext-lexical/react";
+import { TextStateFeatureProps } from "node_modules/@payloadcms/richtext-lexical/dist/features/textState/feature.server";
 import { FormBlockType } from "../../blocks/Form/FormBlock";
 import { CMSLink } from "../Link";
 
@@ -32,116 +38,113 @@ const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
     return relationTo === "posts" ? `/posts/${slug}` : `/${slug}`;
 };
 
+const textConverter: JSXConverter<SerializedTextNode> = ({
+    node,
+}: {
+    node: SerializedTextNode;
+}) => {
+    const text = node.text as string;
+
+    const colorState: TextStateFeatureProps["state"] = textState;
+
+    const styles: React.CSSProperties = {};
+
+    if (node.$) {
+        Object.keys(colorState).forEach((stateKey) => {
+            const stateOptions = colorState[stateKey];
+
+            if (node.$ && node.$[stateKey]) {
+                const stateValue = node.$[stateKey];
+
+                if (
+                    typeof stateValue === "string" &&
+                    stateOptions[stateValue]
+                ) {
+                    Object.assign(styles, stateOptions[stateValue].css);
+                }
+            }
+        });
+    }
+
+    return <span style={styles}>{text}</span>;
+};
+
+const headingConverter: JSXConverter<SerializedHeadingNode> = ({
+    node,
+}: {
+    node: SerializedHeadingNode;
+}) => {
+    const Tag = node.type as "h1" | "h2" | "h3" | "h4";
+
+    const content = node.children.map(
+        (child: SerializedLexicalNodeWithParent, index: number) => {
+            const text = (child && "text" in child ? child.text : "") as string;
+
+            let colorClass = "text-white";
+
+            switch (child?.$?.color) {
+                case "black":
+                    colorClass = "text-background";
+                    break;
+                case "beige":
+                    colorClass = "text-sl-beige";
+                    break;
+                case "orange":
+                    colorClass = "text-sl-orange";
+                    break;
+                default:
+                    colorClass = "text-white";
+                    break;
+            }
+
+            return (
+                <span
+                    key={"child-" + index}
+                    className={cn(colorClass, "block")}
+                >
+                    {text}
+                </span>
+            );
+        },
+    );
+
+    switch (node.tag) {
+        case "h1":
+            return (
+                <h1 className={cn("font-sl-bebas text-5xl md:text-7xl")}>
+                    {content}
+                </h1>
+            );
+        case "h2":
+            return (
+                <h2 className={cn("font-sl-bebas text-4xl md:text-6xl")}>
+                    {content}
+                </h2>
+            );
+        case "h3":
+            return (
+                <h3 className={cn("font-sl-bebas text-3xl md:text-5xl")}>
+                    {content}
+                </h3>
+            );
+        case "h4":
+            return (
+                <h4 className={cn("font-sl-bebas text-2xl md:text-4xl")}>
+                    {content}
+                </h4>
+            );
+        default:
+            return <h5>{content}</h5>;
+    }
+};
+
 const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
     defaultConverters,
 }) => ({
     ...defaultConverters,
     ...LinkJSXConverter({ internalDocToHref }),
-    heading: ({ node }) => {
-        const Tag = node.type as "h1" | "h2" | "h3" | "h4";
-
-        const firstChild = node.children[0];
-        const text = (
-            firstChild && "text" in firstChild ? firstChild.text : ""
-        ) as string;
-
-        let colorClass = "text-white";
-
-        switch (firstChild?.$?.color) {
-            case "black":
-                colorClass = "text-background";
-                break;
-            case "beige":
-                colorClass = "text-sl-beige";
-                break;
-            case "orange":
-                colorClass = "text-sl-orange";
-                break;
-            default:
-                colorClass = "text-white";
-                break;
-        }
-
-        switch (node.tag) {
-            case "h1":
-                return (
-                    <Tag
-                        className={cn(
-                            "font-sl-bebas text-5xl md:text-7xl",
-                            colorClass,
-                        )}
-                    >
-                        {text}
-                    </Tag>
-                );
-            case "h2":
-                return (
-                    <Tag
-                        className={cn(
-                            "font-sl-bebas text-4xl md:text-6xl",
-                            colorClass,
-                        )}
-                    >
-                        {text}
-                    </Tag>
-                );
-            case "h3":
-                return (
-                    <Tag
-                        className={cn(
-                            "font-sl-bebas text-3xl md:text-5xl",
-                            colorClass,
-                        )}
-                    >
-                        {text}
-                    </Tag>
-                );
-            case "h4":
-                return (
-                    <Tag
-                        className={cn(
-                            "font-sl-bebas text-2xl md:text-4xl",
-                            colorClass,
-                        )}
-                    >
-                        {text}
-                    </Tag>
-                );
-            default:
-                return <div>{text}</div>;
-        }
-    },
-    paragraph: ({ node }) => {
-        const firstChild = node.children[0];
-        const text = (
-            firstChild && "text" in firstChild ? firstChild.text : ""
-        ) as string;
-
-        const className = firstChild?.$?.className;
-
-        let colorClass = "text-black";
-
-        switch (firstChild?.$?.color) {
-            case "white":
-                colorClass = "text-white";
-                break;
-            case "beige":
-                colorClass = "text-sl-beige";
-                break;
-            case "orange":
-                colorClass = "text-sl-orange";
-                break;
-            default:
-                colorClass = "text-black";
-                break;
-        }
-
-        return (
-            <p className={`${className ? className : ""} ${colorClass}`}>
-                {text}
-            </p>
-        );
-    },
+    text: textConverter,
+    heading: headingConverter,
     blocks: {
         formBlock: ({ node }: { node: SerializedBlockNode<FormBlockType> }) => (
             <FormBlock {...node.fields} />
@@ -150,7 +153,7 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
             node,
         }: {
             node: SerializedBlockNode<CallToActionBlock>;
-        }) => <CMSLink {...node.fields.link} className="w-full" />,
+        }) => <CMSLink {...node.fields.link} />,
         columnsBlock: ({
             node,
         }: {

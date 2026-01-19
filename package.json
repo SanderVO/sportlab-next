@@ -6,6 +6,10 @@
     "scripts": {
         "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
         "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
+        "db:import": "wrangler d1 execute D1 --local --file=data.sql",
+        "db:disable-foreign-keys": "sh -c '{ echo \"PRAGMA foreign_keys=OFF;\"; echo \"PRAGMA defer_foreign_keys=TRUE;\"; grep -E \"^INSERT INTO\" prod.sql; echo \"PRAGMA foreign_keys=ON;\"; } > data.sql'",
+        "db:export": "rm -rf .wrangler/state/v3/d1 && wrangler d1 export D1 --remote --env production --output=prod.sql && grep -E '^INSERT INTO' prod.sql > data.sql",
+        "db:sync-prod": "pnpm run db:export && pnpm run migrate && pnpm run db:disable-foreign-keys && pnpm run db:import",
         "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
         "payload:generate": "pnpm run generate:types && pnpm run generate:types:cloudflare && pnpm run generate:db && pnpm run generate:importmap",
         "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
