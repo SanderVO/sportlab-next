@@ -31,8 +31,8 @@ export const TeamBlockCarouselItem = ({
             <div className="h-full flex flex-col gap-2 w-full">
                 <div
                     className="h-[440px] w-full relative overflow-hidden cursor-pointer"
-                    onPointerUp={() => setIsHover(true)}
-                    onPointerDown={() => setIsHover(false)}
+                    onMouseEnter={() => setIsHover(true)}
+                    onMouseLeave={() => setIsHover(false)}
                 >
                     <Media
                         fill
