@@ -23,9 +23,9 @@
         "preview": "cross-env NODE_OPTIONS=--no-deprecation CLOUDFLARE_ENV=preview opennextjs-cloudflare build && opennextjs-cloudflare preview --env=preview",
         "deploy": "pnpm run deploy:database:production && pnpm run deploy:build && pnpm run deploy:app",
         "deploy:version": "pnpm run deploy:database:production && pnpm run deploy:build && pnpm run deploy:upload",
-        "deploy:build": "NODE_ENV=production opennextjs-cloudflare build --env=production",
-        "deploy:upload": "NODE_ENV=production opennextjs-cloudflare upload --env=production",
-        "deploy:app": "NODE_ENV=production opennextjs-cloudflare deploy --env=production",
+        "deploy:build": "CLOUDFLARE_ENV=production opennextjs-cloudflare build --env=production",
+        "deploy:upload": "CLOUDFLARE_ENV=production opennextjs-cloudflare upload --env=production",
+        "deploy:app": "CLOUDFLARE_ENV=production opennextjs-cloudflare deploy --env=production",
         "deploy:database:preview": "cross-env NODE_ENV=production CLOUDFLARE_ENV=preview PAYLOAD_SECRET=ignore payload migrate && wrangler d1 execute D1 --command 'PRAGMA optimize' --env=preview --remote",
         "deploy:database:production": "cross-env NODE_ENV=production CLOUDFLARE_ENV=production PAYLOAD_SECRET=ignore payload migrate && wrangler d1 execute D1 --command 'PRAGMA optimize' --env=$CLOUDFLARE_ENV --remote"
     },
