@@ -3,7 +3,6 @@ import CookieBanner from "@/components/CookieBanner/CookieBanner";
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
 import { WhatsappButton } from "@/components/WhatsApp/WhatsappButton";
-import { getEnv } from "@/lib/Env";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import { draftMode } from "next/headers";
@@ -39,7 +38,7 @@ export default async function RootLayout({
 }) {
     const { isEnabled } = await draftMode();
 
-    const env = getEnv();
+    const GTM_ID = process.env.GTM_ID;
 
     return (
         <html
@@ -84,7 +83,7 @@ export default async function RootLayout({
             `}
                 </Script>
 
-                {env.GTM_ID && <GoogleTagManager gtmId={env.GTM_ID} />}
+                {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
             </body>
         </html>
     );

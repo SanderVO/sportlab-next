@@ -5,13 +5,10 @@ import { draftMode } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
-import { getEnv } from "@/lib/Env";
 import configPromise from "@payload-config";
 
 export async function GET(req: NextRequest): Promise<Response> {
     const payload = await getPayload({ config: configPromise });
-
-    const env = getEnv();
 
     const { searchParams } = new URL(req.url);
 
@@ -20,7 +17,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     const slug = searchParams.get("slug");
     const previewSecret = searchParams.get("previewSecret");
 
-    if (previewSecret !== env.PREVIEW_SECRET) {
+    if (previewSecret !== process.env.PREVIEW_SECRET) {
         return new Response("You are not allowed to preview this page", {
             status: 403,
         });
@@ -33,7 +30,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     if (!path.startsWith("/")) {
         return new Response(
             "This endpoint can only be used for relative previews",
-            { status: 500 }
+            { status: 500 },
         );
     }
 
@@ -47,7 +44,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     } catch (error) {
         payload.logger.error(
             { err: error },
-            "Error verifying token for live preview"
+            "Error verifying token for live preview",
         );
         return new Response("You are not allowed to preview this page", {
             status: 403,

@@ -20,7 +20,6 @@ import { Users } from "./collections/Users";
 import { Footer } from "./components/Footer/config";
 import { Header } from "./components/Header/config";
 import { WhatsApp } from "./components/WhatsApp/config";
-import { getEnv } from "./lib/Env";
 import { plugins } from "./plugins";
 import { getServerSideURL } from "./utilities/getURL";
 
@@ -36,14 +35,12 @@ const nl = {
     },
 };
 
-const env = getEnv();
-
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const isProduction = env.NODE_ENV === "production";
-const isDevelopment = env.NODE_ENV === "development";
-const isPreviewBuild = env.CLOUDFLARE_ENV === "preview";
+const isProduction = process.env.NODE_ENV === "production";
+const isDevelopment = process.env.NODE_ENV === "development";
+const isPreviewBuild = process.env.CLOUDFLARE_ENV === "preview";
 
 const cloudflare =
     process.argv.find((value) => value.match(/^(generate|migrate):?/)) ||
@@ -54,27 +51,27 @@ const cloudflare =
 
 const r2DevStorage = () =>
     s3Storage({
-        bucket: env.R2_BUCKET ?? "",
+        bucket: process.env.R2_BUCKET ?? "",
         collections: {
             media: {
                 disableLocalStorage: true,
-                prefix: env.R2_IMAGES_PREFIX,
+                prefix: process.env.R2_IMAGES_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${env.R2_PUBLIC_URL}/${env.R2_IMAGES_PREFIX}${filename}`,
+                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_IMAGES_PREFIX}${filename}`,
             },
             documents: {
                 disableLocalStorage: true,
-                prefix: env.R2_DOCUMENTS_PREFIX,
+                prefix: process.env.R2_DOCUMENTS_PREFIX,
                 generateFileURL: ({ filename }) =>
-                    `${env.R2_PUBLIC_URL}/${env.R2_DOCUMENTS_PREFIX}${filename}`,
+                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_DOCUMENTS_PREFIX}${filename}`,
             },
         },
         config: {
             region: "weur",
-            endpoint: env.R2_ENDPOINT,
+            endpoint: process.env.R2_ENDPOINT,
             credentials: {
-                accessKeyId: env.R2_ACCESS_KEY_ID ?? "",
-                secretAccessKey: env.R2_SECRET_ACCESS_KEY ?? "",
+                accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
+                secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
             },
         },
     });
@@ -176,8 +173,8 @@ function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
         /* webpackIgnore: true */ `${"__wrangler".replaceAll("_", "")}`
     ).then(({ getPlatformProxy }) =>
         getPlatformProxy({
-            environment: env.CLOUDFLARE_ENV,
+            environment: process.env.CLOUDFLARE_ENV,
             remoteBindings: isProduction,
-        } satisfies GetPlatformProxyOptions)
+        } satisfies GetPlatformProxyOptions),
     );
 }

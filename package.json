@@ -23,9 +23,9 @@
         "preview": "cross-env NODE_OPTIONS=--no-deprecation CLOUDFLARE_ENV=preview opennextjs-cloudflare build && opennextjs-cloudflare preview --env=preview",
         "deploy": "pnpm run deploy:database:production && pnpm run deploy:build && pnpm run deploy:app",
         "deploy:version": "pnpm run deploy:database:production && pnpm run deploy:build && pnpm run deploy:upload",
-        "deploy:build": "CLOUDFLARE_ENV=production opennextjs-cloudflare build --env=production",
-        "deploy:upload": "CLOUDFLARE_ENV=production opennextjs-cloudflare upload --env=production",
-        "deploy:app": "CLOUDFLARE_ENV=production opennextjs-cloudflare deploy --env=production",
+        "deploy:build": "NODE_ENV=production opennextjs-cloudflare build --env=production",
+        "deploy:upload": "NODE_ENV=production opennextjs-cloudflare upload --env=production",
+        "deploy:app": "NODE_ENV=production opennextjs-cloudflare deploy --env=production",
         "deploy:database:preview": "cross-env NODE_ENV=production CLOUDFLARE_ENV=preview PAYLOAD_SECRET=ignore payload migrate && wrangler d1 execute D1 --command 'PRAGMA optimize' --env=preview --remote",
         "deploy:database:production": "cross-env NODE_ENV=production CLOUDFLARE_ENV=production PAYLOAD_SECRET=ignore payload migrate && wrangler d1 execute D1 --command 'PRAGMA optimize' --env=$CLOUDFLARE_ENV --remote"
     },
@@ -33,7 +33,7 @@
         "@aws-sdk/client-s3": "^3.940.0",
         "@hookform/resolvers": "^5.1.1",
         "@next/third-parties": "^15.5.9",
-        "@opennextjs/cloudflare": "^1.13.1",
+        "@opennextjs/cloudflare": "^1.14.10",
         "@payloadcms/admin-bar": "^3.69.0",
         "@payloadcms/db-d1-sqlite": "^3.69.0",
         "@payloadcms/email-nodemailer": "^3.69.0",
@@ -88,6 +88,6 @@
         "serve": "^14.2.5",
         "tailwindcss": "^4.1.4",
         "typescript": "^5",
-        "wrangler": "^4.59.2"
+        "wrangler": "^4.59.3"
     }
 }

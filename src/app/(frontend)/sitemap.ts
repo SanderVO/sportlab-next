@@ -1,4 +1,3 @@
-import { getEnv } from "@/lib/Env";
 import config from "@payload-config";
 import { unstable_cache } from "next/cache";
 import { MetadataRoute } from "next/types";
@@ -8,9 +7,8 @@ const getPagesSitemap = unstable_cache(
     async () => {
         const payload = await getPayload({ config });
 
-        const env = getEnv();
-
-        const SITE_URL = env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+        const SITE_URL =
+            process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 
         const results = await payload.find({
             collection: "pages",
@@ -58,15 +56,14 @@ const getPagesSitemap = unstable_cache(
     ["pages-sitemap"],
     {
         tags: ["pages-sitemap"],
-    }
+    },
 );
 
 const getBlogSitemap = unstable_cache(
     async () => {
-        const env = getEnv();
-
         const payload = await getPayload({ config });
-        const SITE_URL = env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+        const SITE_URL =
+            process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 
         const results = await payload.find({
             collection: "posts",
@@ -102,13 +99,12 @@ const getBlogSitemap = unstable_cache(
     ["blog-sitemap"],
     {
         tags: ["blog-sitemap"],
-    }
+    },
 );
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const env = getEnv();
-
-    const baseUrl = env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    const baseUrl =
+        process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
 
     const pagesSitemap = await getPagesSitemap();
     const blogSitemap = await getBlogSitemap();

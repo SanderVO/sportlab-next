@@ -2,7 +2,6 @@
 
 import RichText from "@/components/RichText";
 import { Button } from "@/components/ui/button";
-import { getEnv } from "@/lib/Env";
 import { getClientSideURL } from "@/utilities/getURL";
 import type {
     FormFieldBlock,
@@ -60,7 +59,7 @@ export const FormBlock: React.FC<
 
     const router = useRouter();
 
-    const env = getEnv();
+    const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
     const onSubmit = useCallback(
         (data: FormFieldBlock[]) => {
@@ -204,14 +203,9 @@ export const FormBlock: React.FC<
                         </div>
 
                         <Turnstile
-                            siteKey={
-                                env.NODE_ENV === "development"
-                                    ? (env.NEXT_PUBLIC_TURNSTILE_SITE_KEY! ??
-                                      "")
-                                    : "0x4AAAAAACBFLKYGDAzSPBOB"
-                            }
+                            siteKey={turnstileSiteKey}
                             theme="light"
-                            sandbox={env.NODE_ENV === "development"}
+                            sandbox={process.env.NODE_ENV === "development"}
                             onVerify={setToken}
                         />
 

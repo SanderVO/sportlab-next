@@ -1,4 +1,3 @@
-import { getEnv } from "@/lib/Env";
 import { CollectionSlug, PayloadRequest } from "payload";
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
@@ -19,13 +18,11 @@ export const generatePreviewPath = ({ collection, slug }: Props) => {
 
     const encodedSlug = encodeURIComponent(slug);
 
-    const env = getEnv();
-
     const encodedParams = new URLSearchParams({
         slug: encodedSlug,
         collection,
         path: `${collectionPrefixMap[collection]}/${encodedSlug}`,
-        previewSecret: env.PREVIEW_SECRET || "",
+        previewSecret: process.env.PREVIEW_SECRET || "",
     });
 
     const url = `/next/preview?${encodedParams.toString()}`;

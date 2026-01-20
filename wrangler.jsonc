@@ -2,11 +2,17 @@
     "$schema": "node_modules/wrangler/config-schema.json",
     "main": ".open-next/worker.js",
     "name": "sportlab",
-    "compatibility_date": "2025-08-15",
+    "compatibility_date": "2025-09-15",
     "compatibility_flags": [
         // Enable Node.js API
         // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#nodejs-compatibility-flag
         "nodejs_compat",
+        // Populate process.env with variables defined in wrangler.toml or the Cloudflare dashboard
+        // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#nodejs-compat-populate-process-env
+        "nodejs_compat_populate_process_env",
+        // Enable Node.js process API v2
+        // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#enable-nodejs-process-v2
+        "enable_nodejs_process_v2",
         // Allow to fetch URLs in your app
         // see https://developers.cloudflare.com/workers/configuration/compatibility-flags/#global-fetch-strictly-public
         "global_fetch_strictly_public",
@@ -15,6 +21,12 @@
         "directory": ".open-next/assets",
         "binding": "ASSETS",
     },
+    "services": [
+        {
+            "binding": "WORKER_SELF_REFERENCE",
+            "service": "sportlab",
+        },
+    ],
     "observability": {
         "enabled": false,
         "head_sampling_rate": 1,
@@ -49,6 +61,12 @@
             "remote": true,
             "migrations_dir": "./src/migrations",
         },
+        {
+            "binding": "NEXT_TAG_CACHE_D1",
+            "database_id": "712e8cbd-d164-4f33-ae4d-777321518490",
+            "database_name": "sportlab",
+            "remote": true,
+        },
     ],
     "r2_buckets": [
         {
@@ -80,6 +98,12 @@
                 "SMTP_FROM_NAME": "Sportlab Groningen",
                 "SMTP_ENABLED": true,
             },
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "sportlab",
+                },
+            ],
             "d1_databases": [
                 {
                     "binding": "D1",
@@ -87,6 +111,12 @@
                     "database_id": "712e8cbd-d164-4f33-ae4d-777321518490",
                     "remote": true,
                     "migrations_dir": "./src/migrations",
+                },
+                {
+                    "binding": "NEXT_TAG_CACHE_D1",
+                    "database_id": "712e8cbd-d164-4f33-ae4d-777321518490",
+                    "database_name": "sportlab",
+                    "remote": true,
                 },
             ],
             "r2_buckets": [
@@ -117,6 +147,12 @@
                 "SMTP_FROM_NAME": "Sportlab Groningen",
                 "SMTP_ENABLED": true,
             },
+            "services": [
+                {
+                    "binding": "WORKER_SELF_REFERENCE",
+                    "service": "sportlab-preview",
+                },
+            ],
             "d1_databases": [
                 {
                     "binding": "D1",
@@ -124,6 +160,12 @@
                     "database_id": "31be5e9e-8189-4d1a-b8b4-79d090bc6d10",
                     "remote": true,
                     "migrations_dir": "./src/migrations",
+                },
+                {
+                    "binding": "NEXT_TAG_CACHE_D1",
+                    "database_name": "sportlab-preview",
+                    "database_id": "31be5e9e-8189-4d1a-b8b4-79d090bc6d10",
+                    "remote": true,
                 },
             ],
             "r2_buckets": [
