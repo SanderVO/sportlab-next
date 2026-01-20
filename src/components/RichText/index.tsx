@@ -1,12 +1,12 @@
 import { FormBlock } from "@/blocks/Form/FormBlock";
 import { ServiceCardBlock } from "@/blocks/ServiceCard/ServiceCardBlock";
 import { VirtuagymRosterBlock } from "@/blocks/VirtuagymRoster/VirtuagymRoster";
-import { textState } from "@/fields/textState";
 import {
     CallToActionBlock,
     ColumnsBlock,
     ServiceCardBlock as ServiceCardBlockType,
 } from "@/payload-types";
+import { textState } from "@/utilities/textState";
 import { cn } from "@/utilities/ui";
 import {
     DefaultNodeTypes,
@@ -74,8 +74,6 @@ const headingConverter: JSXConverter<SerializedHeadingNode> = ({
 }: {
     node: SerializedHeadingNode;
 }) => {
-    const Tag = node.type as "h1" | "h2" | "h3" | "h4";
-
     const content = node.children.map(
         (child: SerializedLexicalNodeWithParent, index: number) => {
             const text = (child && "text" in child ? child.text : "") as string;

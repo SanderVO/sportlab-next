@@ -13,7 +13,7 @@ import {
     UnderlineFeature,
 } from "@payloadcms/richtext-lexical";
 import { TextFieldSingleValidation } from "payload";
-import { textState } from "./textState";
+import { textState } from "../utilities/textState";
 
 export const defaultLexicalFeatures = [
     ...defaultEditorFeatures,

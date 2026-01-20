@@ -87,7 +87,8 @@ export default async function Post({ params: paramsPromise }: Args) {
                     <RichText
                         className="max-w-3xl mx-auto text-background"
                         data={post.content}
-                        enableGutter={false}
+                        enableGutter={true}
+                        enableProse={true}
                     />
                 </div>
             </div>

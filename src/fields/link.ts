@@ -43,6 +43,7 @@ export const link: LinkType = ({
                 type: "row",
                 fields: [
                     {
+                        label: "Link type",
                         name: "type",
                         type: "radio",
                         admin: {
@@ -52,25 +53,27 @@ export const link: LinkType = ({
                         defaultValue: "reference",
                         options: [
                             {
-                                label: "Internal link",
+                                label: "Interne link",
                                 value: "reference",
                             },
                             {
-                                label: "Custom URL",
+                                label: "Externe URL",
                                 value: "custom",
                             },
                         ],
                     },
                     {
+                        label: "Openen in nieuw tabblad",
                         name: "newTab",
                         type: "checkbox",
                         admin: {
+                            description:
+                                "Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.",
                             style: {
                                 alignSelf: "flex-end",
                             },
                             width: "50%",
                         },
-                        label: "Open in new tab",
                     },
                 ],
             },
@@ -79,23 +82,25 @@ export const link: LinkType = ({
 
     const linkTypes: Field[] = [
         {
+            label: "Interne link",
             name: "reference",
             type: "relationship",
             admin: {
+                description:
+                    "Kies een pagina of blogpost om naartoe te linken.",
                 condition: (_, siblingData) =>
                     siblingData?.type === "reference",
             },
-            label: "Document to link to",
             relationTo: ["pages", "posts"],
             required: true,
         },
         {
+            label: "Externe URL",
             name: "url",
             type: "text",
             admin: {
                 condition: (_, siblingData) => siblingData?.type === "custom",
             },
-            label: "Custom URL",
             required: true,
         },
     ];
@@ -137,7 +142,7 @@ export const link: LinkType = ({
 
         if (appearances) {
             appearanceOptionsToUse = appearances.map(
-                (appearance) => appearanceOptions[appearance]
+                (appearance) => appearanceOptions[appearance],
             );
         }
 
