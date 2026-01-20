@@ -93,14 +93,12 @@
                 {
                     "binding": "R2",
                     "bucket_name": "sportlab",
-                    "preview_bucket_name": "sportlab",
                     "jurisdiction": "eu",
                     "remote": true,
                 },
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",
                     "bucket_name": "sportlab",
-                    "preview_bucket_name": "sportlab",
                     "jurisdiction": "eu",
                     "remote": true,
                 },
@@ -132,14 +130,12 @@
                 {
                     "binding": "R2",
                     "bucket_name": "sportlab",
-                    "preview_bucket_name": "sportlab",
                     "jurisdiction": "eu",
                     "remote": true,
                 },
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",
                     "bucket_name": "sportlab",
-                    "preview_bucket_name": "sportlab",
                     "jurisdiction": "eu",
                     "remote": true,
                 },

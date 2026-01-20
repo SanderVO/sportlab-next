@@ -351,7 +351,13 @@ export interface TeamBlock {
   enableLink?: boolean | null;
   link?: {
     type?: ('reference' | 'custom') | null;
+    /**
+     * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+     */
     newTab?: boolean | null;
+    /**
+     * Kies een pagina of blogpost om naartoe te linken.
+     */
     reference?:
       | ({
           relationTo: 'pages';
@@ -452,7 +458,13 @@ export interface InstagramBlock {
         enableLink?: boolean | null;
         link?: {
           type?: ('reference' | 'custom') | null;
+          /**
+           * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+           */
           newTab?: boolean | null;
+          /**
+           * Kies een pagina of blogpost om naartoe te linken.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -1324,7 +1336,13 @@ export interface Header {
     | {
         link: {
           type?: ('reference' | 'custom') | null;
+          /**
+           * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+           */
           newTab?: boolean | null;
+          /**
+           * Kies een pagina of blogpost om naartoe te linken.
+           */
           reference?:
             | ({
                 relationTo: 'pages';
@@ -1508,7 +1526,13 @@ export interface FormBlock {
 export interface CallToActionBlock {
   link: {
     type?: ('reference' | 'custom') | null;
+    /**
+     * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+     */
     newTab?: boolean | null;
+    /**
+     * Kies een pagina of blogpost om naartoe te linken.
+     */
     reference?:
       | ({
           relationTo: 'pages';
@@ -1594,7 +1618,13 @@ export interface ServiceCardBlock {
     price: number;
     link: {
       type?: ('reference' | 'custom') | null;
+      /**
+       * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+       */
       newTab?: boolean | null;
+      /**
+       * Kies een pagina of blogpost om naartoe te linken.
+       */
       reference?:
         | ({
             relationTo: 'pages';

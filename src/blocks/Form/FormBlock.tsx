@@ -62,8 +62,6 @@ export const FormBlock: React.FC<
 
     const env = getEnv();
 
-    console.log({ env, process: process.env });
-
     const onSubmit = useCallback(
         (data: FormFieldBlock[]) => {
             let loadingTimerID: ReturnType<typeof setTimeout>;
