@@ -1,8 +1,8 @@
 import { FormBlock } from "@/blocks/Form/FormBlock";
 import { ServiceCardBlock } from "@/blocks/ServiceCard/ServiceCardBlock";
 import { VirtuagymRosterBlock } from "@/blocks/VirtuagymRoster/VirtuagymRoster";
+import { Size, Variant } from "@/lib/ui/variants";
 import {
-    CallToActionBlock,
     ColumnsBlock,
     ServiceCardBlock as ServiceCardBlockType,
 } from "@/payload-types";
@@ -10,6 +10,7 @@ import { textState } from "@/utilities/textState";
 import { cn } from "@/utilities/ui";
 import {
     DefaultNodeTypes,
+    LinkFields,
     SerializedBlockNode,
     SerializedHeadingNode,
     SerializedLinkNode,
@@ -25,7 +26,7 @@ import {
 } from "@payloadcms/richtext-lexical/react";
 import { TextStateFeatureProps } from "node_modules/@payloadcms/richtext-lexical/dist/features/textState/feature.server";
 import { FormBlockType } from "../../blocks/Form/FormBlock";
-import { CMSLink } from "../Link";
+import { Button } from "../ui/Button";
 
 type NodeTypes = DefaultNodeTypes;
 
@@ -136,6 +137,37 @@ const headingConverter: JSXConverter<SerializedHeadingNode> = ({
     }
 };
 
+const linkConverter: JSXConverter<SerializedLinkNode> = ({
+    node,
+}: {
+    node: SerializedLinkNode;
+}) => {
+    const { doc, linkType, newTab, url, variant, size } =
+        node.fields as LinkFields;
+
+    const label = (node.children[0] as SerializedTextNode)?.text || "";
+
+    const href =
+        linkType === "internal" &&
+        typeof doc?.value === "object" &&
+        doc.value.slug
+            ? `${
+                  doc?.relationTo !== "pages" ? `/${doc?.relationTo}` : ""
+              }/${doc.value.slug}`
+            : url;
+
+    return (
+        <Button
+            url={href}
+            newTab={newTab}
+            variant={variant as Variant}
+            size={size as Size}
+        >
+            {label as string}
+        </Button>
+    );
+};
+
 const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
     defaultConverters,
 }) => ({
@@ -143,15 +175,12 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
     ...LinkJSXConverter({ internalDocToHref }),
     text: textConverter,
     heading: headingConverter,
+    link: linkConverter,
+    button: linkConverter,
     blocks: {
         formBlock: ({ node }: { node: SerializedBlockNode<FormBlockType> }) => (
             <FormBlock {...node.fields} />
         ),
-        callToActionBlock: ({
-            node,
-        }: {
-            node: SerializedBlockNode<CallToActionBlock>;
-        }) => <CMSLink {...node.fields.link} />,
         columnsBlock: ({
             node,
         }: {

@@ -28,6 +28,6 @@ export default function customImageLoader({
     const paramsString = params.join(",");
 
     return `https://sportlab.sandervanooijen.dev/cdn-cgi/image/${paramsString}/${normalizeSrc(
-        src
+        src,
     )}`;
 }

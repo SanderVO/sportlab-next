@@ -1,49 +1,46 @@
+import { Label } from "@/components/ui/Label";
 import type { CheckboxField } from "@payloadcms/plugin-form-builder/types";
+import React from "react";
 import type {
     FieldErrorsImpl,
     FieldValues,
     UseFormRegister,
 } from "react-hook-form";
-
-import { useFormContext } from "react-hook-form";
-
-import { Checkbox as CheckboxUi } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import React from "react";
-
 import { Error } from "../Error";
 import { Width } from "../Width";
 
 export const Checkbox: React.FC<
     CheckboxField & {
-        label: "Vinkvakje";
+        label: string;
         errors: Partial<FieldErrorsImpl>;
         register: UseFormRegister<FieldValues>;
     }
 > = ({ name, defaultValue, errors, label, register, required, width }) => {
-    const props = register(name, { required: required });
-    const { setValue } = useFormContext();
-
     return (
         <Width width={width}>
             <div className="flex items-center gap-2">
-                <CheckboxUi
-                    defaultChecked={defaultValue}
+                <input
+                    type="checkbox"
                     id={name}
-                    {...props}
-                    onCheckedChange={(checked) => {
-                        setValue(props.name, checked);
-                    }}
+                    defaultChecked={!!defaultValue}
+                    aria-invalid={!!errors[name]}
+                    className="
+                        h-4 w-4 rounded border-gray-300
+                        text-blue-600 focus:ring-blue-500
+                    "
+                    {...register(name, { required })}
                 />
+
                 <Label htmlFor={name}>
+                    {label}
                     {required && (
                         <span className="required">
                             * <span className="sr-only">(required)</span>
                         </span>
                     )}
-                    {label}
                 </Label>
             </div>
+
             {errors[name] && <Error name={name} />}
         </Width>
     );

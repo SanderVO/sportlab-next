@@ -1,23 +1,14 @@
+import { Label } from "@/components/ui/Label";
 import type { SelectField } from "@payloadcms/plugin-form-builder/types";
-import type { Control, FieldErrorsImpl } from "react-hook-form";
-
-import { Label } from "@/components/ui/label";
-import {
-    Select as SelectComponent,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import React from "react";
+import type { Control, FieldErrorsImpl } from "react-hook-form";
 import { Controller } from "react-hook-form";
-
 import { Error } from "../Error";
 import { Width } from "../Width";
 
 export const Select: React.FC<
     SelectField & {
-        label: "Keuzelijst";
+        label: string;
         control: Control;
         errors: Partial<FieldErrorsImpl>;
     }
@@ -41,37 +32,36 @@ export const Select: React.FC<
                     </span>
                 )}
             </Label>
-            <Controller
-                control={control}
-                defaultValue={defaultValue}
-                name={name}
-                render={({ field: { onChange, value } }) => {
-                    const controlledValue = options.find(
-                        (t) => t.value === value,
-                    );
 
-                    return (
-                        <SelectComponent
-                            onValueChange={(val) => onChange(val)}
-                            value={controlledValue?.value}
-                        >
-                            <SelectTrigger className="w-full" id={name}>
-                                <SelectValue placeholder={label} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {options.map(({ label, value }) => {
-                                    return (
-                                        <SelectItem key={value} value={value}>
-                                            {label}
-                                        </SelectItem>
-                                    );
-                                })}
-                            </SelectContent>
-                        </SelectComponent>
-                    );
-                }}
+            <Controller
+                name={name}
+                control={control}
+                defaultValue={defaultValue ?? ""}
                 rules={{ required }}
+                render={({ field }) => (
+                    <select
+                        id={name}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        className="
+                            w-full rounded-md border border-gray-300
+                            bg-white px-3 py-2 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-blue-500
+                        "
+                    >
+                        <option value="" disabled>
+                            {label}
+                        </option>
+
+                        {options.map(({ label, value }) => (
+                            <option key={value} value={value}>
+                                {label}
+                            </option>
+                        ))}
+                    </select>
+                )}
             />
+
             {errors[name] && <Error name={name} />}
         </Width>
     );

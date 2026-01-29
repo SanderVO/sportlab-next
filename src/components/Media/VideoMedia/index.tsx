@@ -45,6 +45,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
                         playsInline
                         ref={videoRef}
                         poster={videoPoster}
+                        aria-hidden={videoPoster ? "true" : undefined}
                     >
                         <source src={url} />
                     </video>

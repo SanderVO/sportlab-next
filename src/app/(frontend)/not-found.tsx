@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -13,7 +13,7 @@ export default function NotFound() {
                     </p>
                 </div>
 
-                <Button asChild variant="black">
+                <Button variant="black">
                     <Link href="/">Naar de homepagina</Link>
                 </Button>
             </div>

@@ -186,6 +186,9 @@ export interface User {
  */
 export interface Media {
   id: number;
+  /**
+   * Belangrijk voor SEO en toegankelijkheid.
+   */
   alt: string;
   /**
    * Wordt gebruikt als fallback en voor performance (LCP). Nodig voor achtergrondvideo's.
@@ -356,6 +359,10 @@ export interface TeamBlock {
      */
     newTab?: boolean | null;
     /**
+     * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+     */
+    addLabel?: boolean | null;
+    /**
      * Kies een pagina of blogpost om naartoe te linken.
      */
     reference?:
@@ -368,11 +375,7 @@ export interface TeamBlock {
           value: number | Post;
         } | null);
     url?: string | null;
-    label: string;
-    /**
-     * Kies hoe de link eruitziet.
-     */
-    appearance?: ('black' | 'beige' | 'orange') | null;
+    label?: string | null;
   };
   id?: string | null;
   blockName?: string | null;
@@ -463,6 +466,10 @@ export interface InstagramBlock {
            */
           newTab?: boolean | null;
           /**
+           * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+           */
+          addLabel?: boolean | null;
+          /**
            * Kies een pagina of blogpost om naartoe te linken.
            */
           reference?:
@@ -475,11 +482,7 @@ export interface InstagramBlock {
                 value: number | Post;
               } | null);
           url?: string | null;
-          label: string;
-          /**
-           * Kies hoe de link eruitziet.
-           */
-          appearance?: ('black' | 'beige' | 'orange') | null;
+          label?: string | null;
         };
         id?: string | null;
       }[]
@@ -1037,10 +1040,10 @@ export interface TeamBlockSelect<T extends boolean = true> {
     | {
         type?: T;
         newTab?: T;
+        addLabel?: T;
         reference?: T;
         url?: T;
         label?: T;
-        appearance?: T;
       };
   id?: T;
   blockName?: T;
@@ -1064,10 +1067,10 @@ export interface InstagramBlockSelect<T extends boolean = true> {
           | {
               type?: T;
               newTab?: T;
+              addLabel?: T;
               reference?: T;
               url?: T;
               label?: T;
-              appearance?: T;
             };
         id?: T;
       };
@@ -1334,12 +1337,16 @@ export interface Header {
    */
   navItems?:
     | {
-        link: {
+        link?: {
           type?: ('reference' | 'custom') | null;
           /**
            * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
            */
           newTab?: boolean | null;
+          /**
+           * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+           */
+          addLabel?: boolean | null;
           /**
            * Kies een pagina of blogpost om naartoe te linken.
            */
@@ -1353,11 +1360,7 @@ export interface Header {
                 value: number | Post;
               } | null);
           url?: string | null;
-          label: string;
-          /**
-           * Kies hoe de link eruitziet.
-           */
-          appearance?: ('black' | 'beige' | 'orange') | null;
+          label?: string | null;
         };
         id?: string | null;
       }[]
@@ -1428,10 +1431,10 @@ export interface HeaderSelect<T extends boolean = true> {
           | {
               type?: T;
               newTab?: T;
+              addLabel?: T;
               reference?: T;
               url?: T;
               label?: T;
-              appearance?: T;
             };
         id?: T;
       };
@@ -1521,40 +1524,6 @@ export interface FormBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "CallToActionBlock".
- */
-export interface CallToActionBlock {
-  link: {
-    type?: ('reference' | 'custom') | null;
-    /**
-     * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
-     */
-    newTab?: boolean | null;
-    /**
-     * Kies een pagina of blogpost om naartoe te linken.
-     */
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: number | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: number | Post;
-        } | null);
-    url?: string | null;
-    label: string;
-    /**
-     * Kies hoe de link eruitziet.
-     */
-    appearance?: ('black' | 'beige' | 'orange') | null;
-  };
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'callToActionBlock';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ColumnsBlock".
  */
 export interface ColumnsBlock {
@@ -1616,12 +1585,16 @@ export interface ServiceCardBlock {
     };
     priceType: string;
     price: number;
-    link: {
+    link?: {
       type?: ('reference' | 'custom') | null;
       /**
        * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
        */
       newTab?: boolean | null;
+      /**
+       * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+       */
+      addLabel?: boolean | null;
       /**
        * Kies een pagina of blogpost om naartoe te linken.
        */
@@ -1635,11 +1608,7 @@ export interface ServiceCardBlock {
             value: number | Post;
           } | null);
       url?: string | null;
-      label: string;
-      /**
-       * Kies hoe de link eruitziet.
-       */
-      appearance?: ('black' | 'beige' | 'orange') | null;
+      label?: string | null;
     };
     id?: string | null;
   }[];

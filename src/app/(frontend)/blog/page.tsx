@@ -1,5 +1,4 @@
 import { Media } from "@/components/Media";
-import { Pagination } from "@/components/Pagination";
 import { Post } from "@/payload-types";
 import configPromise from "@payload-config";
 import { ArrowRight } from "lucide-react";
@@ -53,7 +52,7 @@ export default async function Page() {
                                 {post.publishedAt && (
                                     <p className="text-sm text-gray-600 mb-4">
                                         {new Date(
-                                            post.publishedAt
+                                            post.publishedAt,
                                         ).toLocaleDateString()}
                                     </p>
                                 )}
@@ -66,15 +65,6 @@ export default async function Page() {
                             </div>
                         </Link>
                     ))}
-                </div>
-
-                <div>
-                    {posts.totalPages > 1 && posts.page && (
-                        <Pagination
-                            page={posts.page}
-                            totalPages={posts.totalPages}
-                        />
-                    )}
                 </div>
             </div>
         </div>

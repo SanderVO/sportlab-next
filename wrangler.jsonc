@@ -157,14 +157,14 @@
                 {
                     "binding": "D1",
                     "database_name": "sportlab-preview",
-                    "database_id": "31be5e9e-8189-4d1a-b8b4-79d090bc6d10",
+                    "database_id": "fd6ac59e-1bbe-4c65-84e4-04294715339a",
                     "remote": true,
                     "migrations_dir": "./src/migrations",
                 },
                 {
                     "binding": "NEXT_TAG_CACHE_D1",
                     "database_name": "sportlab-preview",
-                    "database_id": "31be5e9e-8189-4d1a-b8b4-79d090bc6d10",
+                    "database_id": "fd6ac59e-1bbe-4c65-84e4-04294715339a",
                     "remote": true,
                 },
             ],

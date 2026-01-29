@@ -6,7 +6,6 @@ import { TeamBlock } from "@/blocks/Team/TeamBlock";
 import type { Page } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import React, { Fragment } from "react";
-import { CallToActionBlock } from "./CallToAction/config";
 import { ColumnsBlock } from "./Columns/config";
 
 const blockComponents = {
@@ -15,7 +14,6 @@ const blockComponents = {
     team: TeamBlock,
     instagram: InstagramBlock,
     form: FormBlock,
-    callToAction: CallToActionBlock,
     columns: ColumnsBlock,
 };
 
@@ -45,7 +43,7 @@ export const RenderBlocks: React.FC<{
                                         backgroundColor === "backgroundLight" &&
                                             "bg-sl-beige text-background",
                                         backgroundColor === "backgroundWhite" &&
-                                            "bg-white text-background"
+                                            "bg-white text-background",
                                     )}
                                     key={index}
                                 >

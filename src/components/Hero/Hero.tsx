@@ -7,7 +7,7 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
     const { media, text } = props;
 
     return (
-        <section className="flex flex-col sm:flex-row w-full relative h-auto xxl:h-[1080px] justify-end min-h-[calc(100svh-250px)] sm:min-h-[720px]">
+        <section className="flex flex-col sm:flex-row w-full relative h-auto xxl:h-[1080px] justify-end min-h-[calc(100svh-200px)] sm:min-h-[720px]">
             <Media
                 fill
                 resource={media}

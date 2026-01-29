@@ -23,7 +23,7 @@ export const Header: GlobalConfig = {
             name: "navItems",
             type: "array",
             fields: [link()],
-            maxRows: 6,
+            maxRows: 10,
             admin: {
                 description: "Voeg navigatie items toe aan de header",
                 initCollapsed: true,

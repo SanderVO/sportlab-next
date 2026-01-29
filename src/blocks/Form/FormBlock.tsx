@@ -1,7 +1,7 @@
 "use client";
 
 import RichText from "@/components/RichText";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { getClientSideURL } from "@/utilities/getURL";
 import type {
     FormFieldBlock,

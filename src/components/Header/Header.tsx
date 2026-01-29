@@ -1,8 +1,8 @@
-import { CMSLink } from "@/components/Link";
 import { Media } from "@/components/Media";
 import type { Header } from "@/payload-types";
 import { getCachedGlobal } from "@/utilities/getGlobals";
 import Link from "next/link";
+import { CMSLink } from "../ui/Link";
 import HamburgerMenu from "./HamburgerMenu";
 
 export async function Header() {
@@ -16,9 +16,12 @@ export async function Header() {
                 <Media
                     resource={headerData?.headerLogo}
                     priority
-                    fill
                     htmlElement={null}
+                    size="(max-width: 768px) 175px, 200px"
                     pictureClassName="h-10 w-[175px] sm:h-[50px] sm:w-[200px] relative"
+                    imgClassName="h-full"
+                    imgWidth={200}
+                    imgHeight={50}
                 />
             </Link>
 
@@ -27,6 +30,7 @@ export async function Header() {
                     <CMSLink
                         key={index}
                         {...link}
+                        variant="nav"
                         className="flex flex-col uppercase font-semibold"
                     />
                 ))}

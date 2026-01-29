@@ -14,9 +14,10 @@ import {
 } from "@payloadcms/richtext-lexical";
 import { TextFieldSingleValidation } from "payload";
 import { textState } from "../utilities/textState";
+import { sizeField, variantField } from "./linkFields";
 
 export const defaultLexicalFeatures = [
-    ...defaultEditorFeatures,
+    ...defaultEditorFeatures.filter((feature) => feature.key !== "link"),
     FixedToolbarFeature(),
     InlineToolbarFeature(),
     HorizontalRuleFeature(),
@@ -56,34 +57,17 @@ export const defaultLexicalFeatures = [
                         return value ? true : "URL is required";
                     }) as TextFieldSingleValidation,
                 },
-                {
-                    Label: "Type",
-                    name: "type",
-                    type: "select",
-                    options: [
-                        {
-                            label: "Standaard",
-                            value: "default",
-                        },
-                        {
-                            label: "Zwart CTA",
-                            value: "black",
-                        },
-                        {
-                            label: "Beige CTA",
-                            value: "beige",
-                        },
-                        {
-                            label: "Oranje CTA",
-                            value: "orange",
-                        },
-                    ],
-                    defaultValue: "default",
-                    required: true,
-                    admin: {
-                        description: "Selecteer de type van deze link.",
-                    },
-                },
+                variantField([
+                    { label: "Inline text", value: "inline" },
+                    { label: "Beige", value: "beige" },
+                    { label: "Zwart", value: "black" },
+                    { label: "Oranje", value: "orange" },
+                ]),
+                sizeField([
+                    { label: "Small", value: "sm" },
+                    { label: "Medium", value: "md" },
+                    { label: "Large", value: "lg" },
+                ]),
             ];
         },
     }),

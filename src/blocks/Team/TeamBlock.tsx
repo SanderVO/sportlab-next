@@ -1,5 +1,5 @@
 import { RolesEnum } from "@/collections/Users";
-import { CMSLink } from "@/components/Link";
+import { CMSLink } from "@/components/ui/Link";
 import type { TeamBlock as TeamBlockProps } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import configPromise from "@payload-config";
@@ -35,7 +35,7 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
                 className={cn(
                     "flex flex-row justify-between my-10",
                     type === "grid" && "h-full gap-0",
-                    type === "carousel" && "h-[550px] gap-20 items-center",
+                    type === "carousel" && "h-auto gap-20 items-center",
                 )}
             >
                 <TeamBlockCarousel

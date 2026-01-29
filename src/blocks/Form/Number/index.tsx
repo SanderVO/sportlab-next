@@ -1,19 +1,17 @@
+import { Label } from "@/components/ui/Label";
 import type { TextField } from "@payloadcms/plugin-form-builder/types";
+import React from "react";
 import type {
     FieldErrorsImpl,
     FieldValues,
     UseFormRegister,
 } from "react-hook-form";
-
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import React from "react";
-
 import { Error } from "../Error";
 import { Width } from "../Width";
+
 export const Number: React.FC<
     TextField & {
-        label: "Numeriek veld";
+        label: string;
         errors: Partial<FieldErrorsImpl>;
         register: UseFormRegister<FieldValues>;
     }
@@ -22,19 +20,30 @@ export const Number: React.FC<
         <Width width={width}>
             <Label htmlFor={name}>
                 {label}
-
                 {required && (
                     <span className="required">
                         * <span className="sr-only">(required)</span>
                     </span>
                 )}
             </Label>
-            <Input
-                defaultValue={defaultValue}
-                id={name}
+
+            <input
                 type="number"
-                {...register(name, { required })}
+                id={name}
+                defaultValue={defaultValue ?? ""}
+                aria-invalid={!!errors[name]}
+                className="
+                    w-full rounded-md border border-gray-300
+                    bg-white px-3 py-2 text-sm
+                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                "
+                {...register(name, {
+                    required,
+                    valueAsNumber: true,
+                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                })}
             />
+
             {errors[name] && <Error name={name} />}
         </Width>
     );

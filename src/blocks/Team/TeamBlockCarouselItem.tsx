@@ -1,3 +1,5 @@
+"use client";
+
 import { Media } from "@/components/Media";
 import { User } from "@/payload-types";
 import { cn } from "@/utilities/ui";
@@ -25,20 +27,23 @@ export const TeamBlockCarouselItem = ({
             key={index}
             className={cn(
                 type === "carousel" &&
-                    "flex flex-row items-center text h-full shrink-0 w-[66.6667%] md:w-[25%] px-2",
+                    "flex flex-row items-center text h-full shrink-0 w-[300px] sm:w-[370px] px-2",
             )}
         >
             <div className="h-full flex flex-col gap-2 w-full">
                 <div
-                    className="h-[440px] w-full relative overflow-hidden cursor-pointer"
+                    className="flex h-[440px] w-full max-w-[400px] relative overflow-hidden cursor-pointer"
                     onMouseEnter={() => setIsHover(true)}
                     onMouseLeave={() => setIsHover(false)}
                 >
                     <Media
-                        fill
+                        size="(max-width: 768px) 300px, 400px"
                         resource={user.avatar}
                         htmlElement={null}
-                        imgClassName="object-cover object-top"
+                        pictureClassName="h-full relative"
+                        imgClassName="object-cover object-top h-full aspect-1/2"
+                        imgWidth={400}
+                        imgHeight={440}
                     />
 
                     {isHover && (

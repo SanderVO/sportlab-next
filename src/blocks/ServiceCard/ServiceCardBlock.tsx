@@ -1,8 +1,8 @@
 "use client";
 
-import { CMSLink } from "@/components/Link";
 import { Media } from "@/components/Media";
 import RichText from "@/components/RichText";
+import { CMSLink } from "@/components/ui/Link";
 import type { ServiceCardBlock as ServiceCardBlockProps } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import useEmblaCarousel from "embla-carousel-react";
@@ -31,7 +31,8 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
                                     "bg-background",
                                 column.backgroundColor === "beige" &&
                                     "bg-sl-beige",
-                                column.backgroundColor === "white" && "bg-white"
+                                column.backgroundColor === "white" &&
+                                    "bg-white",
                             )}
                         >
                             <div className="w-full h-64 relative">

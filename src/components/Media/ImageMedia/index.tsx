@@ -24,17 +24,32 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         size: sizeFromProps,
         src: srcFromProps,
         loading: loadingFromProps,
+        imgWidth: widthFromProps,
+        imgHeight: heightFromProps,
     } = props;
 
-    let width: number | undefined;
-    let height: number | undefined;
-    let src: StaticImageData | string = srcFromProps || "";
+    let width: number | undefined = widthFromProps;
+    let height: number | undefined = heightFromProps;
+    let src: StaticImageData | string = srcFromProps?.src || "";
+    let alt = altFromProps;
 
-    const alt = altFromProps;
+    if (resource && typeof resource === "object") {
+        const {
+            alt: altFromResource,
+            height: fullHeight,
+            width: fullWidth,
+        } = resource;
 
-    if (!src && resource && typeof resource === "object") {
-        src = resource?.url ?? "";
+        width = widthFromProps || fullWidth || undefined;
+        height = heightFromProps || fullHeight || undefined;
+        alt = altFromProps || altFromResource || "";
+
+        src = resource?.url || srcFromProps?.src || "";
+    } else if (typeof resource === "string") {
+        src = resource;
     }
+
+    src = encodeURI(src);
 
     const loading = loadingFromProps || (!priority ? "lazy" : undefined);
 

@@ -1,11 +1,11 @@
 "use client";
 
-import { CMSLink } from "@/components/Link";
 import { Header } from "@/payload-types";
 import clsx from "clsx";
 import { MenuIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { CMSLink } from "../ui/Link";
 
 interface Props {
     navItems: Header["navItems"];
@@ -26,9 +26,11 @@ const HamburgerMenuContent = ({ navItems }: Props) => {
                 <nav className="flex flex-col items-center h-full gap-8">
                     {navItems?.map(({ link }, index: number) => (
                         <CMSLink
-                            key={index}
-                            className="self-center"
                             {...link}
+                            key={index}
+                            size="md"
+                            variant="nav"
+                            className="self-center"
                         />
                     ))}
                 </nav>

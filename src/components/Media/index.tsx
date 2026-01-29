@@ -18,7 +18,6 @@ export const Media: React.FC<Props> = (props) => {
                       className,
                   }
                 : {})}
-            aria-hidden={isVideo ? "true" : undefined}
         >
             {isVideo ? <VideoMedia {...props} /> : <ImageMedia {...props} />}
         </Tag>

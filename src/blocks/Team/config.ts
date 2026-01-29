@@ -61,11 +61,9 @@ export const Team: Block = {
             type: "checkbox",
         },
         link({
-            overrides: {
-                admin: {
-                    condition: (_data, siblingData) => {
-                        return Boolean(siblingData?.enableLink);
-                    },
+            admin: {
+                condition: (_data, siblingData) => {
+                    return Boolean(siblingData?.enableLink);
                 },
             },
         }),

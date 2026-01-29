@@ -15,6 +15,9 @@ export const Media: CollectionConfig = {
             name: "alt",
             type: "text",
             required: true,
+            admin: {
+                description: "Belangrijk voor SEO en toegankelijkheid.",
+            },
         },
         {
             label: "Video Poster",

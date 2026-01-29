@@ -1,5 +1,4 @@
-import { Label } from "@/components/ui/label";
-import { Textarea as TextAreaComponent } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/Label";
 import type { TextField } from "@payloadcms/plugin-form-builder/types";
 import React from "react";
 import type {
@@ -12,7 +11,7 @@ import { Width } from "../Width";
 
 export const Textarea: React.FC<
     TextField & {
-        label: "Tekstveld";
+        label: string;
         errors: Partial<FieldErrorsImpl>;
         register: UseFormRegister<FieldValues>;
         rows?: number;
@@ -31,7 +30,6 @@ export const Textarea: React.FC<
         <Width width={width}>
             <Label htmlFor={name}>
                 {label}
-
                 {required && (
                     <span className="required">
                         * <span className="sr-only">(required)</span>
@@ -39,11 +37,18 @@ export const Textarea: React.FC<
                 )}
             </Label>
 
-            <TextAreaComponent
-                defaultValue={defaultValue}
+            <textarea
                 id={name}
+                defaultValue={defaultValue ?? ""}
                 rows={rows}
-                {...register(name, { required: required })}
+                aria-invalid={!!errors[name]}
+                className="
+                    w-full rounded-md border border-gray-300
+                    bg-white px-3 py-2 text-sm
+                    focus:outline-none focus:ring-2 focus:ring-blue-500
+                    resize-y
+                "
+                {...register(name, { required })}
             />
 
             {errors[name] && <Error name={name} />}

@@ -1,4 +1,3 @@
-import { CallToActionBlock } from "@/blocks/CallToAction/config";
 import { ColumnsBlock } from "@/blocks/Columns/config";
 import { FormBlock } from "@/blocks/Form/config";
 import { ServiceCardBlock } from "@/blocks/ServiceCard/config";
@@ -14,7 +13,6 @@ export const defaultLexical = lexicalEditor({
                 ColumnsBlock,
                 FormBlock,
                 VirtuagymRosterBlock,
-                CallToActionBlock,
                 ServiceCardBlock,
             ],
         }),

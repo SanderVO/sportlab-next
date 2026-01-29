@@ -1,7 +1,6 @@
 import { defaultLexicalFeatures } from "@/fields/defaultLexicalFeatures";
 import { BlocksFeature, lexicalEditor } from "@payloadcms/richtext-lexical";
 import type { Block, Field } from "payload";
-import { CallToActionBlock } from "../CallToAction/config";
 import { FormBlock } from "../Form/config";
 
 export const columnFields: Field[] = [
@@ -13,7 +12,7 @@ export const columnFields: Field[] = [
         editor: lexicalEditor({
             features: [
                 ...defaultLexicalFeatures,
-                BlocksFeature({ blocks: [FormBlock, CallToActionBlock] }),
+                BlocksFeature({ blocks: [FormBlock] }),
             ],
         }),
     },

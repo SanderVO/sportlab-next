@@ -109,7 +109,7 @@ export const media = sqliteTable(
     poster: integer("poster_id").references((): AnySQLiteColumn => media.id, {
       onDelete: "set null",
     }),
-    prefix: text("prefix").default("images_dev/"),
+    prefix: text("prefix").default("images/"),
     updatedAt: text("updated_at")
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
@@ -285,11 +285,9 @@ export const pages_blocks_team = sqliteTable(
       "reference",
     ),
     link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
-    link_appearance: text("link_appearance", {
-      enum: ["black", "beige", "orange"],
-    }).default("black"),
     blockName: text("block_name"),
   },
   (columns) => [
@@ -318,11 +316,9 @@ export const pages_blocks_instagram_images = sqliteTable(
       "reference",
     ),
     link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
-    link_appearance: text("link_appearance", {
-      enum: ["black", "beige", "orange"],
-    }).default("black"),
   },
   (columns) => [
     index("pages_blocks_instagram_images_order_idx").on(columns._order),
@@ -592,11 +588,9 @@ export const _pages_v_blocks_team = sqliteTable(
       "reference",
     ),
     link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
-    link_appearance: text("link_appearance", {
-      enum: ["black", "beige", "orange"],
-    }).default("black"),
     _uuid: text("_uuid"),
     blockName: text("block_name"),
   },
@@ -626,11 +620,9 @@ export const _pages_v_blocks_instagram_images = sqliteTable(
       "reference",
     ),
     link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
-    link_appearance: text("link_appearance", {
-      enum: ["black", "beige", "orange"],
-    }).default("black"),
     _uuid: text("_uuid"),
   },
   (columns) => [
@@ -1648,11 +1640,9 @@ export const header_nav_items = sqliteTable(
       "reference",
     ),
     link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
-    link_label: text("link_label").notNull(),
-    link_appearance: text("link_appearance", {
-      enum: ["black", "beige", "orange"],
-    }).default("black"),
+    link_label: text("link_label"),
   },
   (columns) => [
     index("header_nav_items_order_idx").on(columns._order),

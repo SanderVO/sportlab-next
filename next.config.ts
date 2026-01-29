@@ -1,4 +1,4 @@
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare/cloudflare-context";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 

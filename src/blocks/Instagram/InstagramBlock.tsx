@@ -8,7 +8,7 @@ export const InstagramBlock: React.FC<InstagramBlockProps> = (props) => {
 
     return (
         <div className="container mx-auto flex flex-col h-full justify-center py-8 md:py-0 gap-6">
-            <div className="flex flex-row h-[400px]">
+            <div className="flex flex-row h-auto">
                 <InstagramBlockCarousel {...props} />
             </div>
 

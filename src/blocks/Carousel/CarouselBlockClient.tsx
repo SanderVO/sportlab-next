@@ -46,10 +46,13 @@ export const CarouselBlockClient: React.FC<CarouselBlockProps> = (props) => {
                                     <div className="flex flex-row items-center justify-between">
                                         <div className="flex flex-row items-center gap-4">
                                             <Media
-                                                fill
+                                                size="(max-width: 768px) 50px, 75px"
+                                                htmlElement={null}
                                                 resource={carouselItem.media}
-                                                className="w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] relative"
-                                                imgClassName="object-cover object-center rounded-full"
+                                                pictureClassName="w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] relative aspect-square"
+                                                imgClassName="object-cover object-center h-full rounded-full"
+                                                imgWidth={75}
+                                                imgHeight={75}
                                             />
 
                                             <div className="flex flex-col justify-between gap-1">
