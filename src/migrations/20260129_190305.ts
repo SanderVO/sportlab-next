@@ -37,14 +37,17 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
     // Recreate footer table
     await db.run(sql`CREATE TABLE \`__new_footer\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`title\` text NOT NULL,
+  	\`description\` text NOT NULL,
   	\`footer_logo_id\` integer,
+  	\`contact_text\` text,
   	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	FOREIGN KEY (\`footer_logo_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null
   );
   `);
     await db.run(
-        sql`INSERT INTO \`__new_footer\`("id", "footer_logo_id", "updated_at", "created_at") SELECT "id", "footer_logo_id", "updated_at", "created_at" FROM \`footer\`;`,
+        sql`INSERT INTO \`__new_footer\`("id", "title", "description", "footer_logo_id", "contact_text", "updated_at", "created_at") SELECT "id", "title", "description", "footer_logo_id", "contact_text", "updated_at", "created_at" FROM \`footer\`;`,
     );
     await db.run(sql`DROP TABLE \`footer\`;`);
     await db.run(sql`ALTER TABLE \`__new_footer\` RENAME TO \`footer\`;`);
@@ -183,14 +186,17 @@ export async function down({ db }: MigrateDownArgs): Promise<void> {
     // Recreate footer table
     await db.run(sql`CREATE TABLE \`__new_footer\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`title\` text NOT NULL,
+  	\`description\` text NOT NULL,
   	\`footer_logo_id\` integer,
+  	\`contact_text\` text,
   	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	FOREIGN KEY (\`footer_logo_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null
   );
   `);
     await db.run(
-        sql`INSERT INTO \`__new_footer\`("id", "footer_logo_id", "updated_at", "created_at") SELECT "id", "footer_logo_id", "updated_at", "created_at" FROM \`footer\`;`,
+        sql`INSERT INTO \`__new_footer\`("id", "title", "description", "footer_logo_id", "contact_text", "updated_at", "created_at") SELECT "id", "title", "description", "footer_logo_id", "contact_text", "updated_at", "created_at" FROM \`footer\`;`,
     );
     await db.run(sql`DROP TABLE \`footer\`;`);
     await db.run(sql`ALTER TABLE \`__new_footer\` RENAME TO \`footer\`;`);
