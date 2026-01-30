@@ -3,13 +3,12 @@ import { CMSLink } from "@/components/ui/Link";
 import type { TeamBlock as TeamBlockProps } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import configPromise from "@payload-config";
-import { ArrowRightIcon } from "lucide-react";
 import { getPayload } from "payload";
 import React from "react";
 import { TeamBlockCarousel } from "./TeamBlockCarousel";
 
 export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
-    const { title, link, type, limit } = props;
+    const { title, link, type, limit, backgroundColor } = props;
 
     const payload = await getPayload({ config: configPromise });
 
@@ -17,6 +16,7 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
         collection: "users",
         page: 0,
         limit: type === "carousel" ? (limit ?? 0) : 0,
+        sort: "name",
         where: {
             status: {
                 equals: "active",
@@ -28,34 +28,39 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
     });
 
     return (
-        <div className="container mx-auto flex flex-col h-full justify-center py-15 md:py-0">
-            <h2 className="font-sl-bebas text-5xl md:text-7xl">{title}</h2>
-
+        <div className="container mx-auto">
             <div
                 className={cn(
-                    "flex flex-row justify-between my-10",
-                    type === "grid" && "h-full gap-0",
-                    type === "carousel" && "h-auto gap-20 items-center",
+                    "flex flex-col h-full justify-center py-15 md:py-0",
+                    backgroundColor === "backgroundDark" &&
+                        "bg-background text-white",
+                    backgroundColor === "backgroundLight" &&
+                        "bg-sl-beige text-background",
+                    backgroundColor === "backgroundWhite" &&
+                        "bg-white text-white",
                 )}
             >
-                <TeamBlockCarousel
-                    backgroundColor={props.backgroundColor}
-                    type={props.type}
-                    users={users}
-                />
+                <h2 className="font-sl-bebas text-5xl md:text-7xl">{title}</h2>
 
-                <div className="items-center flex-0 hidden md:flex">
-                    <CMSLink
-                        {...link}
-                        className="bg-sl-beige rounded-full p-4 w-20 h-20 text-background flex items-center justify-center text-4xl transition-transform hover:scale-110 shrink-0 cursor-pointer"
-                    >
-                        <ArrowRightIcon />
-                    </CMSLink>
+                <div
+                    className={cn(
+                        "flex flex-row justify-between mt-4",
+                        type === "grid" && "h-full gap-0",
+                        type === "carousel" && "h-auto gap-20 items-center",
+                    )}
+                >
+                    <TeamBlockCarousel
+                        backgroundColor={props.backgroundColor}
+                        type={props.type}
+                        users={users}
+                    />
                 </div>
-            </div>
 
-            <div className="block md:hidden">
-                {link && <CMSLink {...link} />}
+                {link && (
+                    <div className="block">
+                        <CMSLink {...link} />
+                    </div>
+                )}
             </div>
         </div>
     );

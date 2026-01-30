@@ -1,5 +1,6 @@
 import { authenticated } from "@/access/authenticated";
-import type { CollectionConfig } from "payload";
+import { defaultLexical } from "@/fields/defaultLexical";
+import { slugField, type CollectionConfig } from "payload";
 import { User } from "../../payload-types";
 
 export enum RolesEnum {
@@ -16,7 +17,28 @@ export const Users: CollectionConfig = {
         singular: "Gebruiker",
         plural: "Gebruikers",
     },
+    defaultPopulate: {
+        slug: true,
+        meta: {
+            image: true,
+            title: true,
+            description: true,
+        },
+    },
     timestamps: true,
+    hooks: {
+        beforeValidate: [
+            ({ data }) => {
+                if (data && !data.slug && data.name) {
+                    data.slug = data.name
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")
+                        .replace(/[^a-z0-9-]/g, "");
+                }
+                return data;
+            },
+        ],
+    },
     admin: {
         defaultColumns: ["avatar", "name", "email"],
         useAsTitle: "name",
@@ -28,7 +50,24 @@ export const Users: CollectionConfig = {
             false,
         create: authenticated,
         delete: authenticated,
-        read: authenticated,
+        read: () => {
+            // Only allow coaches to be read via the API
+            return {
+                or: [
+                    {
+                        roles: {
+                            contains: RolesEnum.COACH,
+                        },
+                    },
+                    {
+                        // Allow admins and editors to read all users
+                        roles: {
+                            in: [RolesEnum.ADMIN, RolesEnum.EDITOR],
+                        },
+                    },
+                ],
+            };
+        },
         update: authenticated,
     },
     fields: [
@@ -37,6 +76,21 @@ export const Users: CollectionConfig = {
             name: "name",
             type: "text",
         },
+        slugField({
+            required: false,
+            useAsSlug: "name",
+            overrides: (defaultField) => {
+                defaultField.fields[1].admin = {
+                    condition: (_, siblingData) => {
+                        return !!siblingData?.roles?.includes(RolesEnum.COACH);
+                    },
+                    description:
+                        "De slug wordt automatisch gegenereerd op basis van de naam, maar kan hier aangepast worden.",
+                };
+
+                return defaultField;
+            },
+        }),
         {
             label: "Status",
             name: "status",
@@ -93,6 +147,19 @@ export const Users: CollectionConfig = {
             admin: {
                 description: "Achtergrond beschrijving van het lid",
                 rows: 4,
+            },
+        },
+        {
+            label: "Content",
+            name: "content",
+            type: "richText",
+            editor: defaultLexical,
+            required: false,
+            admin: {
+                description: "Pagina content voor de profielpagina van coaches",
+                condition: (_, siblingData) => {
+                    return !!siblingData?.roles?.includes(RolesEnum.COACH);
+                },
             },
         },
     ],

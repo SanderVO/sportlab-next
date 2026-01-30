@@ -1,6 +1,7 @@
 "use client";
 
 import { Media } from "@/components/Media";
+import { Button } from "@/components/ui/Button";
 import { User } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import { useState } from "react";
@@ -16,7 +17,7 @@ export const TeamBlockCarouselItem = ({
     backgroundColor: string;
     user: User;
 }) => {
-    const [isHover, setIsHover] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
 
     if (!user) {
         return null;
@@ -33,22 +34,33 @@ export const TeamBlockCarouselItem = ({
             <div className="h-full flex flex-col gap-2 w-full">
                 <div
                     className="flex h-[440px] w-full max-w-[400px] relative overflow-hidden cursor-pointer"
-                    onMouseEnter={() => setIsHover(true)}
-                    onMouseLeave={() => setIsHover(false)}
+                    onClick={() => setShowInfo(!showInfo)}
                 >
                     <Media
                         size="(max-width: 768px) 300px, 400px"
                         resource={user.avatar}
                         htmlElement={null}
                         pictureClassName="h-full relative"
-                        imgClassName="object-cover object-top h-full aspect-1/2"
+                        imgClassName={cn(
+                            "object-cover object-top h-full aspect-1/2 transform-gpu transition-transform duration-300",
+                            showInfo && "scale-125",
+                        )}
                         imgWidth={400}
                         imgHeight={440}
                     />
 
-                    {isHover && (
-                        <div className="absolute top-0 py-2 px-4 bg-black/65 text-white text-sm h-full w-full flex items-center justify-center italic">
-                            &ldquo;{user.about}&rdquo;
+                    {showInfo && (
+                        <div className="absolute top-0 p-4 bg-black/65 text-white text-sm h-full w-full flex flex-col gap-4 justify-end">
+                            <div className="italic">{user.about}</div>
+
+                            <Button
+                                variant="orange"
+                                size="sm"
+                                url={`/team/${user.slug}`}
+                                className="p-4"
+                            >
+                                Lees meer
+                            </Button>
                         </div>
                     )}
                 </div>

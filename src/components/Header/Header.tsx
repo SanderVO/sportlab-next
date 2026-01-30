@@ -25,13 +25,13 @@ export async function Header() {
                 />
             </Link>
 
-            <nav className="flex-row justify-between items-center gap-4 hidden md:flex">
+            <nav className="flex-row justify-between items-center gap-8 hidden md:flex">
                 {navItems.map(({ link }, index: number) => (
                     <CMSLink
                         key={index}
                         {...link}
                         variant="nav"
-                        className="flex flex-col uppercase font-semibold"
+                        className="flex flex-col uppercase font-semibold shrink-0"
                     />
                 ))}
             </nav>

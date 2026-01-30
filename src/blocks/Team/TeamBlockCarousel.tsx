@@ -1,7 +1,6 @@
 "use client";
 
 import type { User } from "@/payload-types";
-import { useIsMobile } from "@/utilities/useIsMobile";
 import useEmblaCarousel from "embla-carousel-react";
 import { TeamBlockCarouselItem } from "./TeamBlockCarouselItem";
 
@@ -16,13 +15,11 @@ export const TeamBlockCarousel: React.FC<Props> = ({
     backgroundColor,
     users,
 }: Props) => {
-    const isMobile = useIsMobile();
-
     const [emblaRef] = useEmblaCarousel({
         loop: true,
         align: "start",
         containScroll: "trimSnaps",
-        active: isMobile && type === "carousel",
+        active: type === "carousel",
     });
 
     const teamItemContent = () => (
@@ -52,7 +49,7 @@ export const TeamBlockCarousel: React.FC<Props> = ({
 
             {type === "grid" && (
                 <div className="w-full overflow-hidden h-full">
-                    <div className="h-full grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-8">
+                    <div className="h-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
                         {teamItemContent()}
                     </div>
                 </div>

@@ -151,6 +151,14 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  /**
+   * De slug wordt automatisch gegenereerd op basis van de naam, maar kan hier aangepast worden.
+   */
+  slug?: string | null;
   status: 'active' | 'inactive';
   roles: ('admin' | 'editor' | 'user' | 'coach')[];
   avatar?: (number | null) | Media;
@@ -162,6 +170,24 @@ export interface User {
    * Achtergrond beschrijving van het lid
    */
   about?: string | null;
+  /**
+   * Pagina content voor de profielpagina van coaches
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -886,11 +912,14 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  generateSlug?: T;
+  slug?: T;
   status?: T;
   roles?: T;
   avatar?: T;
   subtitle?: T;
   about?: T;
+  content?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

@@ -9,7 +9,7 @@ export const uiVariants = {
         beige: "bg-sl-beige hover:bg-sl-beige-dark text-background",
         black: "bg-background hover:bg-background/90 text-white",
         orange: "bg-sl-orange hover:bg-sl-orange-dark text-white",
-        nav: "uppercase font-semibold text-neutral-400 hover:text-white",
+        nav: "uppercase font-semibold text-neutral-400 hover:text-white justify-center !px-0",
         footer: "text-neutral-400 hover:text-white",
         inline: "underline underline-offset-2 font-semibold !p-0",
     },

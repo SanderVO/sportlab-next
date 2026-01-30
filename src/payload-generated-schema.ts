@@ -67,6 +67,8 @@ export const users = sqliteTable(
   {
     id: integer("id").primaryKey(),
     name: text("name"),
+    generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
+    slug: text("slug"),
     status: text("status", { enum: ["active", "inactive"] })
       .notNull()
       .default("active"),
@@ -75,6 +77,7 @@ export const users = sqliteTable(
     }),
     subtitle: text("subtitle"),
     about: text("about"),
+    content: text("content", { mode: "json" }),
     updatedAt: text("updated_at")
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
@@ -94,6 +97,7 @@ export const users = sqliteTable(
     ),
   },
   (columns) => [
+    uniqueIndex("users_slug_idx").on(columns.slug),
     index("users_avatar_idx").on(columns.avatar),
     index("users_updated_at_idx").on(columns.updatedAt),
     index("users_created_at_idx").on(columns.createdAt),
