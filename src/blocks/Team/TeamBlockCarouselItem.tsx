@@ -4,21 +4,22 @@ import { Media } from "@/components/Media";
 import { Button } from "@/components/ui/Button";
 import { User } from "@/payload-types";
 import { cn } from "@/utilities/ui";
-import { useState } from "react";
 
 export const TeamBlockCarouselItem = ({
     index,
     type,
     backgroundColor,
     user,
+    showInfo,
+    setShowInfo,
 }: {
     index: number;
     type: "carousel" | "grid";
     backgroundColor: string;
     user: User;
+    showInfo: boolean;
+    setShowInfo: (index: number) => void;
 }) => {
-    const [showInfo, setShowInfo] = useState(false);
-
     if (!user) {
         return null;
     }
@@ -34,7 +35,7 @@ export const TeamBlockCarouselItem = ({
             <div className="h-full flex flex-col gap-2 w-full">
                 <div
                     className="flex h-[440px] w-full max-w-[400px] relative overflow-hidden cursor-pointer"
-                    onClick={() => setShowInfo(!showInfo)}
+                    onClick={() => setShowInfo(index)}
                 >
                     <Media
                         size="(max-width: 768px) 300px, 400px"
@@ -42,7 +43,7 @@ export const TeamBlockCarouselItem = ({
                         htmlElement={null}
                         pictureClassName="h-full relative"
                         imgClassName={cn(
-                            "object-cover object-top h-full aspect-1/2 transform-gpu transition-transform duration-300",
+                            "object-cover object-top h-full aspect-1/2 transform-gpu transition-transform duration-300 hover:scale-105",
                             showInfo && "scale-125",
                         )}
                         imgWidth={400}
@@ -51,16 +52,20 @@ export const TeamBlockCarouselItem = ({
 
                     {showInfo && (
                         <div className="absolute top-0 p-4 bg-black/65 text-white text-sm h-full w-full flex flex-col gap-4 justify-end">
-                            <div className="italic">{user.about}</div>
+                            <div className="italic max-h-[50%] overflow-hidden">
+                                {user.about}
+                            </div>
 
-                            <Button
-                                variant="orange"
-                                size="sm"
-                                url={`/team/${user.slug}`}
-                                className="p-4"
-                            >
-                                Lees meer
-                            </Button>
+                            {user.slug && (
+                                <Button
+                                    variant="orange"
+                                    size="sm"
+                                    url={`/team/${user.slug}`}
+                                    className="px-4 py-8"
+                                >
+                                    Lees meer
+                                </Button>
+                            )}
                         </div>
                     )}
                 </div>

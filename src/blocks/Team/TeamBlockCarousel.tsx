@@ -2,6 +2,7 @@
 
 import type { User } from "@/payload-types";
 import useEmblaCarousel from "embla-carousel-react";
+import { useEffect, useState } from "react";
 import { TeamBlockCarouselItem } from "./TeamBlockCarouselItem";
 
 interface Props {
@@ -22,6 +23,32 @@ export const TeamBlockCarousel: React.FC<Props> = ({
         active: type === "carousel",
     });
 
+    const [showInfo, setShowInfo] = useState<{ [key: number]: boolean }>({});
+
+    const toggleShowInfo = (index: number) => {
+        const newState = { ...showInfo };
+
+        Object.keys(newState).forEach((key) => {
+            newState[Number(key)] = false;
+        });
+
+        newState[index] = showInfo[index] ? !showInfo[index] : true;
+
+        setShowInfo(newState);
+    };
+
+    useEffect(() => {
+        const handleClickOutside = () => {
+            setShowInfo({});
+        };
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    });
+
     const teamItemContent = () => (
         <>
             {users &&
@@ -29,6 +56,8 @@ export const TeamBlockCarousel: React.FC<Props> = ({
                     <TeamBlockCarouselItem
                         key={index}
                         index={index}
+                        showInfo={showInfo[index]}
+                        setShowInfo={() => toggleShowInfo(index)}
                         type={type === "carousel" ? "carousel" : "grid"}
                         backgroundColor={backgroundColor}
                         user={user}
