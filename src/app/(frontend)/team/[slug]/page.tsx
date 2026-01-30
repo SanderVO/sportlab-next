@@ -57,11 +57,13 @@ export async function generateStaticParams() {
         },
     });
 
-    const params = users.docs.map(({ slug }) => {
-        return { slug };
-    });
+    const params = users.docs
+        .filter((user) => user.slug)
+        .map(({ slug }) => {
+            return { slug };
+        });
 
-    return params;
+    return params ?? [];
 }
 
 export async function generateMetadata({
