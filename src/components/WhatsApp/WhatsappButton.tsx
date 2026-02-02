@@ -1,12 +1,12 @@
 import { WhatsApp } from "@/payload-types";
-import { getCachedGlobal } from "@/utilities/getGlobals";
 import Link from "next/link";
 import { WhatsappIcon } from "../Social/Icons";
 
-export async function WhatsappButton() {
-    const { phoneNumber, textPreFilled, buttonText }: WhatsApp =
-        (await getCachedGlobal("whatsApp", 1)()) as WhatsApp;
-
+export async function WhatsappButton({
+    phoneNumber,
+    textPreFilled,
+    buttonText,
+}: WhatsApp) {
     return (
         <>
             {phoneNumber && (

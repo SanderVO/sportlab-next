@@ -4,7 +4,8 @@ import { DropdownMenu } from "./DropdownMenu";
 
 export function HeaderNav({ navItems }: { navItems: Header["navItems"] }) {
     const visibleItems = navItems?.filter(
-        ({ initiallyVisible }) => initiallyVisible !== false,
+        ({ initiallyVisible }) =>
+            initiallyVisible || initiallyVisible === undefined,
     );
     const hiddenItems = navItems?.filter(
         ({ initiallyVisible }) => initiallyVisible === false,

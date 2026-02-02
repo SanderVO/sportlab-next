@@ -51,8 +51,8 @@ export async function generateStaticParams() {
             status: {
                 equals: "active",
             },
-            roles: {
-                contains: "coach",
+            slug: {
+                exists: true,
             },
         },
     });

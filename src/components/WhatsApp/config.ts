@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload";
+import { revalidateWhatsapp } from "./hooks/revalidateWhatsapp";
 
 export const WhatsApp: GlobalConfig = {
     slug: "whatsApp",
@@ -30,4 +31,7 @@ export const WhatsApp: GlobalConfig = {
             required: true,
         },
     ],
+    hooks: {
+        afterChange: [revalidateWhatsapp],
+    },
 };

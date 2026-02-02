@@ -77,6 +77,7 @@ export const users = sqliteTable(
     }),
     subtitle: text("subtitle"),
     about: text("about"),
+    position: numeric("position", { mode: "number" }),
     content: text("content", { mode: "json" }),
     updatedAt: text("updated_at")
       .notNull()
@@ -280,6 +281,9 @@ export const pages_blocks_team = sqliteTable(
     id: text("id").primaryKey(),
     title: text("title"),
     limit: numeric("limit", { mode: "number" }).default(0),
+    sortBy: text("sort_by", {
+      enum: ["name", "-name", "-createdAt", "createdAt", "position"],
+    }).default("name"),
     type: text("type", { enum: ["carousel", "grid"] }).default("carousel"),
     backgroundColor: text("background_color", {
       enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
@@ -590,6 +594,9 @@ export const _pages_v_blocks_team = sqliteTable(
     id: integer("id").primaryKey(),
     title: text("title"),
     limit: numeric("limit", { mode: "number" }).default(0),
+    sortBy: text("sort_by", {
+      enum: ["name", "-name", "-createdAt", "createdAt", "position"],
+    }).default("name"),
     type: text("type", { enum: ["carousel", "grid"] }).default("carousel"),
     backgroundColor: text("background_color", {
       enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
@@ -1654,6 +1661,9 @@ export const header_nav_items = sqliteTable(
     _order: integer("_order").notNull(),
     _parentID: integer("_parent_id").notNull(),
     id: text("id").primaryKey(),
+    initiallyVisible: integer("initially_visible", { mode: "boolean" }).default(
+      true,
+    ),
     link_type: text("link_type", { enum: ["reference", "custom"] }).default(
       "reference",
     ),

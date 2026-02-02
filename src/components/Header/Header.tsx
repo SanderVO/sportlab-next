@@ -1,5 +1,5 @@
 import { Media } from "@/components/Media";
-import type { Header } from "@/payload-types";
+import type { Header, WhatsApp } from "@/payload-types";
 import { getCachedGlobal } from "@/utilities/getGlobals";
 import Link from "next/link";
 import { WhatsappButton } from "../WhatsApp/WhatsappButton";
@@ -8,6 +8,11 @@ import { HeaderNav } from "./HeaderNav";
 
 export async function Header() {
     const headerData: Header = (await getCachedGlobal("header", 1)()) as Header;
+
+    const whatsappData: WhatsApp = (await getCachedGlobal(
+        "whatsApp",
+        1,
+    )()) as WhatsApp;
 
     const navItems = headerData?.navItems || [];
 
@@ -29,12 +34,16 @@ export async function Header() {
 
                 <HeaderNav navItems={navItems} />
 
-                <div className="hidden md:block">
-                    <WhatsappButton />
-                </div>
+                {whatsappData?.phoneNumber && (
+                    <div className="hidden md:block">
+                        <WhatsappButton {...whatsappData} />
+                    </div>
+                )}
 
                 <div className="flex flex-row items-center gap-4 md:hidden">
-                    <WhatsappButton />
+                    {whatsappData?.phoneNumber && (
+                        <WhatsappButton {...whatsappData} />
+                    )}
 
                     <HamburgerMenu navItems={headerData.navItems} />
                 </div>
