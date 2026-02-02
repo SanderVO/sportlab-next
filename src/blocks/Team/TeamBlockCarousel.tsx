@@ -1,7 +1,9 @@
 "use client";
 
 import type { User } from "@/payload-types";
+import { cn } from "@/utilities/ui";
 import useEmblaCarousel from "embla-carousel-react";
+import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { TeamBlockCarouselItem } from "./TeamBlockCarouselItem";
 
@@ -16,7 +18,7 @@ export const TeamBlockCarousel: React.FC<Props> = ({
     backgroundColor,
     users,
 }: Props) => {
-    const [emblaRef] = useEmblaCarousel({
+    const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         align: "start",
         containScroll: "trimSnaps",
@@ -53,15 +55,21 @@ export const TeamBlockCarousel: React.FC<Props> = ({
         <>
             {users &&
                 users.map((user: User, index: number) => (
-                    <TeamBlockCarouselItem
+                    <div
                         key={index}
-                        index={index}
-                        showInfo={showInfo[index]}
-                        setShowInfo={() => toggleShowInfo(index)}
-                        type={type === "carousel" ? "carousel" : "grid"}
-                        backgroundColor={backgroundColor}
-                        user={user}
-                    />
+                        className={cn(
+                            type === "carousel" &&
+                                "flex flex-row items-center text h-full shrink-0 w-[300px] sm:w-[370px] last:mr-4 md:last:mr-6",
+                        )}
+                    >
+                        <TeamBlockCarouselItem
+                            index={index}
+                            showInfo={showInfo[index]}
+                            setShowInfo={() => toggleShowInfo(index)}
+                            backgroundColor={backgroundColor}
+                            user={user}
+                        />
+                    </div>
                 ))}
         </>
     );
@@ -69,9 +77,40 @@ export const TeamBlockCarousel: React.FC<Props> = ({
     return (
         <>
             {type === "carousel" && (
-                <div className="w-full overflow-hidden h-full" ref={emblaRef}>
-                    <div className="flex flex-row h-full gap-0 md:gap-8 -mx-2">
-                        {teamItemContent()}
+                <div className="flex flex-col gap-6 w-full">
+                    <div
+                        className="w-full overflow-hidden h-full"
+                        ref={emblaRef}
+                    >
+                        <div className="flex flex-row h-full gap-4 md:gap-6">
+                            {teamItemContent()}
+                        </div>
+                    </div>
+
+                    <div className="hidden md:flex flex-row gap-6 items-center justify-center">
+                        <div
+                            className={cn(
+                                "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
+                                backgroundColor === "backgroundDark"
+                                    ? "bg-sl-beige text-background"
+                                    : "bg-background text-sl-beige",
+                            )}
+                            onClick={() => emblaApi?.scrollPrev()}
+                        >
+                            <ArrowLeftIcon width={32} height={32} />
+                        </div>
+
+                        <div
+                            className={cn(
+                                "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
+                                backgroundColor === "backgroundDark"
+                                    ? "bg-sl-beige text-background"
+                                    : "bg-background text-sl-beige",
+                            )}
+                            onClick={() => emblaApi?.scrollNext()}
+                        >
+                            <ArrowRightIcon width={32} height={32} />
+                        </div>
                     </div>
                 </div>
             )}

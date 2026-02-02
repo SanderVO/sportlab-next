@@ -64,11 +64,21 @@ export const link = (overrides?: Partial<GroupField>): GroupField => ({
             type: "relationship",
             admin: {
                 description:
-                    "Kies een pagina of blogpost om naartoe te linken.",
+                    "Kies een pagina, blogpost of gebruiker om naartoe te linken.",
                 condition: (_, siblingData) =>
                     siblingData?.type === "reference",
             },
-            relationTo: ["pages", "posts"],
+            relationTo: ["pages", "posts", "users"],
+            filterOptions: ({ relationTo }) => {
+                if (relationTo === "users") {
+                    return {
+                        slug: {
+                            exists: true,
+                        },
+                    };
+                }
+                return true;
+            },
             required: true,
         },
         {

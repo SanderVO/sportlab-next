@@ -26,6 +26,10 @@ const fields: Field[] = [
 
 export const Instagram: Block = {
     slug: "instagram",
+    labels: {
+        singular: "Foto gallerij",
+        plural: "Foto gallerijen",
+    },
     interfaceName: "InstagramBlock",
     fields: [
         {

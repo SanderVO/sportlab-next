@@ -1,5 +1,5 @@
 import { Size, Variant } from "@/lib/ui/variants";
-import { Page, Post } from "@/payload-types";
+import { Page, Post, User } from "@/payload-types";
 import { Button } from "./Button";
 
 export type LinkProps = {
@@ -8,8 +8,8 @@ export type LinkProps = {
     label?: string | null;
     newTab?: boolean | null;
     reference?: {
-        relationTo: "pages" | "posts";
-        value: Page | Post | string | number;
+        relationTo: "pages" | "posts" | "users";
+        value: Page | Post | User | string | number;
     } | null;
     type?: "custom" | "reference" | null | undefined;
     url?: string | null;
@@ -36,7 +36,7 @@ export const CMSLink: React.FC<LinkProps> = (props) => {
         reference.value.slug
             ? `${
                   reference?.relationTo !== "pages"
-                      ? `/${reference?.relationTo}`
+                      ? `/${reference?.relationTo === "users" ? "team" : reference?.relationTo}`
                       : ""
               }/${reference.value.slug}`
             : url;

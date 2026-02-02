@@ -29,12 +29,40 @@ export const defaultLexicalFeatures = [
         enabledHeadingSizes: ["h1", "h2", "h3", "h4"],
     }),
     LinkFeature({
-        enabledCollections: ["pages", "posts"],
+        enabledCollections: ["pages", "posts", "users"],
         fields: ({ defaultFields }) => {
-            const defaultFieldsWithoutUrl = defaultFields.filter((field) => {
-                if ("name" in field && field.name === "url") return false;
-                return true;
-            });
+            const defaultFieldsWithoutUrl = defaultFields
+                .map((field) => {
+                    // Add filterOptions to the doc field to only show coaches (users with slugs)
+                    if (
+                        "name" in field &&
+                        field.name === "doc" &&
+                        field.type === "relationship"
+                    ) {
+                        return {
+                            ...field,
+                            filterOptions: ({
+                                relationTo,
+                            }: {
+                                relationTo: string;
+                            }) => {
+                                if (relationTo === "users") {
+                                    return {
+                                        slug: {
+                                            exists: true,
+                                        },
+                                    };
+                                }
+                                return true;
+                            },
+                        } as typeof field;
+                    }
+                    return field;
+                })
+                .filter((field) => {
+                    if ("name" in field && field.name === "url") return false;
+                    return true;
+                });
 
             return [
                 ...defaultFieldsWithoutUrl,

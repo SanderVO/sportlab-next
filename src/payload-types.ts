@@ -389,7 +389,7 @@ export interface TeamBlock {
      */
     addLabel?: boolean | null;
     /**
-     * Kies een pagina of blogpost om naartoe te linken.
+     * Kies een pagina, blogpost of gebruiker om naartoe te linken.
      */
     reference?:
       | ({
@@ -399,6 +399,10 @@ export interface TeamBlock {
       | ({
           relationTo: 'posts';
           value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'users';
+          value: number | User;
         } | null);
     url?: string | null;
     label?: string | null;
@@ -496,7 +500,7 @@ export interface InstagramBlock {
            */
           addLabel?: boolean | null;
           /**
-           * Kies een pagina of blogpost om naartoe te linken.
+           * Kies een pagina, blogpost of gebruiker om naartoe te linken.
            */
           reference?:
             | ({
@@ -506,6 +510,10 @@ export interface InstagramBlock {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'users';
+                value: number | User;
               } | null);
           url?: string | null;
           label?: string | null;
@@ -1377,7 +1385,7 @@ export interface Header {
            */
           addLabel?: boolean | null;
           /**
-           * Kies een pagina of blogpost om naartoe te linken.
+           * Kies een pagina, blogpost of gebruiker om naartoe te linken.
            */
           reference?:
             | ({
@@ -1387,6 +1395,10 @@ export interface Header {
             | ({
                 relationTo: 'posts';
                 value: number | Post;
+              } | null)
+            | ({
+                relationTo: 'users';
+                value: number | User;
               } | null);
           url?: string | null;
           label?: string | null;
@@ -1625,7 +1637,7 @@ export interface ServiceCardBlock {
        */
       addLabel?: boolean | null;
       /**
-       * Kies een pagina of blogpost om naartoe te linken.
+       * Kies een pagina, blogpost of gebruiker om naartoe te linken.
        */
       reference?:
         | ({
@@ -1635,6 +1647,10 @@ export interface ServiceCardBlock {
         | ({
             relationTo: 'posts';
             value: number | Post;
+          } | null)
+        | ({
+            relationTo: 'users';
+            value: number | User;
           } | null);
       url?: string | null;
       label?: string | null;

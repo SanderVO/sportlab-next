@@ -433,6 +433,7 @@ export const pages_rels = sqliteTable(
     path: text("path").notNull(),
     pagesID: integer("pages_id"),
     postsID: integer("posts_id"),
+    usersID: integer("users_id"),
   },
   (columns) => [
     index("pages_rels_order_idx").on(columns.order),
@@ -440,6 +441,7 @@ export const pages_rels = sqliteTable(
     index("pages_rels_path_idx").on(columns.path),
     index("pages_rels_pages_id_idx").on(columns.pagesID),
     index("pages_rels_posts_id_idx").on(columns.postsID),
+    index("pages_rels_users_id_idx").on(columns.usersID),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [pages.id],
@@ -454,6 +456,11 @@ export const pages_rels = sqliteTable(
       columns: [columns["postsID"]],
       foreignColumns: [posts.id],
       name: "pages_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "pages_rels_users_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -780,6 +787,7 @@ export const _pages_v_rels = sqliteTable(
     path: text("path").notNull(),
     pagesID: integer("pages_id"),
     postsID: integer("posts_id"),
+    usersID: integer("users_id"),
   },
   (columns) => [
     index("_pages_v_rels_order_idx").on(columns.order),
@@ -787,6 +795,7 @@ export const _pages_v_rels = sqliteTable(
     index("_pages_v_rels_path_idx").on(columns.path),
     index("_pages_v_rels_pages_id_idx").on(columns.pagesID),
     index("_pages_v_rels_posts_id_idx").on(columns.postsID),
+    index("_pages_v_rels_users_id_idx").on(columns.usersID),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [_pages_v.id],
@@ -801,6 +810,11 @@ export const _pages_v_rels = sqliteTable(
       columns: [columns["postsID"]],
       foreignColumns: [posts.id],
       name: "_pages_v_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "_pages_v_rels_users_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -1687,6 +1701,7 @@ export const header_rels = sqliteTable(
     path: text("path").notNull(),
     pagesID: integer("pages_id"),
     postsID: integer("posts_id"),
+    usersID: integer("users_id"),
   },
   (columns) => [
     index("header_rels_order_idx").on(columns.order),
@@ -1694,6 +1709,7 @@ export const header_rels = sqliteTable(
     index("header_rels_path_idx").on(columns.path),
     index("header_rels_pages_id_idx").on(columns.pagesID),
     index("header_rels_posts_id_idx").on(columns.postsID),
+    index("header_rels_users_id_idx").on(columns.usersID),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [header.id],
@@ -1708,6 +1724,11 @@ export const header_rels = sqliteTable(
       columns: [columns["postsID"]],
       foreignColumns: [posts.id],
       name: "header_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "header_rels_users_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -1927,6 +1948,11 @@ export const relations_pages_rels = relations(pages_rels, ({ one }) => ({
     references: [posts.id],
     relationName: "posts",
   }),
+  usersID: one(users, {
+    fields: [pages_rels.usersID],
+    references: [users.id],
+    relationName: "users",
+  }),
 }));
 export const relations_pages = relations(pages, ({ one, many }) => ({
   parent: one(pages, {
@@ -2082,6 +2108,11 @@ export const relations__pages_v_rels = relations(_pages_v_rels, ({ one }) => ({
     fields: [_pages_v_rels.postsID],
     references: [posts.id],
     relationName: "posts",
+  }),
+  usersID: one(users, {
+    fields: [_pages_v_rels.usersID],
+    references: [users.id],
+    relationName: "users",
   }),
 }));
 export const relations__pages_v = relations(_pages_v, ({ one, many }) => ({
@@ -2519,6 +2550,11 @@ export const relations_header_rels = relations(header_rels, ({ one }) => ({
     fields: [header_rels.postsID],
     references: [posts.id],
     relationName: "posts",
+  }),
+  usersID: one(users, {
+    fields: [header_rels.usersID],
+    references: [users.id],
+    relationName: "users",
   }),
 }));
 export const relations_header = relations(header, ({ one, many }) => ({

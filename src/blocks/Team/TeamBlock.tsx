@@ -8,7 +8,7 @@ import React from "react";
 import { TeamBlockCarousel } from "./TeamBlockCarousel";
 
 export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
-    const { title, link, type, limit, backgroundColor } = props;
+    const { title, type, limit, backgroundColor } = props;
 
     const payload = await getPayload({ config: configPromise });
 
@@ -55,12 +55,6 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
                         users={users}
                     />
                 </div>
-
-                {link && (
-                    <div className="block">
-                        <CMSLink {...link} />
-                    </div>
-                )}
             </div>
         </div>
     );

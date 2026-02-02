@@ -50,22 +50,17 @@ export const Users: CollectionConfig = {
             false,
         create: authenticated,
         delete: authenticated,
-        read: () => {
-            // Only allow coaches to be read via the API
+        read: ({ req }: { req: { user: User | null } }) => {
+            // Authenticated users with admin or editor roles can read all users
+            if (req?.user?.roles?.includes(RolesEnum.ADMIN) || req?.user?.roles?.includes(RolesEnum.EDITOR)) {
+                return true;
+            }
+            
+            // Only allow coaches to be read via the API for unauthenticated users
             return {
-                or: [
-                    {
-                        roles: {
-                            contains: RolesEnum.COACH,
-                        },
-                    },
-                    {
-                        // Allow admins and editors to read all users
-                        roles: {
-                            in: [RolesEnum.ADMIN, RolesEnum.EDITOR],
-                        },
-                    },
-                ],
+                roles: {
+                    contains: RolesEnum.COACH,
+                },
             };
         },
         update: authenticated,

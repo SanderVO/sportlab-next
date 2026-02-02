@@ -14,6 +14,8 @@ import {
     SerializedBlockNode,
     SerializedHeadingNode,
     SerializedLinkNode,
+    SerializedListItemNode,
+    SerializedListNode,
     SerializedTextNode,
     type DefaultTypedEditorState,
 } from "@payloadcms/richtext-lexical";
@@ -25,6 +27,7 @@ import {
     SerializedLexicalNodeWithParent,
 } from "@payloadcms/richtext-lexical/react";
 import { TextStateFeatureProps } from "node_modules/@payloadcms/richtext-lexical/dist/features/textState/feature.server";
+import React from "react";
 import { FormBlockType } from "../../blocks/Form/FormBlock";
 import { Button } from "../ui/Button";
 
@@ -67,7 +70,29 @@ const textConverter: JSXConverter<SerializedTextNode> = ({
         });
     }
 
-    return <span style={styles}>{text}</span>;
+    let content: React.ReactNode = text;
+
+    // Handle text formatting (bold, italic, underline)
+    if (node.format) {
+        const format = node.format;
+
+        // Bold (format & 1)
+        if (format & 1) {
+            content = <strong>{content}</strong>;
+        }
+
+        // Italic (format & 2)
+        if (format & 2) {
+            content = <em>{content}</em>;
+        }
+
+        // Underline (format & 8)
+        if (format & 8) {
+            content = <u>{content}</u>;
+        }
+    }
+
+    return <span style={styles}>{content}</span>;
 };
 
 const headingConverter: JSXConverter<SerializedHeadingNode> = ({
@@ -152,12 +177,15 @@ const linkConverter: JSXConverter<SerializedLinkNode> = ({
         typeof doc?.value === "object" &&
         doc.value.slug
             ? `${
-                  doc?.relationTo !== "pages" ? `/${doc?.relationTo}` : ""
+                  doc?.relationTo !== "pages"
+                      ? `/${doc?.relationTo === "users" ? "team" : doc?.relationTo}`
+                      : ""
               }/${doc.value.slug}`
             : url;
 
     return (
         <Button
+            classes="mr-4"
             url={href}
             newTab={newTab}
             variant={variant as Variant}
@@ -166,6 +194,27 @@ const linkConverter: JSXConverter<SerializedLinkNode> = ({
             {label as string}
         </Button>
     );
+};
+
+const listConverter: JSXConverter<SerializedListNode> = ({
+    node,
+    nodesToJSX,
+}) => {
+    const children = nodesToJSX({ nodes: node.children });
+
+    if (node.listType === "number") {
+        return <ol className="list-decimal pl-6 space-y-2">{children}</ol>;
+    }
+
+    return <ul className="list-disc pl-6 space-y-2">{children}</ul>;
+};
+
+const listItemConverter: JSXConverter<SerializedListItemNode> = ({
+    node,
+    nodesToJSX,
+}) => {
+    const children = nodesToJSX({ nodes: node.children });
+    return <li>{children}</li>;
 };
 
 const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
@@ -177,6 +226,8 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
     heading: headingConverter,
     link: linkConverter,
     button: linkConverter,
+    list: listConverter,
+    listitem: listItemConverter,
     blocks: {
         formBlock: ({ node }: { node: SerializedBlockNode<FormBlockType> }) => (
             <FormBlock {...node.fields} />
