@@ -50,19 +50,9 @@ export const Users: CollectionConfig = {
             false,
         create: authenticated,
         delete: authenticated,
-        read: ({ req }: { req: { user: User | null } }) => {
-            // Authenticated users with admin or editor roles can read all users
-            if (req?.user?.roles?.includes(RolesEnum.ADMIN) || req?.user?.roles?.includes(RolesEnum.EDITOR)) {
-                return true;
-            }
-            
-            // Only allow coaches to be read via the API for unauthenticated users
-            return {
-                roles: {
-                    contains: RolesEnum.COACH,
-                },
-            };
-        },
+        // Read access is open - sensitive data like email/hash is protected by field-level access
+        // Components should filter for coaches where needed using where: { roles: { contains: 'coach' } }
+        read: () => true,
         update: authenticated,
     },
     fields: [
@@ -111,6 +101,12 @@ export const Users: CollectionConfig = {
             defaultValue: "user",
             saveToJWT: true,
             required: true,
+            access: {
+                read: ({ req }) => {
+                    // Only authenticated users can see roles
+                    return !!req?.user;
+                },
+            },
             options: [
                 { label: "Admin", value: RolesEnum.ADMIN },
                 { label: "Content Manager", value: RolesEnum.EDITOR },
@@ -142,6 +138,18 @@ export const Users: CollectionConfig = {
             admin: {
                 description: "Achtergrond beschrijving van het lid",
                 rows: 4,
+            },
+        },
+        {
+            label: "Positie",
+            name: "position",
+            type: "number",
+            admin: {
+                description:
+                    "Bepaal de volgorde in team overzichten (lager nummer = hoger in lijst)",
+                condition: (_, siblingData) => {
+                    return !!siblingData?.roles?.includes(RolesEnum.COACH);
+                },
             },
         },
         {

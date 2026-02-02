@@ -19,7 +19,7 @@ const HamburgerMenuContent = ({ navItems }: Props) => {
             <MenuIcon className="text-3xl" onClick={() => setIsOpen(!isOpen)} />
             <div
                 className={clsx(
-                    "absolute top-[87px] right-0 w-full h-screen bg-background z-50 p-4 transition-opacity",
+                    "absolute top-16 right-0 w-full h-screen bg-background z-50 p-4 transition-opacity",
                     isOpen ? "opacity-100" : "opacity-0 pointer-events-none",
                 )}
             >

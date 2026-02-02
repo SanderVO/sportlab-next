@@ -18,6 +18,20 @@ export const Team: Block = {
             defaultValue: 0,
         },
         {
+            label: "Sortering",
+            name: "sortBy",
+            type: "select",
+            defaultValue: "name",
+            required: true,
+            options: [
+                { label: "Naam (A-Z)", value: "name" },
+                { label: "Naam (Z-A)", value: "-name" },
+                { label: "Nieuwste eerst", value: "-createdAt" },
+                { label: "Oudste eerst", value: "createdAt" },
+                { label: "Aangepaste volgorde", value: "position" },
+            ],
+        },
+        {
             label: "Type",
             name: "type",
             type: "select",

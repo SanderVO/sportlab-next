@@ -38,7 +38,7 @@ export const InstagramBlockCarousel: React.FC<
                                         target="_blank"
                                         rel="noopener noreferrer nofollow"
                                     >
-                                        mediaItemContent(image)
+                                        {mediaItemContent(image)}
                                     </Link>
                                 )}
 

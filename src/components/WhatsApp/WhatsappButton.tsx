@@ -12,9 +12,9 @@ export async function WhatsappButton() {
             {phoneNumber && (
                 <Link
                     href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-                        textPreFilled
+                        textPreFilled,
                     )}`}
-                    className="sticky bottom-6 right-6 bg-[#25D366] text-white px-4 py-2 rounded-2xl z-50 ml-auto shadow-lg w-max flex flex-row gap-2 items-center fill-white"
+                    className="relative transition-colors bg-[#25D366] hover:bg-[#1ebe57] text-white px-4 py-2 rounded-lg z-50 ml-auto shadow-lg w-max flex flex-row gap-2 items-center fill-white"
                     target="_blank"
                     rel="noopener noreferrer"
                 >

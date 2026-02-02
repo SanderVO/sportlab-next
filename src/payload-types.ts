@@ -171,6 +171,10 @@ export interface User {
    */
   about?: string | null;
   /**
+   * Bepaal de volgorde in team overzichten (lager nummer = hoger in lijst)
+   */
+  position?: number | null;
+  /**
    * Pagina content voor de profielpagina van coaches
    */
   content?: {
@@ -375,6 +379,7 @@ export interface CarouselBlock {
 export interface TeamBlock {
   title: string;
   limit?: number | null;
+  sortBy: 'name' | '-name' | '-createdAt' | 'createdAt' | 'position';
   type: 'carousel' | 'grid';
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
   enableLink?: boolean | null;
@@ -927,6 +932,7 @@ export interface UsersSelect<T extends boolean = true> {
   avatar?: T;
   subtitle?: T;
   about?: T;
+  position?: T;
   content?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1069,6 +1075,7 @@ export interface CarouselBlockSelect<T extends boolean = true> {
 export interface TeamBlockSelect<T extends boolean = true> {
   title?: T;
   limit?: T;
+  sortBy?: T;
   type?: T;
   backgroundColor?: T;
   enableLink?: T;
@@ -1374,6 +1381,10 @@ export interface Header {
    */
   navItems?:
     | {
+        /**
+         * Bepaalt of dit item standaard zichtbaar is in de header navigatie
+         */
+        initiallyVisible?: boolean | null;
         link?: {
           type?: ('reference' | 'custom') | null;
           /**
@@ -1467,6 +1478,7 @@ export interface HeaderSelect<T extends boolean = true> {
   navItems?:
     | T
     | {
+        initiallyVisible?: T;
         link?:
           | T
           | {

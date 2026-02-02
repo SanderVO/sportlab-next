@@ -2,7 +2,6 @@ import { AdminBar } from "@/components/AdminBar";
 import CookieBanner from "@/components/CookieBanner/CookieBanner";
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
-import { WhatsappButton } from "@/components/WhatsApp/WhatsappButton";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import { draftMode } from "next/headers";
@@ -65,8 +64,6 @@ export default async function RootLayout({
                 <Footer />
 
                 <CookieBanner />
-
-                <WhatsappButton />
 
                 <Script id="google-consent" strategy="beforeInteractive">
                     {`

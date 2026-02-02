@@ -1,5 +1,4 @@
 import { RolesEnum } from "@/collections/Users";
-import { CMSLink } from "@/components/ui/Link";
 import type { TeamBlock as TeamBlockProps } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import configPromise from "@payload-config";
@@ -8,7 +7,7 @@ import React from "react";
 import { TeamBlockCarousel } from "./TeamBlockCarousel";
 
 export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
-    const { title, type, limit, backgroundColor } = props;
+    const { title, type, limit, backgroundColor, sortBy } = props;
 
     const payload = await getPayload({ config: configPromise });
 
@@ -16,7 +15,7 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
         collection: "users",
         page: 0,
         limit: type === "carousel" ? (limit ?? 0) : 0,
-        sort: "name",
+        sort: sortBy,
         where: {
             status: {
                 equals: "active",

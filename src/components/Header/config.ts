@@ -22,8 +22,20 @@ export const Header: GlobalConfig = {
             label: "Navigatie items",
             name: "navItems",
             type: "array",
-            fields: [link()],
-            maxRows: 10,
+            fields: [
+                {
+                    type: "checkbox",
+                    name: "initiallyVisible",
+                    label: "Standaard zichtbaar",
+                    defaultValue: true,
+                    admin: {
+                        description:
+                            "Bepaalt of dit item standaard zichtbaar is in de header navigatie",
+                    },
+                },
+                link(),
+            ],
+            maxRows: 12,
             admin: {
                 description: "Voeg navigatie items toe aan de header",
                 initCollapsed: true,
