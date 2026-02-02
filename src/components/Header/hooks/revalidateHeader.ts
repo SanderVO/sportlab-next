@@ -9,7 +9,7 @@ export const revalidateHeader: GlobalAfterChangeHook = ({
     if (!context.disableRevalidate) {
         payload.logger.info(`Revalidating header`);
 
-        revalidateTag("global_header");
+        revalidateTag("global_header", {});
     }
 
     return doc;

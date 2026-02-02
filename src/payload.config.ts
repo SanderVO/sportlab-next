@@ -78,7 +78,7 @@ const r2DevStorage = () =>
 
 const r2ProductionStorage = () =>
     r2Storage({
-        bucket: cloudflare.env.R2,
+        bucket: cloudflare.env.R2 as any,
         collections: {
             media: {
                 disableLocalStorage: true,

@@ -9,7 +9,7 @@ export const revalidateWhatsapp: GlobalAfterChangeHook = ({
     if (!context.disableRevalidate) {
         payload.logger.info(`Revalidating WhatsApp`);
 
-        revalidateTag("global_whatsApp");
+        revalidateTag("global_whatsApp", {});
     }
 
     return doc;

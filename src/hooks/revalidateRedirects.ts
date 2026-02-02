@@ -7,7 +7,7 @@ export const revalidateRedirects: CollectionAfterChangeHook = ({
 }) => {
     payload.logger.info(`Revalidating redirects`);
 
-    revalidateTag("redirects");
+    revalidateTag("redirects", {});
 
     return doc;
 };
