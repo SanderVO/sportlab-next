@@ -1,7 +1,7 @@
 "use client";
 
 import { Header } from "@/payload-types";
-import clsx from "clsx";
+import { cn } from "@/utilities/ui";
 import { MenuIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -18,7 +18,7 @@ const HamburgerMenuContent = ({ navItems }: Props) => {
         <>
             <MenuIcon className="text-3xl" onClick={() => setIsOpen(!isOpen)} />
             <div
-                className={clsx(
+                className={cn(
                     "absolute top-16 right-0 w-full h-screen bg-background z-50 p-4 transition-opacity",
                     isOpen ? "opacity-100" : "opacity-0 pointer-events-none",
                 )}

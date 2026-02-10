@@ -1428,6 +1428,35 @@ export interface Footer {
   id: number;
   title: string;
   description: string;
+  link?: {
+    type?: ('reference' | 'custom') | null;
+    /**
+     * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+     */
+    newTab?: boolean | null;
+    /**
+     * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+     */
+    addLabel?: boolean | null;
+    /**
+     * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+     */
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'users';
+          value: number | User;
+        } | null);
+    url?: string | null;
+    label?: string | null;
+  };
   footerLogo: number | Media;
   contactText?: {
     root: {
@@ -1448,6 +1477,52 @@ export interface Footer {
     | {
         platform: 'facebook' | 'twitter' | 'instagram' | 'youtube' | 'tiktok';
         url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Voeg kolommen toe met links voor in de footer
+   */
+  footerColumns?:
+    | {
+        columnTitle: string;
+        /**
+         * Voeg links toe voor deze kolom
+         */
+        links?:
+          | {
+              link?: {
+                type?: ('reference' | 'custom') | null;
+                /**
+                 * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+                 */
+                newTab?: boolean | null;
+                /**
+                 * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+                 */
+                addLabel?: boolean | null;
+                /**
+                 * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+                 */
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null)
+                  | ({
+                      relationTo: 'users';
+                      value: number | User;
+                    } | null);
+                url?: string | null;
+                label?: string | null;
+              };
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -1502,6 +1577,16 @@ export interface HeaderSelect<T extends boolean = true> {
 export interface FooterSelect<T extends boolean = true> {
   title?: T;
   description?: T;
+  link?:
+    | T
+    | {
+        type?: T;
+        newTab?: T;
+        addLabel?: T;
+        reference?: T;
+        url?: T;
+        label?: T;
+      };
   footerLogo?: T;
   contactText?: T;
   socialMediaLinks?:
@@ -1509,6 +1594,27 @@ export interface FooterSelect<T extends boolean = true> {
     | {
         platform?: T;
         url?: T;
+        id?: T;
+      };
+  footerColumns?:
+    | T
+    | {
+        columnTitle?: T;
+        links?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    addLabel?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
+            };
         id?: T;
       };
   updatedAt?: T;

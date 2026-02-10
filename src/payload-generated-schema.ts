@@ -1765,12 +1765,63 @@ export const footer_social_media_links = sqliteTable(
   ],
 );
 
+export const footer_footer_columns_links = sqliteTable(
+  "footer_footer_columns_links",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: text("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_addLabel: integer("link_add_label", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label"),
+  },
+  (columns) => [
+    index("footer_footer_columns_links_order_idx").on(columns._order),
+    index("footer_footer_columns_links_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [footer_footer_columns.id],
+      name: "footer_footer_columns_links_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const footer_footer_columns = sqliteTable(
+  "footer_footer_columns",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    columnTitle: text("column_title").notNull(),
+  },
+  (columns) => [
+    index("footer_footer_columns_order_idx").on(columns._order),
+    index("footer_footer_columns_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [footer.id],
+      name: "footer_footer_columns_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const footer = sqliteTable(
   "footer",
   {
     id: integer("id").primaryKey(),
     title: text("title").notNull(),
     description: text("description").notNull(),
+    link_type: text("link_type", { enum: ["reference", "custom"] }).default(
+      "reference",
+    ),
+    link_newTab: integer("link_new_tab", { mode: "boolean" }),
+    link_addLabel: integer("link_add_label", { mode: "boolean" }),
+    link_url: text("link_url"),
+    link_label: text("link_label"),
     footerLogo: integer("footer_logo_id")
       .notNull()
       .references(() => media.id, {
@@ -1785,6 +1836,47 @@ export const footer = sqliteTable(
     ),
   },
   (columns) => [index("footer_footer_logo_idx").on(columns.footerLogo)],
+);
+
+export const footer_rels = sqliteTable(
+  "footer_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    pagesID: integer("pages_id"),
+    postsID: integer("posts_id"),
+    usersID: integer("users_id"),
+  },
+  (columns) => [
+    index("footer_rels_order_idx").on(columns.order),
+    index("footer_rels_parent_idx").on(columns.parent),
+    index("footer_rels_path_idx").on(columns.path),
+    index("footer_rels_pages_id_idx").on(columns.pagesID),
+    index("footer_rels_posts_id_idx").on(columns.postsID),
+    index("footer_rels_users_id_idx").on(columns.usersID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [footer.id],
+      name: "footer_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["pagesID"]],
+      foreignColumns: [pages.id],
+      name: "footer_rels_pages_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["postsID"]],
+      foreignColumns: [posts.id],
+      name: "footer_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "footer_rels_users_fk",
+    }).onDelete("cascade"),
+  ],
 );
 
 export const whats_app = sqliteTable("whats_app", {
@@ -2590,6 +2682,51 @@ export const relations_footer_social_media_links = relations(
     }),
   }),
 );
+export const relations_footer_footer_columns_links = relations(
+  footer_footer_columns_links,
+  ({ one }) => ({
+    _parentID: one(footer_footer_columns, {
+      fields: [footer_footer_columns_links._parentID],
+      references: [footer_footer_columns.id],
+      relationName: "links",
+    }),
+  }),
+);
+export const relations_footer_footer_columns = relations(
+  footer_footer_columns,
+  ({ one, many }) => ({
+    _parentID: one(footer, {
+      fields: [footer_footer_columns._parentID],
+      references: [footer.id],
+      relationName: "footerColumns",
+    }),
+    links: many(footer_footer_columns_links, {
+      relationName: "links",
+    }),
+  }),
+);
+export const relations_footer_rels = relations(footer_rels, ({ one }) => ({
+  parent: one(footer, {
+    fields: [footer_rels.parent],
+    references: [footer.id],
+    relationName: "_rels",
+  }),
+  pagesID: one(pages, {
+    fields: [footer_rels.pagesID],
+    references: [pages.id],
+    relationName: "pages",
+  }),
+  postsID: one(posts, {
+    fields: [footer_rels.postsID],
+    references: [posts.id],
+    relationName: "posts",
+  }),
+  usersID: one(users, {
+    fields: [footer_rels.usersID],
+    references: [users.id],
+    relationName: "users",
+  }),
+}));
 export const relations_footer = relations(footer, ({ one, many }) => ({
   footerLogo: one(media, {
     fields: [footer.footerLogo],
@@ -2598,6 +2735,12 @@ export const relations_footer = relations(footer, ({ one, many }) => ({
   }),
   socialMediaLinks: many(footer_social_media_links, {
     relationName: "socialMediaLinks",
+  }),
+  footerColumns: many(footer_footer_columns, {
+    relationName: "footerColumns",
+  }),
+  _rels: many(footer_rels, {
+    relationName: "_rels",
   }),
 }));
 export const relations_whats_app = relations(whats_app, () => ({}));
@@ -2660,7 +2803,10 @@ type DatabaseSchema = {
   header: typeof header;
   header_rels: typeof header_rels;
   footer_social_media_links: typeof footer_social_media_links;
+  footer_footer_columns_links: typeof footer_footer_columns_links;
+  footer_footer_columns: typeof footer_footer_columns;
   footer: typeof footer;
+  footer_rels: typeof footer_rels;
   whats_app: typeof whats_app;
   relations_users_roles: typeof relations_users_roles;
   relations_users_sessions: typeof relations_users_sessions;
@@ -2719,6 +2865,9 @@ type DatabaseSchema = {
   relations_header_rels: typeof relations_header_rels;
   relations_header: typeof relations_header;
   relations_footer_social_media_links: typeof relations_footer_social_media_links;
+  relations_footer_footer_columns_links: typeof relations_footer_footer_columns_links;
+  relations_footer_footer_columns: typeof relations_footer_footer_columns;
+  relations_footer_rels: typeof relations_footer_rels;
   relations_footer: typeof relations_footer;
   relations_whats_app: typeof relations_whats_app;
 };

@@ -1,3 +1,4 @@
+import { link } from "@/fields/link";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import type { GlobalConfig } from "payload";
 import { revalidateFooter } from "./hooks/revalidateFooter";
@@ -20,6 +21,9 @@ export const Footer: GlobalConfig = {
             type: "text",
             required: true,
         },
+        link({
+            label: "Contactlink",
+        }),
         {
             label: "Logo",
             name: "footerLogo",
@@ -61,6 +65,31 @@ export const Footer: GlobalConfig = {
                     name: "url",
                     type: "text",
                     required: true,
+                },
+            ],
+        },
+        {
+            label: "Footer Kolommen",
+            name: "footerColumns",
+            type: "array",
+            admin: {
+                description: "Voeg kolommen toe met links voor in de footer",
+            },
+            fields: [
+                {
+                    label: "Kolom Titel",
+                    name: "columnTitle",
+                    type: "text",
+                    required: true,
+                },
+                {
+                    label: "Links",
+                    name: "links",
+                    type: "array",
+                    admin: {
+                        description: "Voeg links toe voor deze kolom",
+                    },
+                    fields: [link()],
                 },
             ],
         },
