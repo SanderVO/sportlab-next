@@ -12,7 +12,7 @@ export async function Footer() {
         <footer className="container mx-auto my-20">
             <CMSLink
                 {...footerData.link}
-                className="flex flex-col text-sl-beige items-baseline no-underline font-normal"
+                className="flex flex-col text-sl-beige items-baseline no-underline font-normal h-auto"
             >
                 <div className="text-8xl font-sl-bebas">{footerData.title}</div>
 
@@ -58,7 +58,7 @@ export async function Footer() {
                     )}
 
                 {footerData.footerColumns && (
-                    <div className="flex flex-row justify-center gap-20 w-full">
+                    <div className="grid grid-cols-2 text-center sm:flex sm:flex-row sm:justify-center gap-12 sm:gap-20 w-full">
                         {footerData.footerColumns.map((column) => (
                             <div key={column.id}>
                                 <h3 className="text-neutral-400 font-bold mb-2">
