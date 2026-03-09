@@ -2,6 +2,8 @@ import { AdminBar } from "@/components/AdminBar";
 import CookieBanner from "@/components/CookieBanner/CookieBanner";
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
+import { Organization } from "@/payload-types";
+import { getCachedGlobal } from "@/utilities/getGlobals";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import { draftMode } from "next/headers";
@@ -38,6 +40,11 @@ export default async function RootLayout({
     const { isEnabled } = await draftMode();
 
     const GTM_ID = process.env.GTM_ID;
+
+    const organization = (await getCachedGlobal(
+        "organization",
+        1,
+    )()) as Organization;
 
     return (
         <html
@@ -81,6 +88,54 @@ export default async function RootLayout({
                 </Script>
 
                 {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
+
+                <Script
+                    id="organization-schema"
+                    type="application/ld+json"
+                    strategy="afterInteractive"
+                >
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "Organization",
+                        name: organization.name,
+                        url: organization.url,
+                        ...(organization.logo &&
+                            typeof organization.logo === "object" && {
+                                logo: organization.logo.url,
+                            }),
+                        ...(organization.email && {
+                            email: organization.email,
+                        }),
+                        ...(organization.description && {
+                            description: organization.description,
+                        }),
+                        ...(organization.contactPoint?.telephone && {
+                            contactPoint: {
+                                "@type": "ContactPoint",
+                                telephone: organization.contactPoint.telephone,
+                                ...(organization.contactPoint.contactType && {
+                                    contactType:
+                                        organization.contactPoint.contactType,
+                                }),
+                            },
+                        }),
+                        ...(organization.address?.streetAddress && {
+                            address: {
+                                "@type": "PostalAddress",
+                                streetAddress:
+                                    organization.address.streetAddress,
+                                addressLocality:
+                                    organization.address.addressLocality,
+                                postalCode: organization.address.postalCode,
+                                addressCountry:
+                                    organization.address.addressCountry,
+                            },
+                        }),
+                        ...(organization.sameAs?.length && {
+                            sameAs: organization.sameAs.map((s) => s.url),
+                        }),
+                    })}
+                </Script>
             </body>
         </html>
     );

@@ -21,6 +21,40 @@ const nextConfig: NextConfig = {
         deviceSizes: [320, 480, 640, 768, 1080, 1366, 1920],
         qualities: [75, 85, 100],
     },
+    redirects: async () => {
+        return [
+            {
+                source: "/personal-training",
+                destination: "/personal-training",
+                permanent: true,
+            },
+            {
+                source: "/semi-private-personal-training",
+                destination: "/personal-training",
+                permanent: true,
+            },
+            {
+                source: "/box-burn",
+                destination: "/small-group-classes",
+                permanent: true,
+            },
+            {
+                source: "/crosstraining",
+                destination: "/small-group-classes",
+                permanent: true,
+            },
+            {
+                source: "/power-hiit",
+                destination: "/small-group-classes",
+                permanent: true,
+            },
+            {
+                source: "/sfeerimpressie",
+                destination: "/over-ons",
+                permanent: true,
+            },
+        ];
+    },
 };
 
 export default withPayload(nextConfig);

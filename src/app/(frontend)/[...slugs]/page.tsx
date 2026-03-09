@@ -7,6 +7,7 @@ import { generateMeta } from "@/utilities/generateMeta";
 import configPromise from "@payload-config";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
+import Script from "next/script";
 import { getPayload, PaginatedDocs } from "payload";
 import { cache } from "react";
 import PageClient from "./page.client";
@@ -110,9 +111,11 @@ export default async function Page({ params }: Args) {
                     {meta.richSnippets.map((snippet, index) => {
                         if (snippet?.jsonLd) {
                             return (
-                                <script
+                                <Script
+                                    id={`rich-snippet-${snippet.id}`}
                                     key={index}
                                     type="application/ld+json"
+                                    strategy="afterInteractive"
                                     dangerouslySetInnerHTML={{
                                         __html: JSON.stringify(
                                             snippet.jsonLd,

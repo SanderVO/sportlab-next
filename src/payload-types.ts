@@ -105,16 +105,19 @@ export interface Config {
     header: Header;
     footer: Footer;
     whatsApp: WhatsApp;
+    organization: Organization;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     whatsApp: WhatsAppSelect<false> | WhatsAppSelect<true>;
+    organization: OrganizationSelect<false> | OrganizationSelect<true>;
   };
   locale: null;
-  user: User & {
-    collection: 'users';
+  widgets: {
+    collections: CollectionsWidget;
   };
+  user: User;
   jobs: {
     tasks: {
       schedulePublish: TaskSchedulePublish;
@@ -209,6 +212,7 @@ export interface User {
       }[]
     | null;
   password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1546,6 +1550,45 @@ export interface WhatsApp {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "organization".
+ */
+export interface Organization {
+  id: number;
+  name: string;
+  url: string;
+  logo?: (number | null) | Media;
+  email?: string | null;
+  description?: string | null;
+  contactPoint?: {
+    /**
+     * Internationaal formaat, bijvoorbeeld: +31612345678
+     */
+    telephone?: string | null;
+    contactType?: string | null;
+  };
+  address?: {
+    streetAddress?: string | null;
+    addressLocality?: string | null;
+    postalCode?: string | null;
+    /**
+     * ISO 3166-1 alpha-2, bijv. NL
+     */
+    addressCountry?: string | null;
+  };
+  /**
+   * Voeg links toe naar social media profielen (Facebook, Instagram, LinkedIn, etc.)
+   */
+  sameAs?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -1632,6 +1675,50 @@ export interface WhatsAppSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "organization_select".
+ */
+export interface OrganizationSelect<T extends boolean = true> {
+  name?: T;
+  url?: T;
+  logo?: T;
+  email?: T;
+  description?: T;
+  contactPoint?:
+    | T
+    | {
+        telephone?: T;
+        contactType?: T;
+      };
+  address?:
+    | T
+    | {
+        streetAddress?: T;
+        addressLocality?: T;
+        postalCode?: T;
+        addressCountry?: T;
+      };
+  sameAs?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_widget".
+ */
+export interface CollectionsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

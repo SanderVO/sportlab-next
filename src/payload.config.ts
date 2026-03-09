@@ -19,6 +19,7 @@ import { Posts } from "./collections/Posts";
 import { Users } from "./collections/Users";
 import { Footer } from "./components/Footer/config";
 import { Header } from "./components/Header/config";
+import { Organization } from "./components/Organization/config";
 import { WhatsApp } from "./components/WhatsApp/config";
 import { plugins } from "./plugins";
 import { getServerSideURL } from "./utilities/getURL";
@@ -147,7 +148,7 @@ export default buildConfig({
               })
             : undefined,
     collections: [Users, Media, Documents, Pages, Posts],
-    globals: [Header, Footer, WhatsApp],
+    globals: [Header, Footer, WhatsApp, Organization],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
     secret: cloudflare.env.PAYLOAD_SECRET || "ignore",

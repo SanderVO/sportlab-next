@@ -1892,6 +1892,52 @@ export const whats_app = sqliteTable("whats_app", {
   ),
 });
 
+export const organization_same_as = sqliteTable(
+  "organization_same_as",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    url: text("url").notNull(),
+  },
+  (columns) => [
+    index("organization_same_as_order_idx").on(columns._order),
+    index("organization_same_as_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [organization.id],
+      name: "organization_same_as_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const organization = sqliteTable(
+  "organization",
+  {
+    id: integer("id").primaryKey(),
+    name: text("name").notNull(),
+    url: text("url").notNull(),
+    logo: integer("logo_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    email: text("email"),
+    description: text("description"),
+    contactPoint_telephone: text("contact_point_telephone"),
+    contactPoint_contactType: text("contact_point_contact_type"),
+    address_streetAddress: text("address_street_address"),
+    address_addressLocality: text("address_address_locality"),
+    address_postalCode: text("address_postal_code"),
+    address_addressCountry: text("address_address_country").default("NL"),
+    updatedAt: text("updated_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    createdAt: text("created_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+  },
+  (columns) => [index("organization_logo_idx").on(columns.logo)],
+);
+
 export const relations_users_roles = relations(users_roles, ({ one }) => ({
   parent: one(users, {
     fields: [users_roles.parent],
@@ -2744,6 +2790,29 @@ export const relations_footer = relations(footer, ({ one, many }) => ({
   }),
 }));
 export const relations_whats_app = relations(whats_app, () => ({}));
+export const relations_organization_same_as = relations(
+  organization_same_as,
+  ({ one }) => ({
+    _parentID: one(organization, {
+      fields: [organization_same_as._parentID],
+      references: [organization.id],
+      relationName: "sameAs",
+    }),
+  }),
+);
+export const relations_organization = relations(
+  organization,
+  ({ one, many }) => ({
+    logo: one(media, {
+      fields: [organization.logo],
+      references: [media.id],
+      relationName: "logo",
+    }),
+    sameAs: many(organization_same_as, {
+      relationName: "sameAs",
+    }),
+  }),
+);
 
 type DatabaseSchema = {
   users_roles: typeof users_roles;
@@ -2808,6 +2877,8 @@ type DatabaseSchema = {
   footer: typeof footer;
   footer_rels: typeof footer_rels;
   whats_app: typeof whats_app;
+  organization_same_as: typeof organization_same_as;
+  organization: typeof organization;
   relations_users_roles: typeof relations_users_roles;
   relations_users_sessions: typeof relations_users_sessions;
   relations_users: typeof relations_users;
@@ -2870,6 +2941,8 @@ type DatabaseSchema = {
   relations_footer_rels: typeof relations_footer_rels;
   relations_footer: typeof relations_footer;
   relations_whats_app: typeof relations_whats_app;
+  relations_organization_same_as: typeof relations_organization_same_as;
+  relations_organization: typeof relations_organization;
 };
 
 declare module "@payloadcms/db-d1-sqlite" {
