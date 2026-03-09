@@ -94,6 +94,31 @@ export default async function Page({ params }: Args) {
 
     const { hero, layout, meta, hasHero } = page;
 
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "";
+
+    const breadcrumbItems = await Promise.all(
+        slugs.map(async (slug, index) => {
+            const doc = await queryPageBySlug({
+                slug: decodeURIComponent(slug),
+            });
+            return {
+                "@type": "ListItem",
+                position: index + 1,
+                name: doc?.title ?? decodeURIComponent(slug),
+                item: `${baseUrl}/${slugs.slice(0, index + 1).join("/")}`,
+            };
+        }),
+    );
+
+    const breadcrumbJsonLd =
+        slugs.length > 1
+            ? {
+                  "@context": "https://schema.org",
+                  "@type": "BreadcrumbList",
+                  itemListElement: breadcrumbItems,
+              }
+            : null;
+
     return (
         <>
             <PageClient />
@@ -127,6 +152,20 @@ export default async function Page({ params }: Args) {
                         return null;
                     })}
                 </>
+            )}
+
+            {breadcrumbJsonLd && (
+                <Script
+                    id="breadcrumb-jsonld"
+                    type="application/ld+json"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify(breadcrumbJsonLd).replace(
+                            /</g,
+                            "\\u003c",
+                        ),
+                    }}
+                />
             )}
         </>
     );
