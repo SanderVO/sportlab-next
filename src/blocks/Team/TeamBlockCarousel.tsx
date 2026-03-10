@@ -42,6 +42,7 @@ export const TeamBlockCarousel: React.FC<Props> = ({
     }, [isTouch]);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsTouch(window.matchMedia("(hover: none)").matches);
     }, []);
 
