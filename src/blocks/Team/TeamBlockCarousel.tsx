@@ -4,7 +4,7 @@ import type { User } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TeamBlockCarouselItem } from "./TeamBlockCarouselItem";
 
 interface Props {
@@ -26,24 +26,25 @@ export const TeamBlockCarousel: React.FC<Props> = ({
     });
 
     const [showInfo, setShowInfo] = useState<{ [key: number]: boolean }>({});
-    const [isTouch, setIsTouch] = useState(false);
+    const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-    const showForIndex = (index: number) => setShowInfo({ [index]: true });
     const hideInfo = () => setShowInfo({});
-    const toggleForIndex = (index: number) =>
-        setShowInfo((prev) => ({ [index]: !prev[index] }));
 
     useEffect(() => {
-        if (!isTouch) return;
-
-        const handleClickOutside = () => setShowInfo({});
-        document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
-    }, [isTouch]);
-
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setIsTouch(window.matchMedia("(hover: none)").matches);
+        const handlePointerDown = (e: PointerEvent) => {
+            if (e.pointerType !== "touch") return;
+            const tappedIndex = cardRefs.current.findIndex((ref) =>
+                ref?.contains(e.target as Node),
+            );
+            if (tappedIndex >= 0) {
+                setShowInfo((prev) => ({ [tappedIndex]: !prev[tappedIndex] }));
+            } else {
+                setShowInfo({});
+            }
+        };
+        document.addEventListener("pointerdown", handlePointerDown);
+        return () =>
+            document.removeEventListener("pointerdown", handlePointerDown);
     }, []);
 
     const teamItemContent = () => (
@@ -52,6 +53,9 @@ export const TeamBlockCarousel: React.FC<Props> = ({
                 users.map((user: User, index: number) => (
                     <div
                         key={index}
+                        ref={(el) => {
+                            cardRefs.current[index] = el;
+                        }}
                         className={cn(
                             type === "carousel" &&
                                 "flex flex-row items-center text h-full shrink-0 w-[300px] sm:w-[370px] last:mr-4 md:last:mr-6",
@@ -59,13 +63,8 @@ export const TeamBlockCarousel: React.FC<Props> = ({
                     >
                         <TeamBlockCarouselItem
                             showInfo={showInfo[index]}
-                            onShow={
-                                isTouch
-                                    ? () => toggleForIndex(index)
-                                    : () => showForIndex(index)
-                            }
-                            onHide={isTouch ? () => {} : hideInfo}
-                            isTouch={isTouch}
+                            onShow={() => setShowInfo({ [index]: true })}
+                            onHide={hideInfo}
                             backgroundColor={backgroundColor}
                             user={user}
                         />

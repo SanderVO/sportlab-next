@@ -60,7 +60,7 @@ export async function Footer() {
                 {footerData.footerColumns && (
                     <div className="grid grid-cols-2 text-center lg:flex lg:flex-row lg:justify-center gap-12 lg:gap-20 w-full">
                         {footerData.footerColumns.map((column) => (
-                            <div key={column.id}>
+                            <div key={column.id} className="lg:w-36">
                                 <h3 className="text-neutral-400 font-bold mb-2">
                                     {column.columnTitle}
                                 </h3>

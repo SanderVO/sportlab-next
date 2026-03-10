@@ -11,14 +11,12 @@ export const TeamBlockCarouselItem = ({
     showInfo,
     onShow,
     onHide,
-    isTouch,
 }: {
     backgroundColor: string;
     user: User;
     showInfo: boolean;
     onShow: () => void;
     onHide: () => void;
-    isTouch: boolean;
 }) => {
     if (!user) {
         return null;
@@ -28,14 +26,13 @@ export const TeamBlockCarouselItem = ({
         <div className="h-full flex flex-col gap-2 w-full">
             <div
                 className="flex h-[440px] md:h-[600px] w-full max-w-[400px] relative overflow-hidden cursor-pointer"
-                {...(isTouch
-                    ? {
-                          onClick: (e: React.MouseEvent) => {
-                              e.stopPropagation();
-                              onShow();
-                          },
-                      }
-                    : { onMouseEnter: onShow, onMouseLeave: onHide })}
+                onMouseEnter={() => {
+                    if (!showInfo) onShow();
+                }}
+                onMouseLeave={onHide}
+                onMouseDown={() => {
+                    if (!showInfo) onHide();
+                }}
             >
                 <Media
                     size="(max-width: 768px) 300px, 450px"
