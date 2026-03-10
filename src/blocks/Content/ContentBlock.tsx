@@ -71,7 +71,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                                 "contentBottom" && "lg:hidden",
                                         )}
                                         imgClassName={cn(
-                                            "object-cover object-center lg:object-top h-full w-full lg:w-auto",
+                                            "object-cover object-center lg:object-top h-full w-full",
                                         )}
                                         imgWidth={570}
                                         imgHeight={350}
