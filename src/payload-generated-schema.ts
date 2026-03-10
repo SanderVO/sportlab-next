@@ -111,6 +111,12 @@ export const media = sqliteTable(
   {
     id: integer("id").primaryKey(),
     alt: text("alt").notNull(),
+    objectPositionDesktop: text("object_position_desktop", {
+      enum: ["center", "top", "bottom", "left", "right"],
+    }).default("top"),
+    objectPositionMobile: text("object_position_mobile", {
+      enum: ["center", "top", "bottom", "left", "right"],
+    }).default("center"),
     poster: integer("poster_id").references((): AnySQLiteColumn => media.id, {
       onDelete: "set null",
     }),

@@ -32,17 +32,26 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
     let height: number | undefined = heightFromProps;
     let src: StaticImageData | string = srcFromProps?.src || "";
     let alt = altFromProps;
+    let optimizedClassName = imgClassName;
 
     if (resource && typeof resource === "object") {
         const {
             alt: altFromResource,
             height: fullHeight,
             width: fullWidth,
+            objectPositionDesktop,
+            objectPositionMobile,
         } = resource;
 
         width = widthFromProps || fullWidth || undefined;
         height = heightFromProps || fullHeight || undefined;
         alt = altFromProps || altFromResource || "";
+
+        optimizedClassName = cn(
+            imgClassName,
+            objectPositionDesktop ? `lg:object-${objectPositionDesktop}` : "",
+            objectPositionMobile ? `object-${objectPositionMobile}` : "",
+        );
 
         src = resource?.url || srcFromProps?.src || "";
     } else if (typeof resource === "string") {
@@ -63,7 +72,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
         <picture className={cn(pictureClassName)}>
             <OptimizedImage
                 alt={alt || ""}
-                className={cn(imgClassName)}
+                className={optimizedClassName}
                 fill={fill}
                 height={!fill ? height : undefined}
                 placeholder="blur"

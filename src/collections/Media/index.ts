@@ -20,6 +20,40 @@ export const Media: CollectionConfig = {
             },
         },
         {
+            label: "Afbeelding Uitsnij Positie (Desktop)",
+            name: "objectPositionDesktop",
+            type: "select",
+            defaultValue: "top",
+            options: [
+                { label: "Midden", value: "center" },
+                { label: "Boven", value: "top" },
+                { label: "Onder", value: "bottom" },
+                { label: "Links", value: "left" },
+                { label: "Rechts", value: "right" },
+            ],
+            admin: {
+                condition: (_, siblingData) =>
+                    siblingData?.mimeType?.startsWith("image"),
+            },
+        },
+        {
+            label: "Afbeelding Uitsnij Positie (Mobiel)",
+            name: "objectPositionMobile",
+            type: "select",
+            defaultValue: "center",
+            options: [
+                { label: "Midden", value: "center" },
+                { label: "Boven", value: "top" },
+                { label: "Onder", value: "bottom" },
+                { label: "Links", value: "left" },
+                { label: "Rechts", value: "right" },
+            ],
+            admin: {
+                condition: (_, siblingData) =>
+                    siblingData?.mimeType?.startsWith("image"),
+            },
+        },
+        {
             label: "Video Poster",
             name: "poster",
             type: "upload",

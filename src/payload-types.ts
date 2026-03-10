@@ -224,6 +224,8 @@ export interface Media {
    * Belangrijk voor SEO en toegankelijkheid.
    */
   alt: string;
+  objectPositionDesktop?: ('center' | 'top' | 'bottom' | 'left' | 'right') | null;
+  objectPositionMobile?: ('center' | 'top' | 'bottom' | 'left' | 'right') | null;
   /**
    * Wordt gebruikt als fallback en voor performance (LCP). Nodig voor achtergrondvideo's.
    */
@@ -961,6 +963,8 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  objectPositionDesktop?: T;
+  objectPositionMobile?: T;
   poster?: T;
   prefix?: T;
   updatedAt?: T;
