@@ -37,7 +37,7 @@ export const RenderBlocks: React.FC<{
                             return (
                                 <section
                                     className={cn(
-                                        "flex items-center w-full relative h-auto sm:min-h-[720px] xxl:min-h-[1080px] flex-row md:py-12",
+                                        "flex items-center w-full relative h-auto sm:min-h-[720px] xxl:min-h-[1080px] flex-row lg:py-12",
                                         backgroundColor === "backgroundDark" &&
                                             "bg-background text-sl-beige",
                                         backgroundColor === "backgroundLight" &&

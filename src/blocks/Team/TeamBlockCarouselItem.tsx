@@ -6,17 +6,19 @@ import { User } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 
 export const TeamBlockCarouselItem = ({
-    index,
     backgroundColor,
     user,
     showInfo,
-    setShowInfo,
+    onShow,
+    onHide,
+    isTouch,
 }: {
-    index: number;
     backgroundColor: string;
     user: User;
     showInfo: boolean;
-    setShowInfo: (index: number) => void;
+    onShow: () => void;
+    onHide: () => void;
+    isTouch: boolean;
 }) => {
     if (!user) {
         return null;
@@ -26,7 +28,14 @@ export const TeamBlockCarouselItem = ({
         <div className="h-full flex flex-col gap-2 w-full">
             <div
                 className="flex h-[440px] md:h-[600px] w-full max-w-[400px] relative overflow-hidden cursor-pointer"
-                onClick={() => setShowInfo(index)}
+                {...(isTouch
+                    ? {
+                          onClick: (e: React.MouseEvent) => {
+                              e.stopPropagation();
+                              onShow();
+                          },
+                      }
+                    : { onMouseEnter: onShow, onMouseLeave: onHide })}
             >
                 <Media
                     size="(max-width: 768px) 300px, 450px"
@@ -34,7 +43,7 @@ export const TeamBlockCarouselItem = ({
                     htmlElement={null}
                     pictureClassName="h-full relative"
                     imgClassName={cn(
-                        "object-cover object-top h-full aspect-1/2 transform-gpu transition-transform duration-300 hover:scale-105",
+                        "object-cover object-top h-full aspect-1/2 transform-gpu transition-transform duration-300 hover:scale-125",
                         showInfo && "scale-125",
                     )}
                     imgWidth={400}

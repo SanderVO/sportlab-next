@@ -185,7 +185,6 @@ const linkConverter: JSXConverter<SerializedLinkNode> = ({
 
     return (
         <Button
-            classes="mr-4"
             url={href}
             newTab={newTab}
             variant={variant as Variant}

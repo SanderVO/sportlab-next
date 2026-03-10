@@ -12,7 +12,7 @@ export function HeaderNav({ navItems }: { navItems: Header["navItems"] }) {
     );
 
     return (
-        <nav className="flex-row justify-between items-center gap-8 hidden md:flex">
+        <nav className="flex-row justify-between items-center gap-8 hidden lg:flex">
             {visibleItems?.map(({ link }, index: number) => (
                 <CMSLink
                     key={index}

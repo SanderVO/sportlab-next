@@ -26,30 +26,24 @@ export const TeamBlockCarousel: React.FC<Props> = ({
     });
 
     const [showInfo, setShowInfo] = useState<{ [key: number]: boolean }>({});
+    const [isTouch, setIsTouch] = useState(false);
 
-    const toggleShowInfo = (index: number) => {
-        const newState = { ...showInfo };
-
-        Object.keys(newState).forEach((key) => {
-            newState[Number(key)] = false;
-        });
-
-        newState[index] = showInfo[index] ? !showInfo[index] : true;
-
-        setShowInfo(newState);
-    };
+    const showForIndex = (index: number) => setShowInfo({ [index]: true });
+    const hideInfo = () => setShowInfo({});
+    const toggleForIndex = (index: number) =>
+        setShowInfo((prev) => ({ [index]: !prev[index] }));
 
     useEffect(() => {
-        const handleClickOutside = () => {
-            setShowInfo({});
-        };
+        if (!isTouch) return;
 
+        const handleClickOutside = () => setShowInfo({});
         document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    }, [isTouch]);
 
-        return () => {
-            document.removeEventListener("click", handleClickOutside);
-        };
-    });
+    useEffect(() => {
+        setIsTouch(window.matchMedia("(hover: none)").matches);
+    }, []);
 
     const teamItemContent = () => (
         <>
@@ -63,9 +57,14 @@ export const TeamBlockCarousel: React.FC<Props> = ({
                         )}
                     >
                         <TeamBlockCarouselItem
-                            index={index}
                             showInfo={showInfo[index]}
-                            setShowInfo={() => toggleShowInfo(index)}
+                            onShow={
+                                isTouch
+                                    ? () => toggleForIndex(index)
+                                    : () => showForIndex(index)
+                            }
+                            onHide={isTouch ? () => {} : hideInfo}
+                            isTouch={isTouch}
                             backgroundColor={backgroundColor}
                             user={user}
                         />

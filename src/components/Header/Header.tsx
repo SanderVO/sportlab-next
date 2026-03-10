@@ -25,7 +25,7 @@ export async function Header() {
                         priority
                         htmlElement={null}
                         size="(max-width: 768px) 175px, 200px"
-                        pictureClassName="h-8 w-[150px] sm:h-10 sm:w-[200px] relative"
+                        pictureClassName="h-8 w-[150px] lg:h-10 lg:w-[200px] relative"
                         imgClassName="h-full"
                         imgWidth={200}
                         imgHeight={50}
@@ -35,12 +35,12 @@ export async function Header() {
                 <HeaderNav navItems={navItems} />
 
                 {whatsappData?.phoneNumber && (
-                    <div className="hidden md:block">
+                    <div className="hidden lg:block">
                         <WhatsappButton {...whatsappData} />
                     </div>
                 )}
 
-                <div className="flex flex-row items-center gap-4 md:hidden">
+                <div className="flex flex-row items-center gap-4 lg:hidden">
                     {whatsappData?.phoneNumber && (
                         <WhatsappButton {...whatsappData} />
                     )}
