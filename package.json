@@ -20,7 +20,7 @@
         "migrate:fresh": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:fresh",
         "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
         "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-        "preview": "cross-env NODE_OPTIONS=--no-deprecation CLOUDFLARE_ENV=preview opennextjs-cloudflare build && opennextjs-cloudflare preview --env=preview",
+        "preview": "pnpm run deploy:database:preview && cross-env NODE_OPTIONS=--no-deprecation CLOUDFLARE_ENV=preview opennextjs-cloudflare build && opennextjs-cloudflare preview --env=preview",
         "deploy": "pnpm run deploy:database:production && pnpm run deploy:build && pnpm run deploy:app",
         "deploy:version": "pnpm run deploy:database:production && pnpm run deploy:build && pnpm run deploy:upload",
         "deploy:build": "CLOUDFLARE_ENV=production opennextjs-cloudflare build --env=production",

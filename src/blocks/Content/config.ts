@@ -103,8 +103,14 @@ export const Content: Block = {
             label: "Kolommen",
             name: "columns",
             type: "array",
+            labels: {
+                singular: "Kolom",
+                plural: "Kolommen",
+            },
             admin: {
                 initCollapsed: true,
+                description:
+                    "Voeg kolommen toe en configureer de inhoud voor elke kolom.",
             },
             fields: columnFields,
         },

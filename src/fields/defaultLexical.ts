@@ -1,4 +1,5 @@
 import { ColumnsBlock } from "@/blocks/Columns/config";
+import { FAQBlock } from "@/blocks/FAQ/config";
 import { FormBlock } from "@/blocks/Form/config";
 import { ServiceCardBlock } from "@/blocks/ServiceCard/config";
 import { VirtuagymRosterBlock } from "@/blocks/VirtuagymRoster/config";
@@ -14,6 +15,7 @@ export const defaultLexical = lexicalEditor({
                 FormBlock,
                 VirtuagymRosterBlock,
                 ServiceCardBlock,
+                FAQBlock,
             ],
         }),
     ],

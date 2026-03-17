@@ -1,9 +1,11 @@
+import { FAQBlock } from "@/blocks/FAQ/FAQBlock";
 import { FormBlock } from "@/blocks/Form/FormBlock";
 import { ServiceCardBlock } from "@/blocks/ServiceCard/ServiceCardBlock";
 import { VirtuagymRosterBlock } from "@/blocks/VirtuagymRoster/VirtuagymRoster";
 import { Size, Variant } from "@/lib/ui/variants";
 import {
     ColumnsBlock,
+    FAQBlock as FAQBlockType,
     ServiceCardBlock as ServiceCardBlockType,
 } from "@/payload-types";
 import { textState } from "@/utilities/textState";
@@ -257,6 +259,9 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
             node: SerializedBlockNode<ServiceCardBlockType>;
         }) => {
             return <ServiceCardBlock {...node.fields} />;
+        },
+        faqBlock: ({ node }: { node: SerializedBlockNode<FAQBlockType> }) => {
+            return <FAQBlock {...node.fields} />;
         },
     },
 });
