@@ -92,6 +92,29 @@ export const Organization: GlobalConfig = {
             ],
         },
         {
+            label: "Coördinaten",
+            name: "geo",
+            type: "group",
+            fields: [
+                {
+                    label: "Breedtegraad (latitude)",
+                    name: "latitude",
+                    type: "number",
+                    admin: {
+                        description: "Bijvoorbeeld: 52.3676",
+                    },
+                },
+                {
+                    label: "Lengtegraad (longitude)",
+                    name: "longitude",
+                    type: "number",
+                    admin: {
+                        description: "Bijvoorbeeld: 4.9041",
+                    },
+                },
+            ],
+        },
+        {
             label: "Social media",
             name: "sameAs",
             type: "array",

@@ -1934,6 +1934,8 @@ export const organization = sqliteTable(
     address_addressLocality: text("address_address_locality"),
     address_postalCode: text("address_postal_code"),
     address_addressCountry: text("address_address_country").default("NL"),
+    geo_latitude: numeric("geo_latitude", { mode: "number" }),
+    geo_longitude: numeric("geo_longitude", { mode: "number" }),
     updatedAt: text("updated_at").default(
       sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
     ),

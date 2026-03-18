@@ -96,7 +96,7 @@ export default async function RootLayout({
                 >
                     {JSON.stringify({
                         "@context": "https://schema.org",
-                        "@type": "Organization",
+                        "@type": ["LocalBusiness", "ExerciseGym"],
                         name: organization.name,
                         url: organization.url,
                         ...(organization.logo &&
@@ -110,15 +110,16 @@ export default async function RootLayout({
                             description: organization.description,
                         }),
                         ...(organization.contactPoint?.telephone && {
-                            contactPoint: {
-                                "@type": "ContactPoint",
-                                telephone: organization.contactPoint.telephone,
-                                ...(organization.contactPoint.contactType && {
-                                    contactType:
-                                        organization.contactPoint.contactType,
-                                }),
-                            },
+                            telephone: organization.contactPoint.telephone,
                         }),
+                        ...(organization.geo?.latitude != null &&
+                            organization.geo?.longitude != null && {
+                                geo: {
+                                    "@type": "GeoCoordinates",
+                                    latitude: organization.geo.latitude,
+                                    longitude: organization.geo.longitude,
+                                },
+                            }),
                         ...(organization.address?.streetAddress && {
                             address: {
                                 "@type": "PostalAddress",

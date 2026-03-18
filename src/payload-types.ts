@@ -328,6 +328,9 @@ export interface Page {
  */
 export interface ContentBlock {
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
+  /**
+   * Voeg kolommen toe en configureer de inhoud voor elke kolom.
+   */
   columns?:
     | {
         contentPosition: 'contentOnly' | 'contentBottom' | 'contentRight' | 'contentLeft';
@@ -1577,6 +1580,16 @@ export interface Organization {
      */
     addressCountry?: string | null;
   };
+  geo?: {
+    /**
+     * Bijvoorbeeld: 52.3676
+     */
+    latitude?: number | null;
+    /**
+     * Bijvoorbeeld: 4.9041
+     */
+    longitude?: number | null;
+  };
   /**
    * Voeg links toe naar social media profielen (Facebook, Instagram, LinkedIn, etc.)
    */
@@ -1701,6 +1714,12 @@ export interface OrganizationSelect<T extends boolean = true> {
         addressLocality?: T;
         postalCode?: T;
         addressCountry?: T;
+      };
+  geo?:
+    | T
+    | {
+        latitude?: T;
+        longitude?: T;
       };
   sameAs?:
     | T
