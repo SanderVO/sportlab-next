@@ -72,6 +72,7 @@ export const users = sqliteTable(
     status: text("status", { enum: ["active", "inactive"] })
       .notNull()
       .default("active"),
+    isCoach: integer("is_coach", { mode: "boolean" }).default(false),
     avatar: integer("avatar_id").references(() => media.id, {
       onDelete: "set null",
     }),
