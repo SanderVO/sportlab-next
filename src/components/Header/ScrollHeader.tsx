@@ -17,7 +17,7 @@ export function ScrollHeader({ children }: { children: React.ReactNode }) {
             if (el && el.offsetHeight > 0) {
                 const height = el.getBoundingClientRect().height;
                 adminBarHeightRef.current = height;
-                setTop(height);
+                setTop(Math.max(0, height - window.scrollY));
             } else {
                 adminBarHeightRef.current = 0;
                 setTop(0);

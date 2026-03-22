@@ -163,6 +163,7 @@ export interface User {
   slug?: string | null;
   status: 'active' | 'inactive';
   roles: ('admin' | 'editor' | 'user' | 'coach')[];
+  isCoach?: boolean | null;
   avatar?: (number | null) | Media;
   /**
    * Rol van het lid bij sportlab in 1 zin
@@ -943,6 +944,7 @@ export interface UsersSelect<T extends boolean = true> {
   slug?: T;
   status?: T;
   roles?: T;
+  isCoach?: T;
   avatar?: T;
   subtitle?: T;
   about?: T;

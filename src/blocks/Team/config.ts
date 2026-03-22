@@ -81,11 +81,11 @@ export const Team: Block = {
                     "Optioneel: kies specifieke coaches om te tonen. Laat leeg om automatisch alle coaches te tonen.",
             },
             filterOptions: {
+                isCoach: {
+                    equals: true,
+                },
                 status: {
                     equals: "active",
-                },
-                roles: {
-                    contains: "coach",
                 },
             },
         },

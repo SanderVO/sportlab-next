@@ -38,6 +38,16 @@ export const Users: CollectionConfig = {
                 return data;
             },
         ],
+        beforeChange: [
+            ({ data }) => {
+                if (data?.roles !== undefined) {
+                    data.isCoach = Array.isArray(data.roles)
+                        ? data.roles.includes(RolesEnum.COACH)
+                        : false;
+                }
+                return data;
+            },
+        ],
     },
     admin: {
         defaultColumns: ["avatar", "name", "email"],
@@ -51,7 +61,7 @@ export const Users: CollectionConfig = {
         create: authenticated,
         delete: authenticated,
         // Read access is open - sensitive data like email/hash is protected by field-level access
-        // Components should filter for coaches where needed using where: { roles: { contains: 'coach' } }
+        // Components should filter for coaches where needed using where: { isCoach: { equals: true } }
         read: () => true,
         update: authenticated,
     },
@@ -113,6 +123,14 @@ export const Users: CollectionConfig = {
                 { label: "Lid", value: RolesEnum.USER },
                 { label: "Coach", value: RolesEnum.COACH },
             ],
+        },
+        {
+            name: "isCoach",
+            type: "checkbox",
+            defaultValue: false,
+            admin: {
+                hidden: true,
+            },
         },
         {
             label: "Foto",
