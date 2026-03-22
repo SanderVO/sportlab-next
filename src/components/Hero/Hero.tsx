@@ -8,7 +8,7 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
     const isCentered = contentPosition === "center";
 
     return (
-        <section className="flex flex-col lg:flex-row w-full relative h-auto xxl:h-[1080px] justify-end min-h-[calc(100svh-200px)] lg:min-h-[720px]">
+        <section className="flex flex-col lg:flex-row w-full relative h-auto xxl:h-[1080px] justify-end min-h-[calc(100svh-150px)] lg:min-h-180">
             <Media
                 fill
                 resource={media}
@@ -22,7 +22,7 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
             <div className="absolute inset-0 bg-black/65 z-10" />
 
             <div
-                className={`container mx-auto z-20 flex items-center h-full self-end overflow-hidden pt-20 lg:pt-24 ${
+                className={`container mx-auto z-20 flex items-center h-full self-end overflow-hidden pt-24 ${
                     isCentered ? "justify-center" : "justify-start"
                 }`}
             >

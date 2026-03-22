@@ -95,7 +95,7 @@ export default async function Coach({ params: paramsPromise }: Args) {
 
             {draft && <LivePreviewListener />}
 
-            <section className="flex items-center w-full relative h-auto sm:min-h-[720px] xxl:min-h-[1080px] flex-col md:flex-row md:py-12">
+            <section className="flex items-center w-full relative h-auto sm:min-h-180 xxl:min-h-[1080px] flex-col md:flex-row md:py-12">
                 {user.avatar && (
                     <Media
                         resource={user.avatar}

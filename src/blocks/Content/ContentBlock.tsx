@@ -31,9 +31,9 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                     htmlElement={null}
                                     pictureClassName={cn(
                                         imageSize === "imageTopCut" &&
-                                            "absolute left-0 bottom-0 w-[480px] hidden lg:block h-9/10",
+                                            "absolute left-0 -bottom-12 w-[480px] hidden lg:block h-full",
                                         imageSize === "imageFull" &&
-                                            "absolute left-0 bottom-0 w-[480px] hidden lg:block h-full",
+                                            "absolute inset-y-0 left-0 w-[480px] hidden lg:block",
                                         imageSize === "imageCenter" &&
                                             "h-[300px] lg:h-auto lg:min-h-[600px] w-full lg:w-[400px] relative shrink-0 hidden lg:block",
                                     )}
@@ -87,9 +87,9 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                     size="(max-width: 768px) 400px, 480px"
                                     pictureClassName={cn(
                                         imageSize === "imageTopCut" &&
-                                            "absolute right-0 bottom-0 w-[480px] hidden lg:block h-9/10",
+                                            "absolute right-0 -bottom-12 w-[480px] hidden lg:block h-full",
                                         imageSize === "imageFull" &&
-                                            "absolute right-0 bottom-0 w-[480px] hidden lg:block h-full",
+                                            "absolute inset-y-0 right-0 w-[480px] hidden lg:block",
                                         imageSize === "imageCenter" &&
                                             "h-[300px] lg:h-auto lg:min-h-[600px] w-full lg:w-[400px] relative shrink-0 hidden lg:block",
                                     )}
