@@ -4,8 +4,9 @@ import { Header } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import { MenuIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CMSLink } from "../ui/Link";
+import { useHeaderState } from "./HeaderContext";
 
 interface Props {
     navItems: Header["navItems"];
@@ -13,13 +14,19 @@ interface Props {
 
 const HamburgerMenuContent = ({ navItems }: Props) => {
     const [isOpen, setIsOpen] = useState(false);
+    const { setMobileMenuOpen } = useHeaderState();
+
+    useEffect(() => {
+        setMobileMenuOpen(isOpen);
+        return () => setMobileMenuOpen(false);
+    }, [isOpen, setMobileMenuOpen]);
 
     return (
         <>
             <MenuIcon className="text-3xl" onClick={() => setIsOpen(!isOpen)} />
             <div
                 className={cn(
-                    "absolute top-16 right-0 w-full h-screen bg-background z-50 p-4 transition-opacity",
+                    "absolute top-16 right-0 w-full h-screen bg-background z-50 p-4 transition-opacity duration-300",
                     isOpen ? "opacity-100" : "opacity-0 pointer-events-none",
                 )}
             >

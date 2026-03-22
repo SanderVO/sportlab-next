@@ -51,6 +51,18 @@ const fields: Field[] = [
         label: "Prijs",
         required: true,
     },
+    {
+        name: "priceAlignment",
+        type: "select",
+        label: "Uitlijning prijssectie",
+        options: [
+            { label: "Links", value: "left" },
+            { label: "Midden", value: "center" },
+            { label: "Rechts", value: "right" },
+        ],
+        defaultValue: "left",
+        required: true,
+    },
     link(),
 ];
 
@@ -62,6 +74,18 @@ export const ServiceCardBlock: Block = {
         plural: "Service Blokken",
     },
     fields: [
+        {
+            name: "arrowBackgroundColor",
+            type: "select",
+            label: "Achtergrondkleur pijlen",
+            options: [
+                { label: "Wit", value: "white" },
+                { label: "Beige", value: "beige" },
+                { label: "Zwart", value: "black" },
+            ],
+            defaultValue: "black",
+            required: true,
+        },
         {
             name: "columns",
             type: "array",

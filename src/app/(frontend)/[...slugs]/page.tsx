@@ -1,4 +1,5 @@
 import { RenderBlocks } from "@/blocks/RenderBlocks";
+import { SetHeroMode } from "@/components/Header/SetHeroMode";
 import { Hero } from "@/components/Hero/Hero";
 import { LivePreviewListener } from "@/components/LivePreviewListener";
 import { PayloadRedirects } from "@/components/PayloadRedirects";
@@ -127,6 +128,7 @@ export default async function Page({ params }: Args) {
 
             {draft && <LivePreviewListener />}
 
+            {hasHero && <SetHeroMode />}
             {hasHero && <Hero {...hero} />}
 
             <RenderBlocks blocks={layout} />

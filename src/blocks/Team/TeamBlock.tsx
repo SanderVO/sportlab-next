@@ -7,24 +7,53 @@ import React from "react";
 import { TeamBlockCarousel } from "./TeamBlockCarousel";
 
 export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
-    const { title, type, limit, backgroundColor, sortBy } = props;
+    const { title, type, limit, backgroundColor, sortBy, selectedCoaches } =
+        props;
+
+    const selectedCoachIds =
+        selectedCoaches
+            ?.map((coach) => (typeof coach === "number" ? coach : coach?.id))
+            .filter((id): id is number => typeof id === "number") ?? [];
+
+    const hasSelectedCoaches = selectedCoachIds.length > 0;
 
     const payload = await getPayload({ config: configPromise });
 
     const { docs: users } = await payload.find({
         collection: "users",
         page: 0,
-        limit: type === "carousel" ? (limit ?? 0) : 0,
+        limit: hasSelectedCoaches ? 0 : type === "carousel" ? (limit ?? 0) : 0,
         sort: sortBy,
         where: {
-            status: {
-                equals: "active",
-            },
-            roles: {
-                contains: RolesEnum.COACH,
-            },
+            and: [
+                {
+                    status: {
+                        equals: "active",
+                    },
+                },
+                {
+                    roles: {
+                        contains: RolesEnum.COACH,
+                    },
+                },
+                ...(hasSelectedCoaches
+                    ? [
+                          {
+                              id: {
+                                  in: selectedCoachIds,
+                              },
+                          },
+                      ]
+                    : []),
+            ],
         },
     });
+
+    const orderedUsers = hasSelectedCoaches
+        ? selectedCoachIds
+              .map((id) => users.find((user) => user.id === id))
+              .filter((user): user is (typeof users)[number] => Boolean(user))
+        : users;
 
     return (
         <div className="container mx-auto">
@@ -51,7 +80,7 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
                     <TeamBlockCarousel
                         backgroundColor={props.backgroundColor}
                         type={props.type}
-                        users={users}
+                        users={orderedUsers}
                     />
                 </div>
             </div>

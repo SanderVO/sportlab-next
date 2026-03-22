@@ -5,6 +5,7 @@ import Link from "next/link";
 import { WhatsappButton } from "../WhatsApp/WhatsappButton";
 import HamburgerMenu from "./HamburgerMenu";
 import { HeaderNav } from "./HeaderNav";
+import { ScrollHeader } from "./ScrollHeader";
 
 export async function Header() {
     const headerData: Header = (await getCachedGlobal("header", 1)()) as Header;
@@ -17,7 +18,7 @@ export async function Header() {
     const navItems = headerData?.navItems || [];
 
     return (
-        <header className="sticky top-0 z-30 w-full bg-background text-white py-6 shadow-neutral-900 transition-colors">
+        <ScrollHeader>
             <div className="container mx-auto flex flex-row justify-between items-center relative">
                 <Link href="/" className="flex items-center shrink-0">
                     <Media
@@ -48,6 +49,6 @@ export async function Header() {
                     <HamburgerMenu navItems={headerData.navItems} />
                 </div>
             </div>
-        </header>
+        </ScrollHeader>
     );
 }

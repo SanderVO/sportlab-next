@@ -9,11 +9,18 @@ export const uiVariants = {
 
     variants: {
         beige: "bg-sl-beige hover:bg-sl-beige-dark text-background",
+        beigeBorder:
+            "border border-sl-beige bg-transparent text-sl-beige hover:bg-sl-beige hover:text-background",
         black: "bg-background hover:bg-background/90 text-white",
+        blackBorder:
+            "border border-background bg-transparent text-background hover:bg-background hover:text-white",
         orange: "bg-sl-orange hover:bg-sl-orange-dark text-white",
+        orangeBorder:
+            "border border-sl-orange bg-transparent text-sl-orange hover:bg-sl-orange hover:text-white",
         nav: "transition-colors uppercase font-semibold text-neutral-400 hover:text-white justify-center !px-0",
         footer: "text-neutral-400 hover:text-white",
         inline: "underline underline-offset-2 font-semibold !p-0",
+        service: "font-semibold !h-auto",
     },
 
     sizes: {

@@ -35,6 +35,47 @@ import { Button } from "../ui/Button";
 
 type NodeTypes = DefaultNodeTypes;
 
+type RichTextLinkFields = LinkFields & {
+    buttonSpacing?: "none" | "sm" | "md" | "lg";
+};
+
+const buttonSpacingClasses: Record<
+    NonNullable<RichTextLinkFields["buttonSpacing"]>,
+    string
+> = {
+    none: "",
+    sm: "mr-2",
+    md: "mr-4",
+    lg: "mr-6",
+};
+
+const headingSizeClasses = {
+    h1: {
+        sm: "text-4xl md:text-6xl",
+        md: "text-5xl md:text-7xl",
+        lg: "text-6xl md:text-8xl",
+        xl: "text-7xl md:text-9xl",
+    },
+    h2: {
+        sm: "text-3xl md:text-5xl",
+        md: "text-4xl md:text-6xl",
+        lg: "text-5xl md:text-7xl",
+        xl: "text-6xl md:text-8xl",
+    },
+    h3: {
+        sm: "text-2xl md:text-4xl",
+        md: "text-3xl md:text-5xl",
+        lg: "text-4xl md:text-6xl",
+        xl: "text-5xl md:text-7xl",
+    },
+    h4: {
+        sm: "text-xl md:text-3xl",
+        md: "text-2xl md:text-4xl",
+        lg: "text-3xl md:text-5xl",
+        xl: "text-4xl md:text-6xl",
+    },
+};
+
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
     const { value, relationTo } = linkNode.fields.doc!;
     if (typeof value !== "object") {
@@ -97,14 +138,58 @@ const textConverter: JSXConverter<SerializedTextNode> = ({
     return <span style={styles}>{content}</span>;
 };
 
+const applyTextFormat = (
+    node: SerializedTextNode,
+    content: React.ReactNode,
+) => {
+    if (!node.format) {
+        return content;
+    }
+
+    let formattedContent = content;
+
+    if (node.format & 1) {
+        formattedContent = <strong>{formattedContent}</strong>;
+    }
+
+    if (node.format & 2) {
+        formattedContent = <em>{formattedContent}</em>;
+    }
+
+    if (node.format & 8) {
+        formattedContent = <u>{formattedContent}</u>;
+    }
+
+    return formattedContent;
+};
+
 const headingConverter: JSXConverter<SerializedHeadingNode> = ({
     node,
 }: {
     node: SerializedHeadingNode;
 }) => {
+    const headingSize = node.children.find((child) => child?.$?.headingSize)?.$
+        ?.headingSize as "sm" | "md" | "lg" | "xl" | undefined;
+
     const content = node.children.map(
         (child: SerializedLexicalNodeWithParent, index: number) => {
-            const text = (child && "text" in child ? child.text : "") as string;
+            const textNode = (
+                child && "text" in child
+                    ? child
+                    : {
+                          text: "",
+                          type: "text",
+                          version: 1,
+                      }
+            ) as SerializedTextNode;
+
+            const text = textNode.text as string;
+
+            const headingFont = child?.$?.fontFamily as
+                | "montserrat"
+                | "openSans"
+                | "bebas"
+                | undefined;
 
             let colorClass = "text-white";
 
@@ -127,8 +212,14 @@ const headingConverter: JSXConverter<SerializedHeadingNode> = ({
                 <span
                     key={"child-" + index}
                     className={cn(colorClass, "block")}
+                    style={
+                        headingFont
+                            ? (textState.fontFamily[headingFont]
+                                  ?.css as React.CSSProperties)
+                            : undefined
+                    }
                 >
-                    {text}
+                    {applyTextFormat(textNode, text)}
                 </span>
             );
         },
@@ -137,25 +228,45 @@ const headingConverter: JSXConverter<SerializedHeadingNode> = ({
     switch (node.tag) {
         case "h1":
             return (
-                <h1 className={cn("font-sl-bebas text-5xl md:text-7xl")}>
+                <h1
+                    className={cn(
+                        "font-sl-bebas",
+                        headingSizeClasses.h1[headingSize ?? "md"],
+                    )}
+                >
                     {content}
                 </h1>
             );
         case "h2":
             return (
-                <h2 className={cn("font-sl-bebas text-4xl md:text-6xl")}>
+                <h2
+                    className={cn(
+                        "font-sl-bebas",
+                        headingSizeClasses.h2[headingSize ?? "md"],
+                    )}
+                >
                     {content}
                 </h2>
             );
         case "h3":
             return (
-                <h3 className={cn("font-sl-bebas text-3xl md:text-5xl")}>
+                <h3
+                    className={cn(
+                        "font-sl-bebas",
+                        headingSizeClasses.h3[headingSize ?? "md"],
+                    )}
+                >
                     {content}
                 </h3>
             );
         case "h4":
             return (
-                <h4 className={cn("font-sl-bebas text-2xl md:text-4xl")}>
+                <h4
+                    className={cn(
+                        "font-sl-bebas",
+                        headingSizeClasses.h4[headingSize ?? "md"],
+                    )}
+                >
                     {content}
                 </h4>
             );
@@ -166,13 +277,11 @@ const headingConverter: JSXConverter<SerializedHeadingNode> = ({
 
 const linkConverter: JSXConverter<SerializedLinkNode> = ({
     node,
-}: {
-    node: SerializedLinkNode;
+    nodesToJSX,
 }) => {
-    const { doc, linkType, newTab, url, variant, size } =
-        node.fields as LinkFields;
-
-    const label = (node.children[0] as SerializedTextNode)?.text || "";
+    const { doc, linkType, newTab, url, variant, size, buttonSpacing } =
+        node.fields as RichTextLinkFields;
+    const label = nodesToJSX({ nodes: node.children });
 
     const href =
         linkType === "internal" &&
@@ -191,8 +300,13 @@ const linkConverter: JSXConverter<SerializedLinkNode> = ({
             newTab={newTab}
             variant={variant as Variant}
             size={size as Size}
+            classes={
+                variant !== "inline"
+                    ? buttonSpacingClasses[buttonSpacing ?? "md"]
+                    : undefined
+            }
         >
-            {label as string}
+            {label}
         </Button>
     );
 };

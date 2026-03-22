@@ -302,6 +302,9 @@ export const pages_blocks_team = sqliteTable(
     link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
+    link_labelColor: text("link_label_color", {
+      enum: ["default", "beige", "orange", "neutral", "white"],
+    }).default("default"),
     blockName: text("block_name"),
   },
   (columns) => [
@@ -333,6 +336,9 @@ export const pages_blocks_instagram_images = sqliteTable(
     link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
+    link_labelColor: text("link_label_color", {
+      enum: ["default", "beige", "orange", "neutral", "white"],
+    }).default("default"),
   },
   (columns) => [
     index("pages_blocks_instagram_images_order_idx").on(columns._order),
@@ -405,6 +411,9 @@ export const pages = sqliteTable(
       onDelete: "set null",
     }),
     hero_text: text("hero_text", { mode: "json" }),
+    hero_contentPosition: text("hero_content_position", {
+      enum: ["left", "center"],
+    }).default("left"),
     meta_title: text("meta_title"),
     meta_image: integer("meta_image_id").references(() => media.id, {
       onDelete: "set null",
@@ -441,21 +450,26 @@ export const pages_rels = sqliteTable(
     order: integer("order"),
     parent: integer("parent_id").notNull(),
     path: text("path").notNull(),
+    usersID: integer("users_id"),
     pagesID: integer("pages_id"),
     postsID: integer("posts_id"),
-    usersID: integer("users_id"),
   },
   (columns) => [
     index("pages_rels_order_idx").on(columns.order),
     index("pages_rels_parent_idx").on(columns.parent),
     index("pages_rels_path_idx").on(columns.path),
+    index("pages_rels_users_id_idx").on(columns.usersID),
     index("pages_rels_pages_id_idx").on(columns.pagesID),
     index("pages_rels_posts_id_idx").on(columns.postsID),
-    index("pages_rels_users_id_idx").on(columns.usersID),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [pages.id],
       name: "pages_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "pages_rels_users_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["pagesID"]],
@@ -466,11 +480,6 @@ export const pages_rels = sqliteTable(
       columns: [columns["postsID"]],
       foreignColumns: [posts.id],
       name: "pages_rels_posts_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [columns["usersID"]],
-      foreignColumns: [users.id],
-      name: "pages_rels_users_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -615,6 +624,9 @@ export const _pages_v_blocks_team = sqliteTable(
     link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
+    link_labelColor: text("link_label_color", {
+      enum: ["default", "beige", "orange", "neutral", "white"],
+    }).default("default"),
     _uuid: text("_uuid"),
     blockName: text("block_name"),
   },
@@ -647,6 +659,9 @@ export const _pages_v_blocks_instagram_images = sqliteTable(
     link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
+    link_labelColor: text("link_label_color", {
+      enum: ["default", "beige", "orange", "neutral", "white"],
+    }).default("default"),
     _uuid: text("_uuid"),
   },
   (columns) => [
@@ -734,6 +749,9 @@ export const _pages_v = sqliteTable(
       },
     ),
     version_hero_text: text("version_hero_text", { mode: "json" }),
+    version_hero_contentPosition: text("version_hero_content_position", {
+      enum: ["left", "center"],
+    }).default("left"),
     version_meta_title: text("version_meta_title"),
     version_meta_image: integer("version_meta_image_id").references(
       () => media.id,
@@ -798,21 +816,26 @@ export const _pages_v_rels = sqliteTable(
     order: integer("order"),
     parent: integer("parent_id").notNull(),
     path: text("path").notNull(),
+    usersID: integer("users_id"),
     pagesID: integer("pages_id"),
     postsID: integer("posts_id"),
-    usersID: integer("users_id"),
   },
   (columns) => [
     index("_pages_v_rels_order_idx").on(columns.order),
     index("_pages_v_rels_parent_idx").on(columns.parent),
     index("_pages_v_rels_path_idx").on(columns.path),
+    index("_pages_v_rels_users_id_idx").on(columns.usersID),
     index("_pages_v_rels_pages_id_idx").on(columns.pagesID),
     index("_pages_v_rels_posts_id_idx").on(columns.postsID),
-    index("_pages_v_rels_users_id_idx").on(columns.usersID),
     foreignKey({
       columns: [columns["parent"]],
       foreignColumns: [_pages_v.id],
       name: "_pages_v_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "_pages_v_rels_users_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["pagesID"]],
@@ -823,11 +846,6 @@ export const _pages_v_rels = sqliteTable(
       columns: [columns["postsID"]],
       foreignColumns: [posts.id],
       name: "_pages_v_rels_posts_fk",
-    }).onDelete("cascade"),
-    foreignKey({
-      columns: [columns["usersID"]],
-      foreignColumns: [users.id],
-      name: "_pages_v_rels_users_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -1677,6 +1695,9 @@ export const header_nav_items = sqliteTable(
     link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
+    link_labelColor: text("link_label_color", {
+      enum: ["default", "beige", "orange", "neutral", "white"],
+    }).default("default"),
   },
   (columns) => [
     index("header_nav_items_order_idx").on(columns._order),
@@ -1784,6 +1805,9 @@ export const footer_footer_columns_links = sqliteTable(
     link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
+    link_labelColor: text("link_label_color", {
+      enum: ["default", "beige", "orange", "neutral", "white"],
+    }).default("default"),
   },
   (columns) => [
     index("footer_footer_columns_links_order_idx").on(columns._order),
@@ -1803,6 +1827,10 @@ export const footer_footer_columns = sqliteTable(
     _parentID: integer("_parent_id").notNull(),
     id: text("id").primaryKey(),
     columnTitle: text("column_title").notNull(),
+    contentType: text("content_type", { enum: ["links", "richText"] })
+      .notNull()
+      .default("links"),
+    richText: text("rich_text", { mode: "json" }),
   },
   (columns) => [
     index("footer_footer_columns_order_idx").on(columns._order),
@@ -1828,6 +1856,9 @@ export const footer = sqliteTable(
     link_addLabel: integer("link_add_label", { mode: "boolean" }),
     link_url: text("link_url"),
     link_label: text("link_label"),
+    link_labelColor: text("link_label_color", {
+      enum: ["default", "beige", "orange", "neutral", "white"],
+    }).default("default"),
     footerLogo: integer("footer_logo_id")
       .notNull()
       .references(() => media.id, {
@@ -2094,6 +2125,11 @@ export const relations_pages_rels = relations(pages_rels, ({ one }) => ({
     references: [pages.id],
     relationName: "_rels",
   }),
+  usersID: one(users, {
+    fields: [pages_rels.usersID],
+    references: [users.id],
+    relationName: "users",
+  }),
   pagesID: one(pages, {
     fields: [pages_rels.pagesID],
     references: [pages.id],
@@ -2103,11 +2139,6 @@ export const relations_pages_rels = relations(pages_rels, ({ one }) => ({
     fields: [pages_rels.postsID],
     references: [posts.id],
     relationName: "posts",
-  }),
-  usersID: one(users, {
-    fields: [pages_rels.usersID],
-    references: [users.id],
-    relationName: "users",
   }),
 }));
 export const relations_pages = relations(pages, ({ one, many }) => ({
@@ -2255,6 +2286,11 @@ export const relations__pages_v_rels = relations(_pages_v_rels, ({ one }) => ({
     references: [_pages_v.id],
     relationName: "_rels",
   }),
+  usersID: one(users, {
+    fields: [_pages_v_rels.usersID],
+    references: [users.id],
+    relationName: "users",
+  }),
   pagesID: one(pages, {
     fields: [_pages_v_rels.pagesID],
     references: [pages.id],
@@ -2264,11 +2300,6 @@ export const relations__pages_v_rels = relations(_pages_v_rels, ({ one }) => ({
     fields: [_pages_v_rels.postsID],
     references: [posts.id],
     relationName: "posts",
-  }),
-  usersID: one(users, {
-    fields: [_pages_v_rels.usersID],
-    references: [users.id],
-    relationName: "users",
   }),
 }));
 export const relations__pages_v = relations(_pages_v, ({ one, many }) => ({

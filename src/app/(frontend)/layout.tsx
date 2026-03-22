@@ -2,6 +2,8 @@ import { AdminBar } from "@/components/AdminBar";
 import CookieBanner from "@/components/CookieBanner/CookieBanner";
 import { Footer } from "@/components/Footer/Footer";
 import { Header } from "@/components/Header/Header";
+import { HeaderStateProvider } from "@/components/Header/HeaderContext";
+import { MainWrapper } from "@/components/MainWrapper";
 import { Organization } from "@/payload-types";
 import { getCachedGlobal } from "@/utilities/getGlobals";
 import { GoogleTagManager } from "@next/third-parties/google";
@@ -58,22 +60,23 @@ export default async function RootLayout({
             </head>
 
             <body>
-                <AdminBar
-                    adminBarProps={{
-                        preview: isEnabled,
-                    }}
-                />
+                <HeaderStateProvider>
+                    <AdminBar
+                        adminBarProps={{
+                            preview: isEnabled,
+                        }}
+                    />
 
-                <Header />
+                    <Header />
 
-                <main>{children}</main>
+                    <MainWrapper>{children}</MainWrapper>
 
-                <Footer />
+                    <Footer />
 
-                <CookieBanner />
+                    <CookieBanner />
 
-                <Script id="google-consent" strategy="beforeInteractive">
-                    {`
+                    <Script id="google-consent" strategy="beforeInteractive">
+                        {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
 
@@ -85,7 +88,8 @@ export default async function RootLayout({
                 wait_for_update: 500
                 });
             `}
-                </Script>
+                    </Script>
+                </HeaderStateProvider>
 
                 {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
 

@@ -6,12 +6,13 @@ import { CMSLink } from "@/components/ui/Link";
 import type { ServiceCardBlock as ServiceCardBlockProps } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import useEmblaCarousel from "embla-carousel-react";
+import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import React from "react";
 
 export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
-    const { columns } = props;
+    const { columns, arrowBackgroundColor } = props;
 
-    const [emblaRef] = useEmblaCarousel({
+    const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         align: "start",
         containScroll: "trimSnaps",
@@ -50,8 +51,24 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
                                     enableGutter={false}
                                 />
 
-                                <div className="flex flex-row items-center">
-                                    <div className="flex flex-col">
+                                <div
+                                    className={cn(
+                                        "flex flex-row items-center",
+                                        column.priceAlignment === "center" &&
+                                            "justify-center",
+                                        column.priceAlignment === "right" &&
+                                            "justify-end",
+                                    )}
+                                >
+                                    <div
+                                        className={cn(
+                                            "flex flex-col",
+                                            column.priceAlignment ===
+                                                "center" && "items-center",
+                                            column.priceAlignment === "right" &&
+                                                "items-end",
+                                        )}
+                                    >
                                         <div className="text-gray-800 text-xs font-normal italic">
                                             {column.priceType}
                                         </div>
@@ -63,12 +80,50 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
 
                                     <CMSLink
                                         {...column.link}
-                                        className="ml-auto"
+                                        variant="service"
+                                        className={cn(
+                                            column.priceAlignment === "left" &&
+                                                "ml-auto",
+                                            column.priceAlignment ===
+                                                "center" && "ml-4",
+                                        )}
                                     />
                                 </div>
                             </div>
                         </div>
                     ))}
+                </div>
+            </div>
+
+            <div className="flex flex-row gap-6 items-center justify-end mt-4">
+                <div
+                    className={cn(
+                        "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
+                        arrowBackgroundColor === "black" &&
+                            "bg-background text-sl-beige",
+                        arrowBackgroundColor === "beige" &&
+                            "bg-sl-beige text-background",
+                        arrowBackgroundColor === "white" &&
+                            "bg-white text-background",
+                    )}
+                    onClick={() => emblaApi?.scrollPrev()}
+                >
+                    <ArrowLeftIcon width={32} height={32} />
+                </div>
+
+                <div
+                    className={cn(
+                        "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
+                        arrowBackgroundColor === "black" &&
+                            "bg-background text-sl-beige",
+                        arrowBackgroundColor === "beige" &&
+                            "bg-sl-beige text-background",
+                        arrowBackgroundColor === "white" &&
+                            "bg-white text-background",
+                    )}
+                    onClick={() => emblaApi?.scrollNext()}
+                >
+                    <ArrowRightIcon width={32} height={32} />
                 </div>
             </div>
         </>

@@ -20,5 +20,21 @@ export const hero: Field = {
             type: "richText",
             editor: defaultLexical,
         },
+        {
+            label: "Content positie",
+            name: "contentPosition",
+            type: "select",
+            defaultValue: "left",
+            options: [
+                {
+                    label: "Links",
+                    value: "left",
+                },
+                {
+                    label: "Midden",
+                    value: "center",
+                },
+            ],
+        },
     ],
 };

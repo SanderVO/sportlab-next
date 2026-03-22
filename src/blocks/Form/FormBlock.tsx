@@ -51,6 +51,7 @@ export const FormBlock: React.FC<
     } = formMethods;
 
     const [token, setToken] = useState<string>();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [hasSubmitted, setHasSubmitted] = useState<boolean>();
     const [error, setError] = useState<
@@ -69,6 +70,7 @@ export const FormBlock: React.FC<
                 if (!token) return;
 
                 setError(undefined);
+                setIsSubmitting(true);
 
                 const dataToSend = Object.entries(data).map(
                     ([name, value]) => ({
@@ -105,6 +107,7 @@ export const FormBlock: React.FC<
 
                     if (req.status >= 400) {
                         setIsLoading(false);
+                        setIsSubmitting(false);
 
                         setError({
                             message:
@@ -117,6 +120,7 @@ export const FormBlock: React.FC<
                     }
 
                     setIsLoading(false);
+                    setIsSubmitting(false);
                     setHasSubmitted(true);
 
                     if (confirmationType === "redirect" && redirect) {
@@ -130,6 +134,7 @@ export const FormBlock: React.FC<
                     console.warn(err);
 
                     setIsLoading(false);
+                    setIsSubmitting(false);
 
                     setError({
                         message: "Er ging wat fout bij het verzenden.",
@@ -162,12 +167,16 @@ export const FormBlock: React.FC<
                         />
                     )}
 
-                {isLoading && !hasSubmitted && <p>Verzenden...</p>}
-
                 {error && (
-                    <div>{`${error.status || "500"}: ${
-                        error.message || ""
-                    }`}</div>
+                    <div
+                        role="alert"
+                        className="mb-6 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800"
+                    >
+                        <strong className="font-semibold">Fout</strong>
+                        <div className="mt-1">{`${error.status || "500"}: ${
+                            error.message || ""
+                        }`}</div>
+                    </div>
                 )}
 
                 {!hasSubmitted && (
@@ -190,6 +199,10 @@ export const FormBlock: React.FC<
                                                 <Field
                                                     form={formFromProps}
                                                     {...field}
+                                                    required={
+                                                        "required" in field &&
+                                                        field.required === true
+                                                    }
                                                     {...formMethods}
                                                     control={control}
                                                     errors={errors}
@@ -213,9 +226,10 @@ export const FormBlock: React.FC<
                             form={formID}
                             type="submit"
                             variant="black"
-                            disabled={!token}
+                            disabled={!token || isSubmitting}
+                            aria-busy={isSubmitting}
                         >
-                            {submitButtonLabel}
+                            {isSubmitting ? "Verzenden..." : submitButtonLabel}
                         </Button>
                     </form>
                 )}

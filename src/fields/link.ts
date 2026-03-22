@@ -99,6 +99,22 @@ export const link = (overrides?: Partial<GroupField>): GroupField => ({
             label: "Label",
             required: true,
         },
+        {
+            label: "Label kleur",
+            name: "labelColor",
+            type: "select",
+            defaultValue: "default",
+            admin: {
+                condition: (_, siblingData) => siblingData?.addLabel === true,
+            },
+            options: [
+                { label: "Standaard", value: "default" },
+                { label: "Beige", value: "beige" },
+                { label: "Oranje", value: "orange" },
+                { label: "Grijs", value: "neutral" },
+                { label: "Wit", value: "white" },
+            ],
+        },
     ],
     ...overrides,
 });

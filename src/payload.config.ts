@@ -98,6 +98,44 @@ const r2ProductionStorage = () =>
 
 const r2StoragePlugin = isProduction ? r2ProductionStorage() : r2DevStorage();
 
+const smtpEnabled = cloudflare.env.SMTP_ENABLED?.toString() === "true";
+const smtpHost = cloudflare.env.SMTP_HOST;
+const smtpUser = cloudflare.env.SMTP_USER;
+const smtpPass = cloudflare.env.SMTP_PASS;
+const smtpFromAddress = cloudflare.env.SMTP_FROM_ADDRESS;
+const smtpFromName = cloudflare.env.SMTP_FROM_NAME;
+
+let missingVars: string[] = [];
+
+if (smtpEnabled) {
+    missingVars = [
+        ["SMTP_HOST", smtpHost],
+        ["SMTP_USER", smtpUser],
+        ["SMTP_PASS", smtpPass],
+        ["SMTP_FROM_ADDRESS", smtpFromAddress],
+        ["SMTP_FROM_NAME", smtpFromName],
+    ]
+        .filter(([, value]) => !value)
+        .map(([key]) => key);
+}
+
+const emailAdapter =
+    smtpEnabled && missingVars.length === 0
+        ? nodemailerAdapter({
+              defaultFromAddress: smtpFromAddress || "",
+              defaultFromName: smtpFromName || "",
+              transportOptions: {
+                  host: smtpHost,
+                  port: 465,
+                  secure: true,
+                  auth: {
+                      user: smtpUser,
+                      pass: smtpPass,
+                  },
+              },
+          })
+        : undefined;
+
 export default buildConfig({
     admin: {
         user: Users.slug,
@@ -132,21 +170,7 @@ export default buildConfig({
             },
         },
     },
-    email:
-        cloudflare.env.SMTP_HOST === "true"
-            ? nodemailerAdapter({
-                  defaultFromAddress: cloudflare.env.SMTP_FROM_ADDRESS || "",
-                  defaultFromName: cloudflare.env.SMTP_FROM_NAME || "",
-                  transportOptions: {
-                      host: cloudflare.env.SMTP_HOST,
-                      port: 465,
-                      auth: {
-                          user: cloudflare.env.SMTP_USER,
-                          pass: cloudflare.env.SMTP_PASS,
-                      },
-                  },
-              })
-            : undefined,
+    email: emailAdapter,
     collections: [Users, Media, Documents, Pages, Posts],
     globals: [Header, Footer, WhatsApp, Organization],
     cors: [getServerSideURL()].filter(Boolean),

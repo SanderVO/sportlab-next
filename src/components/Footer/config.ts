@@ -1,5 +1,10 @@
 import { link } from "@/fields/link";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import {
+    AlignFeature,
+    FixedToolbarFeature,
+    lexicalEditor,
+    ParagraphFeature,
+} from "@payloadcms/richtext-lexical";
 import type { GlobalConfig } from "payload";
 import { revalidateFooter } from "./hooks/revalidateFooter";
 
@@ -73,7 +78,8 @@ export const Footer: GlobalConfig = {
             name: "footerColumns",
             type: "array",
             admin: {
-                description: "Voeg kolommen toe met links voor in de footer",
+                description:
+                    "Voeg kolommen toe met links of rich text voor in de footer",
             },
             fields: [
                 {
@@ -83,13 +89,43 @@ export const Footer: GlobalConfig = {
                     required: true,
                 },
                 {
+                    label: "Inhoudstype",
+                    name: "contentType",
+                    type: "radio",
+                    defaultValue: "links",
+                    options: [
+                        { label: "Links", value: "links" },
+                        { label: "Rich Text", value: "richText" },
+                    ],
+                    required: true,
+                },
+                {
                     label: "Links",
                     name: "links",
                     type: "array",
                     admin: {
                         description: "Voeg links toe voor deze kolom",
+                        condition: (_, siblingData) =>
+                            siblingData?.contentType === "links",
                     },
                     fields: [link()],
+                },
+                {
+                    label: "Rich Text",
+                    name: "richText",
+                    type: "richText",
+                    editor: lexicalEditor({
+                        features: () => [
+                            ParagraphFeature(),
+                            AlignFeature(),
+                            FixedToolbarFeature(),
+                        ],
+                    }),
+                    admin: {
+                        condition: (_, siblingData) =>
+                            siblingData?.contentType === "richText",
+                    },
+                    required: false,
                 },
             ],
         },

@@ -70,6 +70,26 @@ export const Team: Block = {
             ],
         },
         {
+            label: "Geselecteerde coaches",
+            name: "selectedCoaches",
+            type: "relationship",
+            relationTo: "users",
+            hasMany: true,
+            required: false,
+            admin: {
+                description:
+                    "Optioneel: kies specifieke coaches om te tonen. Laat leeg om automatisch alle coaches te tonen.",
+            },
+            filterOptions: {
+                status: {
+                    equals: "active",
+                },
+                roles: {
+                    contains: "coach",
+                },
+            },
+        },
+        {
             label: "Heeft een link",
             name: "enableLink",
             type: "checkbox",

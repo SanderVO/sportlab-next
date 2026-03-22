@@ -10,10 +10,8 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
     return (
         <div
             className={cn(
-                "container m-auto flex py-15 lg:py-0 h-full",
-                columns && columns.length > 1
-                    ? "flex-col lg:flex-row gap-10 lg:gap-50 justify-between"
-                    : "justify-between static!",
+                "container m-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-30 py-15 lg:py-0 h-full",
+                columns?.length === 1 && "lg:grid-cols-1",
             )}
         >
             {columns &&
@@ -24,11 +22,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                     return (
                         <div
                             key={index}
-                            className={cn(
-                                "flex h-full justify-between",
-                                columns.length > 1 && "w-full self-center",
-                                columns.length === 1 && "w-full self-center",
-                            )}
+                            className="flex h-full justify-between w-full self-center"
                         >
                             {media && contentPosition === "contentRight" && (
                                 <Media
@@ -52,7 +46,6 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                             <div
                                 className={cn(
                                     "flex flex-col gap-4 lg:gap-0 w-full relative self-baseline",
-                                    columns.length == 1 && "lg:w-full",
                                     contentPosition === "contentLeft" &&
                                         "lg:max-w-[60%]",
                                     contentPosition === "contentRight" &&

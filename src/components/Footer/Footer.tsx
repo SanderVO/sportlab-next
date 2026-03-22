@@ -18,68 +18,89 @@ export async function Footer() {
 
                 <p>{footerData.description}</p>
 
-                <div className="border-b-4 border-sl-beige w-[50px] mt-2"></div>
+                <div className="border-b-4 border-sl-beige w-12.5 mt-2"></div>
             </CMSLink>
 
-            <div className="flex flex-col justify-center items-center w-full gap-10 mt-20">
-                {footerData.footerLogo && (
-                    <Media
-                        fill
-                        className="relative w-[200px] h-[50px]"
-                        resource={footerData.footerLogo}
-                    />
-                )}
+            <div className="flex flex-col justify-center items-center w-full gap-20 mt-20">
+                <div className="flex flex-col gap-10 items-center w-full lg:flex-row lg:items-start lg:justify-between lg:gap-8">
+                    <div className="flex flex-col gap-4">
+                        {footerData.footerLogo && (
+                            <Media
+                                imgHeight={40}
+                                imgWidth={200}
+                                className="relative w-full lg:w-50 h-12.5 flex justify-center"
+                                resource={footerData.footerLogo}
+                            />
+                        )}
 
-                {footerData.contactText && (
-                    <RichText
-                        className="flex flex-col gap-1 items-center font-montserrat text-sl-beige"
-                        data={footerData.contactText}
-                        enableProse={false}
-                    />
-                )}
+                        {footerData.contactText && (
+                            <RichText
+                                className="flex flex-col gap-1 items-center font-montserrat text-sl-beige lg:items-start"
+                                data={footerData.contactText}
+                                enableProse={false}
+                                enableGutter={false}
+                            />
+                        )}
 
-                {footerData.socialMediaLinks &&
-                    footerData.socialMediaLinks.length > 0 && (
-                        <div className="flex flex-row gap-4 items-center text-sl-beige">
-                            {footerData.socialMediaLinks.map((link, index) => (
-                                <a
-                                    key={index}
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="w-12 fill-sl-beige hover:fill-sl-beige-dark transition-colors"
-                                >
-                                    {link.platform && (
-                                        <SocialIcon platform={link.platform} />
+                        {footerData.socialMediaLinks &&
+                            footerData.socialMediaLinks.length > 0 && (
+                                <div className="flex flex-row gap-4 items-center text-sl-beige">
+                                    {footerData.socialMediaLinks.map(
+                                        (link, index) => (
+                                            <a
+                                                key={index}
+                                                href={link.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-12 fill-sl-beige hover:fill-sl-beige-dark transition-colors"
+                                            >
+                                                {link.platform && (
+                                                    <SocialIcon
+                                                        platform={link.platform}
+                                                    />
+                                                )}
+                                            </a>
+                                        ),
                                     )}
-                                </a>
+                                </div>
+                            )}
+                    </div>
+
+                    {footerData.footerColumns && (
+                        <div className="grid grid-cols-2 gap-12 text-center w-full lg:w-auto lg:flex lg:flex-row lg:justify-end lg:text-left lg:gap-16">
+                            {footerData.footerColumns.map((column) => (
+                                <div key={column.id} className="lg:w-36">
+                                    <h3 className="text-neutral-400 font-bold mb-2">
+                                        {column.columnTitle}
+                                    </h3>
+
+                                    {column.contentType === "richText" ? (
+                                        column.richText ? (
+                                            <RichText
+                                                className="text-sm text-neutral-400 [&_p]:m-0 [&_a]:text-neutral-400 [&_a]:no-underline [&_a:hover]:text-white"
+                                                data={column.richText}
+                                                enableProse={false}
+                                                enableGutter={false}
+                                            />
+                                        ) : null
+                                    ) : (
+                                        <ul className="flex flex-col gap-1">
+                                            {column.links?.map((linkItem) => (
+                                                <li key={linkItem.id}>
+                                                    <CMSLink
+                                                        {...linkItem.link}
+                                                        variant="nav"
+                                                        className="text-sm no-underline normal-case font-normal"
+                                                    />
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     )}
-
-                {footerData.footerColumns && (
-                    <div className="grid grid-cols-2 text-center lg:flex lg:flex-row lg:justify-center gap-12 lg:gap-20 w-full">
-                        {footerData.footerColumns.map((column) => (
-                            <div key={column.id} className="lg:w-36">
-                                <h3 className="text-neutral-400 font-bold mb-2">
-                                    {column.columnTitle}
-                                </h3>
-
-                                <ul className="flex flex-col gap-1">
-                                    {column.links?.map((linkItem) => (
-                                        <li key={linkItem.id}>
-                                            <CMSLink
-                                                {...linkItem.link}
-                                                variant="nav"
-                                                className="text-sm no-underline normal-case font-normal"
-                                            />
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                </div>
 
                 <div className="flex flex-row gap-4 items-center text-neutral-400">
                     <span>

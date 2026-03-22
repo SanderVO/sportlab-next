@@ -288,6 +288,7 @@ export interface Page {
       };
       [k: string]: unknown;
     } | null;
+    contentPosition?: ('left' | 'center') | null;
   };
   layout: (ContentBlock | CarouselBlock | TeamBlock | InstagramBlock)[];
   meta?: {
@@ -389,6 +390,10 @@ export interface TeamBlock {
   sortBy: 'name' | '-name' | '-createdAt' | 'createdAt' | 'position';
   type: 'carousel' | 'grid';
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
+  /**
+   * Optioneel: kies specifieke coaches om te tonen. Laat leeg om automatisch alle coaches te tonen.
+   */
+  selectedCoaches?: (number | User)[] | null;
   enableLink?: boolean | null;
   link?: {
     type?: ('reference' | 'custom') | null;
@@ -418,6 +423,7 @@ export interface TeamBlock {
         } | null);
     url?: string | null;
     label?: string | null;
+    labelColor?: ('default' | 'beige' | 'orange' | 'neutral' | 'white') | null;
   };
   id?: string | null;
   blockName?: string | null;
@@ -529,6 +535,7 @@ export interface InstagramBlock {
               } | null);
           url?: string | null;
           label?: string | null;
+          labelColor?: ('default' | 'beige' | 'orange' | 'neutral' | 'white') | null;
         };
         id?: string | null;
       }[]
@@ -1010,6 +1017,7 @@ export interface PagesSelect<T extends boolean = true> {
     | {
         media?: T;
         text?: T;
+        contentPosition?: T;
       };
   layout?:
     | T
@@ -1087,6 +1095,7 @@ export interface TeamBlockSelect<T extends boolean = true> {
   sortBy?: T;
   type?: T;
   backgroundColor?: T;
+  selectedCoaches?: T;
   enableLink?: T;
   link?:
     | T
@@ -1097,6 +1106,7 @@ export interface TeamBlockSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
         label?: T;
+        labelColor?: T;
       };
   id?: T;
   blockName?: T;
@@ -1124,6 +1134,7 @@ export interface InstagramBlockSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              labelColor?: T;
             };
         id?: T;
       };
@@ -1422,6 +1433,7 @@ export interface Header {
               } | null);
           url?: string | null;
           label?: string | null;
+          labelColor?: ('default' | 'beige' | 'orange' | 'neutral' | 'white') | null;
         };
         id?: string | null;
       }[]
@@ -1465,6 +1477,7 @@ export interface Footer {
         } | null);
     url?: string | null;
     label?: string | null;
+    labelColor?: ('default' | 'beige' | 'orange' | 'neutral' | 'white') | null;
   };
   footerLogo: number | Media;
   contactText?: {
@@ -1490,11 +1503,12 @@ export interface Footer {
       }[]
     | null;
   /**
-   * Voeg kolommen toe met links voor in de footer
+   * Voeg kolommen toe met links of rich text voor in de footer
    */
   footerColumns?:
     | {
         columnTitle: string;
+        contentType: 'links' | 'richText';
         /**
          * Voeg links toe voor deze kolom
          */
@@ -1528,10 +1542,26 @@ export interface Footer {
                     } | null);
                 url?: string | null;
                 label?: string | null;
+                labelColor?: ('default' | 'beige' | 'orange' | 'neutral' | 'white') | null;
               };
               id?: string | null;
             }[]
           | null;
+        richText?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
         id?: string | null;
       }[]
     | null;
@@ -1621,6 +1651,7 @@ export interface HeaderSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+              labelColor?: T;
             };
         id?: T;
       };
@@ -1644,6 +1675,7 @@ export interface FooterSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
         label?: T;
+        labelColor?: T;
       };
   footerLogo?: T;
   contactText?: T;
@@ -1658,6 +1690,7 @@ export interface FooterSelect<T extends boolean = true> {
     | T
     | {
         columnTitle?: T;
+        contentType?: T;
         links?:
           | T
           | {
@@ -1670,9 +1703,11 @@ export interface FooterSelect<T extends boolean = true> {
                     reference?: T;
                     url?: T;
                     label?: T;
+                    labelColor?: T;
                   };
               id?: T;
             };
+        richText?: T;
         id?: T;
       };
   updatedAt?: T;
@@ -1822,6 +1857,7 @@ export interface VirtuagymRosterBlock {
  * via the `definition` "ServiceCardBlock".
  */
 export interface ServiceCardBlock {
+  arrowBackgroundColor: 'white' | 'beige' | 'black';
   columns: {
     backgroundColor: 'white' | 'beige' | 'black';
     image: number | Media;
@@ -1842,6 +1878,7 @@ export interface ServiceCardBlock {
     };
     priceType: string;
     price: number;
+    priceAlignment: 'left' | 'center' | 'right';
     link?: {
       type?: ('reference' | 'custom') | null;
       /**
@@ -1870,6 +1907,7 @@ export interface ServiceCardBlock {
           } | null);
       url?: string | null;
       label?: string | null;
+      labelColor?: ('default' | 'beige' | 'orange' | 'neutral' | 'white') | null;
     };
     id?: string | null;
   }[];

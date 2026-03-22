@@ -9,12 +9,12 @@ import {
     LinkFeature,
     LinkFields,
     ParagraphFeature,
-    TextStateFeature,
     UnderlineFeature,
 } from "@payloadcms/richtext-lexical";
 import { TextFieldSingleValidation } from "payload";
 import { textState } from "../utilities/textState";
-import { sizeField, variantField } from "./linkFields";
+import { buttonSpacingField, sizeField, variantField } from "./linkFields";
+import { TextStateSplitFeature } from "./textStateSplitFeature.server";
 
 export const defaultLexicalFeatures = [
     ...defaultEditorFeatures.filter((feature) => feature.key !== "link"),
@@ -88,18 +88,27 @@ export const defaultLexicalFeatures = [
                 variantField([
                     { label: "Inline text", value: "inline" },
                     { label: "Beige", value: "beige" },
+                    { label: "Beige outline", value: "beigeBorder" },
                     { label: "Zwart", value: "black" },
+                    { label: "Zwart outline", value: "blackBorder" },
                     { label: "Oranje", value: "orange" },
+                    { label: "Oranje outline", value: "orangeBorder" },
                 ]),
                 sizeField([
                     { label: "Small", value: "sm" },
                     { label: "Medium", value: "md" },
                     { label: "Large", value: "lg" },
                 ]),
+                buttonSpacingField([
+                    { label: "Geen", value: "none" },
+                    { label: "Klein", value: "sm" },
+                    { label: "Medium", value: "md" },
+                    { label: "Groot", value: "lg" },
+                ]),
             ];
         },
     }),
-    TextStateFeature({
+    TextStateSplitFeature({
         state: textState,
     }),
 ];

@@ -19,3 +19,16 @@ export const sizeField = (
     defaultValue: "md",
     options: sizes,
 });
+
+export const buttonSpacingField = (
+    spacingOptions: { label: string; value: string }[],
+): SelectField => ({
+    label: "Knop marge",
+    name: "buttonSpacing",
+    type: "select",
+    defaultValue: "md",
+    options: spacingOptions,
+    admin: {
+        condition: (_data, siblingData) => siblingData?.variant !== "inline",
+    },
+});
