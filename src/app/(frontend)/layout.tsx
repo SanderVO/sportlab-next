@@ -41,7 +41,7 @@ export default async function RootLayout({
 }) {
     const { isEnabled } = await draftMode();
 
-    const GTM_ID = process.env.GTM_ID;
+    const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
     const organization = (await getCachedGlobal(
         "organization",

@@ -1,12 +1,26 @@
 "use client";
 
-import { useMount } from "ahooks";
+import { setCookie } from "@/actions/CookieActions";
 import { useState } from "react";
 
 export default function CookieBanner() {
-    const [hasGivenConsent, setHasGivenConsent] = useState(true);
+    const [hasGivenConsent, setHasGivenConsent] = useState(() => {
+        if (typeof document === "undefined") return false;
+
+        return document.cookie.includes("ga_consent=granted");
+    });
 
     const acceptAll = () => {
+        if (!window.gtag) {
+            console.warn(
+                "Google Analytics is not loaded, cannot set consent preferences.",
+            );
+
+            setCookie("ga_consent", "denied");
+
+            return;
+        }
+
         window.gtag("consent", "update", {
             analytics_storage: "granted",
             ad_storage: "granted",
@@ -14,12 +28,22 @@ export default function CookieBanner() {
             ad_personalization: "granted",
         });
 
-        localStorage.setItem("ga_consent", "granted");
+        setCookie("ga_consent", "granted");
 
         setHasGivenConsent(true);
     };
 
     const rejectAll = () => {
+        if (!window.gtag) {
+            console.warn(
+                "Google Analytics is not loaded, cannot set consent preferences.",
+            );
+
+            setCookie("ga_consent", "denied");
+
+            return;
+        }
+
         window.gtag("consent", "update", {
             ad_storage: "denied",
             analytics_storage: "denied",
@@ -27,16 +51,10 @@ export default function CookieBanner() {
             ad_personalization: "denied",
         });
 
-        localStorage.setItem("ga_consent", "denied");
+        setCookie("ga_consent", "denied");
 
         setHasGivenConsent(false);
     };
-
-    useMount(() => {
-        const consent = localStorage.getItem("ga_consent");
-
-        setHasGivenConsent(consent === "granted");
-    });
 
     return (
         <>
