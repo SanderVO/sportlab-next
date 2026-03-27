@@ -35,7 +35,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         imageSize === "imageFull" &&
                                             "absolute inset-y-0 left-0 w-[480px] hidden lg:block",
                                         imageSize === "imageCenter" &&
-                                            "h-[300px] lg:h-auto lg:min-h-[600px] w-full lg:w-[400px] relative shrink-0 hidden lg:block",
+                                            "h-[400px] lg:h-auto lg:min-h-[600px] w-full lg:w-[400px] relative shrink-0 hidden lg:block",
                                     )}
                                     imgClassName="h-full object-cover object-center"
                                     imgWidth={480}
@@ -59,7 +59,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         size="(max-width: 768px) 400px, 480px"
                                         htmlElement={null}
                                         pictureClassName={cn(
-                                            "h-[300px] sm:h-[400px] lg:h-[200px] w-full relative mb-4",
+                                            "h-[400px] sm:h-[400px] lg:h-[200px] w-full relative mb-4",
                                             contentPosition !==
                                                 "contentBottom" && "lg:hidden",
                                         )}
@@ -91,7 +91,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         imageSize === "imageFull" &&
                                             "absolute inset-y-0 right-0 w-[480px] hidden lg:block",
                                         imageSize === "imageCenter" &&
-                                            "h-[300px] lg:h-auto lg:min-h-[600px] w-full lg:w-[400px] relative shrink-0 hidden lg:block",
+                                            "h-[400px] lg:h-auto lg:min-h-[600px] w-full lg:w-[400px] relative shrink-0 hidden lg:block",
                                     )}
                                     imgClassName="object-cover object-center h-full"
                                     imgWidth={480}

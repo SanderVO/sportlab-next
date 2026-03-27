@@ -1,22 +1,23 @@
 "use client";
 
-import { setCookie } from "@/actions/CookieActions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function CookieBanner() {
-    const [hasGivenConsent, setHasGivenConsent] = useState(() => {
-        if (typeof document === "undefined") return false;
+    const [hasGivenConsent, setHasGivenConsent] = useState<boolean>(true);
 
-        return document.cookie.includes("ga_consent=granted");
-    });
+    const setConsentCookie = (value: "granted" | "denied") => {
+        document.cookie = `ga_consent=${value}; Path=/; Max-Age=31536000; SameSite=Lax`;
+    };
 
     const acceptAll = () => {
+        setConsentCookie("granted");
+
+        setHasGivenConsent(true);
+
         if (!window.gtag) {
             console.warn(
                 "Google Analytics is not loaded, cannot set consent preferences.",
             );
-
-            setCookie("ga_consent", "denied");
 
             return;
         }
@@ -27,19 +28,17 @@ export default function CookieBanner() {
             ad_user_data: "granted",
             ad_personalization: "granted",
         });
-
-        setCookie("ga_consent", "granted");
-
-        setHasGivenConsent(true);
     };
 
     const rejectAll = () => {
+        setConsentCookie("denied");
+
+        setHasGivenConsent(true);
+
         if (!window.gtag) {
             console.warn(
                 "Google Analytics is not loaded, cannot set consent preferences.",
             );
-
-            setCookie("ga_consent", "denied");
 
             return;
         }
@@ -50,11 +49,15 @@ export default function CookieBanner() {
             ad_user_data: "denied",
             ad_personalization: "denied",
         });
-
-        setCookie("ga_consent", "denied");
-
-        setHasGivenConsent(false);
     };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setHasGivenConsent(
+            typeof window !== "undefined" &&
+                document.cookie.includes("ga_consent="),
+        );
+    }, []);
 
     return (
         <>

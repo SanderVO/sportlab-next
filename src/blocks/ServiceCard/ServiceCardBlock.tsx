@@ -21,13 +21,13 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
 
     return (
         <>
-            <div className="w-full h-full overflow-hidden" ref={emblaRef}>
-                <div className="flex flex-row h-full gap-4 sm:gap-8">
+            <div className="w-full overflow-hidden" ref={emblaRef}>
+                <div className="flex flex-row items-stretch gap-4 sm:gap-8">
                     {columns?.map((column, index) => (
                         <div
                             key={index}
                             className={cn(
-                                "flex flex-col w-64 h-full shrink-0 sm:w-96",
+                                "flex flex-col w-64 shrink-0 self-stretch sm:w-96 last:mr-4 sm:last:mr-8",
                                 column.backgroundColor === "black" &&
                                     "bg-background",
                                 column.backgroundColor === "beige" &&
@@ -44,7 +44,7 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
                                 />
                             </div>
 
-                            <div className="w-full h-96 container py-4 flex flex-col justify-between">
+                            <div className="w-full min-h-96 flex-1 container py-4 flex flex-col justify-between">
                                 <RichText
                                     data={column.content}
                                     enableProse={false}

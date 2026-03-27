@@ -12,6 +12,7 @@ export default {
             mode: "long-lived",
         }),
         tagCache: d1NextTagCache,
+        enableCacheInterception: true,
     }),
 } satisfies OpenNextConfig;
 

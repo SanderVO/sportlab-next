@@ -37,13 +37,17 @@ export const RenderBlocks: React.FC<{
                             return (
                                 <section
                                     className={cn(
-                                        "flex items-center w-full relative h-auto sm:min-h-180 xxl:min-h-[1080px] flex-row lg:py-12",
+                                        "flex items-center w-full relative h-auto flex-row lg:py-12",
                                         backgroundColor === "backgroundDark" &&
                                             "bg-background text-sl-beige",
                                         backgroundColor === "backgroundLight" &&
                                             "bg-sl-beige text-background",
                                         backgroundColor === "backgroundWhite" &&
                                             "bg-white text-background",
+                                        blockType === "carousel" &&
+                                            "min-h-auto",
+                                        blockType !== "carousel" &&
+                                            "sm:min-h-180 xxl:min-h-[1080px]",
                                     )}
                                     key={index}
                                 >
