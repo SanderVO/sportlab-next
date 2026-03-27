@@ -33,6 +33,15 @@ export const TeamBlockCarousel: React.FC<Props> = ({
     useEffect(() => {
         const handlePointerDown = (e: PointerEvent) => {
             if (e.pointerType !== "touch") return;
+
+            const target = e.target;
+            if (
+                target instanceof Element &&
+                target.closest("[data-team-card-cta='true']")
+            ) {
+                return;
+            }
+
             const tappedIndex = cardRefs.current.findIndex((ref) =>
                 ref?.contains(e.target as Node),
             );

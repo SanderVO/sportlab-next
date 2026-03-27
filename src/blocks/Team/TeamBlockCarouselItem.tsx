@@ -54,14 +54,24 @@ export const TeamBlockCarouselItem = ({
                         </div>
 
                         {user.slug && (
-                            <Button
-                                variant="orange"
-                                size="sm"
-                                url={`/team/${user.slug}`}
-                                className="px-4 py-8"
+                            <div
+                                data-team-card-cta="true"
+                                className="z-20"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onTouchStart={(e) => e.stopPropagation()}
+                                onTouchEnd={(e) => e.stopPropagation()}
+                                onClick={(e) => e.stopPropagation()}
+                                onMouseDown={(e) => e.stopPropagation()}
                             >
-                                Lees meer
-                            </Button>
+                                <Button
+                                    variant="orange"
+                                    size="sm"
+                                    url={`/team/${user.slug}`}
+                                    classes="py-4 w-full"
+                                >
+                                    Lees meer
+                                </Button>
+                            </div>
                         )}
                     </div>
                 )}

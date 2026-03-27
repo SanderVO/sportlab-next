@@ -26,7 +26,7 @@ const HamburgerMenuContent = ({ navItems }: Props) => {
             <MenuIcon className="text-3xl" onClick={() => setIsOpen(!isOpen)} />
             <div
                 className={cn(
-                    "absolute top-16 right-0 w-full h-screen bg-background z-50 p-4 transition-opacity duration-300",
+                    "absolute top-full right-0 w-full h-screen bg-background z-50 p-4 transition-opacity duration-300",
                     isOpen ? "opacity-100" : "opacity-0 pointer-events-none",
                 )}
             >

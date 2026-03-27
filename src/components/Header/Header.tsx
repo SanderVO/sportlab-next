@@ -19,7 +19,7 @@ export async function Header() {
 
     return (
         <ScrollHeader>
-            <div className="container mx-auto flex flex-row justify-between items-center relative">
+            <div className="container mx-auto flex flex-row justify-between items-center">
                 <Link href="/" className="flex items-center shrink-0">
                     <Media
                         resource={headerData?.headerLogo}

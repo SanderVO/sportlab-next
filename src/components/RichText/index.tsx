@@ -44,9 +44,9 @@ const buttonSpacingClasses: Record<
     string
 > = {
     none: "",
-    sm: "mr-2",
-    md: "mr-4",
-    lg: "mr-6",
+    sm: "mb-2 mx-1",
+    md: "mb-4 mx-2",
+    lg: "mb-6 mx-4",
 };
 
 const headingSizeClasses = {
@@ -294,20 +294,28 @@ const linkConverter: JSXConverter<SerializedLinkNode> = ({
               }/${doc.value.slug}`
             : url;
 
-    return (
+    const spacingClass =
+        variant !== "inline" ? buttonSpacingClasses[buttonSpacing ?? "md"] : "";
+
+    const button = (
         <Button
             url={href}
             newTab={newTab}
             variant={variant as Variant}
             size={size as Size}
-            classes={
-                variant !== "inline"
-                    ? buttonSpacingClasses[buttonSpacing ?? "md"]
-                    : undefined
-            }
         >
             {label}
         </Button>
+    );
+
+    if (variant === "inline") {
+        return button;
+    }
+
+    return (
+        <span className={cn("inline-block align-top", spacingClass)}>
+            {button}
+        </span>
     );
 };
 
