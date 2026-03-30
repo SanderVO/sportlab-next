@@ -3,8 +3,7 @@ import { MetadataRoute } from "next/types";
 export const dynamic = "force-dynamic";
 
 export default function robots(): MetadataRoute.Robots {
-    const siteUrl =
-        process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    const canonicalSiteUrl = "https://sportlabgroningen.nl";
 
     const allowIndexing = ["true", "1", "yes", "on"].includes(
         String(process.env.ALLOW_INDEXING).toLowerCase(),
@@ -25,6 +24,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: "/",
             disallow: "/admin/",
         },
-        sitemap: `${siteUrl}/sitemap.xml`,
+        sitemap: `${canonicalSiteUrl}/sitemap.xml`,
     };
 }
