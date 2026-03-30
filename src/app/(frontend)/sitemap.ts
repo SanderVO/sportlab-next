@@ -7,8 +7,7 @@ const getPagesSitemap = unstable_cache(
     async () => {
         const payload = await getPayload({ config });
 
-        const SITE_URL =
-            process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+        const SITE_URL = "https://sportlabgroningen.nl";
 
         const results = await payload.find({
             collection: "pages",
@@ -30,13 +29,6 @@ const getPagesSitemap = unstable_cache(
 
         const dateFallback = new Date().toISOString();
 
-        const defaultSitemap = [
-            {
-                loc: `${SITE_URL}/blog`,
-                lastmod: dateFallback,
-            },
-        ];
-
         const sitemap = results.docs
             ? results.docs
                   .filter((page) => Boolean(page?.slug))
@@ -51,7 +43,7 @@ const getPagesSitemap = unstable_cache(
                   })
             : [];
 
-        return [...defaultSitemap, ...sitemap];
+        return [...sitemap];
     },
     ["pages-sitemap"],
     {
@@ -60,8 +52,7 @@ const getPagesSitemap = unstable_cache(
 );
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl =
-        process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    const baseUrl = "https://sportlabgroningen.nl";
 
     const pagesSitemap = await getPagesSitemap();
 

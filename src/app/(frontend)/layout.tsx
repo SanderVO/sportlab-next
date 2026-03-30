@@ -55,8 +55,11 @@ export default async function RootLayout({
             suppressHydrationWarning
         >
             <head>
-                <link href="/favicon.ico" rel="icon" sizes="32x32" />
-                <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+                <link
+                    rel="icon"
+                    href="https://cdn.sportlabgroningen.nl/images/favicon.ico"
+                    sizes="any"
+                />
             </head>
 
             <body>
