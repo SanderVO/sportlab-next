@@ -13,7 +13,12 @@ import {
 } from "@payloadcms/richtext-lexical";
 import { TextFieldSingleValidation } from "payload";
 import { textState } from "../utilities/textState";
-import { buttonSpacingField, sizeField, variantField } from "./linkFields";
+import {
+    alignmentField,
+    buttonSpacingField,
+    sizeField,
+    variantField,
+} from "./linkFields";
 import { TextStateSplitFeature } from "./textStateSplitFeature.server";
 
 export const defaultLexicalFeatures = [
@@ -105,6 +110,7 @@ export const defaultLexicalFeatures = [
                     { label: "Medium", value: "md" },
                     { label: "Groot", value: "lg" },
                 ]),
+                alignmentField(),
             ];
         },
     }),

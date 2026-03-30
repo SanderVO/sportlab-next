@@ -32,3 +32,17 @@ export const buttonSpacingField = (
         condition: (_data, siblingData) => siblingData?.variant !== "inline",
     },
 });
+
+export const alignmentField = (): SelectField => ({
+    label: "Uitlijning",
+    name: "alignment",
+    type: "select",
+    defaultValue: "left",
+    options: [
+        { label: "Links", value: "left" },
+        { label: "Gecentreerd", value: "center" },
+    ],
+    admin: {
+        condition: (_data, siblingData) => siblingData?.variant !== "inline",
+    },
+});

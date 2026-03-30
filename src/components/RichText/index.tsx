@@ -37,6 +37,7 @@ type NodeTypes = DefaultNodeTypes;
 
 type RichTextLinkFields = LinkFields & {
     buttonSpacing?: "none" | "sm" | "md" | "lg";
+    alignment?: "left" | "center";
 };
 
 const buttonSpacingClasses: Record<
@@ -47,6 +48,16 @@ const buttonSpacingClasses: Record<
     sm: "mb-2 mx-1",
     md: "mb-4 mx-2",
     lg: "mb-6 mx-4",
+};
+
+const buttonSpacingClassesLeftAligned: Record<
+    NonNullable<RichTextLinkFields["buttonSpacing"]>,
+    string
+> = {
+    none: "",
+    sm: "mb-2 mr-1",
+    md: "mb-4 mr-2",
+    lg: "mb-6 mr-4",
 };
 
 const headingSizeClasses = {
@@ -74,6 +85,49 @@ const headingSizeClasses = {
         lg: "text-3xl md:text-5xl",
         xl: "text-4xl md:text-6xl",
     },
+};
+
+const phoneRegex =
+    /(?:\+\d{1,3}[\s\-.]?\d{1,14}(?:[\s\-.]?\d{1,4})*|(?:\+31|0)[6][\s\-.]?[\d\s\-\.\(\)]{8,})/g;
+
+const normalizePhoneNumber = (phone: string): string => {
+    return phone.replace(/[\s\-\.\(\)]/g, "");
+};
+
+const createPhoneLinkedContent = (text: string): React.ReactNode[] => {
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match;
+
+    const regex = new RegExp(phoneRegex.source, phoneRegex.flags);
+
+    while ((match = regex.exec(text)) !== null) {
+        // Add text before the phone number
+        if (match.index > lastIndex) {
+            parts.push(text.substring(lastIndex, match.index));
+        }
+
+        const phoneNumber = match[0];
+        const normalized = normalizePhoneNumber(phoneNumber);
+        parts.push(
+            <a
+                key={`phone-${match.index}`}
+                href={`tel:${normalized}`}
+                className="underline decoration-current underline-offset-2"
+            >
+                {phoneNumber}
+            </a>,
+        );
+
+        lastIndex = match.index + phoneNumber.length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+        parts.push(text.substring(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : [text];
 };
 
 const internalDocToHref = ({ linkNode }: { linkNode: SerializedLinkNode }) => {
@@ -113,7 +167,7 @@ const textConverter: JSXConverter<SerializedTextNode> = ({
         });
     }
 
-    let content: React.ReactNode = text;
+    let content: React.ReactNode = createPhoneLinkedContent(text);
 
     // Handle text formatting (bold, italic, underline)
     if (node.format) {
@@ -279,8 +333,16 @@ const linkConverter: JSXConverter<SerializedLinkNode> = ({
     node,
     nodesToJSX,
 }) => {
-    const { doc, linkType, newTab, url, variant, size, buttonSpacing } =
-        node.fields as RichTextLinkFields;
+    const {
+        doc,
+        linkType,
+        newTab,
+        url,
+        variant,
+        size,
+        buttonSpacing,
+        alignment,
+    } = node.fields as RichTextLinkFields;
     const label = nodesToJSX({ nodes: node.children });
 
     const href =
@@ -294,8 +356,12 @@ const linkConverter: JSXConverter<SerializedLinkNode> = ({
               }/${doc.value.slug}`
             : url;
 
+    const isLeftAligned = alignment === "left" || !alignment;
+    const spacingClasses = isLeftAligned
+        ? buttonSpacingClassesLeftAligned
+        : buttonSpacingClasses;
     const spacingClass =
-        variant !== "inline" ? buttonSpacingClasses[buttonSpacing ?? "md"] : "";
+        variant !== "inline" ? spacingClasses[buttonSpacing ?? "md"] : "";
 
     const button = (
         <Button
