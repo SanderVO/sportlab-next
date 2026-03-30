@@ -6,6 +6,7 @@ initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
     trailingSlash: false,
+    cacheComponents: true,
     experimental: {
         serverActions: {
             bodySizeLimit: "5mb",
