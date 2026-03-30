@@ -52,8 +52,8 @@
         "R2_DOCUMENTS_PREFIX": "documents/",
         "SMTP_FROM_ADDRESS": "info@sportlabgroningen.nl",
         "SMTP_FROM_NAME": "Sportlab Groningen",
-        "SMTP_ENABLED": true,
-        "ALLOW_INDEXING": false,
+        "SMTP_ENABLED": "true",
+        "ALLOW_INDEXING": "false",
     },
     "d1_databases": [
         {
@@ -99,8 +99,8 @@
                 "R2_DOCUMENTS_PREFIX": "documents/",
                 "SMTP_FROM_ADDRESS": "info@sportlabgroningen.nl",
                 "SMTP_FROM_NAME": "Sportlab Groningen",
-                "SMTP_ENABLED": true,
-                "ALLOW_INDEXING": true,
+                "SMTP_ENABLED": "true",
+                "ALLOW_INDEXING": "true",
             },
             "services": [
                 {
@@ -150,8 +150,8 @@
                 "R2_DOCUMENTS_PREFIX": "documents_preview/",
                 "SMTP_FROM_ADDRESS": "info@sportlabgroningen.nl",
                 "SMTP_FROM_NAME": "Sportlab Groningen",
-                "SMTP_ENABLED": true,
-                "ALLOW_INDEXING": false,
+                "SMTP_ENABLED": "true",
+                "ALLOW_INDEXING": "false",
             },
             "services": [
                 {
