@@ -29,7 +29,11 @@ export async function WhatsappButton({
                         <WhatsappIcon height={20} width={20} />
                     </div>
 
-                    <span>{buttonText}</span>
+                    <span
+                        style={{ textShadow: "0 1px 2px rgba(0, 0, 0, 0.35)" }}
+                    >
+                        {buttonText}
+                    </span>
                 </Link>
             )}
         </>

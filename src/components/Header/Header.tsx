@@ -36,12 +36,12 @@ export async function Header() {
                 <HeaderNav navItems={navItems} />
 
                 {whatsappData?.phoneNumber && (
-                    <div className="hidden lg:block">
+                    <div className="hidden xl:block">
                         <WhatsappButton {...whatsappData} />
                     </div>
                 )}
 
-                <div className="flex flex-row items-center gap-4 lg:hidden">
+                <div className="flex flex-row items-center gap-4 lg:gap-8 xl:hidden">
                     {whatsappData?.phoneNumber && (
                         <WhatsappButton {...whatsappData} />
                     )}
