@@ -15,11 +15,26 @@ const nextConfig: NextConfig = {
         remotePatterns: [
             new URL("https://sportlabgroningen.nl/**"),
             new URL("https://cdn.sportlab.sandervanooijen.dev/**"),
+            new URL("https://cdn.sportlabgroningen.nl/**"),
         ],
         loader: "custom",
         loaderFile: "./src/utilities/imageLoader.ts",
         deviceSizes: [320, 480, 640, 768, 1080, 1366, 1920],
         qualities: [75, 85, 100],
+        minimumCacheTTL: 31536000,
+    },
+    headers: async () => {
+        return [
+            {
+                source: "/(.*).(jpg|jpeg|png|webp|avif|gif|svg)",
+                headers: [
+                    {
+                        key: "Cache-Control",
+                        value: "public, s-maxage=31536000, max-age=31536000, immutable",
+                    },
+                ],
+            },
+        ];
     },
     redirects: async () => {
         return [
@@ -30,22 +45,47 @@ const nextConfig: NextConfig = {
             },
             {
                 source: "/box-burn",
-                destination: "/small-group-classes",
+                destination: "/small-group-training",
                 permanent: true,
             },
             {
                 source: "/crosstraining",
-                destination: "/small-group-classes",
+                destination: "/small-group-training",
                 permanent: true,
             },
             {
                 source: "/power-hiit",
-                destination: "/small-group-classes",
+                destination: "/small-group-training",
+                permanent: true,
+            },
+            {
+                source: "/groepstrainingen",
+                destination: "/small-group-training",
+                permanent: true,
+            },
+            {
+                source: "/samen-sporten",
+                destination: "/small-group-training",
                 permanent: true,
             },
             {
                 source: "/sfeerimpressie",
                 destination: "/over-ons",
+                permanent: true,
+            },
+            {
+                source: "/rooster",
+                destination: "/",
+                permanent: true,
+            },
+            {
+                source: "/blog/:path*",
+                destination: "/",
+                permanent: true,
+            },
+            {
+                source: "/wishlist",
+                destination: "/",
                 permanent: true,
             },
         ];

@@ -3,6 +3,20 @@
     "version": "1.0.0",
     "private": true,
     "type": "module",
+    "browserslist": {
+        "production": [
+            "chrome >= 120",
+            "edge >= 120",
+            "firefox >= 120",
+            "safari >= 17",
+            "ios_saf >= 17"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
     "scripts": {
         "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
         "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",

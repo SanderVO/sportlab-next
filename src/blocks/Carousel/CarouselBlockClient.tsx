@@ -35,14 +35,14 @@ export const CarouselBlockClient: React.FC<CarouselBlockProps> = (props) => {
             </div>
 
             <div className="w-full overflow-hidden" ref={emblaRef}>
-                <div className="flex flex-row -mx-2">
+                <div className="flex flex-row -mx-2 items-stretch">
                     {carouselItems &&
                         carouselItems.map((carouselItem, index) => (
                             <div
                                 key={carouselItem.id || index}
-                                className="md:flex-[0_0_100%] min-w-0 w-[66.6667%] px-2 md:px-0 basis-[75%] shrink-0"
+                                className="md:flex-[0_0_100%] min-w-0 w-[66.6667%] px-2 md:px-0 basis-[75%] shrink-0 flex flex-col"
                             >
-                                <div className="bg-sl-beige rounded-4xl h-[300px] sm:h-[250px] md:mx-4 flex flex-col py-6 px-8 text-black gap-4">
+                                <div className="bg-sl-beige rounded-4xl h-full md:mx-4 flex flex-col py-6 px-8 text-black gap-4">
                                     <div className="flex flex-row items-center justify-between">
                                         <div className="flex flex-row items-center gap-4">
                                             <Media
