@@ -11,7 +11,7 @@ export const VirtuagymRosterBlock: React.FC = () => {
             height="600"
             loading="lazy"
             referrerPolicy="no-referrer"
-            sandbox="allow-scripts allow-same-origin"
+            sandbox="allow-scripts allow-popups allow-same-origin"
         ></iframe>
     );
 };
