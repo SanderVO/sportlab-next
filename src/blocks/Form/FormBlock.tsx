@@ -3,16 +3,38 @@
 import RichText from "@/components/RichText";
 import { Button } from "@/components/ui/Button";
 import { getClientSideURL } from "@/utilities/getURL";
-import type {
-    FormFieldBlock,
-    Form as FormType,
-} from "@payloadcms/plugin-form-builder/types";
+import type { Form as FormType } from "@payloadcms/plugin-form-builder/types";
 import type { DefaultTypedEditorState } from "@payloadcms/richtext-lexical";
 import { Turnstile } from "next-turnstile";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { fields } from "./fields";
+
+const toSubmissionValue = (value: unknown): string => {
+    if (value === undefined || value === null) return "";
+
+    if (typeof value === "string") return value;
+
+    if (typeof value === "number") {
+        if (Number.isNaN(value)) return "";
+        return String(value);
+    }
+
+    if (typeof value === "boolean") {
+        return String(value);
+    }
+
+    if (Array.isArray(value)) {
+        return value.map((item) => String(item)).join(", ");
+    }
+
+    if (value instanceof Date) {
+        return value.toISOString();
+    }
+
+    return JSON.stringify(value);
+};
 
 export type FormBlockType = {
     blockName?: string;
@@ -40,8 +62,8 @@ export const FormBlock: React.FC<
         introContent,
     } = props;
 
-    const formMethods = useForm({
-        defaultValues: formFromProps.fields,
+    const formMethods = useForm<Record<string, unknown>>({
+        defaultValues: {},
     });
     const {
         control,
@@ -63,7 +85,7 @@ export const FormBlock: React.FC<
     const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
     const onSubmit = useCallback(
-        (data: FormFieldBlock[]) => {
+        (data: Record<string, unknown>) => {
             let loadingTimerID: ReturnType<typeof setTimeout>;
 
             const submitForm = async () => {
@@ -75,7 +97,7 @@ export const FormBlock: React.FC<
                 const dataToSend = Object.entries(data).map(
                     ([name, value]) => ({
                         field: name,
-                        value,
+                        value: toSubmissionValue(value),
                     }),
                 );
 

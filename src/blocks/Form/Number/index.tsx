@@ -39,8 +39,14 @@ export const Number: React.FC<
                 "
                 {...register(name, {
                     required,
-                    valueAsNumber: true,
-                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    setValueAs: (v) => {
+                        if (v === "") return undefined;
+
+                        const parsed = globalThis.Number(v);
+                        return globalThis.Number.isFinite(parsed)
+                            ? parsed
+                            : undefined;
+                    },
                 })}
             />
 
