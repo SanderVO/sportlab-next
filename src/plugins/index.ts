@@ -10,12 +10,87 @@ import {
     FixedToolbarFeature,
     lexicalEditor,
 } from "@payloadcms/richtext-lexical";
-import { Plugin } from "payload";
+import type { CollectionBeforeChangeHook, Plugin } from "payload";
 
 const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
     const url = getServerSideURL();
 
     return doc?.slug ? `${url}/${doc.slug}` : url;
+};
+
+const replaceSelectValuesWithLabels: CollectionBeforeChangeHook = async ({
+    data,
+    operation,
+    req,
+}) => {
+    if (operation !== "create") return data;
+    if (!data?.form || !Array.isArray(data?.submissionData)) return data;
+
+    const formID =
+        typeof data.form === "object" && data.form !== null
+            ? data.form.id
+            : data.form;
+
+    if (!formID) return data;
+
+    const form = await req.payload.findByID({
+        collection: "forms",
+        id: formID,
+        req,
+    });
+
+    if (!Array.isArray(form?.fields)) return data;
+
+    const optionsByField = new Map<string, Map<string, string>>();
+
+    form.fields.forEach((field) => {
+        if (
+            !field ||
+            typeof field !== "object" ||
+            !("blockType" in field) ||
+            !("name" in field)
+        ) {
+            return;
+        }
+
+        if (field.blockType !== "select") {
+            return;
+        }
+
+        if (!Array.isArray(field.options)) {
+            return;
+        }
+
+        const optionMap = new Map<string, string>();
+
+        field.options.forEach((option) => {
+            if (!option) return;
+
+            optionMap.set(String(option.value), option.label);
+        });
+
+        optionsByField.set(field.name, optionMap);
+    });
+
+    const submissionData = data.submissionData.map((entry) => {
+        const options = optionsByField.get(entry.field);
+        if (!options) return entry;
+
+        const valueAsString = String(entry.value);
+        const label = options.get(valueAsString);
+
+        if (!label) return entry;
+
+        return {
+            ...entry,
+            value: label,
+        };
+    });
+
+    return {
+        ...data,
+        submissionData,
+    };
 };
 
 export const plugins: Plugin[] = [
@@ -113,6 +188,9 @@ export const plugins: Plugin[] = [
             labels: {
                 singular: "Formulier Submissie",
                 plural: "Formulier Submissies",
+            },
+            hooks: {
+                beforeChange: [replaceSelectValuesWithLabels],
             },
         },
         formOverrides: {

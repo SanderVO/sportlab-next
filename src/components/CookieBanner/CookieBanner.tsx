@@ -2,61 +2,83 @@
 
 import { useEffect, useState } from "react";
 
+const parseConsentCookie = (cookie: string): "granted" | "denied" | null => {
+    const consentCookie = cookie
+        .split("; ")
+        .find((row) => row.startsWith("ga_consent="));
+
+    if (!consentCookie) {
+        return null;
+    }
+
+    const value = consentCookie.split("=")[1];
+
+    if (value === "granted" || value === "denied") {
+        return value;
+    }
+
+    return null;
+};
+
 export default function CookieBanner() {
-    const [hasGivenConsent, setHasGivenConsent] = useState<boolean>(true);
+    const [hasGivenConsent, setHasGivenConsent] = useState<boolean>(() => {
+        if (typeof document === "undefined") {
+            return true;
+        }
+
+        return Boolean(parseConsentCookie(document.cookie));
+    });
+
+    const getConsentCookie = (): "granted" | "denied" | null => {
+        return parseConsentCookie(document.cookie);
+    };
+
+    const updateGoogleConsent = (value: "granted" | "denied") => {
+        if (!window.gtag) {
+            console.warn(
+                "Google Analytics is not loaded, cannot set consent preferences.",
+            );
+
+            return;
+        }
+
+        const consentState = value === "granted" ? "granted" : "denied";
+
+        window.gtag("consent", "update", {
+            analytics_storage: consentState,
+            ad_storage: consentState,
+            ad_user_data: consentState,
+            ad_personalization: consentState,
+        });
+    };
 
     const setConsentCookie = (value: "granted" | "denied") => {
-        document.cookie = `ga_consent=${value}; Path=/; Max-Age=31536000; SameSite=Lax`;
+        const secureAttribute =
+            window.location.protocol === "https:" ? "; Secure" : "";
+
+        document.cookie = `ga_consent=${value}; Path=/; Max-Age=31536000; SameSite=Lax${secureAttribute}`;
     };
 
     const acceptAll = () => {
         setConsentCookie("granted");
 
         setHasGivenConsent(true);
-
-        if (!window.gtag) {
-            console.warn(
-                "Google Analytics is not loaded, cannot set consent preferences.",
-            );
-
-            return;
-        }
-
-        window.gtag("consent", "update", {
-            analytics_storage: "granted",
-            ad_storage: "granted",
-            ad_user_data: "granted",
-            ad_personalization: "granted",
-        });
+        updateGoogleConsent("granted");
     };
 
     const rejectAll = () => {
         setConsentCookie("denied");
 
         setHasGivenConsent(true);
-
-        if (!window.gtag) {
-            console.warn(
-                "Google Analytics is not loaded, cannot set consent preferences.",
-            );
-
-            return;
-        }
-
-        window.gtag("consent", "update", {
-            ad_storage: "denied",
-            analytics_storage: "denied",
-            ad_user_data: "denied",
-            ad_personalization: "denied",
-        });
+        updateGoogleConsent("denied");
     };
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setHasGivenConsent(
-            typeof window !== "undefined" &&
-                document.cookie.includes("ga_consent="),
-        );
+        const storedConsent = getConsentCookie();
+
+        if (storedConsent) {
+            updateGoogleConsent(storedConsent);
+        }
     }, []);
 
     return (

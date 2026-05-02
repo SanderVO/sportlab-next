@@ -27,7 +27,7 @@ export default function customImageLoader({
 
     const paramsString = params.join(",");
 
-    return `https://sportlab.sandervanooijen.dev/cdn-cgi/image/${paramsString}/${normalizeSrc(
+    return `https://cdn.sportlabgroningen.nl/cdn-cgi/image/${paramsString}/${normalizeSrc(
         src,
     )}`;
 }

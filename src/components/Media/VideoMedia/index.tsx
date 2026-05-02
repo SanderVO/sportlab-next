@@ -2,16 +2,91 @@
 
 import customImageLoader from "@/utilities/imageLoader";
 import { cn } from "@/utilities/ui";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { Props as MediaProps } from "../types";
 
 export const VideoMedia: React.FC<MediaProps> = (props) => {
-    const { onClick, resource, videoClassName } = props;
+    const { fill, onClick, priority, resource, videoClassName } = props;
 
     const videoRef = useRef<HTMLVideoElement>(null);
+    const [shouldLoadVideo, setShouldLoadVideo] = useState(Boolean(priority));
+    const [shouldAutoplay, setShouldAutoplay] = useState(false);
+
+    useEffect(() => {
+        if (shouldLoadVideo) return;
+
+        const node = videoRef.current;
+
+        if (!node) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const [entry] = entries;
+
+                if (!entry?.isIntersecting) return;
+
+                setShouldLoadVideo(true);
+                observer.disconnect();
+            },
+            {
+                rootMargin: "300px",
+            },
+        );
+
+        observer.observe(node);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [shouldLoadVideo]);
+
+    useEffect(() => {
+        const node = videoRef.current;
+
+        if (!node) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            const [entry] = entries;
+
+            if (!entry) return;
+
+            if (entry.isIntersecting) {
+                setShouldLoadVideo(true);
+                setShouldAutoplay(true);
+
+                return;
+            }
+
+            setShouldAutoplay(false);
+        });
+
+        observer.observe(node);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, []);
+
+    useEffect(() => {
+        const node = videoRef.current;
+
+        if (!node) return;
+
+        if (!shouldAutoplay) {
+            node.pause();
+
+            return;
+        }
+
+        const playPromise = node.play();
+
+        if (playPromise && typeof playPromise.catch === "function") {
+            playPromise.catch(() => {});
+        }
+    }, [shouldAutoplay, shouldLoadVideo]);
 
     if (resource && typeof resource === "object") {
-        const { url, poster } = resource;
+        const { url, poster, width, height } = resource;
 
         let videoPoster;
 
@@ -25,7 +100,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
 
         return (
             <>
-                {videoPoster && videoPoster !== "" && (
+                {priority && videoPoster && videoPoster !== "" && (
                     <link
                         rel="preload"
                         as="image"
@@ -36,18 +111,32 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
 
                 {url && (
                     <video
-                        autoPlay
-                        className={cn(videoClassName)}
+                        className={cn(
+                            fill ? "absolute inset-0 h-full w-full" : "",
+                            videoClassName,
+                        )}
                         controls={false}
                         loop
                         muted
                         onClick={onClick}
                         playsInline
+                        preload={priority ? "metadata" : "none"}
                         ref={videoRef}
                         poster={videoPoster}
+                        width={!fill ? width || undefined : undefined}
+                        height={!fill ? height || undefined : undefined}
+                        style={
+                            !fill && width && height
+                                ? {
+                                      aspectRatio: `${width} / ${height}`,
+                                  }
+                                : undefined
+                        }
                         aria-hidden={videoPoster ? "true" : undefined}
                     >
-                        <source src={url} />
+                        {shouldLoadVideo && (
+                            <source src={url} type="video/mp4" />
+                        )}
                     </video>
                 )}
             </>

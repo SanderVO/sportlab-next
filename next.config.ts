@@ -14,7 +14,6 @@ const nextConfig: NextConfig = {
     images: {
         remotePatterns: [
             new URL("https://sportlabgroningen.nl/**"),
-            new URL("https://cdn.sportlab.sandervanooijen.dev/**"),
             new URL("https://cdn.sportlabgroningen.nl/**"),
         ],
         loader: "custom",
