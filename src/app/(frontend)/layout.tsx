@@ -11,6 +11,7 @@ import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
 import { draftMode } from "next/headers";
 import Script from "next/script";
 import React from "react";
+
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -64,11 +65,13 @@ export default async function RootLayout({
 
             <body>
                 <HeaderStateProvider>
-                    <AdminBar
-                        adminBarProps={{
-                            preview: isEnabled,
-                        }}
-                    />
+                    {isEnabled && (
+                        <AdminBar
+                            adminBarProps={{
+                                preview: isEnabled,
+                            }}
+                        />
+                    )}
 
                     <Header />
 
