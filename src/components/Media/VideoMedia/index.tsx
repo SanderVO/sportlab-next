@@ -9,8 +9,37 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
     const { fill, onClick, priority, resource, videoClassName } = props;
 
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [shouldLoadVideo, setShouldLoadVideo] = useState(Boolean(priority));
+    const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
     const [shouldAutoplay, setShouldAutoplay] = useState(false);
+
+    useEffect(() => {
+        if (!priority || shouldLoadVideo) return;
+
+        let timeoutId: number | undefined;
+        let idleId: number | undefined;
+
+        const loadVideo = () => setShouldLoadVideo(true);
+
+        if (typeof window !== "undefined") {
+            if ("requestIdleCallback" in window) {
+                idleId = window.requestIdleCallback(loadVideo, {
+                    timeout: 1800,
+                });
+            } else if ("setTimeout" in window) {
+                timeoutId = window.setTimeout(loadVideo, 1200);
+            }
+        }
+
+        return () => {
+            if (typeof idleId === "number" && "cancelIdleCallback" in window) {
+                window.cancelIdleCallback(idleId);
+            }
+
+            if (typeof timeoutId === "number") {
+                window.clearTimeout(timeoutId);
+            }
+        };
+    }, [priority, shouldLoadVideo]);
 
     useEffect(() => {
         if (shouldLoadVideo) return;
@@ -20,7 +49,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
         if (!node) return;
 
         const observer = new IntersectionObserver(
-            (entries) => {
+            (entries: IntersectionObserverEntry[]) => {
                 const [entry] = entries;
 
                 if (!entry?.isIntersecting) return;
@@ -86,9 +115,9 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
     }, [shouldAutoplay, shouldLoadVideo]);
 
     if (resource && typeof resource === "object") {
-        const { url, poster, width, height } = resource;
+        const { url, poster, thumbnailURL, width, height } = resource;
 
-        let videoPoster;
+        let videoPoster: string | undefined;
 
         if (typeof poster === "object" && poster?.url) {
             videoPoster = customImageLoader({
@@ -96,6 +125,8 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
                 width: 1080,
                 quality: 85,
             });
+        } else if (thumbnailURL) {
+            videoPoster = encodeURI(thumbnailURL);
         }
 
         return (
@@ -120,7 +151,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
                         muted
                         onClick={onClick}
                         playsInline
-                        preload={priority ? "metadata" : "none"}
+                        preload="none"
                         ref={videoRef}
                         poster={videoPoster}
                         width={!fill ? width || undefined : undefined}
