@@ -8,7 +8,7 @@ export const revalidateOrganization: GlobalAfterChangeHook = ({
     if (!context.disableRevalidate) {
         payload.logger.info(`Revalidating Organization`);
 
-        revalidateTag("global_organization");
+        revalidateTag("global_organization", "max");
     }
 
     return doc;

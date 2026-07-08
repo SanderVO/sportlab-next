@@ -23,7 +23,20 @@ export const Button: React.FC<
         children,
     } = props;
 
-    if (!url) {
+    const isValidUrl =
+        !!url &&
+        (url.startsWith("/") ||
+            url.startsWith("#") ||
+            (() => {
+                try {
+                    const parsed = new URL(url);
+                    return parsed.hostname.length > 0;
+                } catch {
+                    return false;
+                }
+            })());
+
+    if (!isValidUrl) {
         return (
             <button
                 {...props}
@@ -52,7 +65,7 @@ export const Button: React.FC<
                 uiVariants.sizes[size],
                 classes,
             )}
-            href={url}
+            href={url!}
             {...newTabProps}
         >
             {children}

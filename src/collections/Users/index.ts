@@ -54,10 +54,39 @@ export const Users: CollectionConfig = {
         useAsTitle: "name",
     },
     access: {
-        admin: ({ req }: { req: { user: User | null } }) =>
-            (req?.user?.roles.includes(RolesEnum.ADMIN) ||
-                req.user?.roles.includes(RolesEnum.EDITOR)) ??
-            false,
+        admin: async ({ req }) => {
+            const user = req?.user as User | null;
+
+            if (!user?.id) {
+                return false;
+            }
+
+            const jwtRoles = Array.isArray(user.roles) ? user.roles : [];
+
+            if (
+                jwtRoles.includes(RolesEnum.ADMIN) ||
+                jwtRoles.includes(RolesEnum.EDITOR)
+            ) {
+                return true;
+            }
+
+            // Fallback for cases where roles are missing from JWT but present in DB.
+            const freshUser = (await req.payload.findByID({
+                id: user.id,
+                collection: "users",
+                depth: 0,
+                overrideAccess: true,
+            })) as User | null;
+
+            const roles = Array.isArray(freshUser?.roles)
+                ? freshUser.roles
+                : [];
+
+            return (
+                roles.includes(RolesEnum.ADMIN) ||
+                roles.includes(RolesEnum.EDITOR)
+            );
+        },
         create: authenticated,
         delete: authenticated,
         // Read access is open - sensitive data like email/hash is protected by field-level access

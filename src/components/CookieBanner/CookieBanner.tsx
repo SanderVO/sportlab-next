@@ -21,13 +21,7 @@ const parseConsentCookie = (cookie: string): "granted" | "denied" | null => {
 };
 
 export default function CookieBanner() {
-    const [hasGivenConsent, setHasGivenConsent] = useState<boolean>(() => {
-        if (typeof document === "undefined") {
-            return true;
-        }
-
-        return Boolean(parseConsentCookie(document.cookie));
-    });
+    const [hasGivenConsent, setHasGivenConsent] = useState(true);
 
     const getConsentCookie = (): "granted" | "denied" | null => {
         return parseConsentCookie(document.cookie);
@@ -78,7 +72,11 @@ export default function CookieBanner() {
 
         if (storedConsent) {
             updateGoogleConsent(storedConsent);
+            setHasGivenConsent(true);
+            return;
         }
+
+        setHasGivenConsent(false);
     }, []);
 
     return (

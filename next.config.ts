@@ -1,8 +1,5 @@
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
-
-initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
     trailingSlash: false,
@@ -91,4 +88,17 @@ const nextConfig: NextConfig = {
     },
 };
 
-export default withPayload(nextConfig);
+const payloadNextConfig = withPayload(nextConfig);
+const outputFileTracingExcludes = payloadNextConfig.outputFileTracingExcludes;
+const rootExcludes = outputFileTracingExcludes?.["**/*"];
+
+if (Array.isArray(rootExcludes)) {
+    payloadNextConfig.outputFileTracingExcludes = {
+        ...outputFileTracingExcludes,
+        "**/*": rootExcludes.filter(
+            (entry) => entry !== "drizzle-kit" && entry !== "drizzle-kit/api",
+        ),
+    };
+}
+
+export default payloadNextConfig;

@@ -143,7 +143,7 @@
             "vars": {
                 "NEXTJS_ENV": "production",
                 "NEXT_PUBLIC_GTM_ID": "GTM-M88CM7Q",
-                "NEXT_PUBLIC_SERVER_URL": "https://localhost:8787",
+                "NEXT_PUBLIC_SERVER_URL": "http://localhost:8787",
                 "NEXT_PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACBFLKYGDAzSPBOB",
                 "R2_PUBLIC_URL": "https://cdn.sportlabgroningen.nl",
                 "R2_IMAGES_PREFIX": "images_preview/",
