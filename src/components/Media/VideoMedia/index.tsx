@@ -21,17 +21,21 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
         const loadVideo = () => setShouldLoadVideo(true);
 
         if (typeof window !== "undefined") {
-            if ("requestIdleCallback" in window) {
+            if (typeof window.requestIdleCallback === "function") {
                 idleId = window.requestIdleCallback(loadVideo, {
                     timeout: 1800,
                 });
-            } else if ("setTimeout" in window) {
+            } else {
                 timeoutId = window.setTimeout(loadVideo, 1200);
             }
         }
 
         return () => {
-            if (typeof idleId === "number" && "cancelIdleCallback" in window) {
+            if (
+                typeof idleId === "number" &&
+                typeof window !== "undefined" &&
+                typeof window.cancelIdleCallback === "function"
+            ) {
                 window.cancelIdleCallback(idleId);
             }
 
