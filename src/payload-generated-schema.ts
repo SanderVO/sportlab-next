@@ -121,7 +121,7 @@ export const media = sqliteTable(
     poster: integer("poster_id").references((): AnySQLiteColumn => media.id, {
       onDelete: "set null",
     }),
-    prefix: text("prefix").default("images/"),
+    prefix: text("prefix").default("images_dev/"),
     updatedAt: text("updated_at")
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),

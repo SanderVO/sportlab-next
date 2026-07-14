@@ -6,7 +6,6 @@ import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { r2Storage } from "@payloadcms/storage-r2";
-import { s3Storage } from "@payloadcms/storage-s3";
 import { nl as baseNl } from "@payloadcms/translations/languages/nl";
 import path from "path";
 import { buildConfig } from "payload";
@@ -50,33 +49,6 @@ const cloudflare =
         ? await getCloudflareContextFromWrangler()
         : await getCloudflareContext({ async: true });
 
-const r2DevStorage = () =>
-    s3Storage({
-        bucket: process.env.R2_BUCKET ?? "",
-        collections: {
-            media: {
-                disableLocalStorage: true,
-                prefix: process.env.R2_IMAGES_PREFIX,
-                generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_IMAGES_PREFIX}${filename}`,
-            },
-            documents: {
-                disableLocalStorage: true,
-                prefix: process.env.R2_DOCUMENTS_PREFIX,
-                generateFileURL: ({ filename }) =>
-                    `${process.env.R2_PUBLIC_URL}/${process.env.R2_DOCUMENTS_PREFIX}${filename}`,
-            },
-        },
-        config: {
-            region: "weur",
-            endpoint: process.env.R2_ENDPOINT,
-            credentials: {
-                accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
-                secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
-            },
-        },
-    });
-
 const r2ProductionStorage = () =>
     r2Storage({
         bucket: cloudflare.env.R2,
@@ -96,7 +68,7 @@ const r2ProductionStorage = () =>
         },
     });
 
-const r2StoragePlugin = isProduction ? r2ProductionStorage() : r2DevStorage();
+const r2StoragePlugin = r2ProductionStorage();
 
 const smtpEnabled = cloudflare.env.SMTP_ENABLED?.toString() === "true";
 const smtpHost = cloudflare.env.SMTP_HOST;

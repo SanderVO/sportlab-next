@@ -22,8 +22,11 @@
         "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
         "db:import": "wrangler d1 execute D1 --local --file=data.sql",
         "db:disable-foreign-keys": "sh -c '{ echo \"PRAGMA foreign_keys=OFF;\"; echo \"PRAGMA defer_foreign_keys=TRUE;\"; grep -E \"^INSERT INTO\" prod.sql; echo \"PRAGMA foreign_keys=ON;\"; } > data.sql'",
+        "db:prepare-preview-sync": "sh -c '{ echo \"PRAGMA foreign_keys=OFF;\"; echo \"PRAGMA defer_foreign_keys=TRUE;\"; grep -E \"^INSERT INTO\" prod.sql | sed -E \"s/^INSERT INTO ([^ ]+).*/\\1/\" | grep -v \"^\"\\\"sqlite_sequence\\\"\"$\" | grep -v \"^\"\\\"revalidations\\\"\"$\" | sort -u | sed \"s/^/DELETE FROM /; s/$/;/\"; grep -E \"^INSERT INTO\" prod.sql | grep -Ev \"^INSERT INTO \\\"revalidations\\\"\"; echo \"PRAGMA foreign_keys=ON;\"; } > data-preview.sql'",
         "db:export": "rm -rf .wrangler/state/v3/d1 && wrangler d1 export D1 --remote --env production --output=prod.sql && grep -E '^INSERT INTO' prod.sql > data.sql",
         "db:sync-prod": "pnpm run db:export && pnpm run migrate && pnpm run db:disable-foreign-keys && pnpm run db:import",
+        "db:import:preview": "wrangler d1 execute D1 --env=preview --remote --file=data-preview.sql",
+        "db:sync-preview": "pnpm run deploy:database:preview && pnpm run db:export && pnpm run db:prepare-preview-sync && pnpm run db:import:preview",
         "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
         "payload:generate": "pnpm run generate:types && pnpm run generate:types:cloudflare && pnpm run generate:db && pnpm run generate:importmap",
         "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
@@ -48,7 +51,6 @@
         "rollback:production": "cross-env NODE_ENV=production CLOUDFLARE_ENV=production PAYLOAD_SECRET=ignore payload migrate:down"
     },
     "dependencies": {
-        "@aws-sdk/client-s3": "^3.940.0",
         "@hookform/resolvers": "^5.1.1",
         "@next/third-parties": "^16.2.10",
         "@opennextjs/cloudflare": "^1.20.1",
@@ -64,7 +66,6 @@
         "@payloadcms/plugin-seo": "3.85.2",
         "@payloadcms/richtext-lexical": "3.85.2",
         "@payloadcms/storage-r2": "3.85.2",
-        "@payloadcms/storage-s3": "3.85.2",
         "@payloadcms/translations": "3.85.2",
         "@payloadcms/ui": "3.85.2",
         "ahooks": "^3.9.6",
@@ -90,7 +91,7 @@
         "@tailwindcss/postcss": "^4",
         "@tailwindcss/typography": "^0.5.19",
         "@types/he": "^1.2.3",
-        "@types/node": "^22.23.1",
+        "@types/node": "^22.0.0",
         "@types/react": "^19.2.3",
         "@types/react-dom": "^19.2.3",
         "autoprefixer": "^10.4.21",
@@ -102,6 +103,6 @@
         "serve": "^14.2.5",
         "tailwindcss": "^4.1.4",
         "typescript": "^5.2.2",
-        "wrangler": "^4.107.1"
+        "wrangler": "^4.110.0"
     }
 }

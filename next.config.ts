@@ -2,6 +2,11 @@ import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+    cacheComponents: process.env.PAYLOAD_CACHE_COMPONENTS === "true",
+    basePath: process.env?.NEXT_BASE_PATH || undefined,
+    typescript: {
+        ignoreBuildErrors: true,
+    },
     trailingSlash: false,
     experimental: {
         serverActions: {
