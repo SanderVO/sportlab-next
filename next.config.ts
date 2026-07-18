@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
         serverActions: {
             bodySizeLimit: "5mb",
         },
+        // Limit to 1 worker during static generation to prevent concurrent workerd
+        // instances from competing for the same SQLite state file (SQLITE_BUSY).
+        // Each Next.js build worker starts its own local miniflare/workerd instance,
+        // and multiple concurrent instances deadlock on shared SQLite state.
+        cpus: 1,
     },
     images: {
         remotePatterns: [
