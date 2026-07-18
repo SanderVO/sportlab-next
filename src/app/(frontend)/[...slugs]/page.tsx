@@ -19,6 +19,8 @@ type Args = {
     }>;
 };
 
+export const revalidate = 300;
+
 const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
     const { isEnabled: draft } = await draftMode();
 
