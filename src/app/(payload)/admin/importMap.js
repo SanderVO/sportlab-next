@@ -30,6 +30,8 @@ import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
+import { ExerciseImportField as ExerciseImportField_adbc0fcc2f58d15934a7efa4aaa706c0 } from '../../../collections/Lessons/components/ExerciseImportField'
+import { GenerateLessonsButton as GenerateLessonsButton_62298332f54a1a61436879b8e4f2a85f } from '../../../collections/LessonTemplates/components/GenerateLessonsButton'
 import { RowLabel as RowLabel_32a51e6e3af330e56588397e714b8f89 } from '@/components/Header/RowLabel'
 import { default as default_2f594692661464c361c9fb763de845e2 } from '../../../components/Logo/Logo'
 import { R2ClientUploadHandler as R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d } from '@payloadcms/storage-r2/client'
@@ -69,6 +71,8 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
+  "./collections/Lessons/components/ExerciseImportField#ExerciseImportField": ExerciseImportField_adbc0fcc2f58d15934a7efa4aaa706c0,
+  "./collections/LessonTemplates/components/GenerateLessonsButton#GenerateLessonsButton": GenerateLessonsButton_62298332f54a1a61436879b8e4f2a85f,
   "@/components/Header/RowLabel#RowLabel": RowLabel_32a51e6e3af330e56588397e714b8f89,
   "./components/Logo/Logo#default": default_2f594692661464c361c9fb763de845e2,
   "@payloadcms/storage-r2/client#R2ClientUploadHandler": R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d,

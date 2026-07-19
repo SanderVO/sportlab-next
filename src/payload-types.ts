@@ -72,6 +72,14 @@ export interface Config {
     documents: Document;
     pages: Page;
     posts: Post;
+    exercises: Exercise;
+    lessons: Lesson;
+    'lesson-templates': LessonTemplate;
+    events: Event;
+    programs: Program;
+    'lesson-enrollments': LessonEnrollment;
+    'program-enrollments': ProgramEnrollment;
+    'event-registrations': EventRegistration;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -88,6 +96,14 @@ export interface Config {
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
+    exercises: ExercisesSelect<false> | ExercisesSelect<true>;
+    lessons: LessonsSelect<false> | LessonsSelect<true>;
+    'lesson-templates': LessonTemplatesSelect<false> | LessonTemplatesSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    programs: ProgramsSelect<false> | ProgramsSelect<true>;
+    'lesson-enrollments': LessonEnrollmentsSelect<false> | LessonEnrollmentsSelect<true>;
+    'program-enrollments': ProgramEnrollmentsSelect<false> | ProgramEnrollmentsSelect<true>;
+    'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -549,6 +565,228 @@ export interface InstagramBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exercises".
+ */
+export interface Exercise {
+  id: number;
+  name: string;
+  category?: string | null;
+  description?: string | null;
+  videoUrl?: string | null;
+  /**
+   * Gebruik dit veld om oefeningen idempotent te importeren via CSV.
+   */
+  externalId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lessons".
+ */
+export interface Lesson {
+  id: number;
+  /**
+   * Selecteer een sjabloon om type, coaches en standaard oefeningen automatisch over te nemen.
+   */
+  template?: (number | null) | LessonTemplate;
+  title: string;
+  type: 'pt' | 'semi_pt' | 'group' | 'open_gym';
+  /**
+   * PT en Semi PT lessen zijn altijd gesloten. Groepslessen en Open Gym kunnen open of gesloten zijn.
+   */
+  status?: ('open' | 'closed') | null;
+  date?: string | null;
+  /**
+   * Koppel een of meerdere coaches aan deze les.
+   */
+  coaches: (number | User)[];
+  exercisesCSVImport?: string | null;
+  exercises?:
+    | {
+        exercise: number | Exercise;
+        sets?: number | null;
+        reps?: string | null;
+        notes?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Gebruik dit veld om lessen idempotent te importeren via CSV.
+   */
+  externalId?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-templates".
+ */
+export interface LessonTemplate {
+  id: number;
+  /**
+   * Alleen actieve sjablonen worden gebruikt bij het automatisch aanmaken van lessen.
+   */
+  isActive?: boolean | null;
+  /**
+   * bijv. 'PT' of 'Groepsles Maandag/Woensdag'
+   */
+  title: string;
+  type: 'pt' | 'semi_pt' | 'group' | 'open_gym';
+  /**
+   * Voeg één rij toe per dag/tijd combinatie (bijv. Maandag 09:00 én Woensdag 14:00).
+   */
+  schedule: {
+    dayOfWeek: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+    time?: string | null;
+    id?: string | null;
+  }[];
+  coaches?: (number | User)[] | null;
+  /**
+   * Optioneel: standaard oefeningen die worden overgenomen bij nieuwe lessen op basis van dit sjabloon.
+   */
+  defaultExercises?:
+    | {
+        exercise: number | Exercise;
+        sets?: number | null;
+        reps?: string | null;
+        notes?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  eventType: 'running' | 'hyrox' | 'special';
+  bannerImage?: (number | null) | Media;
+  startsAt: string;
+  endsAt?: string | null;
+  location?: string | null;
+  capacity?: number | null;
+  signupOpenAt?: string | null;
+  signupCloseAt?: string | null;
+  /**
+   * Gebruik dit veld om events idempotent te importeren via CSV.
+   */
+  externalId?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "programs".
+ */
+export interface Program {
+  id: number;
+  title: string;
+  startDate: string;
+  endDate: string;
+  bannerImage: number | Media;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  schedule: {
+    /**
+     * Kies een datum binnen de start- en einddatum van het programma.
+     */
+    date: string;
+    lessons: number | Lesson;
+    id?: string | null;
+  }[];
+  finalEvent?: (number | null) | Event;
+  /**
+   * Gebruik dit veld om programma's idempotent te importeren via CSV.
+   */
+  externalId?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-enrollments".
+ */
+export interface LessonEnrollment {
+  id: number;
+  user: number | User;
+  lesson: number | Lesson;
+  status: 'assigned' | 'started' | 'completed' | 'cancelled';
+  /**
+   * Wordt automatisch gezet via een hook.
+   */
+  addedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "program-enrollments".
+ */
+export interface ProgramEnrollment {
+  id: number;
+  user: number | User;
+  program: number | Program;
+  status: 'enrolled' | 'active' | 'completed' | 'dropped';
+  /**
+   * Wordt automatisch gezet via een hook.
+   */
+  addedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-registrations".
+ */
+export interface EventRegistration {
+  id: number;
+  user: number | User;
+  event: number | Event;
+  status: 'registered' | 'waitlist' | 'cancelled' | 'attended';
+  /**
+   * Wordt automatisch gezet via een hook.
+   */
+  addedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -883,6 +1121,38 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null)
     | ({
+        relationTo: 'exercises';
+        value: number | Exercise;
+      } | null)
+    | ({
+        relationTo: 'lessons';
+        value: number | Lesson;
+      } | null)
+    | ({
+        relationTo: 'lesson-templates';
+        value: number | LessonTemplate;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'programs';
+        value: number | Program;
+      } | null)
+    | ({
+        relationTo: 'lesson-enrollments';
+        value: number | LessonEnrollment;
+      } | null)
+    | ({
+        relationTo: 'program-enrollments';
+        value: number | ProgramEnrollment;
+      } | null)
+    | ({
+        relationTo: 'event-registrations';
+        value: number | EventRegistration;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1176,6 +1446,154 @@ export interface PostsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exercises_select".
+ */
+export interface ExercisesSelect<T extends boolean = true> {
+  name?: T;
+  category?: T;
+  description?: T;
+  videoUrl?: T;
+  externalId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lessons_select".
+ */
+export interface LessonsSelect<T extends boolean = true> {
+  template?: T;
+  title?: T;
+  type?: T;
+  status?: T;
+  date?: T;
+  coaches?: T;
+  exercisesCSVImport?: T;
+  exercises?:
+    | T
+    | {
+        exercise?: T;
+        sets?: T;
+        reps?: T;
+        notes?: T;
+        id?: T;
+      };
+  externalId?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-templates_select".
+ */
+export interface LessonTemplatesSelect<T extends boolean = true> {
+  isActive?: T;
+  title?: T;
+  type?: T;
+  schedule?:
+    | T
+    | {
+        dayOfWeek?: T;
+        time?: T;
+        id?: T;
+      };
+  coaches?: T;
+  defaultExercises?:
+    | T
+    | {
+        exercise?: T;
+        sets?: T;
+        reps?: T;
+        notes?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  eventType?: T;
+  bannerImage?: T;
+  startsAt?: T;
+  endsAt?: T;
+  location?: T;
+  capacity?: T;
+  signupOpenAt?: T;
+  signupCloseAt?: T;
+  externalId?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "programs_select".
+ */
+export interface ProgramsSelect<T extends boolean = true> {
+  title?: T;
+  startDate?: T;
+  endDate?: T;
+  bannerImage?: T;
+  description?: T;
+  schedule?:
+    | T
+    | {
+        date?: T;
+        lessons?: T;
+        id?: T;
+      };
+  finalEvent?: T;
+  externalId?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-enrollments_select".
+ */
+export interface LessonEnrollmentsSelect<T extends boolean = true> {
+  user?: T;
+  lesson?: T;
+  status?: T;
+  addedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "program-enrollments_select".
+ */
+export interface ProgramEnrollmentsSelect<T extends boolean = true> {
+  user?: T;
+  program?: T;
+  status?: T;
+  addedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-registrations_select".
+ */
+export interface EventRegistrationsSelect<T extends boolean = true> {
+  user?: T;
+  event?: T;
+  status?: T;
+  addedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

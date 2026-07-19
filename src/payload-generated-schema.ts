@@ -1083,6 +1083,454 @@ export const _posts_v_rels = sqliteTable(
   ],
 );
 
+export const exercises = sqliteTable(
+  "exercises",
+  {
+    id: integer("id").primaryKey(),
+    name: text("name").notNull(),
+    category: text("category"),
+    description: text("description"),
+    videoUrl: text("video_url"),
+    externalId: text("external_id"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    uniqueIndex("exercises_external_id_idx").on(columns.externalId),
+    index("exercises_updated_at_idx").on(columns.updatedAt),
+    index("exercises_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const lessons_exercises = sqliteTable(
+  "lessons_exercises",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    exercise: integer("exercise_id")
+      .notNull()
+      .references(() => exercises.id, {
+        onDelete: "set null",
+      }),
+    sets: numeric("sets", { mode: "number" }),
+    reps: text("reps"),
+    notes: text("notes"),
+  },
+  (columns) => [
+    index("lessons_exercises_order_idx").on(columns._order),
+    index("lessons_exercises_parent_id_idx").on(columns._parentID),
+    index("lessons_exercises_exercise_idx").on(columns.exercise),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [lessons.id],
+      name: "lessons_exercises_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lessons = sqliteTable(
+  "lessons",
+  {
+    id: integer("id").primaryKey(),
+    template: integer("template_id").references(() => lesson_templates.id, {
+      onDelete: "set null",
+    }),
+    title: text("title").notNull(),
+    type: text("type", {
+      enum: ["pt", "semi_pt", "group", "open_gym"],
+    }).notNull(),
+    status: text("status", { enum: ["open", "closed"] }).default("closed"),
+    date: text("date").default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    exercisesCSVImport: text("exercises_c_s_v_import"),
+    externalId: text("external_id"),
+    generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
+    slug: text("slug"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("lessons_template_idx").on(columns.template),
+    uniqueIndex("lessons_external_id_idx").on(columns.externalId),
+    uniqueIndex("lessons_slug_idx").on(columns.slug),
+    index("lessons_updated_at_idx").on(columns.updatedAt),
+    index("lessons_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const lessons_rels = sqliteTable(
+  "lessons_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    usersID: integer("users_id"),
+  },
+  (columns) => [
+    index("lessons_rels_order_idx").on(columns.order),
+    index("lessons_rels_parent_idx").on(columns.parent),
+    index("lessons_rels_path_idx").on(columns.path),
+    index("lessons_rels_users_id_idx").on(columns.usersID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [lessons.id],
+      name: "lessons_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "lessons_rels_users_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lesson_templates_schedule = sqliteTable(
+  "lesson_templates_schedule",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    dayOfWeek: text("day_of_week", {
+      enum: [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+      ],
+    }).notNull(),
+    time: text("time").default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("lesson_templates_schedule_order_idx").on(columns._order),
+    index("lesson_templates_schedule_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [lesson_templates.id],
+      name: "lesson_templates_schedule_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lesson_templates_default_exercises = sqliteTable(
+  "lesson_templates_default_exercises",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    exercise: integer("exercise_id")
+      .notNull()
+      .references(() => exercises.id, {
+        onDelete: "set null",
+      }),
+    sets: numeric("sets", { mode: "number" }),
+    reps: text("reps"),
+    notes: text("notes"),
+  },
+  (columns) => [
+    index("lesson_templates_default_exercises_order_idx").on(columns._order),
+    index("lesson_templates_default_exercises_parent_id_idx").on(
+      columns._parentID,
+    ),
+    index("lesson_templates_default_exercises_exercise_idx").on(
+      columns.exercise,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [lesson_templates.id],
+      name: "lesson_templates_default_exercises_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lesson_templates = sqliteTable(
+  "lesson_templates",
+  {
+    id: integer("id").primaryKey(),
+    isActive: integer("is_active", { mode: "boolean" }).default(true),
+    title: text("title").notNull(),
+    type: text("type", {
+      enum: ["pt", "semi_pt", "group", "open_gym"],
+    }).notNull(),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("lesson_templates_updated_at_idx").on(columns.updatedAt),
+    index("lesson_templates_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const lesson_templates_rels = sqliteTable(
+  "lesson_templates_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    usersID: integer("users_id"),
+  },
+  (columns) => [
+    index("lesson_templates_rels_order_idx").on(columns.order),
+    index("lesson_templates_rels_parent_idx").on(columns.parent),
+    index("lesson_templates_rels_path_idx").on(columns.path),
+    index("lesson_templates_rels_users_id_idx").on(columns.usersID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [lesson_templates.id],
+      name: "lesson_templates_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["usersID"]],
+      foreignColumns: [users.id],
+      name: "lesson_templates_rels_users_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const events = sqliteTable(
+  "events",
+  {
+    id: integer("id").primaryKey(),
+    title: text("title").notNull(),
+    eventType: text("event_type", {
+      enum: ["running", "hyrox", "special"],
+    }).notNull(),
+    bannerImage: integer("banner_image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    startsAt: text("starts_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    endsAt: text("ends_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    location: text("location"),
+    capacity: numeric("capacity", { mode: "number" }),
+    signupOpenAt: text("signup_open_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    signupCloseAt: text("signup_close_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    externalId: text("external_id"),
+    generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
+    slug: text("slug"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("events_banner_image_idx").on(columns.bannerImage),
+    uniqueIndex("events_external_id_idx").on(columns.externalId),
+    uniqueIndex("events_slug_idx").on(columns.slug),
+    index("events_updated_at_idx").on(columns.updatedAt),
+    index("events_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const programs_schedule = sqliteTable(
+  "programs_schedule",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    date: text("date")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    lessons: integer("lessons_id")
+      .notNull()
+      .references(() => lessons.id, {
+        onDelete: "set null",
+      }),
+  },
+  (columns) => [
+    index("programs_schedule_order_idx").on(columns._order),
+    index("programs_schedule_parent_id_idx").on(columns._parentID),
+    index("programs_schedule_lessons_idx").on(columns.lessons),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [programs.id],
+      name: "programs_schedule_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const programs = sqliteTable(
+  "programs",
+  {
+    id: integer("id").primaryKey(),
+    title: text("title").notNull(),
+    startDate: text("start_date")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    endDate: text("end_date")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    bannerImage: integer("banner_image_id")
+      .notNull()
+      .references(() => media.id, {
+        onDelete: "set null",
+      }),
+    description: text("description", { mode: "json" }).notNull(),
+    finalEvent: integer("final_event_id").references(() => events.id, {
+      onDelete: "set null",
+    }),
+    externalId: text("external_id"),
+    generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
+    slug: text("slug"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("programs_banner_image_idx").on(columns.bannerImage),
+    index("programs_final_event_idx").on(columns.finalEvent),
+    uniqueIndex("programs_external_id_idx").on(columns.externalId),
+    uniqueIndex("programs_slug_idx").on(columns.slug),
+    index("programs_updated_at_idx").on(columns.updatedAt),
+    index("programs_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const lesson_enrollments = sqliteTable(
+  "lesson_enrollments",
+  {
+    id: integer("id").primaryKey(),
+    user: integer("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    lesson: integer("lesson_id")
+      .notNull()
+      .references(() => lessons.id, {
+        onDelete: "set null",
+      }),
+    status: text("status", {
+      enum: ["assigned", "started", "completed", "cancelled"],
+    })
+      .notNull()
+      .default("assigned"),
+    addedBy: integer("added_by_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("lesson_enrollments_user_idx").on(columns.user),
+    index("lesson_enrollments_lesson_idx").on(columns.lesson),
+    index("lesson_enrollments_added_by_idx").on(columns.addedBy),
+    index("lesson_enrollments_updated_at_idx").on(columns.updatedAt),
+    index("lesson_enrollments_created_at_idx").on(columns.createdAt),
+    uniqueIndex("user_lesson_idx").on(columns.user, columns.lesson),
+  ],
+);
+
+export const program_enrollments = sqliteTable(
+  "program_enrollments",
+  {
+    id: integer("id").primaryKey(),
+    user: integer("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    program: integer("program_id")
+      .notNull()
+      .references(() => programs.id, {
+        onDelete: "set null",
+      }),
+    status: text("status", {
+      enum: ["enrolled", "active", "completed", "dropped"],
+    })
+      .notNull()
+      .default("enrolled"),
+    addedBy: integer("added_by_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("program_enrollments_user_idx").on(columns.user),
+    index("program_enrollments_program_idx").on(columns.program),
+    index("program_enrollments_added_by_idx").on(columns.addedBy),
+    index("program_enrollments_updated_at_idx").on(columns.updatedAt),
+    index("program_enrollments_created_at_idx").on(columns.createdAt),
+    uniqueIndex("user_program_idx").on(columns.user, columns.program),
+  ],
+);
+
+export const event_registrations = sqliteTable(
+  "event_registrations",
+  {
+    id: integer("id").primaryKey(),
+    user: integer("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    event: integer("event_id")
+      .notNull()
+      .references(() => events.id, {
+        onDelete: "set null",
+      }),
+    status: text("status", {
+      enum: ["registered", "waitlist", "cancelled", "attended"],
+    })
+      .notNull()
+      .default("registered"),
+    addedBy: integer("added_by_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("event_registrations_user_idx").on(columns.user),
+    index("event_registrations_event_idx").on(columns.event),
+    index("event_registrations_added_by_idx").on(columns.addedBy),
+    index("event_registrations_updated_at_idx").on(columns.updatedAt),
+    index("event_registrations_created_at_idx").on(columns.createdAt),
+    uniqueIndex("user_event_idx").on(columns.user, columns.event),
+  ],
+);
+
 export const redirects = sqliteTable(
   "redirects",
   {
@@ -1544,6 +1992,14 @@ export const payload_locked_documents_rels = sqliteTable(
     documentsID: integer("documents_id"),
     pagesID: integer("pages_id"),
     postsID: integer("posts_id"),
+    exercisesID: integer("exercises_id"),
+    lessonsID: integer("lessons_id"),
+    "lesson-templatesID": integer("lesson_templates_id"),
+    eventsID: integer("events_id"),
+    programsID: integer("programs_id"),
+    "lesson-enrollmentsID": integer("lesson_enrollments_id"),
+    "program-enrollmentsID": integer("program_enrollments_id"),
+    "event-registrationsID": integer("event_registrations_id"),
     redirectsID: integer("redirects_id"),
     formsID: integer("forms_id"),
     "form-submissionsID": integer("form_submissions_id"),
@@ -1559,6 +2015,26 @@ export const payload_locked_documents_rels = sqliteTable(
     ),
     index("payload_locked_documents_rels_pages_id_idx").on(columns.pagesID),
     index("payload_locked_documents_rels_posts_id_idx").on(columns.postsID),
+    index("payload_locked_documents_rels_exercises_id_idx").on(
+      columns.exercisesID,
+    ),
+    index("payload_locked_documents_rels_lessons_id_idx").on(columns.lessonsID),
+    index("payload_locked_documents_rels_lesson_templates_id_idx").on(
+      columns["lesson-templatesID"],
+    ),
+    index("payload_locked_documents_rels_events_id_idx").on(columns.eventsID),
+    index("payload_locked_documents_rels_programs_id_idx").on(
+      columns.programsID,
+    ),
+    index("payload_locked_documents_rels_lesson_enrollments_id_idx").on(
+      columns["lesson-enrollmentsID"],
+    ),
+    index("payload_locked_documents_rels_program_enrollments_id_idx").on(
+      columns["program-enrollmentsID"],
+    ),
+    index("payload_locked_documents_rels_event_registrations_id_idx").on(
+      columns["event-registrationsID"],
+    ),
     index("payload_locked_documents_rels_redirects_id_idx").on(
       columns.redirectsID,
     ),
@@ -1595,6 +2071,46 @@ export const payload_locked_documents_rels = sqliteTable(
       columns: [columns["postsID"]],
       foreignColumns: [posts.id],
       name: "payload_locked_documents_rels_posts_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["exercisesID"]],
+      foreignColumns: [exercises.id],
+      name: "payload_locked_documents_rels_exercises_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["lessonsID"]],
+      foreignColumns: [lessons.id],
+      name: "payload_locked_documents_rels_lessons_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["lesson-templatesID"]],
+      foreignColumns: [lesson_templates.id],
+      name: "payload_locked_documents_rels_lesson_templates_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["eventsID"]],
+      foreignColumns: [events.id],
+      name: "payload_locked_documents_rels_events_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["programsID"]],
+      foreignColumns: [programs.id],
+      name: "payload_locked_documents_rels_programs_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["lesson-enrollmentsID"]],
+      foreignColumns: [lesson_enrollments.id],
+      name: "payload_locked_documents_rels_lesson_enrollments_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["program-enrollmentsID"]],
+      foreignColumns: [program_enrollments.id],
+      name: "payload_locked_documents_rels_program_enrollments_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["event-registrationsID"]],
+      foreignColumns: [event_registrations.id],
+      name: "payload_locked_documents_rels_event_registrations_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["redirectsID"]],
@@ -2448,6 +2964,198 @@ export const relations__posts_v = relations(_posts_v, ({ one, many }) => ({
     relationName: "_rels",
   }),
 }));
+export const relations_exercises = relations(exercises, () => ({}));
+export const relations_lessons_exercises = relations(
+  lessons_exercises,
+  ({ one }) => ({
+    _parentID: one(lessons, {
+      fields: [lessons_exercises._parentID],
+      references: [lessons.id],
+      relationName: "exercises",
+    }),
+    exercise: one(exercises, {
+      fields: [lessons_exercises.exercise],
+      references: [exercises.id],
+      relationName: "exercise",
+    }),
+  }),
+);
+export const relations_lessons_rels = relations(lessons_rels, ({ one }) => ({
+  parent: one(lessons, {
+    fields: [lessons_rels.parent],
+    references: [lessons.id],
+    relationName: "_rels",
+  }),
+  usersID: one(users, {
+    fields: [lessons_rels.usersID],
+    references: [users.id],
+    relationName: "users",
+  }),
+}));
+export const relations_lessons = relations(lessons, ({ one, many }) => ({
+  template: one(lesson_templates, {
+    fields: [lessons.template],
+    references: [lesson_templates.id],
+    relationName: "template",
+  }),
+  exercises: many(lessons_exercises, {
+    relationName: "exercises",
+  }),
+  _rels: many(lessons_rels, {
+    relationName: "_rels",
+  }),
+}));
+export const relations_lesson_templates_schedule = relations(
+  lesson_templates_schedule,
+  ({ one }) => ({
+    _parentID: one(lesson_templates, {
+      fields: [lesson_templates_schedule._parentID],
+      references: [lesson_templates.id],
+      relationName: "schedule",
+    }),
+  }),
+);
+export const relations_lesson_templates_default_exercises = relations(
+  lesson_templates_default_exercises,
+  ({ one }) => ({
+    _parentID: one(lesson_templates, {
+      fields: [lesson_templates_default_exercises._parentID],
+      references: [lesson_templates.id],
+      relationName: "defaultExercises",
+    }),
+    exercise: one(exercises, {
+      fields: [lesson_templates_default_exercises.exercise],
+      references: [exercises.id],
+      relationName: "exercise",
+    }),
+  }),
+);
+export const relations_lesson_templates_rels = relations(
+  lesson_templates_rels,
+  ({ one }) => ({
+    parent: one(lesson_templates, {
+      fields: [lesson_templates_rels.parent],
+      references: [lesson_templates.id],
+      relationName: "_rels",
+    }),
+    usersID: one(users, {
+      fields: [lesson_templates_rels.usersID],
+      references: [users.id],
+      relationName: "users",
+    }),
+  }),
+);
+export const relations_lesson_templates = relations(
+  lesson_templates,
+  ({ many }) => ({
+    schedule: many(lesson_templates_schedule, {
+      relationName: "schedule",
+    }),
+    defaultExercises: many(lesson_templates_default_exercises, {
+      relationName: "defaultExercises",
+    }),
+    _rels: many(lesson_templates_rels, {
+      relationName: "_rels",
+    }),
+  }),
+);
+export const relations_events = relations(events, ({ one }) => ({
+  bannerImage: one(media, {
+    fields: [events.bannerImage],
+    references: [media.id],
+    relationName: "bannerImage",
+  }),
+}));
+export const relations_programs_schedule = relations(
+  programs_schedule,
+  ({ one }) => ({
+    _parentID: one(programs, {
+      fields: [programs_schedule._parentID],
+      references: [programs.id],
+      relationName: "schedule",
+    }),
+    lessons: one(lessons, {
+      fields: [programs_schedule.lessons],
+      references: [lessons.id],
+      relationName: "lessons",
+    }),
+  }),
+);
+export const relations_programs = relations(programs, ({ one, many }) => ({
+  bannerImage: one(media, {
+    fields: [programs.bannerImage],
+    references: [media.id],
+    relationName: "bannerImage",
+  }),
+  schedule: many(programs_schedule, {
+    relationName: "schedule",
+  }),
+  finalEvent: one(events, {
+    fields: [programs.finalEvent],
+    references: [events.id],
+    relationName: "finalEvent",
+  }),
+}));
+export const relations_lesson_enrollments = relations(
+  lesson_enrollments,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [lesson_enrollments.user],
+      references: [users.id],
+      relationName: "user",
+    }),
+    lesson: one(lessons, {
+      fields: [lesson_enrollments.lesson],
+      references: [lessons.id],
+      relationName: "lesson",
+    }),
+    addedBy: one(users, {
+      fields: [lesson_enrollments.addedBy],
+      references: [users.id],
+      relationName: "addedBy",
+    }),
+  }),
+);
+export const relations_program_enrollments = relations(
+  program_enrollments,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [program_enrollments.user],
+      references: [users.id],
+      relationName: "user",
+    }),
+    program: one(programs, {
+      fields: [program_enrollments.program],
+      references: [programs.id],
+      relationName: "program",
+    }),
+    addedBy: one(users, {
+      fields: [program_enrollments.addedBy],
+      references: [users.id],
+      relationName: "addedBy",
+    }),
+  }),
+);
+export const relations_event_registrations = relations(
+  event_registrations,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [event_registrations.user],
+      references: [users.id],
+      relationName: "user",
+    }),
+    event: one(events, {
+      fields: [event_registrations.event],
+      references: [events.id],
+      relationName: "event",
+    }),
+    addedBy: one(users, {
+      fields: [event_registrations.addedBy],
+      references: [users.id],
+      relationName: "addedBy",
+    }),
+  }),
+);
 export const relations_redirects_rels = relations(
   redirects_rels,
   ({ one }) => ({
@@ -2660,6 +3368,46 @@ export const relations_payload_locked_documents_rels = relations(
       fields: [payload_locked_documents_rels.postsID],
       references: [posts.id],
       relationName: "posts",
+    }),
+    exercisesID: one(exercises, {
+      fields: [payload_locked_documents_rels.exercisesID],
+      references: [exercises.id],
+      relationName: "exercises",
+    }),
+    lessonsID: one(lessons, {
+      fields: [payload_locked_documents_rels.lessonsID],
+      references: [lessons.id],
+      relationName: "lessons",
+    }),
+    "lesson-templatesID": one(lesson_templates, {
+      fields: [payload_locked_documents_rels["lesson-templatesID"]],
+      references: [lesson_templates.id],
+      relationName: "lesson-templates",
+    }),
+    eventsID: one(events, {
+      fields: [payload_locked_documents_rels.eventsID],
+      references: [events.id],
+      relationName: "events",
+    }),
+    programsID: one(programs, {
+      fields: [payload_locked_documents_rels.programsID],
+      references: [programs.id],
+      relationName: "programs",
+    }),
+    "lesson-enrollmentsID": one(lesson_enrollments, {
+      fields: [payload_locked_documents_rels["lesson-enrollmentsID"]],
+      references: [lesson_enrollments.id],
+      relationName: "lesson-enrollments",
+    }),
+    "program-enrollmentsID": one(program_enrollments, {
+      fields: [payload_locked_documents_rels["program-enrollmentsID"]],
+      references: [program_enrollments.id],
+      relationName: "program-enrollments",
+    }),
+    "event-registrationsID": one(event_registrations, {
+      fields: [payload_locked_documents_rels["event-registrationsID"]],
+      references: [event_registrations.id],
+      relationName: "event-registrations",
     }),
     redirectsID: one(redirects, {
       fields: [payload_locked_documents_rels.redirectsID],
@@ -2886,6 +3634,20 @@ type DatabaseSchema = {
   _posts_v_version_populated_authors: typeof _posts_v_version_populated_authors;
   _posts_v: typeof _posts_v;
   _posts_v_rels: typeof _posts_v_rels;
+  exercises: typeof exercises;
+  lessons_exercises: typeof lessons_exercises;
+  lessons: typeof lessons;
+  lessons_rels: typeof lessons_rels;
+  lesson_templates_schedule: typeof lesson_templates_schedule;
+  lesson_templates_default_exercises: typeof lesson_templates_default_exercises;
+  lesson_templates: typeof lesson_templates;
+  lesson_templates_rels: typeof lesson_templates_rels;
+  events: typeof events;
+  programs_schedule: typeof programs_schedule;
+  programs: typeof programs;
+  lesson_enrollments: typeof lesson_enrollments;
+  program_enrollments: typeof program_enrollments;
+  event_registrations: typeof event_registrations;
   redirects: typeof redirects;
   redirects_rels: typeof redirects_rels;
   forms_blocks_checkbox: typeof forms_blocks_checkbox;
@@ -2950,6 +3712,20 @@ type DatabaseSchema = {
   relations__posts_v_version_populated_authors: typeof relations__posts_v_version_populated_authors;
   relations__posts_v_rels: typeof relations__posts_v_rels;
   relations__posts_v: typeof relations__posts_v;
+  relations_exercises: typeof relations_exercises;
+  relations_lessons_exercises: typeof relations_lessons_exercises;
+  relations_lessons_rels: typeof relations_lessons_rels;
+  relations_lessons: typeof relations_lessons;
+  relations_lesson_templates_schedule: typeof relations_lesson_templates_schedule;
+  relations_lesson_templates_default_exercises: typeof relations_lesson_templates_default_exercises;
+  relations_lesson_templates_rels: typeof relations_lesson_templates_rels;
+  relations_lesson_templates: typeof relations_lesson_templates;
+  relations_events: typeof relations_events;
+  relations_programs_schedule: typeof relations_programs_schedule;
+  relations_programs: typeof relations_programs;
+  relations_lesson_enrollments: typeof relations_lesson_enrollments;
+  relations_program_enrollments: typeof relations_program_enrollments;
+  relations_event_registrations: typeof relations_event_registrations;
   relations_redirects_rels: typeof relations_redirects_rels;
   relations_redirects: typeof relations_redirects;
   relations_forms_blocks_checkbox: typeof relations_forms_blocks_checkbox;

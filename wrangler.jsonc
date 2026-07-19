@@ -57,6 +57,13 @@
         "SMTP_FROM_NAME": "Sportlab Groningen",
         "SMTP_ENABLED": "true",
         "ALLOW_INDEXING": "false",
+        // Set this secret via: wrangler secret put CRON_SECRET
+        // It authenticates the scheduled cron call to /api/generate-lessons
+        "CRON_SECRET": "",
+    },
+    // Runs daily at 03:00 UTC — generates lessons for the next 31 days from active templates
+    "triggers": {
+        "crons": ["0 3 * * *"],
     },
     "d1_databases": [
         {

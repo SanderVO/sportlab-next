@@ -12,9 +12,17 @@ import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
 import { GetPlatformProxyOptions } from "wrangler";
 import { Documents } from "./collections/Documents";
+import { EventRegistrations } from "./collections/EventRegistrations";
+import { Events } from "./collections/Events";
+import { Exercises } from "./collections/Exercises";
+import { LessonEnrollments } from "./collections/LessonEnrollments";
+import { LessonTemplates } from "./collections/LessonTemplates";
+import { Lessons } from "./collections/Lessons";
 import { Media } from "./collections/Media";
 import { Pages } from "./collections/Pages";
 import { Posts } from "./collections/Posts";
+import { ProgramEnrollments } from "./collections/ProgramEnrollments";
+import { Programs } from "./collections/Programs";
 import { Users } from "./collections/Users";
 import { Footer } from "./components/Footer/config";
 import { Header } from "./components/Header/config";
@@ -143,7 +151,21 @@ export default buildConfig({
         },
     },
     email: emailAdapter,
-    collections: [Users, Media, Documents, Pages, Posts],
+    collections: [
+        Users,
+        Media,
+        Documents,
+        Pages,
+        Posts,
+        Exercises,
+        Lessons,
+        LessonTemplates,
+        Events,
+        Programs,
+        LessonEnrollments,
+        ProgramEnrollments,
+        EventRegistrations,
+    ],
     globals: [Header, Footer, WhatsApp, Organization],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
