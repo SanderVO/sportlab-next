@@ -27,6 +27,20 @@
             "service": "sportlab",
         },
     ],
+    "durable_objects": {
+        "bindings": [
+            {
+                "name": "NEXT_CACHE_DO_QUEUE",
+                "class_name": "DOQueueHandler",
+            },
+        ],
+    },
+    "migrations": [
+        {
+            "tag": "v1",
+            "new_sqlite_classes": ["DOQueueHandler"],
+        },
+    ],
     "placement": {
         "mode": "smart",
     },
@@ -111,6 +125,14 @@
                     "service": "sportlab",
                 },
             ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                    },
+                ],
+            },
             "d1_databases": [
                 {
                     "binding": "D1",
@@ -162,6 +184,14 @@
                     "service": "sportlab-preview",
                 },
             ],
+            "durable_objects": {
+                "bindings": [
+                    {
+                        "name": "NEXT_CACHE_DO_QUEUE",
+                        "class_name": "DOQueueHandler",
+                    },
+                ],
+            },
             "d1_databases": [
                 {
                     "binding": "D1",
