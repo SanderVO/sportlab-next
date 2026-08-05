@@ -24,6 +24,7 @@ import { Posts } from "./collections/Posts";
 import { ProgramEnrollments } from "./collections/ProgramEnrollments";
 import { Programs } from "./collections/Programs";
 import { Users } from "./collections/Users";
+import { Workouts } from "./collections/Workouts";
 import { Footer } from "./components/Footer/config";
 import { Header } from "./components/Header/config";
 import { Organization } from "./components/Organization/config";
@@ -162,6 +163,7 @@ export default buildConfig({
         LessonTemplates,
         Events,
         Programs,
+        Workouts,
         LessonEnrollments,
         ProgramEnrollments,
         EventRegistrations,

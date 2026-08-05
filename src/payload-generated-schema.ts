@@ -1088,7 +1088,6 @@ export const exercises = sqliteTable(
   {
     id: integer("id").primaryKey(),
     name: text("name").notNull(),
-    category: text("category"),
     description: text("description"),
     videoUrl: text("video_url"),
     externalId: text("external_id"),
@@ -1106,29 +1105,80 @@ export const exercises = sqliteTable(
   ],
 );
 
-export const lessons_exercises = sqliteTable(
-  "lessons_exercises",
+export const exercises_rels = sqliteTable(
+  "exercises_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    workoutsID: integer("workouts_id"),
+  },
+  (columns) => [
+    index("exercises_rels_order_idx").on(columns.order),
+    index("exercises_rels_parent_idx").on(columns.parent),
+    index("exercises_rels_path_idx").on(columns.path),
+    index("exercises_rels_workouts_id_idx").on(columns.workoutsID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [exercises.id],
+      name: "exercises_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["workoutsID"]],
+      foreignColumns: [workouts.id],
+      name: "exercises_rels_workouts_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lessons_workout_blocks_exercises = sqliteTable(
+  "lessons_workout_blocks_exercises",
   {
     _order: integer("_order").notNull(),
-    _parentID: integer("_parent_id").notNull(),
+    _parentID: text("_parent_id").notNull(),
     id: text("id").primaryKey(),
     exercise: integer("exercise_id")
       .notNull()
       .references(() => exercises.id, {
         onDelete: "set null",
       }),
-    sets: numeric("sets", { mode: "number" }),
-    reps: text("reps"),
-    notes: text("notes"),
   },
   (columns) => [
-    index("lessons_exercises_order_idx").on(columns._order),
-    index("lessons_exercises_parent_id_idx").on(columns._parentID),
-    index("lessons_exercises_exercise_idx").on(columns.exercise),
+    index("lessons_workout_blocks_exercises_order_idx").on(columns._order),
+    index("lessons_workout_blocks_exercises_parent_id_idx").on(
+      columns._parentID,
+    ),
+    index("lessons_workout_blocks_exercises_exercise_idx").on(columns.exercise),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [lessons_workout_blocks.id],
+      name: "lessons_workout_blocks_exercises_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lessons_workout_blocks = sqliteTable(
+  "lessons_workout_blocks",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    workout: integer("workout_id")
+      .notNull()
+      .references(() => workouts.id, {
+        onDelete: "set null",
+      }),
+    duration: numeric("duration", { mode: "number" }).notNull(),
+  },
+  (columns) => [
+    index("lessons_workout_blocks_order_idx").on(columns._order),
+    index("lessons_workout_blocks_parent_id_idx").on(columns._parentID),
+    index("lessons_workout_blocks_workout_idx").on(columns.workout),
     foreignKey({
       columns: [columns["_parentID"]],
       foreignColumns: [lessons.id],
-      name: "lessons_exercises_parent_id_fk",
+      name: "lessons_workout_blocks_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -1140,16 +1190,20 @@ export const lessons = sqliteTable(
     template: integer("template_id").references(() => lesson_templates.id, {
       onDelete: "set null",
     }),
-    title: text("title").notNull(),
-    type: text("type", {
-      enum: ["pt", "semi_pt", "group", "open_gym"],
-    }).notNull(),
+    title: text("title"),
+    type: text("type", { enum: ["pt", "semi_pt", "group", "open_gym"] }),
     status: text("status", { enum: ["open", "closed"] }).default("closed"),
-    date: text("date").default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    startDate: text("start_date").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    endDate: text("end_date").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    image: integer("image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
     exercisesCSVImport: text("exercises_c_s_v_import"),
     externalId: text("external_id"),
-    generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
-    slug: text("slug"),
     updatedAt: text("updated_at")
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
@@ -1159,8 +1213,8 @@ export const lessons = sqliteTable(
   },
   (columns) => [
     index("lessons_template_idx").on(columns.template),
+    index("lessons_image_idx").on(columns.image),
     uniqueIndex("lessons_external_id_idx").on(columns.externalId),
-    uniqueIndex("lessons_slug_idx").on(columns.slug),
     index("lessons_updated_at_idx").on(columns.updatedAt),
     index("lessons_created_at_idx").on(columns.createdAt),
   ],
@@ -1211,6 +1265,9 @@ export const lesson_templates_schedule = sqliteTable(
       ],
     }).notNull(),
     time: text("time").default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    endTime: text("end_time").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
   },
   (columns) => [
     index("lesson_templates_schedule_order_idx").on(columns._order),
@@ -1223,33 +1280,62 @@ export const lesson_templates_schedule = sqliteTable(
   ],
 );
 
-export const lesson_templates_default_exercises = sqliteTable(
-  "lesson_templates_default_exercises",
+export const lesson_templates_default_workout_blocks_exercises = sqliteTable(
+  "lesson_templates_default_workout_blocks_exercises",
   {
     _order: integer("_order").notNull(),
-    _parentID: integer("_parent_id").notNull(),
+    _parentID: text("_parent_id").notNull(),
     id: text("id").primaryKey(),
     exercise: integer("exercise_id")
       .notNull()
       .references(() => exercises.id, {
         onDelete: "set null",
       }),
-    sets: numeric("sets", { mode: "number" }),
-    reps: text("reps"),
-    notes: text("notes"),
   },
   (columns) => [
-    index("lesson_templates_default_exercises_order_idx").on(columns._order),
-    index("lesson_templates_default_exercises_parent_id_idx").on(
+    index("lesson_templates_default_workout_blocks_exercises_order_idx").on(
+      columns._order,
+    ),
+    index("lesson_templates_default_workout_blocks_exercises_parent_id_idx").on(
       columns._parentID,
     ),
-    index("lesson_templates_default_exercises_exercise_idx").on(
+    index("lesson_templates_default_workout_blocks_exercises_exerci_idx").on(
       columns.exercise,
     ),
     foreignKey({
       columns: [columns["_parentID"]],
+      foreignColumns: [lesson_templates_default_workout_blocks.id],
+      name: "lesson_templates_default_workout_blocks_exercises_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lesson_templates_default_workout_blocks = sqliteTable(
+  "lesson_templates_default_workout_blocks",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    workout: integer("workout_id")
+      .notNull()
+      .references(() => workouts.id, {
+        onDelete: "set null",
+      }),
+  },
+  (columns) => [
+    index("lesson_templates_default_workout_blocks_order_idx").on(
+      columns._order,
+    ),
+    index("lesson_templates_default_workout_blocks_parent_id_idx").on(
+      columns._parentID,
+    ),
+    index("lesson_templates_default_workout_blocks_workout_idx").on(
+      columns.workout,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
       foreignColumns: [lesson_templates.id],
-      name: "lesson_templates_default_exercises_parent_id_fk",
+      name: "lesson_templates_default_workout_blocks_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -1263,6 +1349,9 @@ export const lesson_templates = sqliteTable(
     type: text("type", {
       enum: ["pt", "semi_pt", "group", "open_gym"],
     }).notNull(),
+    image: integer("image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
     updatedAt: text("updated_at")
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
@@ -1271,6 +1360,7 @@ export const lesson_templates = sqliteTable(
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
   },
   (columns) => [
+    index("lesson_templates_image_idx").on(columns.image),
     index("lesson_templates_updated_at_idx").on(columns.updatedAt),
     index("lesson_templates_created_at_idx").on(columns.createdAt),
   ],
@@ -1411,6 +1501,113 @@ export const programs = sqliteTable(
     uniqueIndex("programs_slug_idx").on(columns.slug),
     index("programs_updated_at_idx").on(columns.updatedAt),
     index("programs_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const workouts = sqliteTable(
+  "workouts",
+  {
+    id: integer("id").primaryKey(),
+    name: text("name").notNull(),
+    description: text("description"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("workouts_updated_at_idx").on(columns.updatedAt),
+    index("workouts_created_at_idx").on(columns.createdAt),
+  ],
+);
+
+export const workouts_rels = sqliteTable(
+  "workouts_rels",
+  {
+    id: integer("id").primaryKey(),
+    order: integer("order"),
+    parent: integer("parent_id").notNull(),
+    path: text("path").notNull(),
+    exercisesID: integer("exercises_id"),
+  },
+  (columns) => [
+    index("workouts_rels_order_idx").on(columns.order),
+    index("workouts_rels_parent_idx").on(columns.parent),
+    index("workouts_rels_path_idx").on(columns.path),
+    index("workouts_rels_exercises_id_idx").on(columns.exercisesID),
+    foreignKey({
+      columns: [columns["parent"]],
+      foreignColumns: [workouts.id],
+      name: "workouts_rels_parent_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["exercisesID"]],
+      foreignColumns: [exercises.id],
+      name: "workouts_rels_exercises_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lesson_enrollments_workout_progress_exercises = sqliteTable(
+  "lesson_enrollments_workout_progress_exercises",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: text("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    exercise: integer("exercise_id")
+      .notNull()
+      .references(() => exercises.id, {
+        onDelete: "set null",
+      }),
+    sets: numeric("sets", { mode: "number" }),
+    reps: text("reps"),
+    notes: text("notes"),
+  },
+  (columns) => [
+    index("lesson_enrollments_workout_progress_exercises_order_idx").on(
+      columns._order,
+    ),
+    index("lesson_enrollments_workout_progress_exercises_parent_id_idx").on(
+      columns._parentID,
+    ),
+    index("lesson_enrollments_workout_progress_exercises_exercise_idx").on(
+      columns.exercise,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [lesson_enrollments_workout_progress.id],
+      name: "lesson_enrollments_workout_progress_exercises_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lesson_enrollments_workout_progress = sqliteTable(
+  "lesson_enrollments_workout_progress",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    workout: integer("workout_id")
+      .notNull()
+      .references(() => workouts.id, {
+        onDelete: "set null",
+      }),
+  },
+  (columns) => [
+    index("lesson_enrollments_workout_progress_order_idx").on(columns._order),
+    index("lesson_enrollments_workout_progress_parent_id_idx").on(
+      columns._parentID,
+    ),
+    index("lesson_enrollments_workout_progress_workout_idx").on(
+      columns.workout,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [lesson_enrollments.id],
+      name: "lesson_enrollments_workout_progress_parent_id_fk",
+    }).onDelete("cascade"),
   ],
 );
 
@@ -1997,6 +2194,7 @@ export const payload_locked_documents_rels = sqliteTable(
     "lesson-templatesID": integer("lesson_templates_id"),
     eventsID: integer("events_id"),
     programsID: integer("programs_id"),
+    workoutsID: integer("workouts_id"),
     "lesson-enrollmentsID": integer("lesson_enrollments_id"),
     "program-enrollmentsID": integer("program_enrollments_id"),
     "event-registrationsID": integer("event_registrations_id"),
@@ -2025,6 +2223,9 @@ export const payload_locked_documents_rels = sqliteTable(
     index("payload_locked_documents_rels_events_id_idx").on(columns.eventsID),
     index("payload_locked_documents_rels_programs_id_idx").on(
       columns.programsID,
+    ),
+    index("payload_locked_documents_rels_workouts_id_idx").on(
+      columns.workoutsID,
     ),
     index("payload_locked_documents_rels_lesson_enrollments_id_idx").on(
       columns["lesson-enrollmentsID"],
@@ -2096,6 +2297,11 @@ export const payload_locked_documents_rels = sqliteTable(
       columns: [columns["programsID"]],
       foreignColumns: [programs.id],
       name: "payload_locked_documents_rels_programs_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["workoutsID"]],
+      foreignColumns: [workouts.id],
+      name: "payload_locked_documents_rels_workouts_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["lesson-enrollmentsID"]],
@@ -2964,19 +3170,56 @@ export const relations__posts_v = relations(_posts_v, ({ one, many }) => ({
     relationName: "_rels",
   }),
 }));
-export const relations_exercises = relations(exercises, () => ({}));
-export const relations_lessons_exercises = relations(
-  lessons_exercises,
+export const relations_exercises_rels = relations(
+  exercises_rels,
   ({ one }) => ({
-    _parentID: one(lessons, {
-      fields: [lessons_exercises._parentID],
-      references: [lessons.id],
+    parent: one(exercises, {
+      fields: [exercises_rels.parent],
+      references: [exercises.id],
+      relationName: "_rels",
+    }),
+    workoutsID: one(workouts, {
+      fields: [exercises_rels.workoutsID],
+      references: [workouts.id],
+      relationName: "workouts",
+    }),
+  }),
+);
+export const relations_exercises = relations(exercises, ({ many }) => ({
+  _rels: many(exercises_rels, {
+    relationName: "_rels",
+  }),
+}));
+export const relations_lessons_workout_blocks_exercises = relations(
+  lessons_workout_blocks_exercises,
+  ({ one }) => ({
+    _parentID: one(lessons_workout_blocks, {
+      fields: [lessons_workout_blocks_exercises._parentID],
+      references: [lessons_workout_blocks.id],
       relationName: "exercises",
     }),
     exercise: one(exercises, {
-      fields: [lessons_exercises.exercise],
+      fields: [lessons_workout_blocks_exercises.exercise],
       references: [exercises.id],
       relationName: "exercise",
+    }),
+  }),
+);
+export const relations_lessons_workout_blocks = relations(
+  lessons_workout_blocks,
+  ({ one, many }) => ({
+    _parentID: one(lessons, {
+      fields: [lessons_workout_blocks._parentID],
+      references: [lessons.id],
+      relationName: "workoutBlocks",
+    }),
+    workout: one(workouts, {
+      fields: [lessons_workout_blocks.workout],
+      references: [workouts.id],
+      relationName: "workout",
+    }),
+    exercises: many(lessons_workout_blocks_exercises, {
+      relationName: "exercises",
     }),
   }),
 );
@@ -2998,8 +3241,13 @@ export const relations_lessons = relations(lessons, ({ one, many }) => ({
     references: [lesson_templates.id],
     relationName: "template",
   }),
-  exercises: many(lessons_exercises, {
-    relationName: "exercises",
+  image: one(media, {
+    fields: [lessons.image],
+    references: [media.id],
+    relationName: "image",
+  }),
+  workoutBlocks: many(lessons_workout_blocks, {
+    relationName: "workoutBlocks",
   }),
   _rels: many(lessons_rels, {
     relationName: "_rels",
@@ -3015,18 +3263,34 @@ export const relations_lesson_templates_schedule = relations(
     }),
   }),
 );
-export const relations_lesson_templates_default_exercises = relations(
-  lesson_templates_default_exercises,
-  ({ one }) => ({
-    _parentID: one(lesson_templates, {
-      fields: [lesson_templates_default_exercises._parentID],
-      references: [lesson_templates.id],
-      relationName: "defaultExercises",
+export const relations_lesson_templates_default_workout_blocks_exercises =
+  relations(lesson_templates_default_workout_blocks_exercises, ({ one }) => ({
+    _parentID: one(lesson_templates_default_workout_blocks, {
+      fields: [lesson_templates_default_workout_blocks_exercises._parentID],
+      references: [lesson_templates_default_workout_blocks.id],
+      relationName: "exercises",
     }),
     exercise: one(exercises, {
-      fields: [lesson_templates_default_exercises.exercise],
+      fields: [lesson_templates_default_workout_blocks_exercises.exercise],
       references: [exercises.id],
       relationName: "exercise",
+    }),
+  }));
+export const relations_lesson_templates_default_workout_blocks = relations(
+  lesson_templates_default_workout_blocks,
+  ({ one, many }) => ({
+    _parentID: one(lesson_templates, {
+      fields: [lesson_templates_default_workout_blocks._parentID],
+      references: [lesson_templates.id],
+      relationName: "defaultWorkoutBlocks",
+    }),
+    workout: one(workouts, {
+      fields: [lesson_templates_default_workout_blocks.workout],
+      references: [workouts.id],
+      relationName: "workout",
+    }),
+    exercises: many(lesson_templates_default_workout_blocks_exercises, {
+      relationName: "exercises",
     }),
   }),
 );
@@ -3047,12 +3311,17 @@ export const relations_lesson_templates_rels = relations(
 );
 export const relations_lesson_templates = relations(
   lesson_templates,
-  ({ many }) => ({
+  ({ one, many }) => ({
     schedule: many(lesson_templates_schedule, {
       relationName: "schedule",
     }),
-    defaultExercises: many(lesson_templates_default_exercises, {
-      relationName: "defaultExercises",
+    image: one(media, {
+      fields: [lesson_templates.image],
+      references: [media.id],
+      relationName: "image",
+    }),
+    defaultWorkoutBlocks: many(lesson_templates_default_workout_blocks, {
+      relationName: "defaultWorkoutBlocks",
     }),
     _rels: many(lesson_templates_rels, {
       relationName: "_rels",
@@ -3096,9 +3365,57 @@ export const relations_programs = relations(programs, ({ one, many }) => ({
     relationName: "finalEvent",
   }),
 }));
+export const relations_workouts_rels = relations(workouts_rels, ({ one }) => ({
+  parent: one(workouts, {
+    fields: [workouts_rels.parent],
+    references: [workouts.id],
+    relationName: "_rels",
+  }),
+  exercisesID: one(exercises, {
+    fields: [workouts_rels.exercisesID],
+    references: [exercises.id],
+    relationName: "exercises",
+  }),
+}));
+export const relations_workouts = relations(workouts, ({ many }) => ({
+  _rels: many(workouts_rels, {
+    relationName: "_rels",
+  }),
+}));
+export const relations_lesson_enrollments_workout_progress_exercises =
+  relations(lesson_enrollments_workout_progress_exercises, ({ one }) => ({
+    _parentID: one(lesson_enrollments_workout_progress, {
+      fields: [lesson_enrollments_workout_progress_exercises._parentID],
+      references: [lesson_enrollments_workout_progress.id],
+      relationName: "exercises",
+    }),
+    exercise: one(exercises, {
+      fields: [lesson_enrollments_workout_progress_exercises.exercise],
+      references: [exercises.id],
+      relationName: "exercise",
+    }),
+  }));
+export const relations_lesson_enrollments_workout_progress = relations(
+  lesson_enrollments_workout_progress,
+  ({ one, many }) => ({
+    _parentID: one(lesson_enrollments, {
+      fields: [lesson_enrollments_workout_progress._parentID],
+      references: [lesson_enrollments.id],
+      relationName: "workoutProgress",
+    }),
+    workout: one(workouts, {
+      fields: [lesson_enrollments_workout_progress.workout],
+      references: [workouts.id],
+      relationName: "workout",
+    }),
+    exercises: many(lesson_enrollments_workout_progress_exercises, {
+      relationName: "exercises",
+    }),
+  }),
+);
 export const relations_lesson_enrollments = relations(
   lesson_enrollments,
-  ({ one }) => ({
+  ({ one, many }) => ({
     user: one(users, {
       fields: [lesson_enrollments.user],
       references: [users.id],
@@ -3108,6 +3425,9 @@ export const relations_lesson_enrollments = relations(
       fields: [lesson_enrollments.lesson],
       references: [lessons.id],
       relationName: "lesson",
+    }),
+    workoutProgress: many(lesson_enrollments_workout_progress, {
+      relationName: "workoutProgress",
     }),
     addedBy: one(users, {
       fields: [lesson_enrollments.addedBy],
@@ -3394,6 +3714,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [programs.id],
       relationName: "programs",
     }),
+    workoutsID: one(workouts, {
+      fields: [payload_locked_documents_rels.workoutsID],
+      references: [workouts.id],
+      relationName: "workouts",
+    }),
     "lesson-enrollmentsID": one(lesson_enrollments, {
       fields: [payload_locked_documents_rels["lesson-enrollmentsID"]],
       references: [lesson_enrollments.id],
@@ -3635,16 +3960,23 @@ type DatabaseSchema = {
   _posts_v: typeof _posts_v;
   _posts_v_rels: typeof _posts_v_rels;
   exercises: typeof exercises;
-  lessons_exercises: typeof lessons_exercises;
+  exercises_rels: typeof exercises_rels;
+  lessons_workout_blocks_exercises: typeof lessons_workout_blocks_exercises;
+  lessons_workout_blocks: typeof lessons_workout_blocks;
   lessons: typeof lessons;
   lessons_rels: typeof lessons_rels;
   lesson_templates_schedule: typeof lesson_templates_schedule;
-  lesson_templates_default_exercises: typeof lesson_templates_default_exercises;
+  lesson_templates_default_workout_blocks_exercises: typeof lesson_templates_default_workout_blocks_exercises;
+  lesson_templates_default_workout_blocks: typeof lesson_templates_default_workout_blocks;
   lesson_templates: typeof lesson_templates;
   lesson_templates_rels: typeof lesson_templates_rels;
   events: typeof events;
   programs_schedule: typeof programs_schedule;
   programs: typeof programs;
+  workouts: typeof workouts;
+  workouts_rels: typeof workouts_rels;
+  lesson_enrollments_workout_progress_exercises: typeof lesson_enrollments_workout_progress_exercises;
+  lesson_enrollments_workout_progress: typeof lesson_enrollments_workout_progress;
   lesson_enrollments: typeof lesson_enrollments;
   program_enrollments: typeof program_enrollments;
   event_registrations: typeof event_registrations;
@@ -3712,17 +4044,24 @@ type DatabaseSchema = {
   relations__posts_v_version_populated_authors: typeof relations__posts_v_version_populated_authors;
   relations__posts_v_rels: typeof relations__posts_v_rels;
   relations__posts_v: typeof relations__posts_v;
+  relations_exercises_rels: typeof relations_exercises_rels;
   relations_exercises: typeof relations_exercises;
-  relations_lessons_exercises: typeof relations_lessons_exercises;
+  relations_lessons_workout_blocks_exercises: typeof relations_lessons_workout_blocks_exercises;
+  relations_lessons_workout_blocks: typeof relations_lessons_workout_blocks;
   relations_lessons_rels: typeof relations_lessons_rels;
   relations_lessons: typeof relations_lessons;
   relations_lesson_templates_schedule: typeof relations_lesson_templates_schedule;
-  relations_lesson_templates_default_exercises: typeof relations_lesson_templates_default_exercises;
+  relations_lesson_templates_default_workout_blocks_exercises: typeof relations_lesson_templates_default_workout_blocks_exercises;
+  relations_lesson_templates_default_workout_blocks: typeof relations_lesson_templates_default_workout_blocks;
   relations_lesson_templates_rels: typeof relations_lesson_templates_rels;
   relations_lesson_templates: typeof relations_lesson_templates;
   relations_events: typeof relations_events;
   relations_programs_schedule: typeof relations_programs_schedule;
   relations_programs: typeof relations_programs;
+  relations_workouts_rels: typeof relations_workouts_rels;
+  relations_workouts: typeof relations_workouts;
+  relations_lesson_enrollments_workout_progress_exercises: typeof relations_lesson_enrollments_workout_progress_exercises;
+  relations_lesson_enrollments_workout_progress: typeof relations_lesson_enrollments_workout_progress;
   relations_lesson_enrollments: typeof relations_lesson_enrollments;
   relations_program_enrollments: typeof relations_program_enrollments;
   relations_event_registrations: typeof relations_event_registrations;

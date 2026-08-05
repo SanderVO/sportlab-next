@@ -1,7 +1,8 @@
+import { userHasAdminAccess } from "@/access/admin";
 import { generateLessons } from "@/utilities/generateLessons";
 import config from "@payload-config";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import type { PayloadRequest } from "payload";
 import { getPayload } from "payload";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
@@ -9,9 +10,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         const payload = await getPayload({ config });
 
         // Allow admin users (from the Payload session) or a CRON_SECRET bearer token
-        const reqHeaders = await headers();
-        const { user } = await payload.auth({ headers: reqHeaders });
-        const isAdmin = (user as { role?: string } | null)?.role === "ADMIN";
+        const { user } = await payload.auth({
+            req: req as unknown as PayloadRequest,
+            headers: req.headers,
+        });
+        const isAdmin = await userHasAdminAccess({
+            payload,
+            user,
+        });
 
         const authHeader = req.headers.get("Authorization");
         const cronSecret = process.env.CRON_SECRET;

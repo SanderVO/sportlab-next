@@ -77,6 +77,7 @@ export interface Config {
     'lesson-templates': LessonTemplate;
     events: Event;
     programs: Program;
+    workouts: Workout;
     'lesson-enrollments': LessonEnrollment;
     'program-enrollments': ProgramEnrollment;
     'event-registrations': EventRegistration;
@@ -101,6 +102,7 @@ export interface Config {
     'lesson-templates': LessonTemplatesSelect<false> | LessonTemplatesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     programs: ProgramsSelect<false> | ProgramsSelect<true>;
+    workouts: WorkoutsSelect<false> | WorkoutsSelect<true>;
     'lesson-enrollments': LessonEnrollmentsSelect<false> | LessonEnrollmentsSelect<true>;
     'program-enrollments': ProgramEnrollmentsSelect<false> | ProgramEnrollmentsSelect<true>;
     'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
@@ -570,13 +572,33 @@ export interface InstagramBlock {
 export interface Exercise {
   id: number;
   name: string;
-  category?: string | null;
   description?: string | null;
+  /**
+   * Koppel deze oefening aan een of meerdere workouts zodat je hem kunt groeperen binnen lessen.
+   */
+  workouts?: (number | Workout)[] | null;
   videoUrl?: string | null;
   /**
    * Gebruik dit veld om oefeningen idempotent te importeren via CSV.
    */
   externalId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Herbruikbare workout-groepen om oefeningen binnen lessen te bundelen.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workouts".
+ */
+export interface Workout {
+  id: number;
+  name: string;
+  description?: string | null;
+  /**
+   * Koppel oefeningen aan deze workout. Een oefening kan in meerdere workouts voorkomen.
+   */
+  exercises?: (number | Exercise)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -590,36 +612,41 @@ export interface Lesson {
    * Selecteer een sjabloon om type, coaches en standaard oefeningen automatisch over te nemen.
    */
   template?: (number | null) | LessonTemplate;
-  title: string;
-  type: 'pt' | 'semi_pt' | 'group' | 'open_gym';
+  title?: string | null;
+  type?: ('pt' | 'semi_pt' | 'group' | 'open_gym') | null;
   /**
    * PT en Semi PT lessen zijn altijd gesloten. Groepslessen en Open Gym kunnen open of gesloten zijn.
    */
   status?: ('open' | 'closed') | null;
-  date?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  /**
+   * Optioneel: gebruikt in lesson cards. Als leeg, wordt de afbeelding van het gekoppelde sjabloon gebruikt.
+   */
+  image?: (number | null) | Media;
   /**
    * Koppel een of meerdere coaches aan deze les.
    */
-  coaches: (number | User)[];
-  exercisesCSVImport?: string | null;
-  exercises?:
+  coaches?: (number | User)[] | null;
+  /**
+   * Maak eerst workoutblokken aan in de gewenste volgorde. Voeg daarna oefeningen toe binnen elk blok.
+   */
+  workoutBlocks?:
     | {
-        exercise: number | Exercise;
-        sets?: number | null;
-        reps?: string | null;
-        notes?: string | null;
+        workout: number | Workout;
+        duration: number;
+        exercises: {
+          exercise: number | Exercise;
+          id?: string | null;
+        }[];
         id?: string | null;
       }[]
     | null;
+  exercisesCSVImport?: string | null;
   /**
    * Gebruik dit veld om lessen idempotent te importeren via CSV.
    */
   externalId?: string | null;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -646,18 +673,26 @@ export interface LessonTemplate {
   schedule: {
     dayOfWeek: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
     time?: string | null;
+    endTime?: string | null;
     id?: string | null;
   }[];
   coaches?: (number | User)[] | null;
   /**
-   * Optioneel: standaard oefeningen die worden overgenomen bij nieuwe lessen op basis van dit sjabloon.
+   * Optioneel: standaard afbeelding voor lesson cards van lessen die op dit sjabloon gebaseerd zijn.
    */
-  defaultExercises?:
+  image?: (number | null) | Media;
+  /**
+   * Optioneel: standaard workoutblokken met oefeningen die worden overgenomen bij nieuwe lessen op basis van dit sjabloon.
+   */
+  defaultWorkoutBlocks?:
     | {
-        exercise: number | Exercise;
-        sets?: number | null;
-        reps?: string | null;
-        notes?: string | null;
+        workout: number | Workout;
+        exercises?:
+          | {
+              exercise: number | Exercise;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -665,6 +700,8 @@ export interface LessonTemplate {
   createdAt: string;
 }
 /**
+ * Beheer evenementen zoals hardloopwedstrijden, hyrox en speciale events.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
@@ -692,6 +729,8 @@ export interface Event {
   createdAt: string;
 }
 /**
+ * Beheer programma's met een start- en einddatum, lessen en een optioneel eindevent (bijvoorbeeld: Performance Cycle).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "programs".
  */
@@ -746,6 +785,24 @@ export interface LessonEnrollment {
   user: number | User;
   lesson: number | Lesson;
   status: 'assigned' | 'started' | 'completed' | 'cancelled';
+  /**
+   * Per gebruiker ingevulde reps, sets en notes per oefening. Wordt automatisch gevuld vanuit de les.
+   */
+  workoutProgress?:
+    | {
+        workout: number | Workout;
+        exercises?:
+          | {
+              exercise: number | Exercise;
+              sets?: number | null;
+              reps?: string | null;
+              notes?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
   /**
    * Wordt automatisch gezet via een hook.
    */
@@ -943,9 +1000,6 @@ export interface Form {
         replyTo?: string | null;
         emailFrom?: string | null;
         subject: string;
-        /**
-         * Enter the message that should be sent in this email.
-         */
         message?: {
           root: {
             type: string;
@@ -1139,6 +1193,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'programs';
         value: number | Program;
+      } | null)
+    | ({
+        relationTo: 'workouts';
+        value: number | Workout;
       } | null)
     | ({
         relationTo: 'lesson-enrollments';
@@ -1453,8 +1511,8 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface ExercisesSelect<T extends boolean = true> {
   name?: T;
-  category?: T;
   description?: T;
+  workouts?: T;
   videoUrl?: T;
   externalId?: T;
   updatedAt?: T;
@@ -1469,21 +1527,25 @@ export interface LessonsSelect<T extends boolean = true> {
   title?: T;
   type?: T;
   status?: T;
-  date?: T;
+  startDate?: T;
+  endDate?: T;
+  image?: T;
   coaches?: T;
-  exercisesCSVImport?: T;
-  exercises?:
+  workoutBlocks?:
     | T
     | {
-        exercise?: T;
-        sets?: T;
-        reps?: T;
-        notes?: T;
+        workout?: T;
+        duration?: T;
+        exercises?:
+          | T
+          | {
+              exercise?: T;
+              id?: T;
+            };
         id?: T;
       };
+  exercisesCSVImport?: T;
   externalId?: T;
-  generateSlug?: T;
-  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1500,16 +1562,21 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
     | {
         dayOfWeek?: T;
         time?: T;
+        endTime?: T;
         id?: T;
       };
   coaches?: T;
-  defaultExercises?:
+  image?: T;
+  defaultWorkoutBlocks?:
     | T
     | {
-        exercise?: T;
-        sets?: T;
-        reps?: T;
-        notes?: T;
+        workout?: T;
+        exercises?:
+          | T
+          | {
+              exercise?: T;
+              id?: T;
+            };
         id?: T;
       };
   updatedAt?: T;
@@ -1561,12 +1628,38 @@ export interface ProgramsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workouts_select".
+ */
+export interface WorkoutsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  exercises?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lesson-enrollments_select".
  */
 export interface LessonEnrollmentsSelect<T extends boolean = true> {
   user?: T;
   lesson?: T;
   status?: T;
+  workoutProgress?:
+    | T
+    | {
+        workout?: T;
+        exercises?:
+          | T
+          | {
+              exercise?: T;
+              sets?: T;
+              reps?: T;
+              notes?: T;
+              id?: T;
+            };
+        id?: T;
+      };
   addedBy?: T;
   updatedAt?: T;
   createdAt?: T;

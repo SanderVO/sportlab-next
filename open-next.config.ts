@@ -9,8 +9,12 @@ import memoryQueue from "@opennextjs/cloudflare/overrides/queue/memory-queue";
 import queueCache from "@opennextjs/cloudflare/overrides/queue/queue-cache";
 import d1NextTagCache from "@opennextjs/cloudflare/overrides/tag-cache/d1-next-tag-cache";
 
-const queue =
-    process.env.NODE_ENV === "development" ? memoryQueue : queueCache(doQueue);
+const isCloudflareDeployEnv =
+    process.env.CLOUDFLARE_ENV === "production" ||
+    process.env.CLOUDFLARE_ENV === "preview";
+
+const queue = isCloudflareDeployEnv ? queueCache(doQueue) : memoryQueue;
+const enableCacheInterception = isCloudflareDeployEnv;
 
 export default {
     ...defineCloudflareConfig({
@@ -18,7 +22,7 @@ export default {
             mode: "long-lived",
         }),
         tagCache: d1NextTagCache,
-        enableCacheInterception: true,
+        enableCacheInterception,
         queue,
     }),
 } satisfies OpenNextConfig;

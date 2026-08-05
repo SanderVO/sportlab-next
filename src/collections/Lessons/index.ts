@@ -1,8 +1,12 @@
 import { authenticated } from "@/access/authenticated";
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
-import { slugField, type CollectionConfig } from "payload";
-import { applyTemplate } from "./hooks/applyTemplate";
+import { type CollectionConfig } from "payload";
+import {
+    applyTemplate,
+    applyTemplateBeforeValidate,
+} from "./hooks/applyTemplate";
 import { resolveExercises } from "./hooks/parseExercisesCSV";
+import { resolveCardImage } from "./hooks/resolveCardImage";
 
 export const Lessons: CollectionConfig = {
     slug: "lessons",
@@ -18,9 +22,11 @@ export const Lessons: CollectionConfig = {
     },
     admin: {
         useAsTitle: "title",
-        defaultColumns: ["title", "type", "updatedAt"],
+        defaultColumns: ["title", "type", "updatedAt", "startDate"],
     },
     hooks: {
+        afterRead: [resolveCardImage],
+        beforeValidate: [applyTemplateBeforeValidate],
         beforeChange: [applyTemplate, resolveExercises],
     },
     fields: [
@@ -42,12 +48,18 @@ export const Lessons: CollectionConfig = {
             name: "title",
             type: "text",
             required: true,
+            admin: {
+                condition: (_, siblingData) => !siblingData?.template,
+            },
         },
         {
             label: "Type",
             name: "type",
             type: "select",
             required: true,
+            admin: {
+                condition: (_, siblingData) => !siblingData?.template,
+            },
             options: [
                 {
                     label: "PT",
@@ -85,11 +97,11 @@ export const Lessons: CollectionConfig = {
             ],
             hooks: {
                 beforeValidate: [
-                    ({ data }) => {
+                    ({ data, value }) => {
                         if (data?.type === "pt" || data?.type === "semi_pt") {
-                            data.status = "closed";
+                            return "closed";
                         }
-                        return data;
+                        return value;
                     },
                 ],
             },
@@ -105,14 +117,38 @@ export const Lessons: CollectionConfig = {
             },
         },
         {
-            label: "Datum & Tijd",
-            name: "date",
+            label: "Startdatum & -tijd",
+            name: "startDate",
             type: "date",
             required: false,
             admin: {
+                condition: (_, siblingData) => !siblingData?.template,
                 date: {
                     pickerAppearance: "dayAndTime",
                 },
+            },
+        },
+        {
+            label: "Einddatum & -tijd",
+            name: "endDate",
+            type: "date",
+            required: false,
+            admin: {
+                condition: (_, siblingData) => !siblingData?.template,
+                date: {
+                    pickerAppearance: "dayAndTime",
+                },
+            },
+        },
+        {
+            label: "Afbeelding",
+            name: "image",
+            type: "upload",
+            relationTo: "media",
+            required: false,
+            admin: {
+                description:
+                    "Optioneel: gebruikt in lesson cards. Als leeg, wordt de afbeelding van het gekoppelde sjabloon gebruikt.",
             },
         },
         {
@@ -121,7 +157,7 @@ export const Lessons: CollectionConfig = {
             type: "relationship",
             relationTo: "users",
             hasMany: true,
-            required: true,
+            required: false,
             filterOptions: {
                 isCoach: {
                     equals: true,
@@ -132,12 +168,59 @@ export const Lessons: CollectionConfig = {
             },
         },
         {
+            label: "Workoutblokken",
+            name: "workoutBlocks",
+            type: "array",
+            required: false,
+            labels: {
+                singular: "Workoutblok",
+                plural: "Workoutblokken",
+            },
+            admin: {
+                description:
+                    "Maak eerst workoutblokken aan in de gewenste volgorde. Voeg daarna oefeningen toe binnen elk blok.",
+            },
+            fields: [
+                {
+                    label: "Workout",
+                    name: "workout",
+                    type: "relationship",
+                    relationTo: "workouts",
+                    required: true,
+                },
+                {
+                    label: "Tijd (in minuten)",
+                    name: "duration",
+                    type: "number",
+                    required: true,
+                },
+                {
+                    label: "Oefeningen",
+                    name: "exercises",
+                    type: "array",
+                    required: true,
+                    fields: [
+                        {
+                            label: "Oefening",
+                            name: "exercise",
+                            type: "relationship",
+                            relationTo: "exercises",
+                            required: true,
+                        },
+                    ],
+                },
+            ],
+        },
+        {
             type: "ui",
             name: "exerciseImport",
             admin: {
                 components: {
                     Field: "./collections/Lessons/components/ExerciseImportField#ExerciseImportField",
                 },
+                condition: (_, siblingData) =>
+                    Array.isArray(siblingData?.workoutBlocks) &&
+                    siblingData.workoutBlocks.length > 0,
             },
         },
         {
@@ -151,39 +234,6 @@ export const Lessons: CollectionConfig = {
             },
         },
         {
-            label: "Oefeningen",
-            name: "exercises",
-            type: "array",
-            required: false,
-            fields: [
-                {
-                    label: "Oefening",
-                    name: "exercise",
-                    type: "relationship",
-                    relationTo: "exercises",
-                    required: true,
-                },
-                {
-                    label: "Sets",
-                    name: "sets",
-                    type: "number",
-                    required: false,
-                },
-                {
-                    label: "Reps",
-                    name: "reps",
-                    type: "text",
-                    required: false,
-                },
-                {
-                    label: "Notities",
-                    name: "notes",
-                    type: "textarea",
-                    required: false,
-                },
-            ],
-        },
-        {
             label: "Externe ID",
             name: "externalId",
             type: "text",
@@ -194,9 +244,5 @@ export const Lessons: CollectionConfig = {
                     "Gebruik dit veld om lessen idempotent te importeren via CSV.",
             },
         },
-        slugField({
-            required: false,
-            useAsSlug: "title",
-        }),
     ],
 };

@@ -20,9 +20,13 @@ export const LessonTemplates: CollectionConfig = {
         description:
             "Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen.",
         components: {
-            beforeList: [
-                "./collections/LessonTemplates/components/GenerateLessonsButton#GenerateLessonsButton",
-            ],
+            views: {
+                list: {
+                    actions: [
+                        "./collections/LessonTemplates/components/GenerateLessonsButton#GenerateLessonsButton",
+                    ],
+                },
+            },
         },
     },
     fields: [
@@ -62,6 +66,10 @@ export const LessonTemplates: CollectionConfig = {
         {
             label: "Vaste momenten",
             name: "schedule",
+            labels: {
+                singular: "vast moment",
+                plural: "Vaste momenten",
+            },
             type: "array",
             required: true,
             minRows: 1,
@@ -91,7 +99,24 @@ export const LessonTemplates: CollectionConfig = {
                     type: "date",
                     required: false,
                     admin: {
-                        date: { pickerAppearance: "timeOnly" },
+                        date: {
+                            pickerAppearance: "timeOnly",
+                            displayFormat: "HH:mm",
+                            timeFormat: "HH:mm",
+                        },
+                    },
+                },
+                {
+                    label: "Eindtijd",
+                    name: "endTime",
+                    type: "date",
+                    required: false,
+                    admin: {
+                        date: {
+                            pickerAppearance: "timeOnly",
+                            displayFormat: "HH:mm",
+                            timeFormat: "HH:mm",
+                        },
                     },
                 },
             ],
@@ -108,39 +133,51 @@ export const LessonTemplates: CollectionConfig = {
             },
         },
         {
-            label: "Standaard oefeningen",
-            name: "defaultExercises",
-            type: "array",
+            label: "Afbeelding",
+            name: "image",
+            type: "upload",
+            relationTo: "media",
             required: false,
             admin: {
                 description:
-                    "Optioneel: standaard oefeningen die worden overgenomen bij nieuwe lessen op basis van dit sjabloon.",
+                    "Optioneel: standaard afbeelding voor lesson cards van lessen die op dit sjabloon gebaseerd zijn.",
+            },
+        },
+        {
+            label: "Standaard workoutblokken",
+            name: "defaultWorkoutBlocks",
+            type: "array",
+            required: false,
+            labels: {
+                singular: "Workoutblok",
+                plural: "Workoutblokken",
+            },
+            admin: {
+                description:
+                    "Optioneel: standaard workoutblokken met oefeningen die worden overgenomen bij nieuwe lessen op basis van dit sjabloon.",
             },
             fields: [
                 {
-                    label: "Oefening",
-                    name: "exercise",
+                    label: "Workout",
+                    name: "workout",
                     type: "relationship",
-                    relationTo: "exercises",
+                    relationTo: "workouts",
                     required: true,
                 },
                 {
-                    label: "Sets",
-                    name: "sets",
-                    type: "number",
+                    label: "Oefeningen",
+                    name: "exercises",
+                    type: "array",
                     required: false,
-                },
-                {
-                    label: "Reps",
-                    name: "reps",
-                    type: "text",
-                    required: false,
-                },
-                {
-                    label: "Notities",
-                    name: "notes",
-                    type: "textarea",
-                    required: false,
+                    fields: [
+                        {
+                            label: "Oefening",
+                            name: "exercise",
+                            type: "relationship",
+                            relationTo: "exercises",
+                            required: true,
+                        },
+                    ],
                 },
             ],
         },

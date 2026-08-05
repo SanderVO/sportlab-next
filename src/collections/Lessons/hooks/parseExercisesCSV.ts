@@ -87,17 +87,29 @@ export const resolveExercises: CollectionBeforeChangeHook = async ({
         return data;
     }
 
+    const workoutBlocks = Array.isArray(data?.workoutBlocks)
+        ? data.workoutBlocks
+        : [];
+    const firstBlock = workoutBlocks[0];
+    const firstWorkoutId =
+        typeof firstBlock?.workout === "object"
+            ? firstBlock.workout?.id
+            : firstBlock?.workout;
+
     // --- 1. Parse CSV stored by the admin UI component and append to exercises ---
     if (
         typeof data?.exercisesCSVImport === "string" &&
         data.exercisesCSVImport.trim()
     ) {
+        if (!firstWorkoutId) {
+            throw new Error(
+                "Selecteer eerst minimaal 1 workout voordat je oefeningen via CSV importeert.",
+            );
+        }
+
         const rows = parseCSVText(data.exercisesCSVImport);
         const csvExercises: Array<{
             exercise: string | number;
-            sets?: number;
-            reps?: string;
-            notes?: string;
         }> = [];
 
         for (const row of rows) {
@@ -113,44 +125,79 @@ export const resolveExercises: CollectionBeforeChangeHook = async ({
                 externalId,
             );
 
-            const sets = row["sets"] ? parseInt(row["sets"], 10) : undefined;
-
             csvExercises.push({
                 exercise: exerciseId,
-                sets: Number.isNaN(sets) ? undefined : sets,
-                reps: row["reps"] || undefined,
-                notes: row["notes"] || undefined,
             });
         }
 
-        const existing = Array.isArray(data.exercises) ? data.exercises : [];
+        const existingFirstExercises = Array.isArray(firstBlock?.exercises)
+            ? firstBlock.exercises
+            : [];
+        const updatedBlocks = [...workoutBlocks];
+        updatedBlocks[0] = {
+            ...firstBlock,
+            exercises: [...existingFirstExercises, ...csvExercises],
+        };
+
         data = {
             ...data,
-            exercises: [...existing, ...csvExercises],
+            workoutBlocks: updatedBlocks,
             exercisesCSVImport: null,
         };
     }
 
-    // --- 2. Resolve any exercises still referenced by string (externalId) ---
-    if (!Array.isArray(data?.exercises) || data.exercises.length === 0) {
+    // --- 2. Resolve exercises in each workout block ---
+    if (
+        !Array.isArray(data?.workoutBlocks) ||
+        data.workoutBlocks.length === 0
+    ) {
         return data;
     }
 
-    const resolved = [];
-    for (const item of data.exercises) {
-        let exerciseId = item.exercise;
+    const resolvedBlocks = [];
+    for (const block of data.workoutBlocks) {
+        const workoutId =
+            typeof block?.workout === "object"
+                ? block.workout?.id
+                : block?.workout;
 
-        if (typeof item.exercise === "string") {
-            exerciseId = await findOrCreateExercise(
-                req.payload,
-                req,
-                item.exercise_name || item.exercise,
-                item.exercise,
-            );
+        if (!workoutId) {
+            if (Array.isArray(block?.exercises) && block.exercises.length > 0) {
+                throw new Error(
+                    "Elke workoutblok met oefeningen moet een workout hebben.",
+                );
+            }
+
+            resolvedBlocks.push(block);
+            continue;
         }
 
-        resolved.push({ ...item, exercise: exerciseId });
+        const blockExercises = Array.isArray(block?.exercises)
+            ? block.exercises
+            : [];
+
+        const resolvedExercises = [];
+        for (const item of blockExercises) {
+            let exerciseId = item.exercise;
+
+            if (typeof item.exercise === "string") {
+                exerciseId = await findOrCreateExercise(
+                    req.payload,
+                    req,
+                    item.exercise_name || item.exercise,
+                    item.exercise,
+                );
+            }
+
+            resolvedExercises.push({ ...item, exercise: exerciseId });
+        }
+
+        resolvedBlocks.push({
+            ...block,
+            workout: workoutId,
+            exercises: resolvedExercises,
+        });
     }
 
-    return { ...data, exercises: resolved };
+    return { ...data, workoutBlocks: resolvedBlocks };
 };

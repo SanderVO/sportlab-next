@@ -1,6 +1,62 @@
 import { adminCoachOrSelf } from "@/access/adminCoachOrSelf";
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
-import type { CollectionConfig } from "payload";
+import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
+
+const initializeWorkoutProgress: CollectionBeforeChangeHook = async ({
+    data,
+    req,
+    operation,
+}) => {
+    if ((operation !== "create" && operation !== "update") || !data) {
+        return data;
+    }
+
+    const lessonId =
+        typeof data.lesson === "object" ? data.lesson?.id : data.lesson;
+
+    if (!lessonId) {
+        return data;
+    }
+
+    if (
+        Array.isArray(data.workoutProgress) &&
+        data.workoutProgress.length > 0
+    ) {
+        return data;
+    }
+
+    const lesson = await req.payload.findByID({
+        collection: "lessons",
+        id: lessonId,
+        req,
+        depth: 0,
+        overrideAccess: true,
+    });
+
+    const workoutBlocks = Array.isArray(lesson?.workoutBlocks)
+        ? lesson.workoutBlocks
+        : [];
+
+    const workoutProgress = workoutBlocks.map((block: any) => ({
+        workout:
+            typeof block?.workout === "object"
+                ? block.workout?.id
+                : block?.workout,
+        exercises: Array.isArray(block?.exercises)
+            ? block.exercises.map((item: any) => ({
+                  exercise:
+                      typeof item?.exercise === "object"
+                          ? item.exercise?.id
+                          : item?.exercise,
+              }))
+            : [],
+    }));
+
+    return {
+        ...data,
+        workoutProgress,
+    };
+};
 
 export const LessonEnrollments: CollectionConfig = {
     slug: "lesson-enrollments",
@@ -12,11 +68,14 @@ export const LessonEnrollments: CollectionConfig = {
         create: isAdminOrCoach,
         delete: isAdminOrCoach,
         read: adminCoachOrSelf,
-        update: isAdminOrCoach,
+        update: adminCoachOrSelf,
     },
     admin: {
         useAsTitle: "id",
         defaultColumns: ["user", "lesson", "status", "updatedAt"],
+    },
+    hooks: {
+        beforeChange: [initializeWorkoutProgress],
     },
     fields: [
         {
@@ -44,6 +103,58 @@ export const LessonEnrollments: CollectionConfig = {
                 { label: "Gestart", value: "started" },
                 { label: "Afgerond", value: "completed" },
                 { label: "Geannuleerd", value: "cancelled" },
+            ],
+        },
+        {
+            label: "Workout voortgang",
+            name: "workoutProgress",
+            type: "array",
+            required: false,
+            admin: {
+                description:
+                    "Per gebruiker ingevulde reps, sets en notes per oefening. Wordt automatisch gevuld vanuit de les.",
+            },
+            fields: [
+                {
+                    label: "Workout",
+                    name: "workout",
+                    type: "relationship",
+                    relationTo: "workouts",
+                    required: true,
+                },
+                {
+                    label: "Oefeningen",
+                    name: "exercises",
+                    type: "array",
+                    required: false,
+                    fields: [
+                        {
+                            label: "Oefening",
+                            name: "exercise",
+                            type: "relationship",
+                            relationTo: "exercises",
+                            required: true,
+                        },
+                        {
+                            label: "Sets",
+                            name: "sets",
+                            type: "number",
+                            required: false,
+                        },
+                        {
+                            label: "Reps",
+                            name: "reps",
+                            type: "text",
+                            required: false,
+                        },
+                        {
+                            label: "Notities",
+                            name: "notes",
+                            type: "textarea",
+                            required: false,
+                        },
+                    ],
+                },
             ],
         },
         {

@@ -104,6 +104,9 @@ export const ExerciseImportField: React.FC = () => {
                     marginBottom: "0.75rem",
                 }}
             >
+                Selecteer eerst minimaal 1 workoutblok bovenaan het formulier.
+                CSV oefeningen worden bij opslaan toegevoegd aan het eerste
+                workoutblok. <br />
                 Kolommen: <code>exercise_name</code>,{" "}
                 <code>exercise_external_id</code> (optioneel), <code>sets</code>{" "}
                 (optioneel), <code>reps</code> (optioneel), <code>notes</code>{" "}

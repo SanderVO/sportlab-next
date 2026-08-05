@@ -25,6 +25,8 @@ export const Programs: CollectionConfig = {
     admin: {
         useAsTitle: "title",
         defaultColumns: ["title", "startDate", "endDate", "updatedAt"],
+        description:
+            "Beheer programma's met een start- en einddatum, lessen en een optioneel eindevent (bijvoorbeeld: Performance Cycle).",
     },
     fields: [
         {

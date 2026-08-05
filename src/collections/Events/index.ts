@@ -4,8 +4,8 @@ import { slugField, type CollectionConfig } from "payload";
 export const Events: CollectionConfig = {
     slug: "events",
     labels: {
-        singular: "Event",
-        plural: "Events",
+        singular: "Evenement",
+        plural: "Evenementen",
     },
     access: {
         create: isAdminOrCoach,
@@ -16,6 +16,8 @@ export const Events: CollectionConfig = {
     admin: {
         useAsTitle: "title",
         defaultColumns: ["title", "eventType", "startsAt", "updatedAt"],
+        description:
+            "Beheer evenementen zoals hardloopwedstrijden, hyrox en speciale events.",
     },
     fields: [
         {

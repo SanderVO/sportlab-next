@@ -25,16 +25,23 @@ export const Exercises: CollectionConfig = {
             required: true,
         },
         {
-            label: "Categorie",
-            name: "category",
-            type: "text",
-            required: false,
-        },
-        {
             label: "Omschrijving",
             name: "description",
             type: "textarea",
             required: false,
+        },
+        {
+            label: "Workouts",
+            name: "workouts",
+            type: "relationship",
+            relationTo: "workouts",
+            hasMany: true,
+            required: false,
+            admin: {
+                hidden: true,
+                description:
+                    "Koppel deze oefening aan een of meerdere workouts zodat je hem kunt groeperen binnen lessen.",
+            },
         },
         {
             label: "Video URL",
