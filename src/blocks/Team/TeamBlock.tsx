@@ -53,7 +53,7 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
                     backgroundColor === "backgroundDark" &&
                         "bg-background text-white",
                     backgroundColor === "backgroundLight" &&
-                        "bg-sl-beige text-background",
+                        "bg-sand text-background",
                     backgroundColor === "backgroundWhite" &&
                         "bg-white text-white",
                 )}

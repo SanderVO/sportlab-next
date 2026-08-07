@@ -71,7 +71,7 @@ export default function ResetPasswordForm() {
     if (!token) {
         return (
             <div className="text-center">
-                <p className="text-sm text-red-400">{error}</p>
+                <p className="text-sm text-cta">{error}</p>
             </div>
         );
     }
@@ -79,8 +79,8 @@ export default function ResetPasswordForm() {
     if (success) {
         return (
             <div className="space-y-4 text-center">
-                <div className="rounded-md bg-green-900/20 border border-green-800 p-4">
-                    <p className="text-sm text-green-200">
+                <div className="rounded-md border border-olive/40 bg-olive/20 p-4">
+                    <p className="text-sm text-warm-white">
                         Je wachtwoord is succesvol opnieuw ingesteld. Je wordt
                         zo doorgestuurd naar de inlogpagina.
                     </p>
@@ -94,7 +94,7 @@ export default function ResetPasswordForm() {
             <div>
                 <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-white/70"
+                    className="block text-sm font-medium text-sand/70"
                 >
                     Nieuw wachtwoord
                 </label>
@@ -104,7 +104,7 @@ export default function ResetPasswordForm() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30"
+                    className="mt-1 block w-full rounded-md border border-sand/10 bg-charcoal px-3 py-2 text-sm text-warm-white placeholder:text-sand/30 focus:border-cta/50 focus:outline-none focus:ring-1 focus:ring-cta/30"
                     placeholder="Minimaal 8 tekens"
                 />
             </div>
@@ -112,7 +112,7 @@ export default function ResetPasswordForm() {
             <div>
                 <label
                     htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-white/70"
+                    className="block text-sm font-medium text-sand/70"
                 >
                     Bevestig wachtwoord
                 </label>
@@ -122,16 +122,16 @@ export default function ResetPasswordForm() {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="mt-1 block w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30"
+                    className="mt-1 block w-full rounded-md border border-sand/10 bg-charcoal px-3 py-2 text-sm text-warm-white placeholder:text-sand/30 focus:border-cta/50 focus:outline-none focus:ring-1 focus:ring-cta/30"
                 />
             </div>
 
-            {error && <p className="text-sm text-red-400">{error}</p>}
+            {error && <p className="text-sm text-cta">{error}</p>}
 
             <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-md bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] hover:bg-white/90 disabled:opacity-50"
+                className="w-full rounded-md bg-cta px-4 py-2 text-sm font-medium text-ink hover:bg-cta/90 disabled:opacity-50"
             >
                 {loading ? "Bezig..." : "Wachtwoord opnieuw instellen"}
             </button>

@@ -30,8 +30,7 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
                                 "flex flex-col w-64 shrink-0 self-stretch sm:w-96 last:mr-4 sm:last:mr-8",
                                 column.backgroundColor === "black" &&
                                     "bg-background",
-                                column.backgroundColor === "beige" &&
-                                    "bg-sl-beige",
+                                column.backgroundColor === "beige" && "bg-sand",
                                 column.backgroundColor === "white" &&
                                     "bg-white",
                             )}
@@ -100,9 +99,9 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
                     className={cn(
                         "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
                         arrowBackgroundColor === "black" &&
-                            "bg-background text-sl-beige",
+                            "bg-background text-sand",
                         arrowBackgroundColor === "beige" &&
-                            "bg-sl-beige text-background",
+                            "bg-sand text-background",
                         arrowBackgroundColor === "white" &&
                             "bg-white text-background",
                     )}
@@ -115,9 +114,9 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
                     className={cn(
                         "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
                         arrowBackgroundColor === "black" &&
-                            "bg-background text-sl-beige",
+                            "bg-background text-sand",
                         arrowBackgroundColor === "beige" &&
-                            "bg-sl-beige text-background",
+                            "bg-sand text-background",
                         arrowBackgroundColor === "white" &&
                             "bg-white text-background",
                     )}

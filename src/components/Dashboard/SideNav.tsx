@@ -19,21 +19,21 @@ export function SideNav({ user }: { user: User }) {
             {/* Hamburger Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex flex-col gap-1 p-1 hover:bg-white/10 rounded-md transition"
+                className="flex flex-col gap-1 p-1 hover:bg-warm-white/10 rounded-md transition"
                 aria-label="Toggle menu"
             >
                 <span
-                    className={`block w-4 h-0.5 bg-white transition-all duration-300 ${
+                    className={`block w-4 h-0.5 bg-warm-white transition-all duration-300 ${
                         isOpen ? "rotate-45 translate-y-1.5" : ""
                     }`}
                 ></span>
                 <span
-                    className={`block w-4 h-0.5 bg-white transition-all duration-300 ${
+                    className={`block w-4 h-0.5 bg-warm-white transition-all duration-300 ${
                         isOpen ? "opacity-0" : ""
                     }`}
                 ></span>
                 <span
-                    className={`block w-4 h-0.5 bg-white transition-all duration-300 ${
+                    className={`block w-4 h-0.5 bg-warm-white transition-all duration-300 ${
                         isOpen ? "-rotate-45 -translate-y-1.5" : ""
                     }`}
                 ></span>
@@ -42,23 +42,25 @@ export function SideNav({ user }: { user: User }) {
             {/* Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-30"
+                    className="fixed inset-0 bg-ink/50 z-30"
                     onClick={() => setIsOpen(false)}
                 />
             )}
 
             {/* Slide-in Menu */}
             <div
-                className={`fixed left-0 top-0 h-screen w-64 bg-[#0a0a0a] border-r border-white/10 z-40 transform transition-transform duration-300 ${
+                className={`fixed left-0 top-0 h-screen w-64 bg-ink border-r border-sand/10 z-40 transform transition-transform duration-300 ${
                     isOpen ? "translate-x-0" : "-translate-x-full"
                 } flex flex-col`}
             >
                 {/* Close Button */}
-                <div className="flex items-center justify-between border-b border-white/10 p-4">
-                    <h2 className="text-lg font-semibold text-white">Menu</h2>
+                <div className="flex items-center justify-between border-b border-sand/10 p-4">
+                    <h2 className="text-lg font-semibold text-warm-white">
+                        Menu
+                    </h2>
                     <button
                         onClick={() => setIsOpen(false)}
-                        className="text-white/60 hover:text-white"
+                        className="text-sand/60 hover:text-warm-white"
                     >
                         <svg
                             className="w-5 h-5"
@@ -80,8 +82,8 @@ export function SideNav({ user }: { user: User }) {
                 <div className="flex-1 overflow-y-auto p-4">
                     {/* User Profile */}
                     <div className="mb-6">
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5">
-                            <div className="relative h-12 w-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <div className="flex items-center gap-3 rounded-lg bg-sand/5 p-3">
+                            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-sand/20 bg-sand/10">
                                 {typeof user.avatar === "object" &&
                                 user.avatar?.url ? (
                                     <img
@@ -90,17 +92,17 @@ export function SideNav({ user }: { user: User }) {
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <span className="text-sm font-semibold text-white">
+                                    <span className="text-sm font-semibold text-warm-white">
                                         {user.name?.charAt(0).toUpperCase() ||
                                             "U"}
                                     </span>
                                 )}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-white truncate">
+                                <p className="text-sm font-medium text-warm-white truncate">
                                     {user.name || user.email}
                                 </p>
-                                <p className="text-xs text-white/50 truncate">
+                                <p className="text-xs text-sand/50 truncate">
                                     {user.email}
                                 </p>
                             </div>
@@ -111,7 +113,7 @@ export function SideNav({ user }: { user: User }) {
                     <nav className="space-y-2">
                         <a
                             href="/dashboard"
-                            className="block px-3 py-2 rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition"
+                            className="block rounded-lg px-3 py-2 text-sand/70 transition hover:bg-warm-white/10 hover:text-warm-white"
                             onClick={() => setIsOpen(false)}
                         >
                             Dashboard
@@ -120,10 +122,10 @@ export function SideNav({ user }: { user: User }) {
                 </div>
 
                 {/* Logout Button */}
-                <div className="border-t border-white/10 p-4">
+                <div className="border-t border-sand/10 p-4">
                     <button
                         onClick={handleLogout}
-                        className="w-full px-3 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition text-sm font-medium"
+                        className="w-full rounded-lg bg-warm-white/10 px-3 py-2 text-sm font-medium text-warm-white transition hover:bg-warm-white/20"
                     >
                         Uitloggen
                     </button>

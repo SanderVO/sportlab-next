@@ -28,7 +28,7 @@ export const CarouselBlockClient: React.FC<CarouselBlockProps> = (props) => {
     return (
         <div className="flex flex-row justify-between items-center gap-10">
             <div
-                className="bg-sl-beige rounded-full w-20 h-20 text-background items-center justify-center text-4xl cursor-pointer transition-transform hover:scale-110 shrink-0 hidden md:flex"
+                className="bg-sand rounded-full w-20 h-20 text-background items-center justify-center text-4xl cursor-pointer transition-transform hover:scale-110 shrink-0 hidden md:flex"
                 onClick={onPrevClick}
             >
                 <ArrowLeft />
@@ -42,7 +42,7 @@ export const CarouselBlockClient: React.FC<CarouselBlockProps> = (props) => {
                                 key={carouselItem.id || index}
                                 className="md:flex-[0_0_100%] min-w-0 w-[66.6667%] px-2 md:px-0 basis-[75%] shrink-0 flex flex-col"
                             >
-                                <div className="bg-sl-beige rounded-4xl h-full md:mx-4 flex flex-col py-6 px-8 text-black gap-4">
+                                <div className="bg-sand rounded-4xl h-full md:mx-4 flex flex-col py-6 px-8 text-black gap-4">
                                     <div className="flex flex-row items-center justify-between">
                                         <div className="flex flex-row items-center gap-4">
                                             <Media
@@ -60,7 +60,7 @@ export const CarouselBlockClient: React.FC<CarouselBlockProps> = (props) => {
                                                     {carouselItem.name}
                                                 </div>
 
-                                                <div className="text-sl-orange flex flex-row gap-1">
+                                                <div className="text-cta flex flex-row gap-1">
                                                     {[1, 2, 3, 4, 5].map(
                                                         (star) => (
                                                             <div
@@ -113,7 +113,7 @@ export const CarouselBlockClient: React.FC<CarouselBlockProps> = (props) => {
             </div>
 
             <div
-                className="bg-sl-beige rounded-full p-4 w-20 h-20 text-background items-center justify-center text-4xl transition-transform hover:scale-110 shrink-0 cursor-pointer hidden md:flex"
+                className="bg-sand rounded-full p-4 w-20 h-20 text-background items-center justify-center text-4xl transition-transform hover:scale-110 shrink-0 cursor-pointer hidden md:flex"
                 onClick={onNextClick}
             >
                 <ArrowRight />

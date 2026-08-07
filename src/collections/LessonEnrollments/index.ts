@@ -37,20 +37,46 @@ const initializeWorkoutProgress: CollectionBeforeChangeHook = async ({
         ? lesson.workoutBlocks
         : [];
 
-    const workoutProgress = workoutBlocks.map((block: any) => ({
-        workout:
+    const workoutProgress = [];
+
+    for (const block of workoutBlocks) {
+        const workoutId =
             typeof block?.workout === "object"
                 ? block.workout?.id
-                : block?.workout,
-        exercises: Array.isArray(block?.exercises)
-            ? block.exercises.map((item: any) => ({
-                  exercise:
-                      typeof item?.exercise === "object"
-                          ? item.exercise?.id
-                          : item?.exercise,
-              }))
-            : [],
-    }));
+                : block?.workout;
+
+        if (!workoutId) continue;
+
+        const lessonBlockExercises = Array.isArray((block as any)?.exercises)
+            ? (block as any).exercises
+            : [];
+
+        let workoutExercises = lessonBlockExercises;
+
+        if (workoutExercises.length === 0) {
+            const workout = await req.payload.findByID({
+                collection: "workouts",
+                id: workoutId,
+                req,
+                depth: 0,
+                overrideAccess: true,
+            });
+
+            workoutExercises = Array.isArray(workout?.exercises)
+                ? workout.exercises
+                : [];
+        }
+
+        workoutProgress.push({
+            workout: workoutId,
+            exercises: workoutExercises
+                .filter((exercise: any) => Boolean(exercise?.name))
+                .map((exercise: any) => ({
+                    exerciseName: exercise.name,
+                    exerciseExternalId: exercise.externalId || undefined,
+                })),
+        });
+    }
 
     return {
         ...data,
@@ -129,11 +155,16 @@ export const LessonEnrollments: CollectionConfig = {
                     required: false,
                     fields: [
                         {
-                            label: "Oefening",
-                            name: "exercise",
-                            type: "relationship",
-                            relationTo: "exercises",
+                            label: "Oefening naam",
+                            name: "exerciseName",
+                            type: "text",
                             required: true,
+                        },
+                        {
+                            label: "Externe ID",
+                            name: "exerciseExternalId",
+                            type: "text",
+                            required: false,
                         },
                         {
                             label: "Sets",

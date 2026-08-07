@@ -5,7 +5,6 @@ import {
     applyTemplate,
     applyTemplateBeforeValidate,
 } from "./hooks/applyTemplate";
-import { resolveExercises } from "./hooks/parseExercisesCSV";
 import { resolveCardImage } from "./hooks/resolveCardImage";
 
 export const Lessons: CollectionConfig = {
@@ -27,7 +26,7 @@ export const Lessons: CollectionConfig = {
     hooks: {
         afterRead: [resolveCardImage],
         beforeValidate: [applyTemplateBeforeValidate],
-        beforeChange: [applyTemplate, resolveExercises],
+        beforeChange: [applyTemplate],
     },
     fields: [
         {
@@ -141,6 +140,17 @@ export const Lessons: CollectionConfig = {
             },
         },
         {
+            label: "Aantal plekken",
+            name: "spots",
+            type: "number",
+            required: false,
+            admin: {
+                condition: (_, siblingData) => !siblingData?.template,
+                description:
+                    "Optioneel: het aantal beschikbare plekken voor deze les.",
+            },
+        },
+        {
             label: "Afbeelding",
             name: "image",
             type: "upload",
@@ -178,7 +188,7 @@ export const Lessons: CollectionConfig = {
             },
             admin: {
                 description:
-                    "Maak eerst workoutblokken aan in de gewenste volgorde. Voeg daarna oefeningen toe binnen elk blok.",
+                    "Maak workoutblokken aan in de gewenste volgorde en koppel per blok een workout.",
             },
             fields: [
                 {
@@ -198,40 +208,33 @@ export const Lessons: CollectionConfig = {
                     label: "Oefeningen",
                     name: "exercises",
                     type: "array",
-                    required: true,
+                    required: false,
+                    labels: {
+                        singular: "Oefening",
+                        plural: "Oefeningen",
+                    },
                     fields: [
                         {
-                            label: "Oefening",
-                            name: "exercise",
-                            type: "relationship",
-                            relationTo: "exercises",
+                            label: "Naam",
+                            name: "name",
+                            type: "text",
                             required: true,
+                        },
+                        {
+                            label: "Omschrijving",
+                            name: "description",
+                            type: "textarea",
+                            required: true,
+                        },
+                        {
+                            label: "Video URL",
+                            name: "videoUrl",
+                            type: "text",
+                            required: false,
                         },
                     ],
                 },
             ],
-        },
-        {
-            type: "ui",
-            name: "exerciseImport",
-            admin: {
-                components: {
-                    Field: "./collections/Lessons/components/ExerciseImportField#ExerciseImportField",
-                },
-                condition: (_, siblingData) =>
-                    Array.isArray(siblingData?.workoutBlocks) &&
-                    siblingData.workoutBlocks.length > 0,
-            },
-        },
-        {
-            // Hidden field: stores raw CSV text; rendered only by the UI component above.
-            // The beforeChange hook reads and processes it on save.
-            name: "exercisesCSVImport",
-            type: "textarea",
-            required: false,
-            admin: {
-                condition: () => false,
-            },
         },
         {
             label: "Externe ID",

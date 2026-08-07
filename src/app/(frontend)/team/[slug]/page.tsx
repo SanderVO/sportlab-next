@@ -113,7 +113,7 @@ export default async function Coach({ params: paramsPromise }: Args) {
                 <div className="flex flex-col gap-4 sm:gap-0 w-full relative self-baseline sm:w-full mt-8 sm:mt-0 sm:pl-[40%]">
                     {user.content && (
                         <RichText
-                            className="max-w-3xl mx-auto text-sl-beige"
+                            className="max-w-3xl mx-auto text-sand"
                             data={user.content}
                             enableGutter={true}
                             enableProse={false}

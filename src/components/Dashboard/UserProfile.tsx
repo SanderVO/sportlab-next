@@ -11,7 +11,7 @@ export function UserProfile({ user }: { user: User }) {
 
     return (
         <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden">
+            <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-sand/20 bg-sand/10">
                 {avatarUrl ? (
                     <Image
                         src={avatarUrl}
@@ -20,13 +20,13 @@ export function UserProfile({ user }: { user: User }) {
                         className="object-cover"
                     />
                 ) : (
-                    <span className="text-xs font-semibold text-white">
+                    <span className="text-xs font-semibold text-warm-white">
                         {user.name?.charAt(0).toUpperCase() || "U"}
                     </span>
                 )}
             </div>
 
-            <span className="text-sm text-white/70">
+            <span className="text-sm text-sand/70">
                 {user.name || user.email}
             </span>
         </div>

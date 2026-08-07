@@ -14,7 +14,6 @@ import { GetPlatformProxyOptions } from "wrangler";
 import { Documents } from "./collections/Documents";
 import { EventRegistrations } from "./collections/EventRegistrations";
 import { Events } from "./collections/Events";
-import { Exercises } from "./collections/Exercises";
 import { LessonEnrollments } from "./collections/LessonEnrollments";
 import { LessonTemplates } from "./collections/LessonTemplates";
 import { Lessons } from "./collections/Lessons";
@@ -158,7 +157,6 @@ export default buildConfig({
         Documents,
         Pages,
         Posts,
-        Exercises,
         Lessons,
         LessonTemplates,
         Events,

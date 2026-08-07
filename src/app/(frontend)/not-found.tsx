@@ -3,12 +3,12 @@ import Link from "next/link";
 
 export default function NotFound() {
     return (
-        <div className="bg-sl-beige">
+        <div className="bg-sand">
             <div className="container py-28">
                 <div className="prose max-w-none">
-                    <h1>404</h1>
+                    <h1 className="font-sl-poppins">404</h1>
 
-                    <p className="mb-4">
+                    <p className="font-sl-poppins mb-4">
                         Deze pagina kon niet worden gevonden.
                     </p>
                 </div>

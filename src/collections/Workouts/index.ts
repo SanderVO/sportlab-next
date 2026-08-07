@@ -36,15 +36,36 @@ export const Workouts: CollectionConfig = {
         {
             label: "Oefeningen",
             name: "exercises",
-            type: "relationship",
-            relationTo: "exercises",
-            hasMany: true,
+            type: "array",
             required: false,
             admin: {
-                hidden: true,
                 description:
-                    "Koppel oefeningen aan deze workout. Een oefening kan in meerdere workouts voorkomen.",
+                    "Voeg meerdere oefeningen toe die uniek zijn voor deze workout.",
             },
+            labels: {
+                singular: "Oefening",
+                plural: "Oefeningen",
+            },
+            fields: [
+                {
+                    label: "Naam",
+                    name: "name",
+                    type: "text",
+                    required: true,
+                },
+                {
+                    label: "Omschrijving",
+                    name: "description",
+                    type: "textarea",
+                    required: false,
+                },
+                {
+                    label: "Video URL",
+                    name: "videoUrl",
+                    type: "text",
+                    required: false,
+                },
+            ],
         },
     ],
 };

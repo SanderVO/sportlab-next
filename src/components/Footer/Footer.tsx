@@ -12,13 +12,13 @@ export async function Footer() {
         <footer className="container mx-auto my-20">
             <CMSLink
                 {...footerData.link}
-                className="flex flex-col text-sl-beige items-baseline no-underline font-normal h-auto"
+                className="flex flex-col text-sand items-baseline no-underline font-normal h-auto"
             >
                 <div className="text-8xl font-sl-bebas">{footerData.title}</div>
 
                 <p>{footerData.description}</p>
 
-                <div className="border-b-4 border-sl-beige w-12.5 mt-2"></div>
+                <div className="border-b-4 border-sand w-12.5 mt-2"></div>
             </CMSLink>
 
             <div className="flex flex-col justify-center items-center w-full gap-20 mt-20">
@@ -35,7 +35,7 @@ export async function Footer() {
 
                         {footerData.contactText && (
                             <RichText
-                                className="flex flex-col gap-1 items-center font-montserrat text-sl-beige lg:items-start"
+                                className="flex flex-col gap-1 items-center font-montserrat text-sand lg:items-start"
                                 data={footerData.contactText}
                                 enableProse={false}
                                 enableGutter={false}
@@ -44,7 +44,7 @@ export async function Footer() {
 
                         {footerData.socialMediaLinks &&
                             footerData.socialMediaLinks.length > 0 && (
-                                <div className="flex flex-row gap-4 items-center text-sl-beige">
+                                <div className="flex flex-row gap-4 items-center text-sand">
                                     {footerData.socialMediaLinks.map(
                                         (link, index) => (
                                             <a
@@ -52,7 +52,7 @@ export async function Footer() {
                                                 href={link.url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="w-12 fill-sl-beige hover:fill-sl-beige-dark transition-colors"
+                                                className="w-12 fill-sand hover:fill-sand-dark transition-colors"
                                             >
                                                 {link.platform && (
                                                     <SocialIcon

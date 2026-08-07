@@ -4,20 +4,20 @@ export const uiVariants = {
         "rounded-md font-medium transition-colors",
         "focus-visible:outline-none focus-visible:ring-2",
         "disabled:opacity-50 disabled:pointer-events-none",
-        "transition-colors cursor-pointer",
+        "transition-colors cursor-pointer font-sl-poppins",
     ].join(" "),
 
     variants: {
-        beige: "bg-sl-beige hover:bg-sl-beige-dark text-background",
+        beige: "bg-sand hover:bg-sand/90 text-ink",
         beigeBorder:
-            "border border-sl-beige bg-transparent text-sl-beige hover:bg-sl-beige hover:text-background",
-        black: "bg-background hover:bg-background/90 text-white",
+            "border border-sand bg-transparent text-sand hover:bg-sand hover:text-background",
+        black: "bg-charcoal hover:bg-charcoal/90 text-warm-white",
         blackBorder:
-            "border border-background bg-transparent text-background hover:bg-background hover:text-white",
-        orange: "bg-sl-orange hover:bg-sl-orange-dark text-white",
+            "border border-charcoal bg-transparent text-charcoal hover:bg-charcoal hover:text-warm-white",
+        orange: "bg-cta hover:bg-cta-dark text-warm-white",
         orangeBorder:
-            "border border-sl-orange bg-transparent text-sl-orange hover:bg-sl-orange hover:text-white",
-        nav: "transition-colors uppercase font-semibold text-neutral-400 hover:text-white justify-center !px-0",
+            "border border-cta bg-transparent text-cta hover:bg-cta hover:text-warm-white",
+        nav: "transition-colors uppercase font-semibold text-warm-white hover:text-warm-white/90 justify-center !px-0",
         footer: "text-neutral-400 hover:text-white",
         inline: "underline underline-offset-2 font-semibold !p-0",
         service: "font-semibold !h-auto",

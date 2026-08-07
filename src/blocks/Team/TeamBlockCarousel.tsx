@@ -100,8 +100,8 @@ export const TeamBlockCarousel: React.FC<Props> = ({
                             className={cn(
                                 "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
                                 backgroundColor === "backgroundDark"
-                                    ? "bg-sl-beige text-background"
-                                    : "bg-background text-sl-beige",
+                                    ? "bg-sand text-background"
+                                    : "bg-background text-sand",
                             )}
                             onClick={() => emblaApi?.scrollPrev()}
                         >
@@ -112,8 +112,8 @@ export const TeamBlockCarousel: React.FC<Props> = ({
                             className={cn(
                                 "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
                                 backgroundColor === "backgroundDark"
-                                    ? "bg-sl-beige text-background"
-                                    : "bg-background text-sl-beige",
+                                    ? "bg-sand text-background"
+                                    : "bg-background text-sand",
                             )}
                             onClick={() => emblaApi?.scrollNext()}
                         >

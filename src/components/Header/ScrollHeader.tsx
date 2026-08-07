@@ -55,8 +55,8 @@ export function ScrollHeader({ children }: { children: React.ReactNode }) {
     return (
         <header
             style={{ top }}
-            className={`fixed z-30 w-full text-white py-6 transition-colors duration-300 ${
-                transparent ? "bg-transparent" : "bg-black shadow-md"
+            className={`fixed z-30 w-full text-warm-white py-6 transition-colors duration-300 ${
+                transparent ? "bg-transparent" : "bg-charcoal shadow-md"
             }`}
         >
             {children}

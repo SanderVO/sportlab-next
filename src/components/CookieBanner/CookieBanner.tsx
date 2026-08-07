@@ -90,13 +90,13 @@ export default function CookieBanner() {
 
                     <div className="flex flex-row gap-4 items-center">
                         <button
-                            className="block transition-colors rounded-3xl font-bold text-center py-3 px-10 text-xs self-baseline no-underline bg-sl-orange hover:bg-sl-orange-dark text-white w-full"
+                            className="block transition-colors rounded-3xl font-bold text-center py-3 px-10 text-xs self-baseline no-underline bg-cta hover:bg-cta-dark text-white w-full"
                             onClick={acceptAll}
                         >
                             Accepteren
                         </button>
                         <button
-                            className="block transition-colors rounded-3xl font-bold text-center py-3 px-10 text-xs self-baseline no-underline bg-sl-orange hover:bg-sl-orange-dark text-white w-full"
+                            className="block transition-colors rounded-3xl font-bold text-center py-3 px-10 text-xs self-baseline no-underline bg-cta hover:bg-cta-dark text-white w-full"
                             onClick={rejectAll}
                         >
                             Weigeren

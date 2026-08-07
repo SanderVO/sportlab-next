@@ -18,6 +18,7 @@ export const Users: CollectionConfig = {
         plural: "Gebruikers",
     },
     defaultPopulate: {
+        name: true,
         slug: true,
         meta: {
             image: true,

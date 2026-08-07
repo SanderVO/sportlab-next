@@ -64,6 +64,16 @@ export const LessonTemplates: CollectionConfig = {
             ],
         },
         {
+            label: "Aantal plekken",
+            name: "spots",
+            type: "number",
+            required: false,
+            admin: {
+                description:
+                    "Optioneel: standaard aantal plekken voor lessen op basis van dit sjabloon.",
+            },
+        },
+        {
             label: "Vaste momenten",
             name: "schedule",
             labels: {
@@ -165,17 +175,44 @@ export const LessonTemplates: CollectionConfig = {
                     required: true,
                 },
                 {
+                    label: "Tijd (in minuten)",
+                    name: "duration",
+                    type: "number",
+                    required: false,
+                },
+                {
                     label: "Oefeningen",
                     name: "exercises",
                     type: "array",
                     required: false,
+                    labels: {
+                        singular: "Oefening",
+                        plural: "Oefeningen",
+                    },
                     fields: [
                         {
-                            label: "Oefening",
-                            name: "exercise",
-                            type: "relationship",
-                            relationTo: "exercises",
+                            label: "Naam",
+                            name: "name",
+                            type: "text",
                             required: true,
+                        },
+                        {
+                            label: "Omschrijving",
+                            name: "description",
+                            type: "textarea",
+                            required: false,
+                        },
+                        {
+                            label: "Video URL",
+                            name: "videoUrl",
+                            type: "text",
+                            required: false,
+                        },
+                        {
+                            label: "Externe ID",
+                            name: "externalId",
+                            type: "text",
+                            required: false,
                         },
                     ],
                 },

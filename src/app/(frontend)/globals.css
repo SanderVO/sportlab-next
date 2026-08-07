@@ -3,20 +3,25 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-    --color-sl-orange: #ff914d;
-    --color-sl-orange-dark: #ff7c2c;
-
-    --color-sl-beige: #e4dbc7;
-    --color-sl-beige-dark: #d6c8aa;
+    --color-cta: #e8842b;
+    --color-ink: #14110d;
+    --color-charcoal: #241e17;
+    --color-sand: #e8e0ce;
+    --color-warm-white: #f6f2ea;
+    --color-steel: #46555f;
+    --color-olive: #5e5f47;
 
     --font-sl-montserrat: var(--font-montserrat), sans-serif;
     --font-sl-open-sans: var(--font-open-sans), sans-serif;
     --font-sl-bebas: var(--font-bebas), sans-serif;
+    --font-sl-anton: var(--font-anton), sans-serif;
+    --font-sl-archivo: var(--font-archivo), sans-serif;
+    --font-sl-poppins: var(--font-poppins), sans-serif;
 }
 
 :root {
-    --background: #0a0a0a;
-    --foreground: #0a0a0a;
+    --background: var(--color-charcoal);
+    --foreground: var(--color-charcoal);
 }
 
 @theme inline {

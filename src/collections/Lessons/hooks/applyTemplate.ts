@@ -15,6 +15,7 @@ type LessonData = {
     template?: TemplateRelation;
     title?: string;
     type?: string;
+    spots?: number | null;
     image?: unknown;
     coaches?: unknown;
     workoutBlocks?: unknown;
@@ -30,8 +31,6 @@ type HookArgs = {
  * On lesson create, if a template is selected and certain fields are empty,
  * copies title / type / image / coaches / default workout blocks from the
  * template.
- * This runs before resolveExercises so the copied exercises go through the
- * same externalId-resolution path.
  */
 const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
     if (operation !== "create" || !data) return data;
@@ -66,70 +65,48 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
     });
 
     const templateData = template as {
+        spots?: number | null;
         defaultWorkoutBlocks?: Array<{
             workout?: { id?: string | number } | string | number | null;
+            duration?: number | null;
             exercises?: Array<{
-                exercise?: { id?: string | number } | string | number | null;
+                name?: string | null;
+                description?: string | null;
+                videoUrl?: string | null;
+                externalId?: string | null;
             }>;
-        }>;
-        defaultExercises?: Array<{
-            workout?: { id?: string | number } | string | number | null;
-            exercise: { id?: string | number } | string | number;
         }>;
     };
 
     let templateWorkoutBlocks = Array.isArray(templateData.defaultWorkoutBlocks)
         ? templateData.defaultWorkoutBlocks.map((block) => ({
               workout: normalizeRelationValue(block.workout),
+              duration:
+                  typeof block.duration === "number"
+                      ? block.duration
+                      : undefined,
               exercises: Array.isArray(block.exercises)
                   ? block.exercises
-                        .map((item) => ({
-                            exercise: normalizeRelationValue(item.exercise),
+                        .filter((exercise) => Boolean(exercise?.name))
+                        .map((exercise) => ({
+                            name: exercise.name ?? "",
+                            description: exercise.description ?? undefined,
+                            videoUrl: exercise.videoUrl ?? undefined,
+                            externalId: exercise.externalId ?? undefined,
                         }))
-                        .filter((item) => item.exercise != null)
                   : [],
           }))
         : [];
 
-    // Backward compatibility for templates created with the old flat
-    // defaultExercises field.
-    if (
-        templateWorkoutBlocks.length === 0 &&
-        Array.isArray(templateData.defaultExercises)
-    ) {
-        const workoutBlocksMap = new Map<
-            string | number,
-            {
-                workout: string | number;
-                exercises: Array<{
-                    exercise: string | number | undefined;
-                }>;
-            }
-        >();
-
-        for (const item of templateData.defaultExercises) {
-            const workoutId = normalizeRelationValue(item.workout);
-            if (!workoutId) continue;
-
-            const current = workoutBlocksMap.get(workoutId) ?? {
-                workout: workoutId,
-                exercises: [],
-            };
-
-            current.exercises.push({
-                exercise: normalizeRelationValue(item.exercise),
-            });
-
-            workoutBlocksMap.set(workoutId, current);
-        }
-
-        templateWorkoutBlocks = Array.from(workoutBlocksMap.values());
-    }
+    templateWorkoutBlocks = templateWorkoutBlocks.filter(
+        (block) => block.workout != null,
+    );
 
     return {
         ...data,
         title: template.title,
         type: data.type || template.type,
+        spots: typeof data.spots === "number" ? data.spots : templateData.spots,
         image: normalizeRelationValue(
             resolvedImage as { id?: string | number } | string | number,
         ),

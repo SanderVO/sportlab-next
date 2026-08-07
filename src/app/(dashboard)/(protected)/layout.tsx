@@ -14,7 +14,7 @@ export default async function ProtectedLayout({
 
     return (
         <div className="min-h-screen">
-            <header className="border-b border-white/10 bg-[#111111]">
+            <header className="border-b border-sand/10 bg-ink">
                 <div className="relative w-full px-4 py-3 sm:px-6 lg:px-8 flex items-center justify-center min-h-16">
                     <div className="absolute left-4 sm:left-6 lg:left-8">
                         <SideNav user={user} />

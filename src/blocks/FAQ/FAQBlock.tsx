@@ -91,18 +91,18 @@ export const FAQBlock: React.FC<FAQBlockProps> = ({ id, items }) => {
                         item.questionColor === "black"
                             ? "text-background"
                             : item.questionColor === "beige"
-                              ? "text-sl-beige"
+                              ? "text-sand"
                               : item.questionColor === "orange"
-                                ? "text-sl-orange"
+                                ? "text-cta"
                                 : "text-white";
 
                     const iconColorClass =
                         item.iconColor === "black"
                             ? "text-background"
                             : item.iconColor === "beige"
-                              ? "text-sl-beige"
+                              ? "text-sand"
                               : item.iconColor === "orange"
-                                ? "text-sl-orange"
+                                ? "text-cta"
                                 : "text-white";
 
                     return (

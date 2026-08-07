@@ -39,9 +39,9 @@ export const RenderBlocks: React.FC<{
                                     className={cn(
                                         "flex items-center w-full relative h-auto flex-row lg:py-12",
                                         backgroundColor === "backgroundDark" &&
-                                            "bg-background text-sl-beige",
+                                            "bg-background text-sand",
                                         backgroundColor === "backgroundLight" &&
-                                            "bg-sl-beige text-background",
+                                            "bg-sand text-background",
                                         backgroundColor === "backgroundWhite" &&
                                             "bg-white text-background",
                                         blockType === "carousel" &&

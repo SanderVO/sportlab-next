@@ -7,7 +7,14 @@ import { MainWrapper } from "@/components/MainWrapper";
 import { Organization } from "@/payload-types";
 import { getCachedGlobal } from "@/utilities/getGlobals";
 import { GoogleTagManager } from "@next/third-parties/google";
-import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
+import {
+    Anton,
+    Archivo,
+    Bebas_Neue,
+    Montserrat,
+    Open_Sans,
+    Poppins,
+} from "next/font/google";
 import { draftMode } from "next/headers";
 import Script from "next/script";
 import React from "react";
@@ -35,6 +42,27 @@ const openSans = Open_Sans({
     display: "swap",
 });
 
+const anton = Anton({
+    subsets: ["latin"],
+    weight: ["400"],
+    variable: "--font-anton",
+    display: "swap",
+});
+
+const poppins = Poppins({
+    subsets: ["latin"],
+    weight: ["400", "700"],
+    variable: "--font-poppins",
+    display: "swap",
+});
+
+const archivo = Archivo({
+    subsets: ["latin"],
+    weight: ["800"],
+    variable: "--font-archivo",
+    display: "swap",
+});
+
 export default async function RootLayout({
     children,
 }: {
@@ -52,7 +80,7 @@ export default async function RootLayout({
     return (
         <html
             lang="nl"
-            className={`${montserrat.variable} ${bebasNeue.variable} ${openSans.variable}`}
+            className={`${montserrat.variable} ${bebasNeue.variable} ${openSans.variable} ${anton.variable} ${poppins.variable} ${archivo.variable}`}
             suppressHydrationWarning
         >
             <head>

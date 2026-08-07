@@ -49,7 +49,7 @@ export default function LoginForm() {
             <div>
                 <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-white/70"
+                    className="block text-sm font-medium text-sand/70"
                 >
                     E-mailadres
                 </label>
@@ -61,14 +61,14 @@ export default function LoginForm() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 block w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30"
+                    className="mt-1 block w-full rounded-md border border-sand/10 bg-charcoal px-3 py-2 text-sm text-warm-white placeholder:text-sand/30 focus:border-cta/50 focus:outline-none focus:ring-1 focus:ring-cta/30"
                 />
             </div>
 
             <div>
                 <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-white/70"
+                    className="block text-sm font-medium text-sand/70"
                 >
                     Wachtwoord
                 </label>
@@ -80,25 +80,25 @@ export default function LoginForm() {
                     autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-white/30 focus:outline-none focus:ring-1 focus:ring-white/30"
+                    className="mt-1 block w-full rounded-md border border-sand/10 bg-charcoal px-3 py-2 text-sm text-warm-white placeholder:text-sand/30 focus:border-cta/50 focus:outline-none focus:ring-1 focus:ring-cta/30"
                 />
             </div>
 
             <div className="flex justify-end">
                 <Link
                     href="/forgot-password"
-                    className="text-xs text-white/60 hover:text-white/80"
+                    className="text-xs text-sand/60 hover:text-warm-white"
                 >
                     Wachtwoord vergeten?
                 </Link>
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-cta">{error}</p>}
 
             <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-md bg-white px-4 py-2 text-sm font-medium text-[#0a0a0a] hover:bg-white/90 disabled:opacity-50"
+                className="w-full rounded-md bg-cta px-4 py-2 text-sm font-medium text-ink hover:bg-cta/90 disabled:opacity-50"
             >
                 {loading ? "Bezig..." : "Inloggen"}
             </button>

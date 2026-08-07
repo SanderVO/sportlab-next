@@ -3,8 +3,8 @@ import { Page, Post, User } from "@/payload-types";
 import { Button } from "./Button";
 
 const labelColorClasses: Record<string, string> = {
-    beige: "text-sl-beige",
-    orange: "text-sl-orange",
+    beige: "text-sand",
+    orange: "text-cta",
     neutral: "text-neutral-400",
     white: "text-white",
 };

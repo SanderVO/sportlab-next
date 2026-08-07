@@ -72,7 +72,6 @@ export interface Config {
     documents: Document;
     pages: Page;
     posts: Post;
-    exercises: Exercise;
     lessons: Lesson;
     'lesson-templates': LessonTemplate;
     events: Event;
@@ -97,7 +96,6 @@ export interface Config {
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
-    exercises: ExercisesSelect<false> | ExercisesSelect<true>;
     lessons: LessonsSelect<false> | LessonsSelect<true>;
     'lesson-templates': LessonTemplatesSelect<false> | LessonTemplatesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
@@ -567,43 +565,6 @@ export interface InstagramBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "exercises".
- */
-export interface Exercise {
-  id: number;
-  name: string;
-  description?: string | null;
-  /**
-   * Koppel deze oefening aan een of meerdere workouts zodat je hem kunt groeperen binnen lessen.
-   */
-  workouts?: (number | Workout)[] | null;
-  videoUrl?: string | null;
-  /**
-   * Gebruik dit veld om oefeningen idempotent te importeren via CSV.
-   */
-  externalId?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Herbruikbare workout-groepen om oefeningen binnen lessen te bundelen.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "workouts".
- */
-export interface Workout {
-  id: number;
-  name: string;
-  description?: string | null;
-  /**
-   * Koppel oefeningen aan deze workout. Een oefening kan in meerdere workouts voorkomen.
-   */
-  exercises?: (number | Exercise)[] | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lessons".
  */
 export interface Lesson {
@@ -621,6 +582,10 @@ export interface Lesson {
   startDate?: string | null;
   endDate?: string | null;
   /**
+   * Optioneel: het aantal beschikbare plekken voor deze les.
+   */
+  spots?: number | null;
+  /**
    * Optioneel: gebruikt in lesson cards. Als leeg, wordt de afbeelding van het gekoppelde sjabloon gebruikt.
    */
   image?: (number | null) | Media;
@@ -629,20 +594,23 @@ export interface Lesson {
    */
   coaches?: (number | User)[] | null;
   /**
-   * Maak eerst workoutblokken aan in de gewenste volgorde. Voeg daarna oefeningen toe binnen elk blok.
+   * Maak workoutblokken aan in de gewenste volgorde en koppel per blok een workout.
    */
   workoutBlocks?:
     | {
         workout: number | Workout;
         duration: number;
-        exercises: {
-          exercise: number | Exercise;
-          id?: string | null;
-        }[];
+        exercises?:
+          | {
+              name: string;
+              description: string;
+              videoUrl?: string | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
-  exercisesCSVImport?: string | null;
   /**
    * Gebruik dit veld om lessen idempotent te importeren via CSV.
    */
@@ -668,6 +636,10 @@ export interface LessonTemplate {
   title: string;
   type: 'pt' | 'semi_pt' | 'group' | 'open_gym';
   /**
+   * Optioneel: standaard aantal plekken voor lessen op basis van dit sjabloon.
+   */
+  spots?: number | null;
+  /**
    * Voeg één rij toe per dag/tijd combinatie (bijv. Maandag 09:00 én Woensdag 14:00).
    */
   schedule: {
@@ -687,12 +659,40 @@ export interface LessonTemplate {
   defaultWorkoutBlocks?:
     | {
         workout: number | Workout;
+        duration?: number | null;
         exercises?:
           | {
-              exercise: number | Exercise;
+              name: string;
+              description?: string | null;
+              videoUrl?: string | null;
+              externalId?: string | null;
               id?: string | null;
             }[]
           | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Herbruikbare workout-groepen om oefeningen binnen lessen te bundelen.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workouts".
+ */
+export interface Workout {
+  id: number;
+  name: string;
+  description?: string | null;
+  /**
+   * Voeg meerdere oefeningen toe die uniek zijn voor deze workout.
+   */
+  exercises?:
+    | {
+        name: string;
+        description?: string | null;
+        videoUrl?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -793,7 +793,8 @@ export interface LessonEnrollment {
         workout: number | Workout;
         exercises?:
           | {
-              exercise: number | Exercise;
+              exerciseName: string;
+              exerciseExternalId?: string | null;
               sets?: number | null;
               reps?: string | null;
               notes?: string | null;
@@ -1175,10 +1176,6 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null)
     | ({
-        relationTo: 'exercises';
-        value: number | Exercise;
-      } | null)
-    | ({
         relationTo: 'lessons';
         value: number | Lesson;
       } | null)
@@ -1507,19 +1504,6 @@ export interface PostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "exercises_select".
- */
-export interface ExercisesSelect<T extends boolean = true> {
-  name?: T;
-  description?: T;
-  workouts?: T;
-  videoUrl?: T;
-  externalId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lessons_select".
  */
 export interface LessonsSelect<T extends boolean = true> {
@@ -1529,6 +1513,7 @@ export interface LessonsSelect<T extends boolean = true> {
   status?: T;
   startDate?: T;
   endDate?: T;
+  spots?: T;
   image?: T;
   coaches?: T;
   workoutBlocks?:
@@ -1539,12 +1524,13 @@ export interface LessonsSelect<T extends boolean = true> {
         exercises?:
           | T
           | {
-              exercise?: T;
+              name?: T;
+              description?: T;
+              videoUrl?: T;
               id?: T;
             };
         id?: T;
       };
-  exercisesCSVImport?: T;
   externalId?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1557,6 +1543,7 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
   isActive?: T;
   title?: T;
   type?: T;
+  spots?: T;
   schedule?:
     | T
     | {
@@ -1571,10 +1558,14 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
     | T
     | {
         workout?: T;
+        duration?: T;
         exercises?:
           | T
           | {
-              exercise?: T;
+              name?: T;
+              description?: T;
+              videoUrl?: T;
+              externalId?: T;
               id?: T;
             };
         id?: T;
@@ -1633,7 +1624,14 @@ export interface ProgramsSelect<T extends boolean = true> {
 export interface WorkoutsSelect<T extends boolean = true> {
   name?: T;
   description?: T;
-  exercises?: T;
+  exercises?:
+    | T
+    | {
+        name?: T;
+        description?: T;
+        videoUrl?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1652,7 +1650,8 @@ export interface LessonEnrollmentsSelect<T extends boolean = true> {
         exercises?:
           | T
           | {
-              exercise?: T;
+              exerciseName?: T;
+              exerciseExternalId?: T;
               sets?: T;
               reps?: T;
               notes?: T;

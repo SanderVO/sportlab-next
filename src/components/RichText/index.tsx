@@ -252,10 +252,10 @@ const headingConverter: JSXConverter<SerializedHeadingNode> = ({
                     colorClass = "text-background";
                     break;
                 case "beige":
-                    colorClass = "text-sl-beige";
+                    colorClass = "text-sand";
                     break;
                 case "orange":
-                    colorClass = "text-sl-orange";
+                    colorClass = "text-cta";
                     break;
                 default:
                     colorClass = "text-white";

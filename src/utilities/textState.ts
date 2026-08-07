@@ -30,6 +30,18 @@ export const textState = {
             label: "Bebas Neue",
             css: { "font-family": "var(--font-sl-bebas)" },
         },
+        anton: {
+            label: "Anton",
+            css: { "font-family": "var(--font-sl-anton)" },
+        },
+        archivo: {
+            label: "Archivo",
+            css: { "font-family": "var(--font-sl-archivo)" },
+        },
+        poppins: {
+            label: "Poppins",
+            css: { "font-family": "var(--font-sl-poppins)" },
+        },
     },
     headingSize: {
         sm: {
