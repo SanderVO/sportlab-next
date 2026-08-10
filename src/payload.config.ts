@@ -15,6 +15,7 @@ import { Documents } from "./collections/Documents";
 import { EventRegistrations } from "./collections/EventRegistrations";
 import { Events } from "./collections/Events";
 import { LessonEnrollments } from "./collections/LessonEnrollments";
+import { LessonExerciseTracking } from "./collections/LessonExerciseTracking";
 import { LessonTemplates } from "./collections/LessonTemplates";
 import { Lessons } from "./collections/Lessons";
 import { Media } from "./collections/Media";
@@ -23,7 +24,6 @@ import { Posts } from "./collections/Posts";
 import { ProgramEnrollments } from "./collections/ProgramEnrollments";
 import { Programs } from "./collections/Programs";
 import { Users } from "./collections/Users";
-import { Workouts } from "./collections/Workouts";
 import { Footer } from "./components/Footer/config";
 import { Header } from "./components/Header/config";
 import { Organization } from "./components/Organization/config";
@@ -161,8 +161,8 @@ export default buildConfig({
         LessonTemplates,
         Events,
         Programs,
-        Workouts,
         LessonEnrollments,
+        LessonExerciseTracking,
         ProgramEnrollments,
         EventRegistrations,
     ],

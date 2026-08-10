@@ -21,6 +21,17 @@ type LessonData = {
     workoutBlocks?: unknown;
 };
 
+type WorkoutTemplateBlock = {
+    name?: string | null;
+    description?: string | null;
+    duration?: number | null;
+    exercises?: Array<{
+        name?: string | null;
+        description?: string | null;
+        videoUrl?: string | null;
+    }>;
+};
+
 type HookArgs = {
     data?: LessonData;
     req: Parameters<CollectionBeforeChangeHook>[0]["req"];
@@ -66,41 +77,47 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
 
     const templateData = template as {
         spots?: number | null;
-        defaultWorkoutBlocks?: Array<{
-            workout?: { id?: string | number } | string | number | null;
-            duration?: number | null;
-            exercises?: Array<{
-                name?: string | null;
-                description?: string | null;
-                videoUrl?: string | null;
-                externalId?: string | null;
-            }>;
-        }>;
+        defaultWorkoutBlocks?: WorkoutTemplateBlock[];
     };
 
-    let templateWorkoutBlocks = Array.isArray(templateData.defaultWorkoutBlocks)
-        ? templateData.defaultWorkoutBlocks.map((block) => ({
-              workout: normalizeRelationValue(block.workout),
-              duration:
-                  typeof block.duration === "number"
-                      ? block.duration
-                      : undefined,
-              exercises: Array.isArray(block.exercises)
-                  ? block.exercises
-                        .filter((exercise) => Boolean(exercise?.name))
-                        .map((exercise) => ({
-                            name: exercise.name ?? "",
-                            description: exercise.description ?? undefined,
-                            videoUrl: exercise.videoUrl ?? undefined,
-                            externalId: exercise.externalId ?? undefined,
-                        }))
-                  : [],
-          }))
+    const templateWorkoutBlocks = [] as Array<{
+        name: string;
+        description?: string;
+        duration?: number;
+        exercises: Array<{
+            name: string;
+            description?: string;
+            videoUrl?: string;
+        }>;
+    }>;
+
+    const defaultBlocks = Array.isArray(templateData.defaultWorkoutBlocks)
+        ? templateData.defaultWorkoutBlocks
         : [];
 
-    templateWorkoutBlocks = templateWorkoutBlocks.filter(
-        (block) => block.workout != null,
-    );
+    for (const block of defaultBlocks) {
+        const exercises = (
+            Array.isArray(block.exercises) ? block.exercises : []
+        )
+            .filter((exercise) => Boolean(exercise?.name))
+            .map((exercise) => ({
+                name: exercise?.name ?? "",
+                description: exercise?.description ?? undefined,
+                videoUrl: exercise?.videoUrl ?? undefined,
+            }));
+
+        const name = block.name ?? "";
+
+        if (!name) continue;
+
+        templateWorkoutBlocks.push({
+            name,
+            description: block.description ?? undefined,
+            duration:
+                typeof block.duration === "number" ? block.duration : undefined,
+            exercises,
+        });
+    }
 
     return {
         ...data,

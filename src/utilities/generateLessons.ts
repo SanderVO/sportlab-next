@@ -44,43 +44,52 @@ const getLocalTime = (value: string | undefined) => {
           };
 };
 
-const buildWorkoutBlocks = (
+const buildWorkoutBlocks = async (
     blocks: LessonTemplate["defaultWorkoutBlocks"],
-): Lesson["workoutBlocks"] => {
+): Promise<Lesson["workoutBlocks"]> => {
     if (!Array.isArray(blocks)) return undefined;
 
-    const normalizedBlocks = blocks
-        .map((block) => ({
-            workout: toNumericId(block.workout),
+    const normalizedBlocks: Array<{
+        name: string;
+        description?: string;
+        duration?: number;
+        exercises: Array<{
+            name: string;
+            description?: string;
+            videoUrl?: string;
+        }>;
+    }> = [];
+
+    for (const block of blocks) {
+        if (!block.name) continue;
+
+        normalizedBlocks.push({
+            name: block.name,
+            description: block.description ?? undefined,
             duration:
                 typeof block.duration === "number" ? block.duration : undefined,
-            exercises: Array.isArray(block.exercises)
-                ? block.exercises
-                      .filter((exercise) => Boolean(exercise?.name))
-                      .map((exercise) => ({
-                          name: exercise.name ?? "",
-                          description: exercise.description ?? undefined,
-                          videoUrl: exercise.videoUrl ?? undefined,
-                      }))
-                : [],
-        }))
-        .filter((block) => block.workout != null)
-        .map((block) => ({
-            workout: block.workout as number,
-            duration: block.duration,
-            exercises: block.exercises,
-        }));
+            exercises: (Array.isArray(block.exercises) ? block.exercises : [])
+                .filter((exercise) => Boolean(exercise?.name))
+                .map((exercise) => ({
+                    name: exercise?.name ?? "",
+                    description: exercise?.description ?? undefined,
+                    videoUrl: exercise?.videoUrl ?? undefined,
+                })),
+        });
+    }
 
     return normalizedBlocks.length > 0
         ? (normalizedBlocks as Lesson["workoutBlocks"])
         : undefined;
 };
 
-const getTemplateBackfillData = ({
+const getTemplateBackfillData = async ({
+    payload,
     lesson,
     template,
     titleDate,
 }: {
+    payload: BasePayload;
     lesson: Lesson;
     template: LessonTemplate;
     titleDate: string;
@@ -93,7 +102,7 @@ const getTemplateBackfillData = ({
               .filter((id): id is number => typeof id === "number")
         : undefined;
 
-    const templateWorkoutBlocks = buildWorkoutBlocks(
+    const templateWorkoutBlocks = await buildWorkoutBlocks(
         template.defaultWorkoutBlocks,
     );
 
@@ -259,7 +268,8 @@ export async function generateLessons(
 
                     if (existing.docs.length > 0) {
                         const currentLesson = existing.docs[0] as Lesson;
-                        const backfillData = getTemplateBackfillData({
+                        const backfillData = await getTemplateBackfillData({
+                            payload,
                             lesson: currentLesson,
                             template,
                             titleDate,

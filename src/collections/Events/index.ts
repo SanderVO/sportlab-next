@@ -109,17 +109,6 @@ export const Events: CollectionConfig = {
                 },
             },
         },
-        {
-            label: "Externe ID",
-            name: "externalId",
-            type: "text",
-            unique: true,
-            required: false,
-            admin: {
-                description:
-                    "Gebruik dit veld om events idempotent te importeren via CSV.",
-            },
-        },
         slugField({
             required: false,
             useAsSlug: "title",

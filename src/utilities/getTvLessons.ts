@@ -16,7 +16,8 @@ export const tvLessonSelect = {
         position: true,
     },
     workoutBlocks: {
-        workout: true,
+        name: true,
+        description: true,
         duration: true,
         exercises: {
             name: true,

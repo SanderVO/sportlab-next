@@ -6,6 +6,7 @@ import {
     applyTemplateBeforeValidate,
 } from "./hooks/applyTemplate";
 import { resolveCardImage } from "./hooks/resolveCardImage";
+import { syncExerciseTrackingOnLessonUpdate } from "./hooks/syncExerciseTrackingOnLessonUpdate";
 
 export const Lessons: CollectionConfig = {
     slug: "lessons",
@@ -24,6 +25,7 @@ export const Lessons: CollectionConfig = {
         defaultColumns: ["title", "type", "updatedAt", "startDate"],
     },
     hooks: {
+        afterChange: [syncExerciseTrackingOnLessonUpdate],
         afterRead: [resolveCardImage],
         beforeValidate: [applyTemplateBeforeValidate],
         beforeChange: [applyTemplate],
@@ -188,15 +190,20 @@ export const Lessons: CollectionConfig = {
             },
             admin: {
                 description:
-                    "Maak workoutblokken aan in de gewenste volgorde en koppel per blok een workout.",
+                    "Maak workoutblokken aan in de gewenste volgorde en vul per blok de workoutgegevens en oefeningen in.",
             },
             fields: [
                 {
-                    label: "Workout",
-                    name: "workout",
-                    type: "relationship",
-                    relationTo: "workouts",
+                    label: "Workout naam",
+                    name: "name",
+                    type: "text",
                     required: true,
+                },
+                {
+                    label: "Workout omschrijving",
+                    name: "description",
+                    type: "textarea",
+                    required: false,
                 },
                 {
                     label: "Tijd (in minuten)",
@@ -224,7 +231,7 @@ export const Lessons: CollectionConfig = {
                             label: "Omschrijving",
                             name: "description",
                             type: "textarea",
-                            required: true,
+                            required: false,
                         },
                         {
                             label: "Video URL",
@@ -235,17 +242,6 @@ export const Lessons: CollectionConfig = {
                     ],
                 },
             ],
-        },
-        {
-            label: "Externe ID",
-            name: "externalId",
-            type: "text",
-            unique: true,
-            required: false,
-            admin: {
-                description:
-                    "Gebruik dit veld om lessen idempotent te importeren via CSV.",
-            },
         },
     ],
 };

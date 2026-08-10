@@ -31,19 +31,6 @@ export const Exercises: CollectionConfig = {
             required: false,
         },
         {
-            label: "Workouts",
-            name: "workouts",
-            type: "relationship",
-            relationTo: "workouts",
-            hasMany: true,
-            required: false,
-            admin: {
-                hidden: true,
-                description:
-                    "Koppel deze oefening aan een of meerdere workouts zodat je hem kunt groeperen binnen lessen.",
-            },
-        },
-        {
             label: "Video URL",
             name: "videoUrl",
             type: "text",

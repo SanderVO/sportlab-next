@@ -1090,7 +1090,7 @@ export const lessons_workout_blocks_exercises = sqliteTable(
     _parentID: text("_parent_id").notNull(),
     id: text("id").primaryKey(),
     name: text("name").notNull(),
-    description: text("description").notNull(),
+    description: text("description"),
     videoUrl: text("video_url"),
   },
   (columns) => [
@@ -1112,18 +1112,13 @@ export const lessons_workout_blocks = sqliteTable(
     _order: integer("_order").notNull(),
     _parentID: integer("_parent_id").notNull(),
     id: text("id").primaryKey(),
-    workout: integer("workout_id")
-      .notNull()
-      .references(() => workouts.id, {
-        onDelete: "set null",
-      }),
+    name: text("name").notNull(),
     description: text("description"),
     duration: numeric("duration", { mode: "number" }).notNull(),
   },
   (columns) => [
     index("lessons_workout_blocks_order_idx").on(columns._order),
     index("lessons_workout_blocks_parent_id_idx").on(columns._parentID),
-    index("lessons_workout_blocks_workout_idx").on(columns.workout),
     foreignKey({
       columns: [columns["_parentID"]],
       foreignColumns: [lessons.id],
@@ -1261,11 +1256,8 @@ export const lesson_templates_default_workout_blocks = sqliteTable(
     _order: integer("_order").notNull(),
     _parentID: integer("_parent_id").notNull(),
     id: text("id").primaryKey(),
-    workout: integer("workout_id")
-      .notNull()
-      .references(() => workouts.id, {
-        onDelete: "set null",
-      }),
+    name: text("name").notNull(),
+    description: text("description"),
     duration: numeric("duration", { mode: "number" }),
   },
   (columns) => [
@@ -1274,9 +1266,6 @@ export const lesson_templates_default_workout_blocks = sqliteTable(
     ),
     index("lesson_templates_default_workout_blocks_parent_id_idx").on(
       columns._parentID,
-    ),
-    index("lesson_templates_default_workout_blocks_workout_idx").on(
-      columns.workout,
     ),
     foreignKey({
       columns: [columns["_parentID"]],
@@ -1451,102 +1440,6 @@ export const programs = sqliteTable(
   ],
 );
 
-export const workouts_exercises = sqliteTable(
-  "workouts_exercises",
-  {
-    _order: integer("_order").notNull(),
-    _parentID: integer("_parent_id").notNull(),
-    id: text("id").primaryKey(),
-    name: text("name").notNull(),
-    description: text("description"),
-    videoUrl: text("video_url"),
-    externalId: text("external_id"),
-  },
-  (columns) => [
-    index("workouts_exercises_order_idx").on(columns._order),
-    index("workouts_exercises_parent_id_idx").on(columns._parentID),
-    foreignKey({
-      columns: [columns["_parentID"]],
-      foreignColumns: [workouts.id],
-      name: "workouts_exercises_parent_id_fk",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const workouts = sqliteTable(
-  "workouts",
-  {
-    id: integer("id").primaryKey(),
-    name: text("name").notNull(),
-    description: text("description"),
-    updatedAt: text("updated_at")
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-    createdAt: text("created_at")
-      .notNull()
-      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
-  },
-  (columns) => [
-    index("workouts_updated_at_idx").on(columns.updatedAt),
-    index("workouts_created_at_idx").on(columns.createdAt),
-  ],
-);
-
-export const lesson_enrollments_workout_progress_exercises = sqliteTable(
-  "lesson_enrollments_workout_progress_exercises",
-  {
-    _order: integer("_order").notNull(),
-    _parentID: text("_parent_id").notNull(),
-    id: text("id").primaryKey(),
-    exerciseName: text("exercise_name").notNull(),
-    exerciseExternalId: text("exercise_external_id"),
-    sets: numeric("sets", { mode: "number" }),
-    reps: text("reps"),
-    notes: text("notes"),
-  },
-  (columns) => [
-    index("lesson_enrollments_workout_progress_exercises_order_idx").on(
-      columns._order,
-    ),
-    index("lesson_enrollments_workout_progress_exercises_parent_id_idx").on(
-      columns._parentID,
-    ),
-    foreignKey({
-      columns: [columns["_parentID"]],
-      foreignColumns: [lesson_enrollments_workout_progress.id],
-      name: "lesson_enrollments_workout_progress_exercises_parent_id_fk",
-    }).onDelete("cascade"),
-  ],
-);
-
-export const lesson_enrollments_workout_progress = sqliteTable(
-  "lesson_enrollments_workout_progress",
-  {
-    _order: integer("_order").notNull(),
-    _parentID: integer("_parent_id").notNull(),
-    id: text("id").primaryKey(),
-    workout: integer("workout_id")
-      .notNull()
-      .references(() => workouts.id, {
-        onDelete: "set null",
-      }),
-  },
-  (columns) => [
-    index("lesson_enrollments_workout_progress_order_idx").on(columns._order),
-    index("lesson_enrollments_workout_progress_parent_id_idx").on(
-      columns._parentID,
-    ),
-    index("lesson_enrollments_workout_progress_workout_idx").on(
-      columns.workout,
-    ),
-    foreignKey({
-      columns: [columns["_parentID"]],
-      foreignColumns: [lesson_enrollments.id],
-      name: "lesson_enrollments_workout_progress_parent_id_fk",
-    }).onDelete("cascade"),
-  ],
-);
-
 export const lesson_enrollments = sqliteTable(
   "lesson_enrollments",
   {
@@ -1583,6 +1476,95 @@ export const lesson_enrollments = sqliteTable(
     index("lesson_enrollments_updated_at_idx").on(columns.updatedAt),
     index("lesson_enrollments_created_at_idx").on(columns.createdAt),
     uniqueIndex("user_lesson_idx").on(columns.user, columns.lesson),
+  ],
+);
+
+export const lesson_exercise_tracking_workout_blocks_exercises = sqliteTable(
+  "lesson_exercise_tracking_workout_blocks_exercises",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: text("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    lessonExerciseId: text("lesson_exercise_id").notNull(),
+    exerciseName: text("exercise_name").notNull(),
+    exerciseDescription: text("exercise_description"),
+    videoUrl: text("video_url"),
+    sets: numeric("sets", { mode: "number" }),
+    reps: text("reps"),
+    notes: text("notes"),
+    completed: integer("completed", { mode: "boolean" }).default(false),
+  },
+  (columns) => [
+    index("lesson_exercise_tracking_workout_blocks_exercises_order_idx").on(
+      columns._order,
+    ),
+    index("lesson_exercise_tracking_workout_blocks_exercises_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [lesson_exercise_tracking_workout_blocks.id],
+      name: "lesson_exercise_tracking_workout_blocks_exercises_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lesson_exercise_tracking_workout_blocks = sqliteTable(
+  "lesson_exercise_tracking_workout_blocks",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    lessonBlockId: text("lesson_block_id").notNull(),
+    workoutName: text("workout_name").notNull(),
+    workoutDescription: text("workout_description"),
+    duration: numeric("duration", { mode: "number" }),
+  },
+  (columns) => [
+    index("lesson_exercise_tracking_workout_blocks_order_idx").on(
+      columns._order,
+    ),
+    index("lesson_exercise_tracking_workout_blocks_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [lesson_exercise_tracking.id],
+      name: "lesson_exercise_tracking_workout_blocks_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const lesson_exercise_tracking = sqliteTable(
+  "lesson_exercise_tracking",
+  {
+    id: integer("id").primaryKey(),
+    user: integer("user_id")
+      .notNull()
+      .references(() => users.id, {
+        onDelete: "set null",
+      }),
+    lesson: integer("lesson_id")
+      .notNull()
+      .references(() => lessons.id, {
+        onDelete: "set null",
+      }),
+    lastLoggedAt: text("last_logged_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("lesson_exercise_tracking_user_idx").on(columns.user),
+    index("lesson_exercise_tracking_lesson_idx").on(columns.lesson),
+    index("lesson_exercise_tracking_updated_at_idx").on(columns.updatedAt),
+    index("lesson_exercise_tracking_created_at_idx").on(columns.createdAt),
+    uniqueIndex("user_lesson_1_idx").on(columns.user, columns.lesson),
   ],
 );
 
@@ -2129,8 +2111,8 @@ export const payload_locked_documents_rels = sqliteTable(
     "lesson-templatesID": integer("lesson_templates_id"),
     eventsID: integer("events_id"),
     programsID: integer("programs_id"),
-    workoutsID: integer("workouts_id"),
     "lesson-enrollmentsID": integer("lesson_enrollments_id"),
+    "lesson-exercise-trackingID": integer("lesson_exercise_tracking_id"),
     "program-enrollmentsID": integer("program_enrollments_id"),
     "event-registrationsID": integer("event_registrations_id"),
     redirectsID: integer("redirects_id"),
@@ -2156,11 +2138,11 @@ export const payload_locked_documents_rels = sqliteTable(
     index("payload_locked_documents_rels_programs_id_idx").on(
       columns.programsID,
     ),
-    index("payload_locked_documents_rels_workouts_id_idx").on(
-      columns.workoutsID,
-    ),
     index("payload_locked_documents_rels_lesson_enrollments_id_idx").on(
       columns["lesson-enrollmentsID"],
+    ),
+    index("payload_locked_documents_rels_lesson_exercise_tracking_i_idx").on(
+      columns["lesson-exercise-trackingID"],
     ),
     index("payload_locked_documents_rels_program_enrollments_id_idx").on(
       columns["program-enrollmentsID"],
@@ -2226,14 +2208,14 @@ export const payload_locked_documents_rels = sqliteTable(
       name: "payload_locked_documents_rels_programs_fk",
     }).onDelete("cascade"),
     foreignKey({
-      columns: [columns["workoutsID"]],
-      foreignColumns: [workouts.id],
-      name: "payload_locked_documents_rels_workouts_fk",
-    }).onDelete("cascade"),
-    foreignKey({
       columns: [columns["lesson-enrollmentsID"]],
       foreignColumns: [lesson_enrollments.id],
       name: "payload_locked_documents_rels_lesson_enrollments_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["lesson-exercise-trackingID"]],
+      foreignColumns: [lesson_exercise_tracking.id],
+      name: "payload_locked_documents_rels_lesson_exercise_tracking_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["program-enrollmentsID"]],
@@ -3115,11 +3097,6 @@ export const relations_lessons_workout_blocks = relations(
       references: [lessons.id],
       relationName: "workoutBlocks",
     }),
-    workout: one(workouts, {
-      fields: [lessons_workout_blocks.workout],
-      references: [workouts.id],
-      relationName: "workout",
-    }),
     exercises: many(lessons_workout_blocks_exercises, {
       relationName: "exercises",
     }),
@@ -3180,11 +3157,6 @@ export const relations_lesson_templates_default_workout_blocks = relations(
       fields: [lesson_templates_default_workout_blocks._parentID],
       references: [lesson_templates.id],
       relationName: "defaultWorkoutBlocks",
-    }),
-    workout: one(workouts, {
-      fields: [lesson_templates_default_workout_blocks.workout],
-      references: [workouts.id],
-      relationName: "workout",
     }),
     exercises: many(lesson_templates_default_workout_blocks_exercises, {
       relationName: "exercises",
@@ -3262,50 +3234,9 @@ export const relations_programs = relations(programs, ({ one, many }) => ({
     relationName: "finalEvent",
   }),
 }));
-export const relations_workouts_exercises = relations(
-  workouts_exercises,
-  ({ one }) => ({
-    _parentID: one(workouts, {
-      fields: [workouts_exercises._parentID],
-      references: [workouts.id],
-      relationName: "exercises",
-    }),
-  }),
-);
-export const relations_workouts = relations(workouts, ({ many }) => ({
-  exercises: many(workouts_exercises, {
-    relationName: "exercises",
-  }),
-}));
-export const relations_lesson_enrollments_workout_progress_exercises =
-  relations(lesson_enrollments_workout_progress_exercises, ({ one }) => ({
-    _parentID: one(lesson_enrollments_workout_progress, {
-      fields: [lesson_enrollments_workout_progress_exercises._parentID],
-      references: [lesson_enrollments_workout_progress.id],
-      relationName: "exercises",
-    }),
-  }));
-export const relations_lesson_enrollments_workout_progress = relations(
-  lesson_enrollments_workout_progress,
-  ({ one, many }) => ({
-    _parentID: one(lesson_enrollments, {
-      fields: [lesson_enrollments_workout_progress._parentID],
-      references: [lesson_enrollments.id],
-      relationName: "workoutProgress",
-    }),
-    workout: one(workouts, {
-      fields: [lesson_enrollments_workout_progress.workout],
-      references: [workouts.id],
-      relationName: "workout",
-    }),
-    exercises: many(lesson_enrollments_workout_progress_exercises, {
-      relationName: "exercises",
-    }),
-  }),
-);
 export const relations_lesson_enrollments = relations(
   lesson_enrollments,
-  ({ one, many }) => ({
+  ({ one }) => ({
     user: one(users, {
       fields: [lesson_enrollments.user],
       references: [users.id],
@@ -3316,13 +3247,49 @@ export const relations_lesson_enrollments = relations(
       references: [lessons.id],
       relationName: "lesson",
     }),
-    workoutProgress: many(lesson_enrollments_workout_progress, {
-      relationName: "workoutProgress",
-    }),
     addedBy: one(users, {
       fields: [lesson_enrollments.addedBy],
       references: [users.id],
       relationName: "addedBy",
+    }),
+  }),
+);
+export const relations_lesson_exercise_tracking_workout_blocks_exercises =
+  relations(lesson_exercise_tracking_workout_blocks_exercises, ({ one }) => ({
+    _parentID: one(lesson_exercise_tracking_workout_blocks, {
+      fields: [lesson_exercise_tracking_workout_blocks_exercises._parentID],
+      references: [lesson_exercise_tracking_workout_blocks.id],
+      relationName: "exercises",
+    }),
+  }));
+export const relations_lesson_exercise_tracking_workout_blocks = relations(
+  lesson_exercise_tracking_workout_blocks,
+  ({ one, many }) => ({
+    _parentID: one(lesson_exercise_tracking, {
+      fields: [lesson_exercise_tracking_workout_blocks._parentID],
+      references: [lesson_exercise_tracking.id],
+      relationName: "workoutBlocks",
+    }),
+    exercises: many(lesson_exercise_tracking_workout_blocks_exercises, {
+      relationName: "exercises",
+    }),
+  }),
+);
+export const relations_lesson_exercise_tracking = relations(
+  lesson_exercise_tracking,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [lesson_exercise_tracking.user],
+      references: [users.id],
+      relationName: "user",
+    }),
+    lesson: one(lessons, {
+      fields: [lesson_exercise_tracking.lesson],
+      references: [lessons.id],
+      relationName: "lesson",
+    }),
+    workoutBlocks: many(lesson_exercise_tracking_workout_blocks, {
+      relationName: "workoutBlocks",
     }),
   }),
 );
@@ -3599,15 +3566,15 @@ export const relations_payload_locked_documents_rels = relations(
       references: [programs.id],
       relationName: "programs",
     }),
-    workoutsID: one(workouts, {
-      fields: [payload_locked_documents_rels.workoutsID],
-      references: [workouts.id],
-      relationName: "workouts",
-    }),
     "lesson-enrollmentsID": one(lesson_enrollments, {
       fields: [payload_locked_documents_rels["lesson-enrollmentsID"]],
       references: [lesson_enrollments.id],
       relationName: "lesson-enrollments",
+    }),
+    "lesson-exercise-trackingID": one(lesson_exercise_tracking, {
+      fields: [payload_locked_documents_rels["lesson-exercise-trackingID"]],
+      references: [lesson_exercise_tracking.id],
+      relationName: "lesson-exercise-tracking",
     }),
     "program-enrollmentsID": one(program_enrollments, {
       fields: [payload_locked_documents_rels["program-enrollmentsID"]],
@@ -3856,11 +3823,10 @@ type DatabaseSchema = {
   events: typeof events;
   programs_schedule: typeof programs_schedule;
   programs: typeof programs;
-  workouts_exercises: typeof workouts_exercises;
-  workouts: typeof workouts;
-  lesson_enrollments_workout_progress_exercises: typeof lesson_enrollments_workout_progress_exercises;
-  lesson_enrollments_workout_progress: typeof lesson_enrollments_workout_progress;
   lesson_enrollments: typeof lesson_enrollments;
+  lesson_exercise_tracking_workout_blocks_exercises: typeof lesson_exercise_tracking_workout_blocks_exercises;
+  lesson_exercise_tracking_workout_blocks: typeof lesson_exercise_tracking_workout_blocks;
+  lesson_exercise_tracking: typeof lesson_exercise_tracking;
   program_enrollments: typeof program_enrollments;
   event_registrations: typeof event_registrations;
   redirects: typeof redirects;
@@ -3939,11 +3905,10 @@ type DatabaseSchema = {
   relations_events: typeof relations_events;
   relations_programs_schedule: typeof relations_programs_schedule;
   relations_programs: typeof relations_programs;
-  relations_workouts_exercises: typeof relations_workouts_exercises;
-  relations_workouts: typeof relations_workouts;
-  relations_lesson_enrollments_workout_progress_exercises: typeof relations_lesson_enrollments_workout_progress_exercises;
-  relations_lesson_enrollments_workout_progress: typeof relations_lesson_enrollments_workout_progress;
   relations_lesson_enrollments: typeof relations_lesson_enrollments;
+  relations_lesson_exercise_tracking_workout_blocks_exercises: typeof relations_lesson_exercise_tracking_workout_blocks_exercises;
+  relations_lesson_exercise_tracking_workout_blocks: typeof relations_lesson_exercise_tracking_workout_blocks;
+  relations_lesson_exercise_tracking: typeof relations_lesson_exercise_tracking;
   relations_program_enrollments: typeof relations_program_enrollments;
   relations_event_registrations: typeof relations_event_registrations;
   relations_redirects_rels: typeof relations_redirects_rels;

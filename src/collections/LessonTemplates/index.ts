@@ -168,11 +168,16 @@ export const LessonTemplates: CollectionConfig = {
             },
             fields: [
                 {
-                    label: "Workout",
-                    name: "workout",
-                    type: "relationship",
-                    relationTo: "workouts",
+                    label: "Workout naam",
+                    name: "name",
+                    type: "text",
                     required: true,
+                },
+                {
+                    label: "Workout omschrijving",
+                    name: "description",
+                    type: "textarea",
+                    required: false,
                 },
                 {
                     label: "Tijd (in minuten)",

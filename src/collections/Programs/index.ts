@@ -126,17 +126,6 @@ export const Programs: CollectionConfig = {
             hasMany: false,
             required: false,
         },
-        {
-            label: "Externe ID",
-            name: "externalId",
-            type: "text",
-            unique: true,
-            required: false,
-            admin: {
-                description:
-                    "Gebruik dit veld om programma's idempotent te importeren via CSV.",
-            },
-        },
         slugField({
             required: false,
             useAsSlug: "title",

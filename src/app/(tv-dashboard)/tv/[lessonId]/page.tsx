@@ -59,96 +59,112 @@ export default async function TvLessonPage({
             <div className="relative z-10 mb-4 flex justify-start">
                 <a
                     href={backHref}
-                    className="inline-flex items-center rounded-full border border-white/10 bg-black/40 px-5 py-3 text-sm uppercase tracking-[0.22em] text-white transition hover:border-[#e8842b]/40 hover:bg-black/60"
+                    className="inline-flex items-center rounded-full border border-white/10 bg-black/40 px-5 py-3 text-sm uppercase tracking-[0.22em] text-white transition hover:border-cta/40 hover:bg-black/60"
                 >
                     Terug naar overzicht
                 </a>
             </div>
 
             <div className="relative z-10 min-h-[calc(100vh-7rem)] overflow-hidden rounded-4xl border border-white/10 bg-ink/80 shadow-2xl shadow-black/25 backdrop-blur">
-                <div className="relative min-h-80 bg-black">
-                    {lessonImage?.url ? (
-                        <Image
-                            src={lessonImage.url}
-                            alt={lessonImage.alt || lesson.title || "Les"}
-                            fill
-                            className="object-cover"
-                            priority
-                        />
-                    ) : (
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_36%),linear-gradient(180deg,rgba(20,17,13,0.2),rgba(20,17,13,0.9))]" />
-                    )}
+                <div className="grid min-h-[calc(100vh-7rem)] md:grid-cols-[minmax(20rem,34vw)_1fr]">
+                    <aside className="relative min-h-80 overflow-hidden border-b border-white/10 bg-black md:min-h-full md:border-b-0 md:border-r">
+                        {lessonImage?.url ? (
+                            <Image
+                                src={lessonImage.url}
+                                alt={lessonImage.alt || lesson.title || "Les"}
+                                fill
+                                className="object-cover"
+                                priority
+                            />
+                        ) : (
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_36%),linear-gradient(180deg,rgba(20,17,13,0.2),rgba(20,17,13,0.9))]" />
+                        )}
 
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,17,13,0.06)_0%,rgba(20,17,13,0.18)_36%,rgba(20,17,13,0.88)_100%)]" />
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,17,13,0.08)_0%,rgba(20,17,13,0.24)_36%,rgba(20,17,13,0.94)_100%)]" />
 
-                    <div className="absolute inset-0 flex items-end p-6 xl:p-10">
-                        <div className="max-w-3xl">
-                            <p className="text-xs uppercase tracking-[0.35em] text-white/70">
-                                {lesson.coaches
-                                    ?.map((coach) =>
-                                        isUser(coach) && coach.name
-                                            ? coach.name
-                                            : "Coach",
-                                    )
-                                    .join(" · ") || "Geen coach gekoppeld"}
-                            </p>
+                        <div className="absolute inset-0 flex items-end p-6 xl:p-10">
+                            <div className="max-w-xl">
+                                <p className="text-xs uppercase tracking-[0.35em] text-white/70">
+                                    {lesson.coaches
+                                        ?.map((coach) =>
+                                            isUser(coach) && coach.name
+                                                ? coach.name
+                                                : "Coach",
+                                        )
+                                        .join(" · ") || "Geen coach gekoppeld"}
+                                </p>
 
-                            <h1 className="mt-4 text-5xl uppercase tracking-[0.12em] text-white sm:text-6xl xl:text-8xl font-(--font-archivo)">
-                                {lesson.title || `Les ${lesson.id}`}
-                            </h1>
+                                <h1 className="mt-4 text-4xl uppercase tracking-[0.12em] text-white sm:text-5xl xl:text-7xl font-(--font-archivo)">
+                                    {lesson.title || `Les ${lesson.id}`}
+                                </h1>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </aside>
 
-                <div className="p-6 xl:p-10">
-                    <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-                        {(lesson.workoutBlocks ?? []).map((block, index) => {
-                            const workout =
-                                typeof block.workout === "object" &&
-                                block.workout !== null
-                                    ? block.workout
-                                    : null;
-                            const exercises = Array.isArray(block.exercises)
-                                ? block.exercises
-                                : [];
+                    <div className="p-6 xl:p-10">
+                        <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+                            {(lesson.workoutBlocks ?? []).map(
+                                (block, index) => {
+                                    const exercises = Array.isArray(
+                                        (block as { exercises?: unknown[] })
+                                            .exercises,
+                                    )
+                                        ? ((block as { exercises?: unknown[] })
+                                              .exercises as Array<{
+                                              id?: string;
+                                              name?: string;
+                                              description?: string;
+                                          }>)
+                                        : [];
 
-                            return (
-                                <section
-                                    key={block.id ?? `${lesson.id}-${index}`}
-                                    className="rounded-3xl border border-white/10 bg-warm-white/6 p-5"
-                                >
-                                    <div className="flex items-center justify-between gap-4">
-                                        <h2 className="text-3xl uppercase tracking-widest text-white font-(--font-archivo)">
-                                            {workout && "name" in workout
-                                                ? workout.name
-                                                : "Workout"}
-                                        </h2>
+                                    return (
+                                        <section
+                                            key={
+                                                block.id ??
+                                                `${lesson.id}-${index}`
+                                            }
+                                            className="rounded-3xl border border-white/10 bg-warm-white/6 p-5"
+                                        >
+                                            <div className="flex items-center justify-between gap-4">
+                                                <h2 className="text-3xl uppercase tracking-widest text-white font-(--font-archivo)">
+                                                    {(
+                                                        block as {
+                                                            name?: string;
+                                                        }
+                                                    ).name || "Workout"}
+                                                </h2>
 
-                                        <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-sm uppercase tracking-[0.25em] text-white/70">
-                                            {block.duration} min
-                                        </span>
-                                    </div>
-
-                                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                                        {exercises.map((exercise) => (
-                                            <div
-                                                key={
-                                                    exercise.id ?? exercise.name
-                                                }
-                                                className="rounded-2xl border border-white/10 bg-black/20 p-4"
-                                            >
-                                                <h3 className="text-xl uppercase tracking-[0.08em] text-white font-(--font-archivo)">
-                                                    {exercise.name}
-                                                </h3>
-                                                <p className="mt-2 text-base leading-6 text-white/65">
-                                                    {exercise.description}
-                                                </p>
+                                                <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-sm uppercase tracking-[0.25em] text-white/70">
+                                                    {block.duration} min
+                                                </span>
                                             </div>
-                                        ))}
-                                    </div>
-                                </section>
-                            );
-                        })}
+
+                                            <div className="mt-4 flex flex-col gap-3">
+                                                {exercises.map((exercise) => (
+                                                    <div
+                                                        key={
+                                                            exercise.id ??
+                                                            exercise.name
+                                                        }
+                                                        className="rounded-2xl border border-white/10 bg-black/20 p-4"
+                                                    >
+                                                        <h3 className="text-xl uppercase tracking-[0.08em] text-white font-(--font-archivo)">
+                                                            {exercise.name ||
+                                                                "Oefening"}
+                                                        </h3>
+                                                        <p className="mt-2 text-base leading-6 text-white/65">
+                                                            {
+                                                                exercise.description
+                                                            }
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </section>
+                                    );
+                                },
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

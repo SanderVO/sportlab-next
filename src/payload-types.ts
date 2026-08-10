@@ -76,8 +76,8 @@ export interface Config {
     'lesson-templates': LessonTemplate;
     events: Event;
     programs: Program;
-    workouts: Workout;
     'lesson-enrollments': LessonEnrollment;
+    'lesson-exercise-tracking': LessonExerciseTracking;
     'program-enrollments': ProgramEnrollment;
     'event-registrations': EventRegistration;
     redirects: Redirect;
@@ -100,8 +100,8 @@ export interface Config {
     'lesson-templates': LessonTemplatesSelect<false> | LessonTemplatesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     programs: ProgramsSelect<false> | ProgramsSelect<true>;
-    workouts: WorkoutsSelect<false> | WorkoutsSelect<true>;
     'lesson-enrollments': LessonEnrollmentsSelect<false> | LessonEnrollmentsSelect<true>;
+    'lesson-exercise-tracking': LessonExerciseTrackingSelect<false> | LessonExerciseTrackingSelect<true>;
     'program-enrollments': ProgramEnrollmentsSelect<false> | ProgramEnrollmentsSelect<true>;
     'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
@@ -594,16 +594,17 @@ export interface Lesson {
    */
   coaches?: (number | User)[] | null;
   /**
-   * Maak workoutblokken aan in de gewenste volgorde en koppel per blok een workout.
+   * Maak workoutblokken aan in de gewenste volgorde en vul per blok de workoutgegevens en oefeningen in.
    */
   workoutBlocks?:
     | {
-        workout: number | Workout;
+        name: string;
+        description?: string | null;
         duration: number;
         exercises?:
           | {
               name: string;
-              description: string;
+              description?: string | null;
               videoUrl?: string | null;
               id?: string | null;
             }[]
@@ -611,10 +612,6 @@ export interface Lesson {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Gebruik dit veld om lessen idempotent te importeren via CSV.
-   */
-  externalId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -658,7 +655,8 @@ export interface LessonTemplate {
    */
   defaultWorkoutBlocks?:
     | {
-        workout: number | Workout;
+        name: string;
+        description?: string | null;
         duration?: number | null;
         exercises?:
           | {
@@ -669,30 +667,6 @@ export interface LessonTemplate {
               id?: string | null;
             }[]
           | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Herbruikbare workout-groepen om oefeningen binnen lessen te bundelen.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "workouts".
- */
-export interface Workout {
-  id: number;
-  name: string;
-  description?: string | null;
-  /**
-   * Voeg meerdere oefeningen toe die uniek zijn voor deze workout.
-   */
-  exercises?:
-    | {
-        name: string;
-        description?: string | null;
-        videoUrl?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -716,10 +690,6 @@ export interface Event {
   capacity?: number | null;
   signupOpenAt?: string | null;
   signupCloseAt?: string | null;
-  /**
-   * Gebruik dit veld om events idempotent te importeren via CSV.
-   */
-  externalId?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -765,10 +735,6 @@ export interface Program {
   }[];
   finalEvent?: (number | null) | Event;
   /**
-   * Gebruik dit veld om programma's idempotent te importeren via CSV.
-   */
-  externalId?: string | null;
-  /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
@@ -786,18 +752,39 @@ export interface LessonEnrollment {
   lesson: number | Lesson;
   status: 'assigned' | 'started' | 'completed' | 'cancelled';
   /**
-   * Per gebruiker ingevulde reps, sets en notes per oefening. Wordt automatisch gevuld vanuit de les.
+   * Wordt automatisch gezet via een hook.
    */
-  workoutProgress?:
+  addedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-exercise-tracking".
+ */
+export interface LessonExerciseTracking {
+  id: number;
+  user: number | User;
+  lesson: number | Lesson;
+  /**
+   * Per gebruiker ingevulde sets, reps en notities per oefening in een les.
+   */
+  workoutBlocks?:
     | {
-        workout: number | Workout;
+        lessonBlockId: string;
+        workoutName: string;
+        workoutDescription?: string | null;
+        duration?: number | null;
         exercises?:
           | {
+              lessonExerciseId: string;
               exerciseName: string;
-              exerciseExternalId?: string | null;
+              exerciseDescription?: string | null;
+              videoUrl?: string | null;
               sets?: number | null;
               reps?: string | null;
               notes?: string | null;
+              completed?: boolean | null;
               id?: string | null;
             }[]
           | null;
@@ -805,9 +792,9 @@ export interface LessonEnrollment {
       }[]
     | null;
   /**
-   * Wordt automatisch gezet via een hook.
+   * Optioneel: laatste keer dat deze gebruiker progressie heeft bijgewerkt.
    */
-  addedBy?: (number | null) | User;
+  lastLoggedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1192,12 +1179,12 @@ export interface PayloadLockedDocument {
         value: number | Program;
       } | null)
     | ({
-        relationTo: 'workouts';
-        value: number | Workout;
-      } | null)
-    | ({
         relationTo: 'lesson-enrollments';
         value: number | LessonEnrollment;
+      } | null)
+    | ({
+        relationTo: 'lesson-exercise-tracking';
+        value: number | LessonExerciseTracking;
       } | null)
     | ({
         relationTo: 'program-enrollments';
@@ -1519,7 +1506,8 @@ export interface LessonsSelect<T extends boolean = true> {
   workoutBlocks?:
     | T
     | {
-        workout?: T;
+        name?: T;
+        description?: T;
         duration?: T;
         exercises?:
           | T
@@ -1531,7 +1519,6 @@ export interface LessonsSelect<T extends boolean = true> {
             };
         id?: T;
       };
-  externalId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1557,7 +1544,8 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
   defaultWorkoutBlocks?:
     | T
     | {
-        workout?: T;
+        name?: T;
+        description?: T;
         duration?: T;
         exercises?:
           | T
@@ -1587,7 +1575,6 @@ export interface EventsSelect<T extends boolean = true> {
   capacity?: T;
   signupOpenAt?: T;
   signupCloseAt?: T;
-  externalId?: T;
   generateSlug?: T;
   slug?: T;
   updatedAt?: T;
@@ -1611,27 +1598,8 @@ export interface ProgramsSelect<T extends boolean = true> {
         id?: T;
       };
   finalEvent?: T;
-  externalId?: T;
   generateSlug?: T;
   slug?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "workouts_select".
- */
-export interface WorkoutsSelect<T extends boolean = true> {
-  name?: T;
-  description?: T;
-  exercises?:
-    | T
-    | {
-        name?: T;
-        description?: T;
-        videoUrl?: T;
-        id?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1643,23 +1611,40 @@ export interface LessonEnrollmentsSelect<T extends boolean = true> {
   user?: T;
   lesson?: T;
   status?: T;
-  workoutProgress?:
+  addedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-exercise-tracking_select".
+ */
+export interface LessonExerciseTrackingSelect<T extends boolean = true> {
+  user?: T;
+  lesson?: T;
+  workoutBlocks?:
     | T
     | {
-        workout?: T;
+        lessonBlockId?: T;
+        workoutName?: T;
+        workoutDescription?: T;
+        duration?: T;
         exercises?:
           | T
           | {
+              lessonExerciseId?: T;
               exerciseName?: T;
-              exerciseExternalId?: T;
+              exerciseDescription?: T;
+              videoUrl?: T;
               sets?: T;
               reps?: T;
               notes?: T;
+              completed?: T;
               id?: T;
             };
         id?: T;
       };
-  addedBy?: T;
+  lastLoggedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
