@@ -233,12 +233,6 @@ export const Lessons: CollectionConfig = {
                             type: "textarea",
                             required: false,
                         },
-                        {
-                            label: "Video URL",
-                            name: "videoUrl",
-                            type: "text",
-                            required: false,
-                        },
                     ],
                 },
             ],

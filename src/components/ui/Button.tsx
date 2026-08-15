@@ -21,6 +21,7 @@ export const Button: React.FC<
         size = "md",
         classes,
         children,
+        ...buttonProps
     } = props;
 
     const isValidUrl =
@@ -39,7 +40,7 @@ export const Button: React.FC<
     if (!isValidUrl) {
         return (
             <button
-                {...props}
+                {...buttonProps}
                 className={cn(
                     uiVariants.base,
                     uiVariants.variants[variant],

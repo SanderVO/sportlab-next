@@ -82,25 +82,28 @@ export default function CookieBanner() {
     return (
         <>
             {!hasGivenConsent && (
-                <div className="fixed flex flex-col sm:flex-row bottom-4 left-4 right-4 bg-black text-white p-4 max-w-3xl mx-auto z-50 flex-wrap gap-4 border-2 border-gray-950 shadow-gray-950 shadow-lg justify-between items-center">
-                    <p className="w-full text-center sm:text-left sm:max-w-1/2">
-                        Sportlab gebruikt cookies voor analytische en marketing
-                        doeleinden.
-                    </p>
+                <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-cta/30 bg-[#f6f2ea]/95 px-4 py-4 text-ink shadow-lg shadow-charcoal/10 sm:px-6 lg:px-8">
+                    <div className="mx-auto flex max-w-none flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:gap-6">
+                        <p className="w-full text-center text-sm leading-relaxed sm:max-w-xl sm:text-left md:text-base">
+                            Sportlab gebruikt cookies voor analytische en
+                            marketing doeleinden.
+                        </p>
 
-                    <div className="flex flex-row gap-4 items-center">
-                        <button
-                            className="block transition-colors rounded-3xl font-bold text-center py-3 px-10 text-xs self-baseline no-underline bg-cta hover:bg-cta-dark text-white w-full"
-                            onClick={acceptAll}
-                        >
-                            Accepteren
-                        </button>
-                        <button
-                            className="block transition-colors rounded-3xl font-bold text-center py-3 px-10 text-xs self-baseline no-underline bg-cta hover:bg-cta-dark text-white w-full"
-                            onClick={rejectAll}
-                        >
-                            Weigeren
-                        </button>
+                        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+                            <button
+                                className="cursor-pointer w-full rounded-3xl bg-cta px-6 py-3 text-center text-xs font-bold text-warm-white transition-colors hover:bg-cta-dark sm:w-auto"
+                                onClick={acceptAll}
+                            >
+                                Accepteren
+                            </button>
+
+                            <button
+                                className="cursor-pointer w-full rounded-3xl border border-cta bg-transparent px-6 py-3 text-center text-xs font-bold text-cta transition-colors hover:bg-cta hover:text-warm-white sm:w-auto"
+                                onClick={rejectAll}
+                            >
+                                Weigeren
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

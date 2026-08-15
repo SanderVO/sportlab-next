@@ -158,15 +158,6 @@ export const LessonExerciseTracking: CollectionConfig = {
                             },
                         },
                         {
-                            label: "Video URL",
-                            name: "videoUrl",
-                            type: "text",
-                            required: false,
-                            admin: {
-                                readOnly: true,
-                            },
-                        },
-                        {
                             label: "Sets",
                             name: "sets",
                             type: "number",

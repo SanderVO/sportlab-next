@@ -19,7 +19,7 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
                 priority={true}
             />
 
-            <div className="absolute inset-0 bg-black/65 z-10" />
+            <div className="absolute inset-0 bg-charcoal/65 z-10" />
 
             <div
                 className={`container mx-auto z-20 flex items-center h-full self-end overflow-hidden pt-24 ${

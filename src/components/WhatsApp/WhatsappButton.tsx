@@ -1,6 +1,5 @@
 import { WhatsApp } from "@/payload-types";
 import Link from "next/link";
-import { WhatsappIcon } from "../Social/Icons";
 
 export async function WhatsappButton({
     phoneNumber,
@@ -17,23 +16,18 @@ export async function WhatsappButton({
                     data-gtm="whatsapp-cta"
                     data-gtm-event="whatsapp_click"
                     data-gtm-phone={phoneNumber}
-                    className="relative transition-colors bg-[#25D366] hover:bg-[#1ebe57] text-white px-4 py-2 rounded-lg z-50 ml-auto shadow-lg w-max flex flex-row gap-2 items-center fill-white text-xs lg:text-base"
+                    className="relative z-50 ml-auto inline-flex h-9 w-max items-center gap-1.5 rounded-3xl border border-charcoal/90 bg-sand px-3.5 font-sl-poppins text-[10px] font-semibold uppercase tracking-[0.08em] text-charcoal transition-colors hover:bg-warm-white lg:h-11 lg:gap-2 lg:px-5 lg:text-sm"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <div className="hidden lg:block">
-                        <WhatsappIcon height={24} width={24} />
-                    </div>
-
-                    <div className="block lg:hidden">
-                        <WhatsappIcon height={20} width={20} />
-                    </div>
-
                     <span
-                        style={{ textShadow: "0 1px 2px rgba(0, 0, 0, 0.35)" }}
+                        aria-hidden="true"
+                        className="relative flex h-2.5 w-2.5"
                     >
-                        {buttonText}
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-charcoal/50 animate-ping" />
+                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-charcoal" />
                     </span>
+                    <span>{buttonText}</span>
                 </Link>
             )}
         </>

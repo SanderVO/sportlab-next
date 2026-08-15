@@ -207,18 +207,6 @@ export const LessonTemplates: CollectionConfig = {
                             type: "textarea",
                             required: false,
                         },
-                        {
-                            label: "Video URL",
-                            name: "videoUrl",
-                            type: "text",
-                            required: false,
-                        },
-                        {
-                            label: "Externe ID",
-                            name: "externalId",
-                            type: "text",
-                            required: false,
-                        },
                     ],
                 },
             ],

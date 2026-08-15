@@ -605,7 +605,6 @@ export interface Lesson {
           | {
               name: string;
               description?: string | null;
-              videoUrl?: string | null;
               id?: string | null;
             }[]
           | null;
@@ -662,8 +661,6 @@ export interface LessonTemplate {
           | {
               name: string;
               description?: string | null;
-              videoUrl?: string | null;
-              externalId?: string | null;
               id?: string | null;
             }[]
           | null;
@@ -780,7 +777,6 @@ export interface LessonExerciseTracking {
               lessonExerciseId: string;
               exerciseName: string;
               exerciseDescription?: string | null;
-              videoUrl?: string | null;
               sets?: number | null;
               reps?: string | null;
               notes?: string | null;
@@ -1514,7 +1510,6 @@ export interface LessonsSelect<T extends boolean = true> {
           | {
               name?: T;
               description?: T;
-              videoUrl?: T;
               id?: T;
             };
         id?: T;
@@ -1552,8 +1547,6 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
           | {
               name?: T;
               description?: T;
-              videoUrl?: T;
-              externalId?: T;
               id?: T;
             };
         id?: T;
@@ -1635,7 +1628,6 @@ export interface LessonExerciseTrackingSelect<T extends boolean = true> {
               lessonExerciseId?: T;
               exerciseName?: T;
               exerciseDescription?: T;
-              videoUrl?: T;
               sets?: T;
               reps?: T;
               notes?: T;

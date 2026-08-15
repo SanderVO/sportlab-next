@@ -1,7 +1,7 @@
 "use client";
 
 import type { Header } from "@/payload-types";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../ui/Button";
 import { CMSLink } from "../ui/Link";
 
@@ -11,43 +11,141 @@ type DropdownMenuProps = {
 
 export function DropdownMenu({ hiddenItems }: DropdownMenuProps) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [dropdownTop, setDropdownTop] = useState<number | null>(null);
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const updateDropdownTop = useCallback(() => {
+        if (!triggerRef.current) {
+            return;
+        }
+
+        const headerEl = triggerRef.current.closest("header");
+
+        if (headerEl) {
+            const headerRect = headerEl.getBoundingClientRect();
+            setDropdownTop(headerRect.bottom);
+            return;
+        }
+
+        const triggerRect = triggerRef.current.getBoundingClientRect();
+        setDropdownTop(triggerRect.bottom);
+    }, []);
+
+    const openDropdown = useCallback(() => {
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+        }
+
+        updateDropdownTop();
+        setIsDropdownOpen(true);
+    }, [updateDropdownTop]);
+
+    const closeDropdown = useCallback(() => {
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+        }
+
+        setIsDropdownOpen(false);
+    }, []);
+
+    const scheduleCloseDropdown = useCallback(() => {
+        if (closeTimeoutRef.current) {
+            clearTimeout(closeTimeoutRef.current);
+        }
+
+        closeTimeoutRef.current = setTimeout(() => {
+            setIsDropdownOpen(false);
+            closeTimeoutRef.current = null;
+        }, 180);
+    }, []);
+
+    useEffect(() => {
+        if (!isDropdownOpen) {
+            return;
+        }
+
+        updateDropdownTop();
+
+        window.addEventListener("resize", updateDropdownTop);
+        window.addEventListener("scroll", updateDropdownTop, {
+            passive: true,
+        });
+
+        return () => {
+            window.removeEventListener("resize", updateDropdownTop);
+            window.removeEventListener("scroll", updateDropdownTop);
+        };
+    }, [isDropdownOpen, updateDropdownTop]);
+
+    useEffect(() => {
+        return () => {
+            if (closeTimeoutRef.current) {
+                clearTimeout(closeTimeoutRef.current);
+            }
+        };
+    }, []);
 
     if (!hiddenItems || hiddenItems.length === 0) {
         return null;
     }
 
     return (
-        <div className="relative">
+        <div
+            ref={triggerRef}
+            className="relative"
+            onMouseEnter={openDropdown}
+            onMouseLeave={scheduleCloseDropdown}
+            onFocusCapture={openDropdown}
+            onBlurCapture={(event) => {
+                if (
+                    !event.currentTarget.contains(
+                        event.relatedTarget as Node | null,
+                    )
+                ) {
+                    scheduleCloseDropdown();
+                }
+            }}
+        >
             <Button
                 variant="nav"
                 size="md"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                onClick={() => {
+                    if (isDropdownOpen) {
+                        closeDropdown();
+                        return;
+                    }
+
+                    openDropdown();
+                }}
                 type="button"
+                aria-expanded={isDropdownOpen}
+                aria-haspopup="true"
             >
                 Meer
             </Button>
 
-            {isDropdownOpen && (
-                <>
-                    <div
-                        className="fixed inset-0 z-40"
-                        onClick={() => setIsDropdownOpen(false)}
-                    />
-                    <div className="absolute top-full right-0 mt-8 bg-background border-2 border-neutral-800 rounded-md py-2 min-w-[200px] z-50 before:content-[''] before:absolute before:bottom-full before:right-6 before:border-8 before:border-transparent before:border-b-neutral-800 after:content-[''] after:absolute after:bottom-full after:right-6 after:border-[7px] after:border-transparent after:border-b-background after:translate-y-px">
+            {isDropdownOpen && dropdownTop !== null && (
+                <div
+                    className="fixed inset-x-0 z-50 border-b border-sand/70 bg-charcoal/95 py-4 backdrop-blur-sm"
+                    style={{ top: dropdownTop }}
+                    onMouseEnter={openDropdown}
+                    onMouseLeave={scheduleCloseDropdown}
+                >
+                    <div className="container mx-auto flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
                         {hiddenItems.map(({ link }, index: number) => (
-                            <div
-                                key={index}
-                                onClick={() => setIsDropdownOpen(false)}
-                            >
+                            <div key={index} onClick={closeDropdown}>
                                 <CMSLink
                                     {...link}
                                     variant="nav"
-                                    className="flex flex-col uppercase font-semibold shrink-0 items-center"
+                                    className="flex w-full shrink-0 items-center justify-center uppercase font-semibold"
                                 />
                             </div>
                         ))}
                     </div>
-                </>
+                </div>
             )}
         </div>
     );

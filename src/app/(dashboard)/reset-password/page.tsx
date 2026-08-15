@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import ResetPasswordForm from "./ResetPasswordForm";
 
 export default function ResetPasswordPage() {
@@ -12,7 +13,11 @@ export default function ResetPasswordPage() {
                     Voer je nieuwe wachtwoord in.
                 </p>
 
-                <ResetPasswordForm />
+                <Suspense
+                    fallback={<p className="text-sm text-sand/60">Laden...</p>}
+                >
+                    <ResetPasswordForm />
+                </Suspense>
             </div>
         </div>
     );

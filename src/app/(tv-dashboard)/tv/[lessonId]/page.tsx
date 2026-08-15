@@ -14,6 +14,22 @@ type PageProps = {
 
 export const revalidate = 60;
 
+function formatDate(value?: string | null) {
+    if (!value) return null;
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return null;
+
+    return new Intl.DateTimeFormat("nl-NL", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(date);
+}
+
 function isMedia(
     value: unknown,
 ): value is { url?: string | null; alt?: string | null } {
@@ -24,6 +40,24 @@ function isUser(
     value: unknown,
 ): value is { id: number; name?: string | null; email?: string | null } {
     return typeof value === "object" && value !== null;
+}
+
+function toDateParam(value: string | Date | null | undefined) {
+    if (!value) {
+        return null;
+    }
+
+    const date = value instanceof Date ? value : new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return null;
+    }
+
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
 }
 
 export default async function TvLessonPage({
@@ -46,7 +80,11 @@ export default async function TvLessonPage({
     }
 
     const lessonImage = isMedia(lesson.image) ? lesson.image : null;
-    const backHref = `/tv${resolvedSearchParams.category ? `?category=${resolvedSearchParams.category}` : ""}`;
+    const lessonStartDate = formatDate(lesson.startDate);
+    const lessonDateParam = toDateParam(lesson.startDate);
+    const backHref = lessonDateParam
+        ? `/tv?date=${lessonDateParam}${resolvedSearchParams.category ? `&category=${resolvedSearchParams.category}` : ""}`
+        : `/tv${resolvedSearchParams.category ? `?category=${resolvedSearchParams.category}` : ""}`;
 
     return (
         <div className="relative min-h-screen overflow-hidden px-4 py-4 text-white sm:px-6 sm:py-6 lg:px-8 lg:py-8">
@@ -55,7 +93,6 @@ export default async function TvLessonPage({
                 <div className="absolute right-0 top-1/4 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
                 <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-steel/10 blur-3xl" />
             </div>
-
             <div className="relative z-10 mb-4 flex justify-start">
                 <a
                     href={backHref}
@@ -82,9 +119,31 @@ export default async function TvLessonPage({
 
                         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,17,13,0.08)_0%,rgba(20,17,13,0.24)_36%,rgba(20,17,13,0.94)_100%)]" />
 
+                        {lessonStartDate ? (
+                            <div className="absolute left-6 top-6 z-20">
+                                <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/55 px-3 py-1 text-[0.65rem] uppercase tracking-[0.25em] text-white/75 shadow-lg shadow-black/20 backdrop-blur">
+                                    <svg
+                                        aria-hidden="true"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        className="h-3.5 w-3.5 text-white/70"
+                                    >
+                                        <path
+                                            d="M7 2V5M17 2V5M3 9H21M5 4H19C20.1046 4 21 4.89543 21 6V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V6C3 4.89543 3.89543 4 5 4Z"
+                                            stroke="currentColor"
+                                            strokeWidth="1.8"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        />
+                                    </svg>
+                                    {lessonStartDate}
+                                </p>
+                            </div>
+                        ) : null}
+
                         <div className="absolute inset-0 flex items-end p-6 xl:p-10">
                             <div className="max-w-xl">
-                                <p className="text-xs uppercase tracking-[0.35em] text-white/70">
+                                <p className="mt-4 text-xs uppercase tracking-[0.35em] text-white/70">
                                     {lesson.coaches
                                         ?.map((coach) =>
                                             isUser(coach) && coach.name
@@ -102,7 +161,7 @@ export default async function TvLessonPage({
                     </aside>
 
                     <div className="p-6 xl:p-10">
-                        <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+                        <div className="grid gap-6 xl:grid-cols-2">
                             {(lesson.workoutBlocks ?? []).map(
                                 (block, index) => {
                                     const exercises = Array.isArray(
@@ -116,6 +175,11 @@ export default async function TvLessonPage({
                                               description?: string;
                                           }>)
                                         : [];
+                                    const workoutDescription = (
+                                        block as {
+                                            description?: string;
+                                        }
+                                    ).description;
 
                                     return (
                                         <section
@@ -125,16 +189,24 @@ export default async function TvLessonPage({
                                             }
                                             className="rounded-3xl border border-white/10 bg-warm-white/6 p-5"
                                         >
-                                            <div className="flex items-center justify-between gap-4">
-                                                <h2 className="text-3xl uppercase tracking-widest text-white font-(--font-archivo)">
-                                                    {(
-                                                        block as {
-                                                            name?: string;
-                                                        }
-                                                    ).name || "Workout"}
-                                                </h2>
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div className="min-w-0">
+                                                    <h2 className="text-3xl uppercase tracking-widest text-white font-(--font-archivo)">
+                                                        {(
+                                                            block as {
+                                                                name?: string;
+                                                            }
+                                                        ).name || "Workout"}
+                                                    </h2>
 
-                                                <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1 text-sm uppercase tracking-[0.25em] text-white/70">
+                                                    {workoutDescription ? (
+                                                        <p className="mt-2 text-base leading-6 text-white/65">
+                                                            {workoutDescription}
+                                                        </p>
+                                                    ) : null}
+                                                </div>
+
+                                                <span className="shrink-0 rounded-full border border-cta/35 bg-cta/15 px-3 py-1 text-sm uppercase tracking-[0.25em] text-[#f7d7b8]">
                                                     {block.duration} min
                                                 </span>
                                             </div>

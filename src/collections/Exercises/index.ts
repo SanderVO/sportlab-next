@@ -30,22 +30,5 @@ export const Exercises: CollectionConfig = {
             type: "textarea",
             required: false,
         },
-        {
-            label: "Video URL",
-            name: "videoUrl",
-            type: "text",
-            required: false,
-        },
-        {
-            label: "Externe ID",
-            name: "externalId",
-            type: "text",
-            unique: true,
-            required: false,
-            admin: {
-                description:
-                    "Gebruik dit veld om oefeningen idempotent te importeren via CSV.",
-            },
-        },
     ],
 };

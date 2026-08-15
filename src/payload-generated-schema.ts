@@ -1091,7 +1091,6 @@ export const lessons_workout_blocks_exercises = sqliteTable(
     id: text("id").primaryKey(),
     name: text("name").notNull(),
     description: text("description"),
-    videoUrl: text("video_url"),
   },
   (columns) => [
     index("lessons_workout_blocks_exercises_order_idx").on(columns._order),
@@ -1147,7 +1146,6 @@ export const lessons = sqliteTable(
     image: integer("image_id").references(() => media.id, {
       onDelete: "set null",
     }),
-    externalId: text("external_id"),
     updatedAt: text("updated_at")
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
@@ -1158,7 +1156,6 @@ export const lessons = sqliteTable(
   (columns) => [
     index("lessons_template_idx").on(columns.template),
     index("lessons_image_idx").on(columns.image),
-    uniqueIndex("lessons_external_id_idx").on(columns.externalId),
     index("lessons_updated_at_idx").on(columns.updatedAt),
     index("lessons_created_at_idx").on(columns.createdAt),
   ],
@@ -1232,8 +1229,6 @@ export const lesson_templates_default_workout_blocks_exercises = sqliteTable(
     id: text("id").primaryKey(),
     name: text("name").notNull(),
     description: text("description"),
-    videoUrl: text("video_url"),
-    externalId: text("external_id"),
   },
   (columns) => [
     index("lesson_templates_default_workout_blocks_exercises_order_idx").on(
@@ -1354,7 +1349,6 @@ export const events = sqliteTable(
     signupCloseAt: text("signup_close_at").default(
       sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
     ),
-    externalId: text("external_id"),
     generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
     slug: text("slug"),
     updatedAt: text("updated_at")
@@ -1366,7 +1360,6 @@ export const events = sqliteTable(
   },
   (columns) => [
     index("events_banner_image_idx").on(columns.bannerImage),
-    uniqueIndex("events_external_id_idx").on(columns.externalId),
     uniqueIndex("events_slug_idx").on(columns.slug),
     index("events_updated_at_idx").on(columns.updatedAt),
     index("events_created_at_idx").on(columns.createdAt),
@@ -1420,7 +1413,6 @@ export const programs = sqliteTable(
     finalEvent: integer("final_event_id").references(() => events.id, {
       onDelete: "set null",
     }),
-    externalId: text("external_id"),
     generateSlug: integer("generate_slug", { mode: "boolean" }).default(true),
     slug: text("slug"),
     updatedAt: text("updated_at")
@@ -1433,7 +1425,6 @@ export const programs = sqliteTable(
   (columns) => [
     index("programs_banner_image_idx").on(columns.bannerImage),
     index("programs_final_event_idx").on(columns.finalEvent),
-    uniqueIndex("programs_external_id_idx").on(columns.externalId),
     uniqueIndex("programs_slug_idx").on(columns.slug),
     index("programs_updated_at_idx").on(columns.updatedAt),
     index("programs_created_at_idx").on(columns.createdAt),
@@ -1488,7 +1479,6 @@ export const lesson_exercise_tracking_workout_blocks_exercises = sqliteTable(
     lessonExerciseId: text("lesson_exercise_id").notNull(),
     exerciseName: text("exercise_name").notNull(),
     exerciseDescription: text("exercise_description"),
-    videoUrl: text("video_url"),
     sets: numeric("sets", { mode: "number" }),
     reps: text("reps"),
     notes: text("notes"),
