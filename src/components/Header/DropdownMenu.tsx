@@ -129,7 +129,7 @@ export function DropdownMenu({ hiddenItems }: DropdownMenuProps) {
 
             {isDropdownOpen && dropdownTop !== null && (
                 <div
-                    className="fixed inset-x-0 z-50 border-b border-sand/70 bg-charcoal/95 py-4 backdrop-blur-sm"
+                    className="fixed inset-x-0 z-50 bg-charcoal/95 py-4 backdrop-blur-sm"
                     style={{ top: dropdownTop }}
                     onMouseEnter={openDropdown}
                     onMouseLeave={scheduleCloseDropdown}

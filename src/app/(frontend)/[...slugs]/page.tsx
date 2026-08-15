@@ -56,12 +56,19 @@ export async function generateStaticParams() {
         },
     });
 
-    const params = pages.docs
-        ?.filter((doc: PaginatedDocs["docs"][0]) => doc.slug !== "home")
-        .map(
-            async (page: PaginatedDocs["docs"][0]) =>
-                await buildFullSlug(page, payload),
-        );
+    const params = await Promise.all(
+        pages.docs
+            ?.filter((doc: PaginatedDocs["docs"][0]) => doc.slug !== "home")
+            .map(async (page: PaginatedDocs["docs"][0]) => {
+                const fullSlug = await buildFullSlug(page, payload);
+                return {
+                    slugs: fullSlug
+                        .replace(/^\/+/, "")
+                        .split("/")
+                        .filter(Boolean),
+                };
+            }) ?? [],
+    );
 
     return params;
 }
