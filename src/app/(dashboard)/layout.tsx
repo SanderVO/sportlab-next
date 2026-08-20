@@ -1,26 +1,26 @@
-import { Bebas_Neue, Montserrat, Open_Sans } from "next/font/google";
+import { Anton, Archivo, Poppins } from "next/font/google";
 import React from "react";
 
 import "../(frontend)/globals.css";
 
-const montserrat = Montserrat({
+const anton = Anton({
     subsets: ["latin"],
-    weight: ["400", "500", "700"],
-    variable: "--font-montserrat",
+    weight: ["400"],
+    variable: "--font-anton",
     display: "swap",
 });
 
-const bebasNeue = Bebas_Neue({
-    subsets: ["latin"],
-    weight: "400",
-    variable: "--font-bebas",
-    display: "swap",
-});
-
-const openSans = Open_Sans({
+const poppins = Poppins({
     subsets: ["latin"],
     weight: ["400", "700"],
-    variable: "--font-open-sans",
+    variable: "--font-poppins",
+    display: "swap",
+});
+
+const archivo = Archivo({
+    subsets: ["latin"],
+    weight: ["800"],
+    variable: "--font-archivo",
     display: "swap",
 });
 
@@ -32,7 +32,7 @@ export default function DashboardRootLayout({
     return (
         <html
             lang="nl"
-            className={`${montserrat.variable} ${bebasNeue.variable} ${openSans.variable}`}
+            className={`${anton.variable} ${poppins.variable} ${archivo.variable}`}
             suppressHydrationWarning
         >
             <head>

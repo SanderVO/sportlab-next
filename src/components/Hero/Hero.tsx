@@ -34,7 +34,7 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
                     }`}
                 >
                     {text && (
-                        <div className="font-sl-open-sans text-lg lg:w-4/5">
+                        <div className="font-sl-poppins text-lg lg:w-4/5">
                             <RichText
                                 data={text}
                                 enableGutter={false}

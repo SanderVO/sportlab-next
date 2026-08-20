@@ -1,4 +1,4 @@
-import { Archivo, Open_Sans, Poppins } from "next/font/google";
+import { Anton, Archivo, Poppins } from "next/font/google";
 import React from "react";
 
 import "../(frontend)/globals.css";
@@ -17,10 +17,10 @@ const poppins = Poppins({
     display: "swap",
 });
 
-const openSans = Open_Sans({
+const anton = Anton({
     subsets: ["latin"],
-    weight: ["400", "700"],
-    variable: "--font-open-sans",
+    weight: ["400"],
+    variable: "--font-anton",
     display: "swap",
 });
 
@@ -32,7 +32,7 @@ export default function TvDashboardRootLayout({
     return (
         <html
             lang="nl"
-            className={`${archivo.variable} ${poppins.variable} ${openSans.variable}`}
+            className={`${archivo.variable} ${poppins.variable} ${anton.variable}`}
             suppressHydrationWarning
         >
             <head>
