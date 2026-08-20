@@ -6,7 +6,7 @@ const labelColorClasses: Record<string, string> = {
     beige: "text-sand",
     orange: "text-cta",
     neutral: "text-neutral-400",
-    white: "text-white",
+    white: "text-warm-white",
 };
 
 export type LinkProps = {

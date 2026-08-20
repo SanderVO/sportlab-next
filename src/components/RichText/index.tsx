@@ -28,7 +28,6 @@ import {
     LinkJSXConverter,
     SerializedLexicalNodeWithParent,
 } from "@payloadcms/richtext-lexical/react";
-import { TextStateFeatureProps } from "node_modules/@payloadcms/richtext-lexical/dist/features/textState/feature.server";
 import React from "react";
 import { FormBlockType } from "../../blocks/Form/FormBlock";
 import { Button } from "../ui/Button";
@@ -146,22 +145,26 @@ const textConverter: JSXConverter<SerializedTextNode> = ({
 }) => {
     const text = node.text as string;
 
-    const colorState: TextStateFeatureProps["state"] = textState;
+    const colorState = textState;
 
     const styles: React.CSSProperties = {};
 
     if (node.$) {
         Object.keys(colorState).forEach((stateKey) => {
-            const stateOptions = colorState[stateKey];
+            const stateOptions =
+                colorState[stateKey as keyof typeof colorState];
 
             if (node.$ && node.$[stateKey]) {
                 const stateValue = node.$[stateKey];
 
                 if (
                     typeof stateValue === "string" &&
-                    stateOptions[stateValue]
+                    stateValue in stateOptions
                 ) {
-                    Object.assign(styles, stateOptions[stateValue].css);
+                    Object.assign(
+                        styles,
+                        (stateOptions as Record<string, any>)[stateValue].css,
+                    );
                 }
             }
         });
@@ -243,13 +246,16 @@ const headingConverter: JSXConverter<SerializedHeadingNode> = ({
                 | "montserrat"
                 | "openSans"
                 | "bebas"
+                | "anton"
+                | "archivo"
+                | "poppins"
                 | undefined;
 
-            let colorClass = "text-white";
+            let colorClass = "text-warm-white";
 
             switch (child?.$?.color) {
                 case "black":
-                    colorClass = "text-background";
+                    colorClass = "text-ink";
                     break;
                 case "beige":
                     colorClass = "text-sand";
@@ -258,7 +264,7 @@ const headingConverter: JSXConverter<SerializedHeadingNode> = ({
                     colorClass = "text-cta";
                     break;
                 default:
-                    colorClass = "text-white";
+                    colorClass = "text-warm-white";
                     break;
             }
 

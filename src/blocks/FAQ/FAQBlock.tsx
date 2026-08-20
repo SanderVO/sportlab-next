@@ -89,21 +89,21 @@ export const FAQBlock: React.FC<FAQBlockProps> = ({ id, items }) => {
                 {items.map((item, index) => {
                     const colorClass =
                         item.questionColor === "black"
-                            ? "text-background"
+                            ? "text-ink"
                             : item.questionColor === "beige"
                               ? "text-sand"
                               : item.questionColor === "orange"
                                 ? "text-cta"
-                                : "text-white";
+                                : "text-warm-white";
 
                     const iconColorClass =
                         item.iconColor === "black"
-                            ? "text-background"
+                            ? "text-ink"
                             : item.iconColor === "beige"
                               ? "text-sand"
                               : item.iconColor === "orange"
                                 ? "text-cta"
-                                : "text-white";
+                                : "text-warm-white";
 
                     return (
                         <details key={item.id ?? index} className="group">

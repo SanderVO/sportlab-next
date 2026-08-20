@@ -48,7 +48,7 @@ export const TeamBlockCarouselItem = ({
                 />
 
                 {showInfo && (
-                    <div className="absolute top-0 p-4 bg-black/65 text-white text-sm h-full w-full flex flex-col gap-4 justify-end">
+                    <div className="absolute top-0 p-4 bg-charcoal/65 text-warm-white text-sm h-full w-full flex flex-col gap-4 justify-end">
                         <div className="italic max-h-[50%] overflow-hidden">
                             {user.about}
                         </div>
@@ -81,11 +81,10 @@ export const TeamBlockCarouselItem = ({
                 <div
                     className={cn(
                         "text-xl",
-                        backgroundColor === "backgroundLight" &&
-                            "text-background",
-                        backgroundColor === "backgroundDark" && "text-white",
-                        backgroundColor === "backgroundWhite" &&
-                            "text-background",
+                        backgroundColor === "backgroundLight" && "text-ink",
+                        backgroundColor === "backgroundDark" &&
+                            "text-warm-white",
+                        backgroundColor === "backgroundWhite" && "text-ink",
                     )}
                 >
                     {user.name}
@@ -96,11 +95,11 @@ export const TeamBlockCarouselItem = ({
                         className={cn(
                             "text-sm",
                             backgroundColor === "backgroundLight" &&
-                                "text-background/70",
+                                "text-ink/70",
                             backgroundColor === "backgroundDark" &&
-                                "text-white/70",
+                                "text-warm-white/70",
                             backgroundColor === "backgroundWhite" &&
-                                "text-background/70",
+                                "text-ink/70",
                         )}
                     >
                         {user.subtitle}

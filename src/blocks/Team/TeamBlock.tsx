@@ -51,11 +51,10 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
                 className={cn(
                     "flex flex-col h-full justify-center py-15 md:py-0",
                     backgroundColor === "backgroundDark" &&
-                        "bg-background text-white",
-                    backgroundColor === "backgroundLight" &&
-                        "bg-sand text-background",
+                        "bg-charcoal text-warm-white",
+                    backgroundColor === "backgroundLight" && "bg-sand text-ink",
                     backgroundColor === "backgroundWhite" &&
-                        "bg-white text-white",
+                        "bg-warm-white text-ink",
                 )}
             >
                 <h2 className="font-sl-bebas text-5xl md:text-7xl">{title}</h2>
