@@ -3,7 +3,7 @@ import { revalidateOrganization } from "./hooks/revalidateOrganization";
 
 export const Organization: GlobalConfig = {
     slug: "organization",
-    label: "Organisatie",
+    label: { en: "Organization", nl: "Organisatie" },
     access: {
         read: () => true,
     },

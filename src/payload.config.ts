@@ -6,6 +6,7 @@ import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { r2Storage } from "@payloadcms/storage-r2";
+import { en as baseEn } from "@payloadcms/translations/languages/en";
 import { nl as baseNl } from "@payloadcms/translations/languages/nl";
 import path from "path";
 import { buildConfig } from "payload";
@@ -39,6 +40,18 @@ const nl = {
             ...baseNl.translations.general,
             lock: "Vergrendelen",
             unlock: "Ontgrendelen",
+        },
+    },
+};
+
+const en = {
+    ...baseEn,
+    translations: {
+        ...baseEn.translations,
+        general: {
+            ...baseEn.translations.general,
+            lock: "Lock",
+            unlock: "Unlock",
         },
     },
 };
@@ -176,7 +189,7 @@ export default buildConfig({
     db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
     plugins: [...plugins, r2StoragePlugin],
     i18n: {
-        supportedLanguages: { nl },
+        supportedLanguages: { nl, en },
         fallbackLanguage: "en",
     },
     upload: {

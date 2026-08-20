@@ -23,8 +23,8 @@ import { revalidateDelete, revalidatePage } from "./hooks/revalidatePage";
 export const Pages: CollectionConfig<"pages"> = {
     slug: "pages",
     labels: {
-        singular: "Pagina",
-        plural: "Pagina's",
+        singular: { en: "Page", nl: "Pagina" },
+        plural: { en: "Pages", nl: "Pagina's" },
     },
     access: {
         create: isAdmin,
@@ -70,7 +70,7 @@ export const Pages: CollectionConfig<"pages"> = {
     },
     fields: [
         {
-            label: "Valt onder",
+            label: { en: "Parent", nl: "Valt onder" },
             name: "parent",
             type: "relationship",
             relationTo: "pages",
@@ -80,18 +80,20 @@ export const Pages: CollectionConfig<"pages"> = {
                 publishedAt: { not_equals: null },
             },
             admin: {
-                description:
-                    "Kies hier een bovenliggende pagina, indien van toepassing.",
+                description: {
+                    en: "Select a parent page here, if applicable.",
+                    nl: "Kies hier een bovenliggende pagina, indien van toepassing.",
+                },
             },
         },
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Met Hero",
+            label: { en: "Has hero", nl: "Met Hero" },
             name: "hasHero",
             type: "checkbox",
             required: true,
@@ -101,7 +103,7 @@ export const Pages: CollectionConfig<"pages"> = {
             tabs: [
                 {
                     fields: [hero],
-                    label: "Hero",
+                    label: { en: "Hero", nl: "Hero" },
                     admin: {
                         condition: (_, siblingData) => {
                             return siblingData?.hasHero === true;
@@ -127,11 +129,11 @@ export const Pages: CollectionConfig<"pages"> = {
                             },
                         },
                     ],
-                    label: "Content",
+                    label: { en: "Content", nl: "Content" },
                 },
                 {
                     name: "meta",
-                    label: "SEO",
+                    label: { en: "SEO", nl: "SEO" },
                     fields: [
                         OverviewField({
                             titlePath: "meta.title",
@@ -146,19 +148,20 @@ export const Pages: CollectionConfig<"pages"> = {
                         }),
                         MetaDescriptionField({}),
                         PreviewField({
-                            // if the `generateUrl` function is configured
                             hasGenerateFn: true,
-                            // field paths to match the target field for data
                             titlePath: "meta.title",
                             descriptionPath: "meta.description",
                         }),
                         {
-                            label: "Rich Snippets",
+                            label: { en: "Rich snippets", nl: "Rich Snippets" },
                             name: "richSnippets",
                             type: "array",
                             fields: [
                                 {
-                                    label: "Rich Snippet JSON-LD",
+                                    label: {
+                                        en: "Rich snippet JSON-LD",
+                                        nl: "Rich Snippet JSON-LD",
+                                    },
                                     name: "jsonLd",
                                     type: "json",
                                 },

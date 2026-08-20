@@ -16,6 +16,10 @@ import { revalidateDelete, revalidatePost } from "./hooks/revalidatePost";
 
 export const Posts: CollectionConfig<"posts"> = {
     slug: "posts",
+    labels: {
+        singular: { en: "Post", nl: "Bericht" },
+        plural: { en: "Posts", nl: "Berichten" },
+    },
     access: {
         create: editorOrAdmin,
         delete: editorOrAdmin,
@@ -50,13 +54,13 @@ export const Posts: CollectionConfig<"posts"> = {
     },
     fields: [
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Intro",
+            label: { en: "Intro", nl: "Intro" },
             name: "intro",
             type: "text",
             required: true,
@@ -67,7 +71,7 @@ export const Posts: CollectionConfig<"posts"> = {
                 {
                     fields: [
                         {
-                            label: "Thumbnail",
+                            label: { en: "Thumbnail", nl: "Thumbnail" },
                             name: "thumbnailImage",
                             type: "upload",
                             relationTo: "media",
@@ -86,7 +90,7 @@ export const Posts: CollectionConfig<"posts"> = {
                             required: true,
                         },
                     ],
-                    label: "Content",
+                    label: { en: "Content", nl: "Content" },
                 },
                 {
                     fields: [
@@ -107,11 +111,11 @@ export const Posts: CollectionConfig<"posts"> = {
                             relationTo: "posts",
                         },
                     ],
-                    label: "Meta",
+                    label: { en: "Meta", nl: "Meta" },
                 },
                 {
                     name: "meta",
-                    label: "SEO",
+                    label: { en: "SEO", nl: "SEO" },
                     fields: [
                         OverviewField({
                             titlePath: "meta.title",
@@ -127,10 +131,7 @@ export const Posts: CollectionConfig<"posts"> = {
 
                         MetaDescriptionField({}),
                         PreviewField({
-                            // if the `generateUrl` function is configured
                             hasGenerateFn: true,
-
-                            // field paths to match the target field for data
                             titlePath: "meta.title",
                             descriptionPath: "meta.description",
                         }),
@@ -159,7 +160,7 @@ export const Posts: CollectionConfig<"posts"> = {
             },
         },
         {
-            label: "Auteurs",
+            label: { en: "Authors", nl: "Auteurs" },
             name: "authors",
             type: "relationship",
             admin: {

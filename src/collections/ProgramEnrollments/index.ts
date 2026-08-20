@@ -5,8 +5,8 @@ import type { CollectionConfig } from "payload";
 export const ProgramEnrollments: CollectionConfig = {
     slug: "program-enrollments",
     labels: {
-        singular: "Programma Deelname",
-        plural: "Programma Deelnames",
+        singular: { en: "Program enrollment", nl: "Programma deelname" },
+        plural: { en: "Program enrollments", nl: "Programma deelnames" },
     },
     access: {
         create: isAdminOrCoach,
@@ -20,41 +20,50 @@ export const ProgramEnrollments: CollectionConfig = {
     },
     fields: [
         {
-            label: "Gebruiker",
+            label: { en: "User", nl: "Gebruiker" },
             name: "user",
             type: "relationship",
             relationTo: "users",
             required: true,
         },
         {
-            label: "Programma",
+            label: { en: "Program", nl: "Programma" },
             name: "program",
             type: "relationship",
             relationTo: "programs",
             required: true,
         },
         {
-            label: "Status",
+            label: { en: "Status", nl: "Status" },
             name: "status",
             type: "select",
             required: true,
             defaultValue: "enrolled",
             options: [
-                { label: "Ingeschreven", value: "enrolled" },
-                { label: "Actief", value: "active" },
-                { label: "Afgerond", value: "completed" },
-                { label: "Gestopt", value: "dropped" },
+                {
+                    label: { en: "Enrolled", nl: "Ingeschreven" },
+                    value: "enrolled",
+                },
+                { label: { en: "Active", nl: "Actief" }, value: "active" },
+                {
+                    label: { en: "Completed", nl: "Afgerond" },
+                    value: "completed",
+                },
+                { label: { en: "Dropped", nl: "Gestopt" }, value: "dropped" },
             ],
         },
         {
-            label: "Toegevoegd door",
+            label: { en: "Added by", nl: "Toegevoegd door" },
             name: "addedBy",
             type: "relationship",
             relationTo: "users",
             required: false,
             admin: {
                 readOnly: true,
-                description: "Wordt automatisch gezet via een hook.",
+                description: {
+                    en: "Automatically set via a hook.",
+                    nl: "Wordt automatisch gezet via een hook.",
+                },
             },
             hooks: {
                 beforeChange: [

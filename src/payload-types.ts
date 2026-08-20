@@ -175,7 +175,7 @@ export interface User {
    */
   generateSlug?: boolean | null;
   /**
-   * De slug wordt automatisch gegenereerd op basis van de naam, maar kan hier aangepast worden.
+   * The slug is automatically generated from the name, but can be adjusted here.
    */
   slug?: string | null;
   status: 'active' | 'inactive';
@@ -183,19 +183,19 @@ export interface User {
   isCoach?: boolean | null;
   avatar?: (number | null) | Media;
   /**
-   * Rol van het lid bij sportlab in 1 zin
+   * Member role at Sportlab in one sentence.
    */
   subtitle?: string | null;
   /**
-   * Achtergrond beschrijving van het lid
+   * Background description of the member.
    */
   about?: string | null;
   /**
-   * Bepaal de volgorde in team overzichten (lager nummer = hoger in lijst)
+   * Set the order in team overview lists (lower number = higher in list).
    */
   position?: number | null;
   /**
-   * Pagina content voor de profielpagina van coaches
+   * Page content for the coach profile page.
    */
   content?: {
     root: {
@@ -238,13 +238,13 @@ export interface User {
 export interface Media {
   id: number;
   /**
-   * Belangrijk voor SEO en toegankelijkheid.
+   * Important for SEO and accessibility.
    */
   alt: string;
   objectPositionDesktop?: ('center' | 'top' | 'bottom' | 'left' | 'right') | null;
   objectPositionMobile?: ('center' | 'top' | 'bottom' | 'left' | 'right') | null;
   /**
-   * Wordt gebruikt als fallback en voor performance (LCP). Nodig voor achtergrondvideo's.
+   * Used as a fallback and for performance (LCP). Required for background videos.
    */
   poster?: (number | null) | Media;
   prefix?: string | null;
@@ -285,7 +285,7 @@ export interface Document {
 export interface Page {
   id: number;
   /**
-   * Kies hier een bovenliggende pagina, indien van toepassing.
+   * Select a parent page here, if applicable.
    */
   parent?: (number | null) | Page;
   title: string;
@@ -633,31 +633,31 @@ export interface MediaCarouselBlock {
 export interface Lesson {
   id: number;
   /**
-   * Selecteer een sjabloon om type, coaches en standaard oefeningen automatisch over te nemen.
+   * Select a template to automatically apply its type, coaches, and default exercises.
    */
   template?: (number | null) | LessonTemplate;
   title?: string | null;
   type?: ('pt' | 'semi_pt' | 'group' | 'open_gym') | null;
   /**
-   * PT en Semi PT lessen zijn altijd gesloten. Groepslessen en Open Gym kunnen open of gesloten zijn.
+   * PT and Semi PT lessons are always closed. Group lessons and Open Gym can be open or closed.
    */
   status?: ('open' | 'closed') | null;
   startDate?: string | null;
   endDate?: string | null;
   /**
-   * Optioneel: het aantal beschikbare plekken voor deze les.
+   * Optional: the number of available spots for this lesson.
    */
   spots?: number | null;
   /**
-   * Optioneel: gebruikt in lesson cards. Als leeg, wordt de afbeelding van het gekoppelde sjabloon gebruikt.
+   * Optional: used in lesson cards. If left empty, the image from the linked template is used.
    */
   image?: (number | null) | Media;
   /**
-   * Koppel een of meerdere coaches aan deze les.
+   * Link one or more coaches to this lesson.
    */
   coaches?: (number | User)[] | null;
   /**
-   * Maak workoutblokken aan in de gewenste volgorde en vul per blok de workoutgegevens en oefeningen in.
+   * Create workout blocks in the desired order and fill in each block's workout details and exercises.
    */
   workoutBlocks?:
     | {
@@ -686,20 +686,20 @@ export interface Lesson {
 export interface LessonTemplate {
   id: number;
   /**
-   * Alleen actieve sjablonen worden gebruikt bij het automatisch aanmaken van lessen.
+   * Only active templates are used when automatically creating lessons.
    */
   isActive?: boolean | null;
   /**
-   * bijv. 'PT' of 'Groepsles Maandag/Woensdag'
+   * e.g. 'PT' or 'Group class Monday/Wednesday'
    */
   title: string;
   type: 'pt' | 'semi_pt' | 'group' | 'open_gym';
   /**
-   * Optioneel: standaard aantal plekken voor lessen op basis van dit sjabloon.
+   * Optional: default number of spots for lessons based on this template.
    */
   spots?: number | null;
   /**
-   * Voeg één rij toe per dag/tijd combinatie (bijv. Maandag 09:00 én Woensdag 14:00).
+   * Add one row per day/time combination (e.g. Monday 09:00 and Wednesday 14:00).
    */
   schedule: {
     dayOfWeek: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
@@ -709,11 +709,11 @@ export interface LessonTemplate {
   }[];
   coaches?: (number | User)[] | null;
   /**
-   * Optioneel: standaard afbeelding voor lesson cards van lessen die op dit sjabloon gebaseerd zijn.
+   * Optional: default image for lesson cards of lessons based on this template.
    */
   image?: (number | null) | Media;
   /**
-   * Optioneel: standaard workoutblokken met oefeningen die worden overgenomen bij nieuwe lessen op basis van dit sjabloon.
+   * Optional: default workout blocks with exercises that are copied to new lessons based on this template.
    */
   defaultWorkoutBlocks?:
     | {
@@ -787,7 +787,7 @@ export interface Program {
   };
   schedule: {
     /**
-     * Kies een datum binnen de start- en einddatum van het programma.
+     * Choose a date within the program's start and end date.
      */
     date: string;
     lessons: number | Lesson;
@@ -812,7 +812,7 @@ export interface LessonEnrollment {
   lesson: number | Lesson;
   status: 'assigned' | 'started' | 'completed' | 'cancelled';
   /**
-   * Wordt automatisch gezet via een hook.
+   * Automatically set via a hook.
    */
   addedBy?: (number | null) | User;
   updatedAt: string;
@@ -827,7 +827,7 @@ export interface LessonExerciseTracking {
   user: number | User;
   lesson: number | Lesson;
   /**
-   * Per gebruiker ingevulde sets, reps en notities per oefening in een les.
+   * Sets, reps, and notes entered by the user for each exercise in a lesson.
    */
   workoutBlocks?:
     | {
@@ -851,7 +851,7 @@ export interface LessonExerciseTracking {
       }[]
     | null;
   /**
-   * Optioneel: laatste keer dat deze gebruiker progressie heeft bijgewerkt.
+   * Optional: the last time this user updated their progress.
    */
   lastLoggedAt?: string | null;
   updatedAt: string;
@@ -867,7 +867,7 @@ export interface ProgramEnrollment {
   program: number | Program;
   status: 'enrolled' | 'active' | 'completed' | 'dropped';
   /**
-   * Wordt automatisch gezet via een hook.
+   * Automatically set via a hook.
    */
   addedBy?: (number | null) | User;
   updatedAt: string;
@@ -883,7 +883,7 @@ export interface EventRegistration {
   event: number | Event;
   status: 'registered' | 'waitlist' | 'cancelled' | 'attended';
   /**
-   * Wordt automatisch gezet via een hook.
+   * Automatically set via a hook.
    */
   addedBy?: (number | null) | User;
   updatedAt: string;

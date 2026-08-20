@@ -13,8 +13,8 @@ import { slugField, type CollectionConfig } from "payload";
 export const Programs: CollectionConfig = {
     slug: "programs",
     labels: {
-        singular: "Programma",
-        plural: "Programma's",
+        singular: { en: "Program", nl: "Programma" },
+        plural: { en: "Programs", nl: "Programma's" },
     },
     access: {
         create: isAdminOrCoach,
@@ -30,13 +30,13 @@ export const Programs: CollectionConfig = {
     },
     fields: [
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Startdatum",
+            label: { en: "Start date", nl: "Startdatum" },
             name: "startDate",
             type: "date",
             required: true,
@@ -45,7 +45,7 @@ export const Programs: CollectionConfig = {
             },
         },
         {
-            label: "Einddatum",
+            label: { en: "End date", nl: "Einddatum" },
             name: "endDate",
             type: "date",
             required: true,
@@ -54,14 +54,14 @@ export const Programs: CollectionConfig = {
             },
         },
         {
-            label: "Banner Afbeelding",
+            label: { en: "Banner image", nl: "Banner afbeelding" },
             name: "bannerImage",
             type: "upload",
             relationTo: "media",
             required: true,
         },
         {
-            label: "Beschrijving",
+            label: { en: "Description", nl: "Beschrijving" },
             name: "description",
             type: "richText",
             required: true,
@@ -77,20 +77,22 @@ export const Programs: CollectionConfig = {
             }),
         },
         {
-            label: "Lessen",
+            label: { en: "Lessons", nl: "Lessen" },
             name: "schedule",
             type: "array",
             required: true,
             fields: [
                 {
-                    label: "Datum",
+                    label: { en: "Date", nl: "Datum" },
                     name: "date",
                     type: "date",
                     required: true,
                     admin: {
                         date: { pickerAppearance: "dayAndTime" },
-                        description:
-                            "Kies een datum binnen de start- en einddatum van het programma.",
+                        description: {
+                            en: "Choose a date within the program's start and end date.",
+                            nl: "Kies een datum binnen de start- en einddatum van het programma.",
+                        },
                     },
                     validate: (
                         value: Date | null | undefined,
@@ -100,16 +102,16 @@ export const Programs: CollectionConfig = {
                         const start = data?.startDate as string | undefined;
                         const end = data?.endDate as string | undefined;
                         if (start && new Date(value) < new Date(start)) {
-                            return "Datum moet na de startdatum van het programma liggen.";
+                            return "Date must be after the program start date.";
                         }
                         if (end && new Date(value) > new Date(end)) {
-                            return "Datum moet voor de einddatum van het programma liggen.";
+                            return "Date must be before the program end date.";
                         }
                         return true;
                     },
                 },
                 {
-                    label: "Les",
+                    label: { en: "Lesson", nl: "Les" },
                     name: "lessons",
                     type: "relationship",
                     relationTo: "lessons",
@@ -119,7 +121,7 @@ export const Programs: CollectionConfig = {
             ],
         },
         {
-            label: "Eindevent",
+            label: { en: "Final event", nl: "Eindevent" },
             name: "finalEvent",
             type: "relationship",
             relationTo: "events",

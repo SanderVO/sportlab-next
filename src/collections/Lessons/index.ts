@@ -11,8 +11,8 @@ import { syncExerciseTrackingOnLessonUpdate } from "./hooks/syncExerciseTracking
 export const Lessons: CollectionConfig = {
     slug: "lessons",
     labels: {
-        singular: "Les",
-        plural: "Lessen",
+        singular: { en: "Lesson", nl: "Les" },
+        plural: { en: "Lessons", nl: "Lessen" },
     },
     access: {
         create: isAdminOrCoach,
@@ -32,20 +32,22 @@ export const Lessons: CollectionConfig = {
     },
     fields: [
         {
-            label: "Sjabloon",
+            label: { en: "Template", nl: "Sjabloon" },
             name: "template",
             type: "relationship",
             relationTo: "lesson-templates",
             hasMany: false,
             required: false,
             admin: {
-                description:
-                    "Selecteer een sjabloon om type, coaches en standaard oefeningen automatisch over te nemen.",
+                description: {
+                    en: "Select a template to automatically apply its type, coaches, and default exercises.",
+                    nl: "Selecteer een sjabloon om type, coaches en standaard oefeningen automatisch over te nemen.",
+                },
                 position: "sidebar",
             },
         },
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
@@ -54,7 +56,7 @@ export const Lessons: CollectionConfig = {
             },
         },
         {
-            label: "Type",
+            label: { en: "Type", nl: "Type" },
             name: "type",
             type: "select",
             required: true,
@@ -63,36 +65,36 @@ export const Lessons: CollectionConfig = {
             },
             options: [
                 {
-                    label: "PT",
+                    label: { en: "PT", nl: "PT" },
                     value: "pt",
                 },
                 {
-                    label: "Semi PT",
+                    label: { en: "Semi PT", nl: "Semi PT" },
                     value: "semi_pt",
                 },
                 {
-                    label: "Groepslessen",
+                    label: { en: "Group lessons", nl: "Groepslessen" },
                     value: "group",
                 },
                 {
-                    label: "Open Gym",
+                    label: { en: "Open Gym", nl: "Open Gym" },
                     value: "open_gym",
                 },
             ],
         },
         {
-            label: "Status",
+            label: { en: "Status", nl: "Status" },
             name: "status",
             type: "select",
             required: true,
             defaultValue: "closed",
             options: [
                 {
-                    label: "Open",
+                    label: { en: "Open", nl: "Open" },
                     value: "open",
                 },
                 {
-                    label: "Closed",
+                    label: { en: "Closed", nl: "Gesloten" },
                     value: "closed",
                 },
             ],
@@ -113,12 +115,14 @@ export const Lessons: CollectionConfig = {
                         siblingData?.type === "open_gym"
                     );
                 },
-                description:
-                    "PT en Semi PT lessen zijn altijd gesloten. Groepslessen en Open Gym kunnen open of gesloten zijn.",
+                description: {
+                    en: "PT and Semi PT lessons are always closed. Group lessons and Open Gym can be open or closed.",
+                    nl: "PT en Semi PT lessen zijn altijd gesloten. Groepslessen en Open Gym kunnen open of gesloten zijn.",
+                },
             },
         },
         {
-            label: "Startdatum & -tijd",
+            label: { en: "Start date & time", nl: "Startdatum & -tijd" },
             name: "startDate",
             type: "date",
             required: false,
@@ -130,7 +134,7 @@ export const Lessons: CollectionConfig = {
             },
         },
         {
-            label: "Einddatum & -tijd",
+            label: { en: "End date & time", nl: "Einddatum & -tijd" },
             name: "endDate",
             type: "date",
             required: false,
@@ -142,29 +146,33 @@ export const Lessons: CollectionConfig = {
             },
         },
         {
-            label: "Aantal plekken",
+            label: { en: "Available spots", nl: "Aantal plekken" },
             name: "spots",
             type: "number",
             required: false,
             admin: {
                 condition: (_, siblingData) => !siblingData?.template,
-                description:
-                    "Optioneel: het aantal beschikbare plekken voor deze les.",
+                description: {
+                    en: "Optional: the number of available spots for this lesson.",
+                    nl: "Optioneel: het aantal beschikbare plekken voor deze les.",
+                },
             },
         },
         {
-            label: "Afbeelding",
+            label: { en: "Image", nl: "Afbeelding" },
             name: "image",
             type: "upload",
             relationTo: "media",
             required: false,
             admin: {
-                description:
-                    "Optioneel: gebruikt in lesson cards. Als leeg, wordt de afbeelding van het gekoppelde sjabloon gebruikt.",
+                description: {
+                    en: "Optional: used in lesson cards. If left empty, the image from the linked template is used.",
+                    nl: "Optioneel: gebruikt in lesson cards. Als leeg, wordt de afbeelding van het gekoppelde sjabloon gebruikt.",
+                },
             },
         },
         {
-            label: "Coaches",
+            label: { en: "Coaches", nl: "Coaches" },
             name: "coaches",
             type: "relationship",
             relationTo: "users",
@@ -176,59 +184,67 @@ export const Lessons: CollectionConfig = {
                 },
             },
             admin: {
-                description: "Koppel een of meerdere coaches aan deze les.",
+                description: {
+                    en: "Link one or more coaches to this lesson.",
+                    nl: "Koppel een of meerdere coaches aan deze les.",
+                },
             },
         },
         {
-            label: "Workoutblokken",
+            label: { en: "Workout blocks", nl: "Workoutblokken" },
             name: "workoutBlocks",
             type: "array",
             required: false,
             labels: {
-                singular: "Workoutblok",
-                plural: "Workoutblokken",
+                singular: { en: "Workout block", nl: "Workoutblok" },
+                plural: { en: "Workout blocks", nl: "Workoutblokken" },
             },
             admin: {
-                description:
-                    "Maak workoutblokken aan in de gewenste volgorde en vul per blok de workoutgegevens en oefeningen in.",
+                description: {
+                    en: "Create workout blocks in the desired order and fill in each block's workout details and exercises.",
+                    nl: "Maak workoutblokken aan in de gewenste volgorde en vul per blok de workoutgegevens en oefeningen in.",
+                },
             },
             fields: [
                 {
-                    label: "Workout naam",
+                    label: { en: "Workout name", nl: "Workout naam" },
                     name: "name",
                     type: "text",
                     required: true,
                 },
                 {
-                    label: "Workout omschrijving",
+                    label: {
+                        en: "Workout description",
+                        nl: "Workout omschrijving",
+                    },
                     name: "description",
                     type: "textarea",
                     required: false,
                 },
                 {
-                    label: "Tijd (in minuten)",
+                    label: { en: "Time (minutes)", nl: "Tijd (in minuten)" },
                     name: "duration",
                     type: "number",
                     required: true,
                 },
                 {
-                    label: "Oefeningen",
+                    label: { en: "Exercises", nl: "Oefeningen" },
                     name: "exercises",
                     type: "array",
                     required: false,
                     labels: {
-                        singular: "Oefening",
-                        plural: "Oefeningen",
+                        singular: { en: "Exercise", nl: "Oefening" },
+                        plural: { en: "Exercises", nl: "Oefeningen" },
                     },
                     fields: [
                         {
-                            label: "Naam",
+                            label: { en: "Name", nl: "Naam" },
                             name: "name",
                             type: "text",
                             required: true,
                         },
                         {
-                            label: "Omschrijving",
+                            label: { en: "Description", nl: "Omschrijving" },
                             name: "description",
                             type: "textarea",
                             required: false,

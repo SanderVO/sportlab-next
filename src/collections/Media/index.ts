@@ -3,6 +3,10 @@ import type { CollectionConfig } from "payload";
 
 export const Media: CollectionConfig = {
     slug: "media",
+    labels: {
+        singular: { en: "Media item", nl: "Media item" },
+        plural: { en: "Media", nl: "Media" },
+    },
     access: {
         create: isAdmin,
         delete: isAdmin,
@@ -11,25 +15,31 @@ export const Media: CollectionConfig = {
     },
     fields: [
         {
-            label: "Alt Tekst",
+            label: { en: "Alt text", nl: "Alt tekst" },
             name: "alt",
             type: "text",
             required: true,
             admin: {
-                description: "Belangrijk voor SEO en toegankelijkheid.",
+                description: {
+                    en: "Important for SEO and accessibility.",
+                    nl: "Belangrijk voor SEO en toegankelijkheid.",
+                },
             },
         },
         {
-            label: "Afbeelding Uitsnij Positie (Desktop)",
+            label: {
+                en: "Image crop position (desktop)",
+                nl: "Afbeelding uitsnij positie (desktop)",
+            },
             name: "objectPositionDesktop",
             type: "select",
             defaultValue: "top",
             options: [
-                { label: "Midden", value: "center" },
-                { label: "Boven", value: "top" },
-                { label: "Onder", value: "bottom" },
-                { label: "Links", value: "left" },
-                { label: "Rechts", value: "right" },
+                { label: { en: "Center", nl: "Midden" }, value: "center" },
+                { label: { en: "Top", nl: "Boven" }, value: "top" },
+                { label: { en: "Bottom", nl: "Onder" }, value: "bottom" },
+                { label: { en: "Left", nl: "Links" }, value: "left" },
+                { label: { en: "Right", nl: "Rechts" }, value: "right" },
             ],
             admin: {
                 condition: (_, siblingData) =>
@@ -37,16 +47,19 @@ export const Media: CollectionConfig = {
             },
         },
         {
-            label: "Afbeelding Uitsnij Positie (Mobiel)",
+            label: {
+                en: "Image crop position (mobile)",
+                nl: "Afbeelding uitsnij positie (mobiel)",
+            },
             name: "objectPositionMobile",
             type: "select",
             defaultValue: "center",
             options: [
-                { label: "Midden", value: "center" },
-                { label: "Boven", value: "top" },
-                { label: "Onder", value: "bottom" },
-                { label: "Links", value: "left" },
-                { label: "Rechts", value: "right" },
+                { label: { en: "Center", nl: "Midden" }, value: "center" },
+                { label: { en: "Top", nl: "Boven" }, value: "top" },
+                { label: { en: "Bottom", nl: "Onder" }, value: "bottom" },
+                { label: { en: "Left", nl: "Links" }, value: "left" },
+                { label: { en: "Right", nl: "Rechts" }, value: "right" },
             ],
             admin: {
                 condition: (_, siblingData) =>
@@ -54,7 +67,7 @@ export const Media: CollectionConfig = {
             },
         },
         {
-            label: "Video Poster",
+            label: { en: "Video poster", nl: "Video poster" },
             name: "poster",
             type: "upload",
             relationTo: "media",
@@ -67,8 +80,10 @@ export const Media: CollectionConfig = {
 
                     return siblingData?.mimeType?.startsWith("video");
                 },
-                description:
-                    "Wordt gebruikt als fallback en voor performance (LCP). Nodig voor achtergrondvideo's.",
+                description: {
+                    en: "Used as a fallback and for performance (LCP). Required for background videos.",
+                    nl: "Wordt gebruikt als fallback en voor performance (LCP). Nodig voor achtergrondvideo's.",
+                },
             },
         },
     ],

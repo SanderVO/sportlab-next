@@ -47,8 +47,14 @@ const initializeExerciseTracking: CollectionBeforeChangeHook = async ({
 export const LessonExerciseTracking: CollectionConfig = {
     slug: "lesson-exercise-tracking",
     labels: {
-        singular: "Les Oefening Voortgang",
-        plural: "Les Oefening Voortgang",
+        singular: {
+            en: "Lesson exercise progress",
+            nl: "Les oefening voortgang",
+        },
+        plural: {
+            en: "Lesson exercise progress",
+            nl: "Les oefening voortgang",
+        },
     },
     access: {
         create: isAdminOrCoach,
@@ -65,31 +71,36 @@ export const LessonExerciseTracking: CollectionConfig = {
     },
     fields: [
         {
-            label: "Gebruiker",
+            label: { en: "User", nl: "Gebruiker" },
             name: "user",
             type: "relationship",
             relationTo: "users",
             required: true,
         },
         {
-            label: "Les",
+            label: { en: "Lesson", nl: "Les" },
             name: "lesson",
             type: "relationship",
             relationTo: "lessons",
             required: true,
         },
         {
-            label: "Workoutblokken",
+            label: { en: "Workout blocks", nl: "Workoutblokken" },
             name: "workoutBlocks",
             type: "array",
             required: false,
             admin: {
-                description:
-                    "Per gebruiker ingevulde sets, reps en notities per oefening in een les.",
+                description: {
+                    en: "Sets, reps, and notes entered by the user for each exercise in a lesson.",
+                    nl: "Per gebruiker ingevulde sets, reps en notities per oefening in een les.",
+                },
             },
             fields: [
                 {
-                    label: "Les workoutblok ID",
+                    label: {
+                        en: "Lesson workout block ID",
+                        nl: "Les workoutblok ID",
+                    },
                     name: "lessonBlockId",
                     type: "text",
                     required: true,
@@ -98,7 +109,7 @@ export const LessonExerciseTracking: CollectionConfig = {
                     },
                 },
                 {
-                    label: "Workout naam",
+                    label: { en: "Workout name", nl: "Workout naam" },
                     name: "workoutName",
                     type: "text",
                     required: true,
@@ -107,7 +118,10 @@ export const LessonExerciseTracking: CollectionConfig = {
                     },
                 },
                 {
-                    label: "Workout omschrijving",
+                    label: {
+                        en: "Workout description",
+                        nl: "Workout omschrijving",
+                    },
                     name: "workoutDescription",
                     type: "textarea",
                     required: false,
@@ -116,7 +130,7 @@ export const LessonExerciseTracking: CollectionConfig = {
                     },
                 },
                 {
-                    label: "Tijd (in minuten)",
+                    label: { en: "Time (minutes)", nl: "Tijd (in minuten)" },
                     name: "duration",
                     type: "number",
                     required: false,
@@ -125,13 +139,16 @@ export const LessonExerciseTracking: CollectionConfig = {
                     },
                 },
                 {
-                    label: "Oefeningen",
+                    label: { en: "Exercises", nl: "Oefeningen" },
                     name: "exercises",
                     type: "array",
                     required: false,
                     fields: [
                         {
-                            label: "Les oefening ID",
+                            label: {
+                                en: "Lesson exercise ID",
+                                nl: "Les oefening ID",
+                            },
                             name: "lessonExerciseId",
                             type: "text",
                             required: true,
@@ -140,7 +157,7 @@ export const LessonExerciseTracking: CollectionConfig = {
                             },
                         },
                         {
-                            label: "Oefening naam",
+                            label: { en: "Exercise name", nl: "Oefening naam" },
                             name: "exerciseName",
                             type: "text",
                             required: true,
@@ -149,7 +166,10 @@ export const LessonExerciseTracking: CollectionConfig = {
                             },
                         },
                         {
-                            label: "Oefening omschrijving",
+                            label: {
+                                en: "Exercise description",
+                                nl: "Oefening omschrijving",
+                            },
                             name: "exerciseDescription",
                             type: "textarea",
                             required: false,
@@ -158,25 +178,25 @@ export const LessonExerciseTracking: CollectionConfig = {
                             },
                         },
                         {
-                            label: "Sets",
+                            label: { en: "Sets", nl: "Sets" },
                             name: "sets",
                             type: "number",
                             required: false,
                         },
                         {
-                            label: "Reps",
+                            label: { en: "Reps", nl: "Reps" },
                             name: "reps",
                             type: "text",
                             required: false,
                         },
                         {
-                            label: "Notities",
+                            label: { en: "Notes", nl: "Notities" },
                             name: "notes",
                             type: "textarea",
                             required: false,
                         },
                         {
-                            label: "Afgerond",
+                            label: { en: "Completed", nl: "Afgerond" },
                             name: "completed",
                             type: "checkbox",
                             required: false,
@@ -187,7 +207,7 @@ export const LessonExerciseTracking: CollectionConfig = {
             ],
         },
         {
-            label: "Bijgewerkt op",
+            label: { en: "Updated at", nl: "Bijgewerkt op" },
             name: "lastLoggedAt",
             type: "date",
             required: false,
@@ -195,8 +215,10 @@ export const LessonExerciseTracking: CollectionConfig = {
                 date: {
                     pickerAppearance: "dayAndTime",
                 },
-                description:
-                    "Optioneel: laatste keer dat deze gebruiker progressie heeft bijgewerkt.",
+                description: {
+                    en: "Optional: the last time this user updated their progress.",
+                    nl: "Optioneel: laatste keer dat deze gebruiker progressie heeft bijgewerkt.",
+                },
             },
         },
     ],

@@ -4,8 +4,8 @@ import type { CollectionConfig } from "payload";
 export const Exercises: CollectionConfig = {
     slug: "exercises",
     labels: {
-        singular: "Oefening",
-        plural: "Oefeningen",
+        singular: { en: "Exercise", nl: "Oefening" },
+        plural: { en: "Exercises", nl: "Oefeningen" },
     },
     access: {
         create: isAdminOrCoach,
@@ -19,13 +19,13 @@ export const Exercises: CollectionConfig = {
     },
     fields: [
         {
-            label: "Naam",
+            label: { en: "Name", nl: "Naam" },
             name: "name",
             type: "text",
             required: true,
         },
         {
-            label: "Omschrijving",
+            label: { en: "Description", nl: "Omschrijving" },
             name: "description",
             type: "textarea",
             required: false,

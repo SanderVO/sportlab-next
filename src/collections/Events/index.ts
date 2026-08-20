@@ -4,8 +4,8 @@ import { slugField, type CollectionConfig } from "payload";
 export const Events: CollectionConfig = {
     slug: "events",
     labels: {
-        singular: "Evenement",
-        plural: "Evenementen",
+        singular: { en: "Event", nl: "Evenement" },
+        plural: { en: "Events", nl: "Evenementen" },
     },
     access: {
         create: isAdminOrCoach,
@@ -21,40 +21,40 @@ export const Events: CollectionConfig = {
     },
     fields: [
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Type",
+            label: { en: "Type", nl: "Type" },
             name: "eventType",
             type: "select",
             required: true,
             options: [
                 {
-                    label: "Hardlopen",
+                    label: { en: "Running", nl: "Hardlopen" },
                     value: "running",
                 },
                 {
-                    label: "Hyrox",
+                    label: { en: "Hyrox", nl: "Hyrox" },
                     value: "hyrox",
                 },
                 {
-                    label: "Speciaal",
+                    label: { en: "Special", nl: "Speciaal" },
                     value: "special",
                 },
             ],
         },
         {
-            label: "Banner Afbeelding",
+            label: { en: "Banner image", nl: "Banner afbeelding" },
             name: "bannerImage",
             type: "upload",
             relationTo: "media",
             required: false,
         },
         {
-            label: "Startdatum",
+            label: { en: "Start date", nl: "Startdatum" },
             name: "startsAt",
             type: "date",
             required: true,
@@ -65,7 +65,7 @@ export const Events: CollectionConfig = {
             },
         },
         {
-            label: "Einddatum",
+            label: { en: "End date", nl: "Einddatum" },
             name: "endsAt",
             type: "date",
             required: false,
@@ -76,19 +76,19 @@ export const Events: CollectionConfig = {
             },
         },
         {
-            label: "Locatie",
+            label: { en: "Location", nl: "Locatie" },
             name: "location",
             type: "text",
             required: false,
         },
         {
-            label: "Capaciteit",
+            label: { en: "Capacity", nl: "Capaciteit" },
             name: "capacity",
             type: "number",
             required: false,
         },
         {
-            label: "Inschrijven geopend vanaf",
+            label: { en: "Signup opens from", nl: "Inschrijven geopend vanaf" },
             name: "signupOpenAt",
             type: "date",
             required: false,
@@ -99,7 +99,10 @@ export const Events: CollectionConfig = {
             },
         },
         {
-            label: "Inschrijven gesloten vanaf",
+            label: {
+                en: "Signup closes from",
+                nl: "Inschrijven gesloten vanaf",
+            },
             name: "signupCloseAt",
             type: "date",
             required: false,

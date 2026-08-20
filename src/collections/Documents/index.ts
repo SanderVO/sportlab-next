@@ -4,8 +4,8 @@ import type { CollectionConfig } from "payload";
 export const Documents: CollectionConfig = {
     slug: "documents",
     labels: {
-        plural: "Documenten",
-        singular: "Document",
+        plural: { en: "Documents", nl: "Documenten" },
+        singular: { en: "Document", nl: "Document" },
     },
     access: {
         create: isAdmin,
@@ -15,7 +15,7 @@ export const Documents: CollectionConfig = {
     },
     fields: [
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,

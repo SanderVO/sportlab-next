@@ -14,8 +14,8 @@ export const Users: CollectionConfig = {
     slug: "users",
     auth: true,
     labels: {
-        singular: "Gebruiker",
-        plural: "Gebruikers",
+        singular: { en: "User", nl: "Gebruiker" },
+        plural: { en: "Users", nl: "Gebruikers" },
     },
     defaultPopulate: {
         name: true,
@@ -97,7 +97,7 @@ export const Users: CollectionConfig = {
     },
     fields: [
         {
-            label: "Naam",
+            label: { en: "Name", nl: "Naam" },
             name: "name",
             type: "text",
         },
@@ -109,32 +109,34 @@ export const Users: CollectionConfig = {
                     condition: (_, siblingData) => {
                         return !!siblingData?.roles?.includes(RolesEnum.COACH);
                     },
-                    description:
-                        "De slug wordt automatisch gegenereerd op basis van de naam, maar kan hier aangepast worden.",
+                    description: {
+                        en: "The slug is automatically generated from the name, but can be adjusted here.",
+                        nl: "De slug wordt automatisch gegenereerd op basis van de naam, maar kan hier aangepast worden.",
+                    },
                 };
 
                 return defaultField;
             },
         }),
         {
-            label: "Status",
+            label: { en: "Status", nl: "Status" },
             name: "status",
             type: "select",
             defaultValue: "active",
             required: true,
             options: [
                 {
-                    label: "Actief",
+                    label: { en: "Active", nl: "Actief" },
                     value: "active",
                 },
                 {
-                    label: "Inactief",
+                    label: { en: "Inactive", nl: "Inactief" },
                     value: "inactive",
                 },
             ],
         },
         {
-            label: "Rollen",
+            label: { en: "Roles", nl: "Rollen" },
             name: "roles",
             type: "select",
             hasMany: true,
@@ -148,10 +150,13 @@ export const Users: CollectionConfig = {
                 },
             },
             options: [
-                { label: "Admin", value: RolesEnum.ADMIN },
-                { label: "Content Manager", value: RolesEnum.EDITOR },
-                { label: "Lid", value: RolesEnum.USER },
-                { label: "Coach", value: RolesEnum.COACH },
+                { label: { en: "Admin", nl: "Admin" }, value: RolesEnum.ADMIN },
+                {
+                    label: { en: "Content Manager", nl: "Content Manager" },
+                    value: RolesEnum.EDITOR,
+                },
+                { label: { en: "Member", nl: "Lid" }, value: RolesEnum.USER },
+                { label: { en: "Coach", nl: "Coach" }, value: RolesEnum.COACH },
             ],
         },
         {
@@ -163,51 +168,62 @@ export const Users: CollectionConfig = {
             },
         },
         {
-            label: "Foto",
+            label: { en: "Photo", nl: "Foto" },
             name: "avatar",
             type: "upload",
             relationTo: "media",
             required: false,
         },
         {
-            label: "Ondertitel",
+            label: { en: "Subtitle", nl: "Ondertitel" },
             name: "subtitle",
             type: "text",
             required: false,
             admin: {
-                description: "Rol van het lid bij sportlab in 1 zin",
+                description: {
+                    en: "Member role at Sportlab in one sentence.",
+                    nl: "Rol van het lid bij sportlab in 1 zin",
+                },
             },
         },
         {
-            label: "Over",
+            label: { en: "About", nl: "Over" },
             name: "about",
             type: "textarea",
             required: false,
             admin: {
-                description: "Achtergrond beschrijving van het lid",
+                description: {
+                    en: "Background description of the member.",
+                    nl: "Achtergrond beschrijving van het lid",
+                },
                 rows: 4,
             },
         },
         {
-            label: "Positie",
+            label: { en: "Position", nl: "Positie" },
             name: "position",
             type: "number",
             admin: {
-                description:
-                    "Bepaal de volgorde in team overzichten (lager nummer = hoger in lijst)",
+                description: {
+                    en: "Set the order in team overview lists (lower number = higher in list).",
+                    nl: "Bepaal de volgorde in team overzichten (lager nummer = hoger in lijst)",
+                },
                 condition: (_, siblingData) => {
                     return !!siblingData?.roles?.includes(RolesEnum.COACH);
                 },
             },
         },
         {
-            label: "Content",
+            label: { en: "Content", nl: "Content" },
             name: "content",
             type: "richText",
             editor: defaultLexical,
             required: false,
             admin: {
-                description: "Pagina content voor de profielpagina van coaches",
+                description: {
+                    en: "Page content for the coach profile page.",
+                    nl: "Pagina content voor de profielpagina van coaches",
+                },
                 condition: (_, siblingData) => {
                     return !!siblingData?.roles?.includes(RolesEnum.COACH);
                 },

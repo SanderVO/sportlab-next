@@ -5,8 +5,8 @@ import type { CollectionConfig } from "payload";
 export const EventRegistrations: CollectionConfig = {
     slug: "event-registrations",
     labels: {
-        singular: "Event Inschrijving",
-        plural: "Event Inschrijvingen",
+        singular: { en: "Event registration", nl: "Event inschrijving" },
+        plural: { en: "Event registrations", nl: "Event inschrijvingen" },
     },
     access: {
         create: isAdminOrCoach,
@@ -20,41 +20,56 @@ export const EventRegistrations: CollectionConfig = {
     },
     fields: [
         {
-            label: "Gebruiker",
+            label: { en: "User", nl: "Gebruiker" },
             name: "user",
             type: "relationship",
             relationTo: "users",
             required: true,
         },
         {
-            label: "Event",
+            label: { en: "Event", nl: "Event" },
             name: "event",
             type: "relationship",
             relationTo: "events",
             required: true,
         },
         {
-            label: "Status",
+            label: { en: "Status", nl: "Status" },
             name: "status",
             type: "select",
             required: true,
             defaultValue: "registered",
             options: [
-                { label: "Ingeschreven", value: "registered" },
-                { label: "Wachtlijst", value: "waitlist" },
-                { label: "Geannuleerd", value: "cancelled" },
-                { label: "Aanwezig", value: "attended" },
+                {
+                    label: { en: "Registered", nl: "Ingeschreven" },
+                    value: "registered",
+                },
+                {
+                    label: { en: "Waitlist", nl: "Wachtlijst" },
+                    value: "waitlist",
+                },
+                {
+                    label: { en: "Cancelled", nl: "Geannuleerd" },
+                    value: "cancelled",
+                },
+                {
+                    label: { en: "Attended", nl: "Aanwezig" },
+                    value: "attended",
+                },
             ],
         },
         {
-            label: "Toegevoegd door",
+            label: { en: "Added by", nl: "Toegevoegd door" },
             name: "addedBy",
             type: "relationship",
             relationTo: "users",
             required: false,
             admin: {
                 readOnly: true,
-                description: "Wordt automatisch gezet via een hook.",
+                description: {
+                    en: "Automatically set via a hook.",
+                    nl: "Wordt automatisch gezet via een hook.",
+                },
             },
             hooks: {
                 beforeChange: [
