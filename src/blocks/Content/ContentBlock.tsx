@@ -5,7 +5,7 @@ import { cn } from "@/utilities/ui";
 import React from "react";
 
 export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
-    const { columns } = props;
+    const { columns, backgroundColor, title, introduction } = props;
 
     return (
         <div
@@ -14,15 +14,67 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                 columns?.length === 1 && "lg:grid-cols-1",
             )}
         >
+            {(title || introduction) && (
+                <div className="col-span-full flex flex-col gap-3 lg:gap-4 pt-2">
+                    {title && (
+                        <h2
+                            className={cn(
+                                "font-sl-bebas text-4xl md:text-6xl leading-none",
+                                backgroundColor === "backgroundDark" &&
+                                    "text-warm-white",
+                                backgroundColor === "backgroundLight" &&
+                                    "text-ink",
+                                backgroundColor === "backgroundWhite" &&
+                                    "text-ink",
+                            )}
+                        >
+                            {title}
+                        </h2>
+                    )}
+
+                    {introduction && (
+                        <p
+                            className={cn(
+                                "max-w-3xl text-sm md:text-base leading-relaxed",
+                            )}
+                        >
+                            <RichText
+                                data={introduction}
+                                enableGutter={false}
+                                enableProse={false}
+                            />
+                        </p>
+                    )}
+                </div>
+            )}
+
             {columns &&
                 columns.length > 0 &&
                 columns.map((col, index) => {
+                    const columnBackgroundColor = (
+                        col as {
+                            backgroundColor?:
+                                | "backgroundDark"
+                                | "backgroundLight"
+                                | "backgroundWhite"
+                                | null;
+                        }
+                    ).backgroundColor;
+
                     const { richText, media, contentPosition, imageSize } = col;
 
                     return (
                         <div
                             key={index}
-                            className="flex h-full justify-between w-full self-center"
+                            className={cn(
+                                "flex h-full justify-between w-full self-center",
+                                columnBackgroundColor === "backgroundDark" &&
+                                    "bg-charcoal/90 text-warm-white",
+                                columnBackgroundColor === "backgroundLight" &&
+                                    "bg-sand/90 text-ink",
+                                columnBackgroundColor === "backgroundWhite" &&
+                                    "bg-warm-white/90 text-ink",
+                            )}
                         >
                             {media && contentPosition === "contentRight" && (
                                 <Media

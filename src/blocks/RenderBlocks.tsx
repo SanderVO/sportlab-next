@@ -1,7 +1,9 @@
 import { CarouselBlock } from "@/blocks/Carousel/CarouselBlock";
 import { ContentBlock } from "@/blocks/Content/ContentBlock";
+import { CycleTimelineBlock } from "@/blocks/CycleTimeline/CycleTimelineBlock";
 import { FormBlock } from "@/blocks/Form/FormBlock";
 import { InstagramBlock } from "@/blocks/Instagram/InstagramBlock";
+import { MediaCarouselBlock } from "@/blocks/MediaCarousel/MediaCarouselBlock";
 import { TeamBlock } from "@/blocks/Team/TeamBlock";
 import type { Page } from "@/payload-types";
 import { cn } from "@/utilities/ui";
@@ -13,8 +15,10 @@ const blockComponents = {
     carousel: CarouselBlock,
     team: TeamBlock,
     instagram: InstagramBlock,
+    cycleTimeline: CycleTimelineBlock,
     form: FormBlock,
     columns: ColumnsBlock,
+    mediaCarousel: MediaCarouselBlock,
 };
 
 export const RenderBlocks: React.FC<{
@@ -29,6 +33,10 @@ export const RenderBlocks: React.FC<{
             <Fragment>
                 {blocks.map((block, index) => {
                     const { blockType, backgroundColor } = block;
+                    const autoHeightBlockSlugs = ["carousel", "mediaCarousel"];
+                    const isAutoHeightBlock = autoHeightBlockSlugs.includes(
+                        String(blockType),
+                    );
 
                     if (blockType && blockType in blockComponents) {
                         const Block = blockComponents[blockType];
@@ -44,9 +52,8 @@ export const RenderBlocks: React.FC<{
                                             "bg-sand text-background",
                                         backgroundColor === "backgroundWhite" &&
                                             "bg-white text-background",
-                                        blockType === "carousel" &&
-                                            "min-h-auto",
-                                        blockType !== "carousel" &&
+                                        isAutoHeightBlock && "min-h-auto",
+                                        !isAutoHeightBlock &&
                                             "sm:min-h-180 xxl:min-h-[1080px]",
                                     )}
                                     key={index}

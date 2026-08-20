@@ -1,6 +1,8 @@
 import { isAdmin } from "@/access/admin";
 import { Carousel } from "@/blocks/Carousel/config";
+import { CycleTimeline } from "@/blocks/CycleTimeline/config";
 import { Instagram } from "@/blocks/Instagram/config";
+import { MediaCarousel } from "@/blocks/MediaCarousel/config";
 import { Team } from "@/blocks/Team/config";
 import { hero } from "@/components/Hero/config";
 import {
@@ -111,7 +113,14 @@ export const Pages: CollectionConfig<"pages"> = {
                         {
                             name: "layout",
                             type: "blocks",
-                            blocks: [Content, Carousel, Team, Instagram],
+                            blocks: [
+                                Content,
+                                Carousel,
+                                Team,
+                                Instagram,
+                                CycleTimeline,
+                                MediaCarousel,
+                            ],
                             required: true,
                             admin: {
                                 initCollapsed: true,

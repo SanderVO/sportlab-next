@@ -3,6 +3,26 @@ import type { Block, Field } from "payload";
 
 const columnFields: Field[] = [
     {
+        label: "Achtergrondkleur",
+        name: "backgroundColor",
+        type: "select",
+        required: false,
+        options: [
+            {
+                label: "Zwart",
+                value: "backgroundDark",
+            },
+            {
+                label: "Beige",
+                value: "backgroundLight",
+            },
+            {
+                label: "Wit",
+                value: "backgroundWhite",
+            },
+        ],
+    },
+    {
         label: "Content Type",
         name: "contentPosition",
         type: "select",
@@ -98,6 +118,27 @@ export const Content: Block = {
                     value: "backgroundWhite",
                 },
             ],
+        },
+        {
+            label: "Titel",
+            name: "title",
+            type: "text",
+            required: false,
+            admin: {
+                description:
+                    "Optioneel: Voeg een titel toe boven de kolommen. Laat leeg als je geen titel wilt.",
+            },
+        },
+        {
+            label: "Introductie",
+            name: "introduction",
+            type: "richText",
+            required: false,
+            editor: defaultLexical,
+            admin: {
+                description:
+                    "Optioneel: Voeg een introductie toe boven de kolommen. Laat leeg als je geen introductie wilt.",
+            },
         },
         {
             label: "Kolommen",

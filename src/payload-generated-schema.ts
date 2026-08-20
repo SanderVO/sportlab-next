@@ -179,6 +179,9 @@ export const pages_blocks_content_columns = sqliteTable(
     _order: integer("_order").notNull(),
     _parentID: text("_parent_id").notNull(),
     id: text("id").primaryKey(),
+    backgroundColor: text("background_color", {
+      enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
+    }),
     contentPosition: text("content_position", {
       enum: ["contentOnly", "contentBottom", "contentRight", "contentLeft"],
     }).default("contentRight"),
@@ -212,6 +215,8 @@ export const pages_blocks_content = sqliteTable(
     backgroundColor: text("background_color", {
       enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
     }).default("backgroundDark"),
+    title: text("title"),
+    introduction: text("introduction", { mode: "json" }),
     blockName: text("block_name"),
   },
   (columns) => [
@@ -380,6 +385,116 @@ export const pages_blocks_instagram = sqliteTable(
   ],
 );
 
+export const pages_blocks_cycle_timeline_stages = sqliteTable(
+  "pages_blocks_cycle_timeline_stages",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: text("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    weekLabel: text("week_label"),
+    phaseTitle: text("phase_title"),
+    description: text("description"),
+  },
+  (columns) => [
+    index("pages_blocks_cycle_timeline_stages_order_idx").on(columns._order),
+    index("pages_blocks_cycle_timeline_stages_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_cycle_timeline.id],
+      name: "pages_blocks_cycle_timeline_stages_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_cycle_timeline = sqliteTable(
+  "pages_blocks_cycle_timeline",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    backgroundColor: text("background_color", {
+      enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
+    }).default("backgroundDark"),
+    title: text("title"),
+    subtitle: text("subtitle"),
+    footerText: text("footer_text"),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_cycle_timeline_order_idx").on(columns._order),
+    index("pages_blocks_cycle_timeline_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_cycle_timeline_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_cycle_timeline_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_media_carousel_gallery_images = sqliteTable(
+  "pages_blocks_media_carousel_gallery_images",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: text("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    media: integer("media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    caption: text("caption"),
+  },
+  (columns) => [
+    index("pages_blocks_media_carousel_gallery_images_order_idx").on(
+      columns._order,
+    ),
+    index("pages_blocks_media_carousel_gallery_images_parent_id_idx").on(
+      columns._parentID,
+    ),
+    index("pages_blocks_media_carousel_gallery_images_media_idx").on(
+      columns.media,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages_blocks_media_carousel.id],
+      name: "pages_blocks_media_carousel_gallery_images_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const pages_blocks_media_carousel = sqliteTable(
+  "pages_blocks_media_carousel",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: text("id").primaryKey(),
+    backgroundColor: text("background_color", {
+      enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
+    }).default("backgroundLight"),
+    title: text("title"),
+    mainMedia: integer("main_media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    quote_text: text("quote_text"),
+    quote_author: text("quote_author"),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("pages_blocks_media_carousel_order_idx").on(columns._order),
+    index("pages_blocks_media_carousel_parent_id_idx").on(columns._parentID),
+    index("pages_blocks_media_carousel_path_idx").on(columns._path),
+    index("pages_blocks_media_carousel_main_media_idx").on(columns.mainMedia),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [pages.id],
+      name: "pages_blocks_media_carousel_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const pages_meta_rich_snippets = sqliteTable(
   "pages_meta_rich_snippets",
   {
@@ -491,6 +606,9 @@ export const _pages_v_blocks_content_columns = sqliteTable(
     _order: integer("_order").notNull(),
     _parentID: integer("_parent_id").notNull(),
     id: integer("id").primaryKey(),
+    backgroundColor: text("background_color", {
+      enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
+    }),
     contentPosition: text("content_position", {
       enum: ["contentOnly", "contentBottom", "contentRight", "contentLeft"],
     }).default("contentRight"),
@@ -527,6 +645,8 @@ export const _pages_v_blocks_content = sqliteTable(
     backgroundColor: text("background_color", {
       enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
     }).default("backgroundDark"),
+    title: text("title"),
+    introduction: text("introduction", { mode: "json" }),
     _uuid: text("_uuid"),
     blockName: text("block_name"),
   },
@@ -703,6 +823,122 @@ export const _pages_v_blocks_instagram = sqliteTable(
       columns: [columns["_parentID"]],
       foreignColumns: [_pages_v.id],
       name: "_pages_v_blocks_instagram_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_cycle_timeline_stages = sqliteTable(
+  "_pages_v_blocks_cycle_timeline_stages",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: integer("id").primaryKey(),
+    weekLabel: text("week_label"),
+    phaseTitle: text("phase_title"),
+    description: text("description"),
+    _uuid: text("_uuid"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_cycle_timeline_stages_order_idx").on(columns._order),
+    index("_pages_v_blocks_cycle_timeline_stages_parent_id_idx").on(
+      columns._parentID,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v_blocks_cycle_timeline.id],
+      name: "_pages_v_blocks_cycle_timeline_stages_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_cycle_timeline = sqliteTable(
+  "_pages_v_blocks_cycle_timeline",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: integer("id").primaryKey(),
+    backgroundColor: text("background_color", {
+      enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
+    }).default("backgroundDark"),
+    title: text("title"),
+    subtitle: text("subtitle"),
+    footerText: text("footer_text"),
+    _uuid: text("_uuid"),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_cycle_timeline_order_idx").on(columns._order),
+    index("_pages_v_blocks_cycle_timeline_parent_id_idx").on(columns._parentID),
+    index("_pages_v_blocks_cycle_timeline_path_idx").on(columns._path),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v.id],
+      name: "_pages_v_blocks_cycle_timeline_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_media_carousel_gallery_images = sqliteTable(
+  "_pages_v_blocks_media_carousel_gallery_images",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: integer("id").primaryKey(),
+    media: integer("media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    caption: text("caption"),
+    _uuid: text("_uuid"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_media_carousel_gallery_images_order_idx").on(
+      columns._order,
+    ),
+    index("_pages_v_blocks_media_carousel_gallery_images_parent_id_idx").on(
+      columns._parentID,
+    ),
+    index("_pages_v_blocks_media_carousel_gallery_images_media_idx").on(
+      columns.media,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v_blocks_media_carousel.id],
+      name: "_pages_v_blocks_media_carousel_gallery_images_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const _pages_v_blocks_media_carousel = sqliteTable(
+  "_pages_v_blocks_media_carousel",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    _path: text("_path").notNull(),
+    id: integer("id").primaryKey(),
+    backgroundColor: text("background_color", {
+      enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
+    }).default("backgroundLight"),
+    title: text("title"),
+    mainMedia: integer("main_media_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+    quote_text: text("quote_text"),
+    quote_author: text("quote_author"),
+    _uuid: text("_uuid"),
+    blockName: text("block_name"),
+  },
+  (columns) => [
+    index("_pages_v_blocks_media_carousel_order_idx").on(columns._order),
+    index("_pages_v_blocks_media_carousel_parent_id_idx").on(columns._parentID),
+    index("_pages_v_blocks_media_carousel_path_idx").on(columns._path),
+    index("_pages_v_blocks_media_carousel_main_media_idx").on(
+      columns.mainMedia,
+    ),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [_pages_v.id],
+      name: "_pages_v_blocks_media_carousel_parent_id_fk",
     }).onDelete("cascade"),
   ],
 );
@@ -2731,6 +2967,62 @@ export const relations_pages_blocks_instagram = relations(
     }),
   }),
 );
+export const relations_pages_blocks_cycle_timeline_stages = relations(
+  pages_blocks_cycle_timeline_stages,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_cycle_timeline, {
+      fields: [pages_blocks_cycle_timeline_stages._parentID],
+      references: [pages_blocks_cycle_timeline.id],
+      relationName: "stages",
+    }),
+  }),
+);
+export const relations_pages_blocks_cycle_timeline = relations(
+  pages_blocks_cycle_timeline,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_cycle_timeline._parentID],
+      references: [pages.id],
+      relationName: "_blocks_cycleTimeline",
+    }),
+    stages: many(pages_blocks_cycle_timeline_stages, {
+      relationName: "stages",
+    }),
+  }),
+);
+export const relations_pages_blocks_media_carousel_gallery_images = relations(
+  pages_blocks_media_carousel_gallery_images,
+  ({ one }) => ({
+    _parentID: one(pages_blocks_media_carousel, {
+      fields: [pages_blocks_media_carousel_gallery_images._parentID],
+      references: [pages_blocks_media_carousel.id],
+      relationName: "galleryImages",
+    }),
+    media: one(media, {
+      fields: [pages_blocks_media_carousel_gallery_images.media],
+      references: [media.id],
+      relationName: "media",
+    }),
+  }),
+);
+export const relations_pages_blocks_media_carousel = relations(
+  pages_blocks_media_carousel,
+  ({ one, many }) => ({
+    _parentID: one(pages, {
+      fields: [pages_blocks_media_carousel._parentID],
+      references: [pages.id],
+      relationName: "_blocks_mediaCarousel",
+    }),
+    mainMedia: one(media, {
+      fields: [pages_blocks_media_carousel.mainMedia],
+      references: [media.id],
+      relationName: "mainMedia",
+    }),
+    galleryImages: many(pages_blocks_media_carousel_gallery_images, {
+      relationName: "galleryImages",
+    }),
+  }),
+);
 export const relations_pages_meta_rich_snippets = relations(
   pages_meta_rich_snippets,
   ({ one }) => ({
@@ -2785,6 +3077,12 @@ export const relations_pages = relations(pages, ({ one, many }) => ({
   }),
   _blocks_instagram: many(pages_blocks_instagram, {
     relationName: "_blocks_instagram",
+  }),
+  _blocks_cycleTimeline: many(pages_blocks_cycle_timeline, {
+    relationName: "_blocks_cycleTimeline",
+  }),
+  _blocks_mediaCarousel: many(pages_blocks_media_carousel, {
+    relationName: "_blocks_mediaCarousel",
   }),
   meta_image: one(media, {
     fields: [pages.meta_image],
@@ -2892,6 +3190,60 @@ export const relations__pages_v_blocks_instagram = relations(
     }),
   }),
 );
+export const relations__pages_v_blocks_cycle_timeline_stages = relations(
+  _pages_v_blocks_cycle_timeline_stages,
+  ({ one }) => ({
+    _parentID: one(_pages_v_blocks_cycle_timeline, {
+      fields: [_pages_v_blocks_cycle_timeline_stages._parentID],
+      references: [_pages_v_blocks_cycle_timeline.id],
+      relationName: "stages",
+    }),
+  }),
+);
+export const relations__pages_v_blocks_cycle_timeline = relations(
+  _pages_v_blocks_cycle_timeline,
+  ({ one, many }) => ({
+    _parentID: one(_pages_v, {
+      fields: [_pages_v_blocks_cycle_timeline._parentID],
+      references: [_pages_v.id],
+      relationName: "_blocks_cycleTimeline",
+    }),
+    stages: many(_pages_v_blocks_cycle_timeline_stages, {
+      relationName: "stages",
+    }),
+  }),
+);
+export const relations__pages_v_blocks_media_carousel_gallery_images =
+  relations(_pages_v_blocks_media_carousel_gallery_images, ({ one }) => ({
+    _parentID: one(_pages_v_blocks_media_carousel, {
+      fields: [_pages_v_blocks_media_carousel_gallery_images._parentID],
+      references: [_pages_v_blocks_media_carousel.id],
+      relationName: "galleryImages",
+    }),
+    media: one(media, {
+      fields: [_pages_v_blocks_media_carousel_gallery_images.media],
+      references: [media.id],
+      relationName: "media",
+    }),
+  }));
+export const relations__pages_v_blocks_media_carousel = relations(
+  _pages_v_blocks_media_carousel,
+  ({ one, many }) => ({
+    _parentID: one(_pages_v, {
+      fields: [_pages_v_blocks_media_carousel._parentID],
+      references: [_pages_v.id],
+      relationName: "_blocks_mediaCarousel",
+    }),
+    mainMedia: one(media, {
+      fields: [_pages_v_blocks_media_carousel.mainMedia],
+      references: [media.id],
+      relationName: "mainMedia",
+    }),
+    galleryImages: many(_pages_v_blocks_media_carousel_gallery_images, {
+      relationName: "galleryImages",
+    }),
+  }),
+);
 export const relations__pages_v_version_meta_rich_snippets = relations(
   _pages_v_version_meta_rich_snippets,
   ({ one }) => ({
@@ -2951,6 +3303,12 @@ export const relations__pages_v = relations(_pages_v, ({ one, many }) => ({
   }),
   _blocks_instagram: many(_pages_v_blocks_instagram, {
     relationName: "_blocks_instagram",
+  }),
+  _blocks_cycleTimeline: many(_pages_v_blocks_cycle_timeline, {
+    relationName: "_blocks_cycleTimeline",
+  }),
+  _blocks_mediaCarousel: many(_pages_v_blocks_media_carousel, {
+    relationName: "_blocks_mediaCarousel",
   }),
   version_meta_image: one(media, {
     fields: [_pages_v.version_meta_image],
@@ -3782,6 +4140,10 @@ type DatabaseSchema = {
   pages_blocks_team: typeof pages_blocks_team;
   pages_blocks_instagram_images: typeof pages_blocks_instagram_images;
   pages_blocks_instagram: typeof pages_blocks_instagram;
+  pages_blocks_cycle_timeline_stages: typeof pages_blocks_cycle_timeline_stages;
+  pages_blocks_cycle_timeline: typeof pages_blocks_cycle_timeline;
+  pages_blocks_media_carousel_gallery_images: typeof pages_blocks_media_carousel_gallery_images;
+  pages_blocks_media_carousel: typeof pages_blocks_media_carousel;
   pages_meta_rich_snippets: typeof pages_meta_rich_snippets;
   pages: typeof pages;
   pages_rels: typeof pages_rels;
@@ -3792,6 +4154,10 @@ type DatabaseSchema = {
   _pages_v_blocks_team: typeof _pages_v_blocks_team;
   _pages_v_blocks_instagram_images: typeof _pages_v_blocks_instagram_images;
   _pages_v_blocks_instagram: typeof _pages_v_blocks_instagram;
+  _pages_v_blocks_cycle_timeline_stages: typeof _pages_v_blocks_cycle_timeline_stages;
+  _pages_v_blocks_cycle_timeline: typeof _pages_v_blocks_cycle_timeline;
+  _pages_v_blocks_media_carousel_gallery_images: typeof _pages_v_blocks_media_carousel_gallery_images;
+  _pages_v_blocks_media_carousel: typeof _pages_v_blocks_media_carousel;
   _pages_v_version_meta_rich_snippets: typeof _pages_v_version_meta_rich_snippets;
   _pages_v: typeof _pages_v;
   _pages_v_rels: typeof _pages_v_rels;
@@ -3864,6 +4230,10 @@ type DatabaseSchema = {
   relations_pages_blocks_team: typeof relations_pages_blocks_team;
   relations_pages_blocks_instagram_images: typeof relations_pages_blocks_instagram_images;
   relations_pages_blocks_instagram: typeof relations_pages_blocks_instagram;
+  relations_pages_blocks_cycle_timeline_stages: typeof relations_pages_blocks_cycle_timeline_stages;
+  relations_pages_blocks_cycle_timeline: typeof relations_pages_blocks_cycle_timeline;
+  relations_pages_blocks_media_carousel_gallery_images: typeof relations_pages_blocks_media_carousel_gallery_images;
+  relations_pages_blocks_media_carousel: typeof relations_pages_blocks_media_carousel;
   relations_pages_meta_rich_snippets: typeof relations_pages_meta_rich_snippets;
   relations_pages_rels: typeof relations_pages_rels;
   relations_pages: typeof relations_pages;
@@ -3874,6 +4244,10 @@ type DatabaseSchema = {
   relations__pages_v_blocks_team: typeof relations__pages_v_blocks_team;
   relations__pages_v_blocks_instagram_images: typeof relations__pages_v_blocks_instagram_images;
   relations__pages_v_blocks_instagram: typeof relations__pages_v_blocks_instagram;
+  relations__pages_v_blocks_cycle_timeline_stages: typeof relations__pages_v_blocks_cycle_timeline_stages;
+  relations__pages_v_blocks_cycle_timeline: typeof relations__pages_v_blocks_cycle_timeline;
+  relations__pages_v_blocks_media_carousel_gallery_images: typeof relations__pages_v_blocks_media_carousel_gallery_images;
+  relations__pages_v_blocks_media_carousel: typeof relations__pages_v_blocks_media_carousel;
   relations__pages_v_version_meta_rich_snippets: typeof relations__pages_v_version_meta_rich_snippets;
   relations__pages_v_rels: typeof relations__pages_v_rels;
   relations__pages_v: typeof relations__pages_v;

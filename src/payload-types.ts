@@ -309,7 +309,7 @@ export interface Page {
     } | null;
     contentPosition?: ('left' | 'center') | null;
   };
-  layout: (ContentBlock | CarouselBlock | TeamBlock | InstagramBlock)[];
+  layout: (ContentBlock | CarouselBlock | TeamBlock | InstagramBlock | CycleTimelineBlock | MediaCarouselBlock)[];
   meta?: {
     title?: string | null;
     /**
@@ -349,10 +349,33 @@ export interface Page {
 export interface ContentBlock {
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
   /**
+   * Optioneel: Voeg een titel toe boven de kolommen. Laat leeg als je geen titel wilt.
+   */
+  title?: string | null;
+  /**
+   * Optioneel: Voeg een introductie toe boven de kolommen. Laat leeg als je geen introductie wilt.
+   */
+  introduction?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
    * Voeg kolommen toe en configureer de inhoud voor elke kolom.
    */
   columns?:
     | {
+        backgroundColor?: ('backgroundDark' | 'backgroundLight' | 'backgroundWhite') | null;
         contentPosition: 'contentOnly' | 'contentBottom' | 'contentRight' | 'contentLeft';
         media?: (number | null) | Media;
         imageSize?: ('imageTopCut' | 'imageFull' | 'imageCenter') | null;
@@ -562,6 +585,46 @@ export interface InstagramBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'instagram';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CycleTimelineBlock".
+ */
+export interface CycleTimelineBlock {
+  backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
+  title: string;
+  subtitle?: string | null;
+  stages: {
+    weekLabel: string;
+    phaseTitle: string;
+    description: string;
+    id?: string | null;
+  }[];
+  footerText?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cycleTimeline';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaCarouselBlock".
+ */
+export interface MediaCarouselBlock {
+  backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
+  title: string;
+  mainMedia: number | Media;
+  galleryImages: {
+    media: number | Media;
+    caption?: string | null;
+    id?: string | null;
+  }[];
+  quote?: {
+    text?: string | null;
+    author?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'mediaCarousel';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1338,6 +1401,8 @@ export interface PagesSelect<T extends boolean = true> {
         carousel?: T | CarouselBlockSelect<T>;
         team?: T | TeamBlockSelect<T>;
         instagram?: T | InstagramBlockSelect<T>;
+        cycleTimeline?: T | CycleTimelineBlockSelect<T>;
+        mediaCarousel?: T | MediaCarouselBlockSelect<T>;
       };
   meta?:
     | T
@@ -1365,9 +1430,12 @@ export interface PagesSelect<T extends boolean = true> {
  */
 export interface ContentBlockSelect<T extends boolean = true> {
   backgroundColor?: T;
+  title?: T;
+  introduction?: T;
   columns?:
     | T
     | {
+        backgroundColor?: T;
         contentPosition?: T;
         media?: T;
         imageSize?: T;
@@ -1449,6 +1517,50 @@ export interface InstagramBlockSelect<T extends boolean = true> {
               labelColor?: T;
             };
         id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CycleTimelineBlock_select".
+ */
+export interface CycleTimelineBlockSelect<T extends boolean = true> {
+  backgroundColor?: T;
+  title?: T;
+  subtitle?: T;
+  stages?:
+    | T
+    | {
+        weekLabel?: T;
+        phaseTitle?: T;
+        description?: T;
+        id?: T;
+      };
+  footerText?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "MediaCarouselBlock_select".
+ */
+export interface MediaCarouselBlockSelect<T extends boolean = true> {
+  backgroundColor?: T;
+  title?: T;
+  mainMedia?: T;
+  galleryImages?:
+    | T
+    | {
+        media?: T;
+        caption?: T;
+        id?: T;
+      };
+  quote?:
+    | T
+    | {
+        text?: T;
+        author?: T;
       };
   id?: T;
   blockName?: T;
