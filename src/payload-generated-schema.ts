@@ -2806,6 +2806,59 @@ export const organization_same_as = sqliteTable(
   ],
 );
 
+export const organization_opening_hours = sqliteTable(
+  "organization_opening_hours",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    dayOfWeek: text("day_of_week", {
+      enum: [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+        "sunday",
+      ],
+    }).notNull(),
+    opens: text("opens").notNull(),
+    closes: text("closes").notNull(),
+  },
+  (columns) => [
+    index("organization_opening_hours_order_idx").on(columns._order),
+    index("organization_opening_hours_parent_id_idx").on(columns._parentID),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [organization.id],
+      name: "organization_opening_hours_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const organization_images = sqliteTable(
+  "organization_images",
+  {
+    _order: integer("_order").notNull(),
+    _parentID: integer("_parent_id").notNull(),
+    id: text("id").primaryKey(),
+    image: integer("image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
+  },
+  (columns) => [
+    index("organization_images_order_idx").on(columns._order),
+    index("organization_images_parent_id_idx").on(columns._parentID),
+    index("organization_images_image_idx").on(columns.image),
+    foreignKey({
+      columns: [columns["_parentID"]],
+      foreignColumns: [organization.id],
+      name: "organization_images_parent_id_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const organization = sqliteTable(
   "organization",
   {
@@ -2825,6 +2878,7 @@ export const organization = sqliteTable(
     address_addressCountry: text("address_address_country").default("NL"),
     geo_latitude: numeric("geo_latitude", { mode: "number" }),
     geo_longitude: numeric("geo_longitude", { mode: "number" }),
+    priceRange: text("price_range"),
     updatedAt: text("updated_at").default(
       sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
     ),
@@ -4113,6 +4167,31 @@ export const relations_organization_same_as = relations(
     }),
   }),
 );
+export const relations_organization_opening_hours = relations(
+  organization_opening_hours,
+  ({ one }) => ({
+    _parentID: one(organization, {
+      fields: [organization_opening_hours._parentID],
+      references: [organization.id],
+      relationName: "openingHours",
+    }),
+  }),
+);
+export const relations_organization_images = relations(
+  organization_images,
+  ({ one }) => ({
+    _parentID: one(organization, {
+      fields: [organization_images._parentID],
+      references: [organization.id],
+      relationName: "images",
+    }),
+    image: one(media, {
+      fields: [organization_images.image],
+      references: [media.id],
+      relationName: "image",
+    }),
+  }),
+);
 export const relations_organization = relations(
   organization,
   ({ one, many }) => ({
@@ -4123,6 +4202,12 @@ export const relations_organization = relations(
     }),
     sameAs: many(organization_same_as, {
       relationName: "sameAs",
+    }),
+    openingHours: many(organization_opening_hours, {
+      relationName: "openingHours",
+    }),
+    images: many(organization_images, {
+      relationName: "images",
     }),
   }),
 );
@@ -4217,6 +4302,8 @@ type DatabaseSchema = {
   footer_rels: typeof footer_rels;
   whats_app: typeof whats_app;
   organization_same_as: typeof organization_same_as;
+  organization_opening_hours: typeof organization_opening_hours;
+  organization_images: typeof organization_images;
   organization: typeof organization;
   relations_users_roles: typeof relations_users_roles;
   relations_users_sessions: typeof relations_users_sessions;
@@ -4307,6 +4394,8 @@ type DatabaseSchema = {
   relations_footer: typeof relations_footer;
   relations_whats_app: typeof relations_whats_app;
   relations_organization_same_as: typeof relations_organization_same_as;
+  relations_organization_opening_hours: typeof relations_organization_opening_hours;
+  relations_organization_images: typeof relations_organization_images;
   relations_organization: typeof relations_organization;
 };
 

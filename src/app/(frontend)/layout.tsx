@@ -19,6 +19,7 @@ import { draftMode } from "next/headers";
 import Script from "next/script";
 import React from "react";
 
+import { Media } from "@/components/Media";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -137,6 +138,24 @@ export default async function RootLayout({
                         "@type": ["LocalBusiness", "ExerciseGym"],
                         name: organization.name,
                         url: organization.url,
+                        ...(organization.priceRange && {
+                            priceRange: organization.priceRange,
+                        }),
+                        ...(organization.images &&
+                            typeof organization.images === "object" && {
+                                image: organization.images
+                                    .filter(
+                                        (img) =>
+                                            img.image &&
+                                            typeof img.image === "object" &&
+                                            "url" in img.image,
+                                    )
+                                    .map((img) =>
+                                        img.image instanceof Media
+                                            ? img.image.url
+                                            : img.image,
+                                    ),
+                            }),
                         ...(organization.logo &&
                             typeof organization.logo === "object" && {
                                 logo: organization.logo.url,
@@ -172,6 +191,10 @@ export default async function RootLayout({
                         }),
                         ...(organization.sameAs?.length && {
                             sameAs: organization.sameAs.map((s) => s.url),
+                        }),
+                        ...(organization.openingHours && {
+                            openingHoursSpecification:
+                                organization.openingHours,
                         }),
                     })}
                 </Script>

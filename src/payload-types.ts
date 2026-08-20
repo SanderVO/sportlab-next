@@ -2199,7 +2199,7 @@ export interface Organization {
   description?: string | null;
   contactPoint?: {
     /**
-     * Internationaal formaat, bijvoorbeeld: +31612345678
+     * International format, for example: +31612345678
      */
     telephone?: string | null;
     contactType?: string | null;
@@ -2209,26 +2209,56 @@ export interface Organization {
     addressLocality?: string | null;
     postalCode?: string | null;
     /**
-     * ISO 3166-1 alpha-2, bijv. NL
+     * ISO 3166-1 alpha-2, e.g. NL
      */
     addressCountry?: string | null;
   };
   geo?: {
     /**
-     * Bijvoorbeeld: 52.3676
+     * For example: 52.3676
      */
     latitude?: number | null;
     /**
-     * Bijvoorbeeld: 4.9041
+     * For example: 4.9041
      */
     longitude?: number | null;
   };
   /**
-   * Voeg links toe naar social media profielen (Facebook, Instagram, LinkedIn, etc.)
+   * Add links to social media profiles (Facebook, Instagram, LinkedIn, etc.)
    */
   sameAs?:
     | {
         url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * For example: €€
+   */
+  priceRange?: string | null;
+  /**
+   * Add one row per day/time combination (e.g. Monday 09:00-17:00 and Wednesday 14:00-20:00).
+   */
+  openingHours?:
+    | {
+        dayOfWeek: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+        /**
+         * For example 09:00
+         */
+        opens: string;
+        /**
+         * For example 17:00
+         */
+        closes: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Upload images related to the organization
+   */
+  images?:
+    | {
+        image?: (number | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -2363,6 +2393,21 @@ export interface OrganizationSelect<T extends boolean = true> {
     | T
     | {
         url?: T;
+        id?: T;
+      };
+  priceRange?: T;
+  openingHours?:
+    | T
+    | {
+        dayOfWeek?: T;
+        opens?: T;
+        closes?: T;
+        id?: T;
+      };
+  images?:
+    | T
+    | {
+        image?: T;
         id?: T;
       };
   updatedAt?: T;
