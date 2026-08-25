@@ -1,6 +1,13 @@
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
+// @payloadcms/drizzle lazily requires drizzle-kit/api to push dev schema, a
+// path that never runs in production. Alias it to a stub for Cloudflare
+// builds so the ~18MB drizzle-kit package isn't pulled into the Worker.
+const isCloudflareDeployEnv =
+    process.env.CLOUDFLARE_ENV === "production" ||
+    process.env.CLOUDFLARE_ENV === "preview";
+
 const nextConfig: NextConfig = {
     cacheComponents: process.env.PAYLOAD_CACHE_COMPONENTS === "true",
     basePath: process.env?.NEXT_BASE_PATH || undefined,
@@ -8,6 +15,13 @@ const nextConfig: NextConfig = {
         ignoreBuildErrors: true,
     },
     trailingSlash: false,
+    turbopack: isCloudflareDeployEnv
+        ? {
+              resolveAlias: {
+                  "drizzle-kit/api": "./src/utilities/drizzleKitApiStub.ts",
+              },
+          }
+        : undefined,
     experimental: {
         serverActions: {
             bodySizeLimit: "5mb",
@@ -99,16 +113,5 @@ const nextConfig: NextConfig = {
 };
 
 const payloadNextConfig = withPayload(nextConfig);
-const outputFileTracingExcludes = payloadNextConfig.outputFileTracingExcludes;
-const rootExcludes = outputFileTracingExcludes?.["**/*"];
-
-if (Array.isArray(rootExcludes)) {
-    payloadNextConfig.outputFileTracingExcludes = {
-        ...outputFileTracingExcludes,
-        "**/*": rootExcludes.filter(
-            (entry) => entry !== "drizzle-kit" && entry !== "drizzle-kit/api",
-        ),
-    };
-}
 
 export default payloadNextConfig;
