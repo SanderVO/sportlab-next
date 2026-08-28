@@ -11,7 +11,7 @@ import { nl as baseNl } from "@payloadcms/translations/languages/nl";
 import path from "path";
 import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
-import { GetPlatformProxyOptions } from "wrangler";
+import type { GetPlatformProxyOptions } from "wrangler";
 import { Documents } from "./collections/Documents";
 import { EventRegistrations } from "./collections/EventRegistrations";
 import { Events } from "./collections/Events";

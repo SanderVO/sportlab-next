@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default function robots(): MetadataRoute.Robots {
     const canonicalSiteUrl = "https://sportlabgroningen.nl";

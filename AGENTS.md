@@ -55,3 +55,31 @@ When making or updating UI styling, agents must:
 - [src/app/(frontend)/globals.css](<src/app/(frontend)/globals.css>)
 - [src/cssVariables.js](src/cssVariables.js)
 - [docs/style-guide.md](docs/style-guide.md)
+
+## Testing Cloudflare Worker bundle size
+
+Cloudflare Workers has a 10MiB gzip limit on the deployed script. To check the current size:
+
+1. `pnpm deploy:build` — runs `opennextjs-cloudflare build --env=production`, producing `.open-next/worker.js` and `.open-next/server-functions/default/`.
+2. `pnpx wrangler deploy --dry-run --env production` — reports the real deploy size, e.g. `Total Upload: 45730.31 KiB / gzip: 10094.71 KiB`. This is the number to compare against the 10MiB limit.
+
+Both commands need real filesystem/network access (wrangler writes to `~/Library/Preferences/.wrangler` and needs to reach Cloudflare), so in sandboxed environments run them with unsandboxed execution enabled.
+
+To find what's contributing to size, parse esbuild's metafile instead of guessing:
+
+```js
+const meta = JSON.parse(
+    fs.readFileSync(
+        ".open-next/server-functions/default/handler.mjs.meta.json",
+        "utf8",
+    ),
+);
+const entries = Object.entries(meta.inputs)
+    .map(([k, v]) => [k, v.bytes])
+    .sort((a, b) => b[1] - a[1]);
+```
+
+Known findings so far (see `/memories/repo/worker-bundle-size.md` for full detail):
+
+- `drizzle-kit` (~18MB) must stay excluded from Next's `outputFileTracingExcludes`; it's aliased away via a Turbopack `resolveAlias` stub for Cloudflare builds in [next.config.ts](next.config.ts) instead.
+- Several ~2.7MB near-duplicate SSR chunks exist in the bundle. Merging the `(tv-dashboard)` and `(frontend)` route groups did **not** reduce this — the duplication isn't caused by separate route-group root layouts, so don't assume consolidating layouts will shrink the bundle without measuring first.

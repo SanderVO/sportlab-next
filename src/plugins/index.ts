@@ -2,7 +2,6 @@ import { revalidateRedirects } from "@/hooks/revalidateRedirects";
 import { Page, Post } from "@/payload-types";
 import { getServerSideURL } from "@/utilities/getURL";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
-import { nestedDocsPlugin } from "@payloadcms/plugin-nested-docs";
 import { redirectsPlugin } from "@payloadcms/plugin-redirects";
 import { seoPlugin } from "@payloadcms/plugin-seo";
 import { GenerateURL } from "@payloadcms/plugin-seo/types";
@@ -10,9 +9,13 @@ import {
     FixedToolbarFeature,
     lexicalEditor,
 } from "@payloadcms/richtext-lexical";
-import type { CollectionBeforeChangeHook, Plugin } from "payload";
+import type { CollectionBeforeChangeHook, Field, Plugin } from "payload";
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
+const generateURL: GenerateURL<Post | Page> = ({
+    doc,
+}: {
+    doc: Post | Page | null;
+}) => {
     const url = getServerSideURL();
 
     return doc?.slug ? `${url}/${doc.slug}` : url;
@@ -117,15 +120,11 @@ export const plugins: Plugin[] = [
             },
         },
     }),
-    nestedDocsPlugin({
-        collections: [],
-        generateURL: (docs) =>
-            docs.reduce((url, doc) => `${url}/${doc.slug}`, ""),
-    }),
     seoPlugin({
-        generateTitle: ({ doc }) => `${doc.title} - Sportlab Groningen`,
+        generateTitle: ({ doc }: { doc: Post | Page }) =>
+            `${doc.title} - Sportlab Groningen`,
         generateURL,
-        fields: ({ defaultFields }) => {
+        fields: ({ defaultFields }: { defaultFields: Field[] }) => {
             return [
                 ...defaultFields,
                 {
@@ -198,8 +197,7 @@ export const plugins: Plugin[] = [
                 singular: "Formulier",
                 plural: "Formulieren",
             },
-            // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
-            fields: ({ defaultFields }) => {
+            fields: ({ defaultFields }: { defaultFields: Field[] }) => {
                 return defaultFields.map((field) => {
                     if ("name" in field && field.name === "title") {
                         return {
