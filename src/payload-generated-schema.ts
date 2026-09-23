@@ -1391,6 +1391,7 @@ export const lessons = sqliteTable(
   },
   (columns) => [
     index("lessons_template_idx").on(columns.template),
+    index("lessons_start_date_idx").on(columns.startDate),
     index("lessons_image_idx").on(columns.image),
     index("lessons_updated_at_idx").on(columns.updatedAt),
     index("lessons_created_at_idx").on(columns.createdAt),
