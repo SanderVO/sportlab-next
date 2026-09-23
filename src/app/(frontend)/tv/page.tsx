@@ -15,7 +15,8 @@ type PageProps = {
     }>;
 };
 
-export const revalidate = 60;
+// Revalidation disabled for now: ISR cache writes were timing out (waitUntil cancelled) on slow renders.
+export const dynamic = "force-dynamic";
 
 export default async function TvDashboardPage({ searchParams }: PageProps) {
     const params = await searchParams;

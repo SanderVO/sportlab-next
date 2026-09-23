@@ -126,6 +126,8 @@ export const Lessons: CollectionConfig = {
             name: "startDate",
             type: "date",
             required: false,
+            // Queried on every /tv render (range filter); needs an index to avoid a full table scan.
+            index: true,
             admin: {
                 condition: (_, siblingData) => !siblingData?.template,
                 date: {

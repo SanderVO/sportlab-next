@@ -1,5 +1,5 @@
 import { withPayload } from "@payloadcms/next/withPayload";
-import type { NextConfig } from "next";
+import NextConfig from "next";
 
 // @payloadcms/drizzle lazily requires drizzle-kit/api to push dev schema, a
 // path that never runs in production. Alias it to a stub for Cloudflare
@@ -113,5 +113,26 @@ const nextConfig: NextConfig = {
 };
 
 const payloadNextConfig = withPayload(nextConfig);
+
+const originalHeaders = payloadNextConfig.headers;
+
+// withPayload() adds Vary/Accept-CH/Critical-CH: Sec-CH-Prefers-Color-Scheme to
+// every route ("/:path*") for the admin theme, but a Vary other than
+// Accept-Encoding makes Cloudflare treat all public pages as uncacheable.
+// Scope that rule to /admin only.
+payloadNextConfig.headers = async () => {
+    const rules = (await originalHeaders?.()) ?? [];
+
+    return rules.map((rule: { source: string; headers: any[] }) =>
+        rule.source === "/:path*" &&
+        rule.headers.some(
+            (header) =>
+                header.key === "Vary" &&
+                header.value === "Sec-CH-Prefers-Color-Scheme",
+        )
+            ? { ...rule, source: "/admin/:path*" }
+            : rule,
+    );
+};
 
 export default payloadNextConfig;

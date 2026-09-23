@@ -83,3 +83,13 @@ Known findings so far (see `/memories/repo/worker-bundle-size.md` for full detai
 
 - `drizzle-kit` (~18MB) must stay excluded from Next's `outputFileTracingExcludes`; it's aliased away via a Turbopack `resolveAlias` stub for Cloudflare builds in [next.config.ts](next.config.ts) instead.
 - Several ~2.7MB near-duplicate SSR chunks exist in the bundle. Merging the `(tv-dashboard)` and `(frontend)` route groups did **not** reduce this — the duplication isn't caused by separate route-group root layouts, so don't assume consolidating layouts will shrink the bundle without measuring first.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

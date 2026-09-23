@@ -102,6 +102,14 @@
     "env": {
         "production": {
             "name": "sportlab",
+            // Route-based hostname (not a Workers Custom Domain) so zone Cache Rules apply in front of the Worker
+            "routes": [
+                {
+                    "pattern": "sportlabgroningen.nl/*",
+                    "zone_name": "sportlabgroningen.nl",
+                    "custom_domain": false,
+                },
+            ],
             "vars": {
                 "NEXTJS_ENV": "production",
                 "NEXT_PUBLIC_GTM_ID": "GTM-M88CM7Q",
