@@ -10,7 +10,7 @@ import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import React from "react";
 
 export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
-    const { columns, arrowBackgroundColor } = props;
+    const { columns, arrowBackgroundColor, footerText } = props;
 
     const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
@@ -32,7 +32,7 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
                                     "bg-background",
                                 column.backgroundColor === "beige" && "bg-sand",
                                 column.backgroundColor === "white" &&
-                                    "bg-white",
+                                    "bg-warm-white",
                             )}
                         >
                             <div className="w-full h-64 relative">
@@ -94,35 +94,47 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
                 </div>
             </div>
 
-            <div className="flex flex-row gap-6 items-center justify-end mt-4">
-                <div
-                    className={cn(
-                        "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
-                        arrowBackgroundColor === "black" &&
-                            "bg-background text-sand",
-                        arrowBackgroundColor === "beige" &&
-                            "bg-sand text-background",
-                        arrowBackgroundColor === "white" &&
-                            "bg-white text-background",
-                    )}
-                    onClick={() => emblaApi?.scrollPrev()}
-                >
-                    <ArrowLeftIcon width={32} height={32} />
-                </div>
+            <div
+                className={cn(
+                    "flex flex-col gap-5 sm:gap-0 sm:flex-row items-center mt-4",
+                    footerText && "justify-between",
+                    !footerText && "justify-end",
+                )}
+            >
+                {footerText && (
+                    <p className="text-sm text-steel">{footerText}</p>
+                )}
 
-                <div
-                    className={cn(
-                        "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
-                        arrowBackgroundColor === "black" &&
-                            "bg-background text-sand",
-                        arrowBackgroundColor === "beige" &&
-                            "bg-sand text-background",
-                        arrowBackgroundColor === "white" &&
-                            "bg-white text-background",
-                    )}
-                    onClick={() => emblaApi?.scrollNext()}
-                >
-                    <ArrowRightIcon width={32} height={32} />
+                <div className="flex flex-row gap-6 items-center justify-end">
+                    <div
+                        className={cn(
+                            "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
+                            arrowBackgroundColor === "black" &&
+                                "bg-background text-sand",
+                            arrowBackgroundColor === "beige" &&
+                                "bg-sand text-background",
+                            arrowBackgroundColor === "white" &&
+                                "bg-warm-white text-background",
+                        )}
+                        onClick={() => emblaApi?.scrollPrev()}
+                    >
+                        <ArrowLeftIcon width={32} height={32} />
+                    </div>
+
+                    <div
+                        className={cn(
+                            "flex justify-center items-center w-14 h-14 rounded-full cursor-pointer",
+                            arrowBackgroundColor === "black" &&
+                                "bg-background text-sand",
+                            arrowBackgroundColor === "beige" &&
+                                "bg-sand text-background",
+                            arrowBackgroundColor === "white" &&
+                                "bg-warm-white text-background",
+                        )}
+                        onClick={() => emblaApi?.scrollNext()}
+                    >
+                        <ArrowRightIcon width={32} height={32} />
+                    </div>
                 </div>
             </div>
         </>

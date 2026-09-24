@@ -10,7 +10,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
     return (
         <div
             className={cn(
-                "container m-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-30 py-15 lg:py-0 h-full",
+                "container m-auto grid grid-cols-1 lg:grid-cols-2 gap-4 py-15 lg:py-0 h-full content-start",
                 columns?.length === 1 && "lg:grid-cols-1",
             )}
         >
@@ -102,6 +102,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                         "lg:max-w-[60%]",
                                     contentPosition === "contentRight" &&
                                         "lg:pl-[40%]",
+                                    contentPosition === "contentOnly" && "p-8",
                                 )}
                                 key={col.id || index}
                             >

@@ -56,7 +56,6 @@ const buildWorkoutBlocks = async (
         exercises: Array<{
             name: string;
             description?: string;
-            videoUrl?: string;
         }>;
     }> = [];
 
@@ -73,7 +72,6 @@ const buildWorkoutBlocks = async (
                 .map((exercise) => ({
                     name: exercise?.name ?? "",
                     description: exercise?.description ?? undefined,
-                    videoUrl: exercise?.videoUrl ?? undefined,
                 })),
         });
     }

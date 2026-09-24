@@ -1,6 +1,6 @@
 import config from "@payload-config";
+import type { MetadataRoute } from "next";
 import { unstable_cache } from "next/cache";
-import MetadataRoute from "next/types";
 import { getPayload } from "payload";
 
 // Fallback ISR window in case a revalidateTag("pages-sitemap") call is ever missed

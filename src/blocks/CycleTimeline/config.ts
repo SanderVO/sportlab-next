@@ -1,6 +1,14 @@
+import { defaultLexical } from "@/fields/defaultLexical";
 import type { Block, Field } from "payload";
 
 const stageFields: Field[] = [
+    {
+        label: "Afbeelding",
+        name: "image",
+        type: "upload",
+        relationTo: "media",
+        required: false,
+    },
     {
         label: "Weeklabel",
         name: "weekLabel",
@@ -78,6 +86,13 @@ export const CycleTimeline: Block = {
             label: "Voettekst",
             name: "footerText",
             type: "text",
+            required: false,
+        },
+        {
+            label: "Voettekst content",
+            name: "footerContent",
+            type: "richText",
+            editor: defaultLexical,
             required: false,
         },
     ],

@@ -215,6 +215,9 @@ export const pages_blocks_content = sqliteTable(
     backgroundColor: text("background_color", {
       enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
     }).default("backgroundDark"),
+    blockHeight: text("block_height", { enum: ["fixed", "auto"] }).default(
+      "fixed",
+    ),
     title: text("title"),
     introduction: text("introduction", { mode: "json" }),
     blockName: text("block_name"),
@@ -391,6 +394,9 @@ export const pages_blocks_cycle_timeline_stages = sqliteTable(
     _order: integer("_order").notNull(),
     _parentID: text("_parent_id").notNull(),
     id: text("id").primaryKey(),
+    image: integer("image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
     weekLabel: text("week_label"),
     phaseTitle: text("phase_title"),
     description: text("description"),
@@ -400,6 +406,7 @@ export const pages_blocks_cycle_timeline_stages = sqliteTable(
     index("pages_blocks_cycle_timeline_stages_parent_id_idx").on(
       columns._parentID,
     ),
+    index("pages_blocks_cycle_timeline_stages_image_idx").on(columns.image),
     foreignKey({
       columns: [columns["_parentID"]],
       foreignColumns: [pages_blocks_cycle_timeline.id],
@@ -421,6 +428,7 @@ export const pages_blocks_cycle_timeline = sqliteTable(
     title: text("title"),
     subtitle: text("subtitle"),
     footerText: text("footer_text"),
+    footerContent: text("footer_content", { mode: "json" }),
     blockName: text("block_name"),
   },
   (columns) => [
@@ -645,6 +653,9 @@ export const _pages_v_blocks_content = sqliteTable(
     backgroundColor: text("background_color", {
       enum: ["backgroundDark", "backgroundLight", "backgroundWhite"],
     }).default("backgroundDark"),
+    blockHeight: text("block_height", { enum: ["fixed", "auto"] }).default(
+      "fixed",
+    ),
     title: text("title"),
     introduction: text("introduction", { mode: "json" }),
     _uuid: text("_uuid"),
@@ -833,6 +844,9 @@ export const _pages_v_blocks_cycle_timeline_stages = sqliteTable(
     _order: integer("_order").notNull(),
     _parentID: integer("_parent_id").notNull(),
     id: integer("id").primaryKey(),
+    image: integer("image_id").references(() => media.id, {
+      onDelete: "set null",
+    }),
     weekLabel: text("week_label"),
     phaseTitle: text("phase_title"),
     description: text("description"),
@@ -843,6 +857,7 @@ export const _pages_v_blocks_cycle_timeline_stages = sqliteTable(
     index("_pages_v_blocks_cycle_timeline_stages_parent_id_idx").on(
       columns._parentID,
     ),
+    index("_pages_v_blocks_cycle_timeline_stages_image_idx").on(columns.image),
     foreignKey({
       columns: [columns["_parentID"]],
       foreignColumns: [_pages_v_blocks_cycle_timeline.id],
@@ -864,6 +879,7 @@ export const _pages_v_blocks_cycle_timeline = sqliteTable(
     title: text("title"),
     subtitle: text("subtitle"),
     footerText: text("footer_text"),
+    footerContent: text("footer_content", { mode: "json" }),
     _uuid: text("_uuid"),
     blockName: text("block_name"),
   },
@@ -3030,6 +3046,11 @@ export const relations_pages_blocks_cycle_timeline_stages = relations(
       references: [pages_blocks_cycle_timeline.id],
       relationName: "stages",
     }),
+    image: one(media, {
+      fields: [pages_blocks_cycle_timeline_stages.image],
+      references: [media.id],
+      relationName: "image",
+    }),
   }),
 );
 export const relations_pages_blocks_cycle_timeline = relations(
@@ -3252,6 +3273,11 @@ export const relations__pages_v_blocks_cycle_timeline_stages = relations(
       fields: [_pages_v_blocks_cycle_timeline_stages._parentID],
       references: [_pages_v_blocks_cycle_timeline.id],
       relationName: "stages",
+    }),
+    image: one(media, {
+      fields: [_pages_v_blocks_cycle_timeline_stages.image],
+      references: [media.id],
+      relationName: "image",
     }),
   }),
 );

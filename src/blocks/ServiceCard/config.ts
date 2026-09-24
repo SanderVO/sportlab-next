@@ -87,6 +87,11 @@ export const ServiceCardBlock: Block = {
             required: true,
         },
         {
+            name: "footerText",
+            type: "text",
+            label: "Footertekst",
+        },
+        {
             name: "columns",
             type: "array",
             label: "Kolommen",

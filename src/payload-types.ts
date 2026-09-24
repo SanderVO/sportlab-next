@@ -349,6 +349,10 @@ export interface Page {
 export interface ContentBlock {
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
   /**
+   * Vast gebruikt de standaard blokhoogte. Automatisch past de hoogte aan op de inhoud.
+   */
+  blockHeight: 'fixed' | 'auto';
+  /**
    * Optioneel: Voeg een titel toe boven de kolommen. Laat leeg als je geen titel wilt.
    */
   title?: string | null;
@@ -595,12 +599,28 @@ export interface CycleTimelineBlock {
   title: string;
   subtitle?: string | null;
   stages: {
+    image?: (number | null) | Media;
     weekLabel: string;
     phaseTitle: string;
     description: string;
     id?: string | null;
   }[];
   footerText?: string | null;
+  footerContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'cycleTimeline';
@@ -1430,6 +1450,7 @@ export interface PagesSelect<T extends boolean = true> {
  */
 export interface ContentBlockSelect<T extends boolean = true> {
   backgroundColor?: T;
+  blockHeight?: T;
   title?: T;
   introduction?: T;
   columns?:
@@ -1532,12 +1553,14 @@ export interface CycleTimelineBlockSelect<T extends boolean = true> {
   stages?:
     | T
     | {
+        image?: T;
         weekLabel?: T;
         phaseTitle?: T;
         description?: T;
         id?: T;
       };
   footerText?: T;
+  footerContent?: T;
   id?: T;
   blockName?: T;
 }
@@ -2516,6 +2539,7 @@ export interface VirtuagymRosterBlock {
  */
 export interface ServiceCardBlock {
   arrowBackgroundColor: 'white' | 'beige' | 'black';
+  footerText?: string | null;
   columns: {
     backgroundColor: 'white' | 'beige' | 'black';
     image: number | Media;

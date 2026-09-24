@@ -2,9 +2,17 @@ import type { CollectionAfterChangeHook } from "payload";
 
 const toRelationId = (
     value: { id?: string | number } | string | number | null | undefined,
-): string | number | undefined => {
-    if (value == null) return undefined;
-    return typeof value === "object" ? value.id : value;
+): number | undefined => {
+    const relationId = typeof value === "object" ? value?.id : value;
+
+    if (typeof relationId === "number") return relationId;
+
+    if (typeof relationId === "string") {
+        const parsedId = Number(relationId);
+        return Number.isNaN(parsedId) ? undefined : parsedId;
+    }
+
+    return undefined;
 };
 
 export const syncExerciseTrackingOnEnrollment: CollectionAfterChangeHook =

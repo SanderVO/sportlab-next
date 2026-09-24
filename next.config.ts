@@ -1,5 +1,5 @@
 import { withPayload } from "@payloadcms/next/withPayload";
-import NextConfig from "next";
+import type { NextConfig } from "next";
 
 // @payloadcms/drizzle lazily requires drizzle-kit/api to push dev schema, a
 // path that never runs in production. Alias it to a stub for Cloudflare

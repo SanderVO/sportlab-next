@@ -120,6 +120,27 @@ export const Content: Block = {
             ],
         },
         {
+            label: "Hoogte",
+            name: "blockHeight",
+            type: "select",
+            defaultValue: "fixed",
+            required: true,
+            options: [
+                {
+                    label: "Vast",
+                    value: "fixed",
+                },
+                {
+                    label: "Automatisch (op basis van inhoud)",
+                    value: "auto",
+                },
+            ],
+            admin: {
+                description:
+                    "Vast gebruikt de standaard blokhoogte. Automatisch past de hoogte aan op de inhoud.",
+            },
+        },
+        {
             label: "Titel",
             name: "title",
             type: "text",

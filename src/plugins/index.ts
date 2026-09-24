@@ -113,7 +113,7 @@ export const plugins: Plugin[] = [
                         };
                     }
                     return field;
-                });
+                }) as Field[];
             },
             hooks: {
                 afterChange: [revalidateRedirects],

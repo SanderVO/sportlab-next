@@ -1,22 +1,11 @@
 "use client";
 
+import { Media } from "@/components/Media";
+import RichText from "@/components/RichText";
+import type { CycleTimelineBlock as CycleTimelineBlockProps } from "@/payload-types";
 import { cn } from "@/utilities/ui";
 import useEmblaCarousel from "embla-carousel-react";
 import React, { useEffect, useState } from "react";
-
-type Stage = {
-    id?: string | null;
-    weekLabel: string;
-    phaseTitle: string;
-    description: string;
-};
-
-type CycleTimelineBlockProps = {
-    title: string;
-    subtitle?: string | null;
-    stages?: Stage[] | null;
-    footerText?: string | null;
-};
 
 export const CycleTimelineBlock: React.FC<CycleTimelineBlockProps> = (
     props,
@@ -139,22 +128,34 @@ export const CycleTimelineBlock: React.FC<CycleTimelineBlockProps> = (
                                 >
                                     <article
                                         className={cn(
-                                            "h-full rounded-sm border border-current/20 bg-current/5 p-5 transition-colors duration-500",
+                                            "flex h-full flex-col overflow-hidden rounded-sm border border-current/20 bg-current/5 transition-colors duration-500",
                                             index === activeIndex &&
                                                 "border-cta/80 bg-cta/10",
                                         )}
                                     >
-                                        <p className="font-sl-archivo text-xs tracking-[0.14em] uppercase text-cta">
-                                            {stage.weekLabel}
-                                        </p>
+                                        {stage.image && (
+                                            <div className="relative aspect-4/3 w-full">
+                                                <Media
+                                                    fill
+                                                    resource={stage.image}
+                                                    imgClassName="object-cover"
+                                                />
+                                            </div>
+                                        )}
 
-                                        <h3 className="mt-2 font-sl-bebas text-3xl leading-none uppercase">
-                                            {stage.phaseTitle}
-                                        </h3>
+                                        <div className="flex flex-1 flex-col p-5">
+                                            <p className="font-sl-archivo text-xs tracking-[0.14em] uppercase text-cta">
+                                                {stage.weekLabel}
+                                            </p>
 
-                                        <p className="mt-3 text-sm leading-relaxed text-inherit/85">
-                                            {stage.description}
-                                        </p>
+                                            <h3 className="mt-2 font-sl-bebas text-3xl leading-none uppercase">
+                                                {stage.phaseTitle}
+                                            </h3>
+
+                                            <p className="mt-3 text-sm leading-relaxed text-inherit/85">
+                                                {stage.description}
+                                            </p>
+                                        </div>
                                     </article>
                                 </div>
                             ))}
@@ -188,22 +189,34 @@ export const CycleTimelineBlock: React.FC<CycleTimelineBlockProps> = (
                                 `${stage.weekLabel}-${stage.phaseTitle}`
                             }
                             className={cn(
-                                "rounded-sm border border-current/20 bg-current/5 p-5 transition-colors duration-500",
+                                "flex flex-col overflow-hidden rounded-sm border border-current/20 bg-current/5 transition-colors duration-500",
                                 index === activeIndex &&
                                     "border-cta/80 bg-cta/10",
                             )}
                         >
-                            <p className="font-sl-archivo text-xs tracking-[0.14em] uppercase text-cta">
-                                {stage.weekLabel}
-                            </p>
+                            {stage.image && (
+                                <div className="relative aspect-4/3 w-full">
+                                    <Media
+                                        fill
+                                        resource={stage.image}
+                                        imgClassName="object-cover"
+                                    />
+                                </div>
+                            )}
 
-                            <h3 className="mt-2 font-sl-bebas text-3xl leading-none uppercase">
-                                {stage.phaseTitle}
-                            </h3>
+                            <div className="flex flex-1 flex-col p-5">
+                                <p className="font-sl-archivo text-xs tracking-[0.14em] uppercase text-cta">
+                                    {stage.weekLabel}
+                                </p>
 
-                            <p className="mt-3 text-sm leading-relaxed text-inherit/85">
-                                {stage.description}
-                            </p>
+                                <h3 className="mt-2 font-sl-bebas text-3xl leading-none uppercase">
+                                    {stage.phaseTitle}
+                                </h3>
+
+                                <p className="mt-3 text-sm leading-relaxed text-inherit/85">
+                                    {stage.description}
+                                </p>
+                            </div>
                         </article>
                     ))}
                 </div>
@@ -212,6 +225,14 @@ export const CycleTimelineBlock: React.FC<CycleTimelineBlockProps> = (
                     <p className="mt-8 text-sm md:text-base text-gray-400">
                         {footerText}
                     </p>
+                )}
+
+                {props.footerContent && (
+                    <RichText
+                        data={props.footerContent}
+                        enableGutter={false}
+                        className={cn(!footerText && "mt-8")}
+                    />
                 )}
             </div>
         </div>

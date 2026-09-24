@@ -34,9 +34,12 @@ export const RenderBlocks: React.FC<{
                 {blocks.map((block, index) => {
                     const { blockType, backgroundColor } = block;
                     const autoHeightBlockSlugs = ["carousel", "mediaCarousel"];
-                    const isAutoHeightBlock = autoHeightBlockSlugs.includes(
-                        String(blockType),
-                    );
+                    const blockHeight = (
+                        block as { blockHeight?: "auto" | "fixed" }
+                    ).blockHeight;
+                    const isAutoHeightBlock = blockHeight
+                        ? blockHeight === "auto"
+                        : autoHeightBlockSlugs.includes(String(blockType));
 
                     if (blockType && blockType in blockComponents) {
                         const Block = blockComponents[blockType];
@@ -51,7 +54,7 @@ export const RenderBlocks: React.FC<{
                                         backgroundColor === "backgroundLight" &&
                                             "bg-sand text-background",
                                         backgroundColor === "backgroundWhite" &&
-                                            "bg-white text-background",
+                                            "bg-warm-white text-background",
                                         isAutoHeightBlock && "min-h-auto",
                                         !isAutoHeightBlock &&
                                             "sm:min-h-180 xxl:min-h-[1080px]",
