@@ -93,6 +93,9 @@ export const users = sqliteTable(
     ),
     salt: text("salt"),
     hash: text("hash"),
+    resetPasswordRequestedAt: text("reset_password_requested_at").default(
+      sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    ),
     loginAttempts: numeric("login_attempts", { mode: "number" }).default(0),
     lockUntil: text("lock_until").default(
       sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
@@ -122,6 +125,7 @@ export const media = sqliteTable(
       onDelete: "set null",
     }),
     prefix: text("prefix").default("images_dev/"),
+    _objectKey: text("_objectkey"),
     updatedAt: text("updated_at")
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
@@ -150,6 +154,7 @@ export const documents = sqliteTable(
     id: integer("id").primaryKey(),
     title: text("title").notNull(),
     prefix: text("prefix").default("documents_dev/"),
+    _objectKey: text("_objectkey"),
     updatedAt: text("updated_at")
       .notNull()
       .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
