@@ -66,7 +66,8 @@ export const Users: CollectionConfig = {
 
             if (
                 jwtRoles.includes(RolesEnum.ADMIN) ||
-                jwtRoles.includes(RolesEnum.EDITOR)
+                jwtRoles.includes(RolesEnum.EDITOR) ||
+                jwtRoles.includes(RolesEnum.COACH)
             ) {
                 return true;
             }
@@ -85,7 +86,8 @@ export const Users: CollectionConfig = {
 
             return (
                 roles.includes(RolesEnum.ADMIN) ||
-                roles.includes(RolesEnum.EDITOR)
+                roles.includes(RolesEnum.EDITOR) ||
+                roles.includes(RolesEnum.COACH)
             );
         },
         create: authenticated,

@@ -1624,6 +1624,25 @@ export const events = sqliteTable(
   ],
 );
 
+export const exercises = sqliteTable(
+  "exercises",
+  {
+    id: integer("id").primaryKey(),
+    name: text("name").notNull(),
+    description: text("description"),
+    updatedAt: text("updated_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+    createdAt: text("created_at")
+      .notNull()
+      .default(sql`(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`),
+  },
+  (columns) => [
+    index("exercises_updated_at_idx").on(columns.updatedAt),
+    index("exercises_created_at_idx").on(columns.createdAt),
+  ],
+);
+
 export const programs_schedule = sqliteTable(
   "programs_schedule",
   {
@@ -2358,6 +2377,7 @@ export const payload_locked_documents_rels = sqliteTable(
     lessonsID: integer("lessons_id"),
     "lesson-templatesID": integer("lesson_templates_id"),
     eventsID: integer("events_id"),
+    exercisesID: integer("exercises_id"),
     programsID: integer("programs_id"),
     "lesson-enrollmentsID": integer("lesson_enrollments_id"),
     "lesson-exercise-trackingID": integer("lesson_exercise_tracking_id"),
@@ -2383,6 +2403,9 @@ export const payload_locked_documents_rels = sqliteTable(
       columns["lesson-templatesID"],
     ),
     index("payload_locked_documents_rels_events_id_idx").on(columns.eventsID),
+    index("payload_locked_documents_rels_exercises_id_idx").on(
+      columns.exercisesID,
+    ),
     index("payload_locked_documents_rels_programs_id_idx").on(
       columns.programsID,
     ),
@@ -2449,6 +2472,11 @@ export const payload_locked_documents_rels = sqliteTable(
       columns: [columns["eventsID"]],
       foreignColumns: [events.id],
       name: "payload_locked_documents_rels_events_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [columns["exercisesID"]],
+      foreignColumns: [exercises.id],
+      name: "payload_locked_documents_rels_exercises_fk",
     }).onDelete("cascade"),
     foreignKey({
       columns: [columns["programsID"]],
@@ -3638,6 +3666,7 @@ export const relations_events = relations(events, ({ one }) => ({
     relationName: "bannerImage",
   }),
 }));
+export const relations_exercises = relations(exercises, () => ({}));
 export const relations_programs_schedule = relations(
   programs_schedule,
   ({ one }) => ({
@@ -3995,6 +4024,11 @@ export const relations_payload_locked_documents_rels = relations(
       references: [events.id],
       relationName: "events",
     }),
+    exercisesID: one(exercises, {
+      fields: [payload_locked_documents_rels.exercisesID],
+      references: [exercises.id],
+      relationName: "exercises",
+    }),
     programsID: one(programs, {
       fields: [payload_locked_documents_rels.programsID],
       references: [programs.id],
@@ -4294,6 +4328,7 @@ type DatabaseSchema = {
   lesson_templates: typeof lesson_templates;
   lesson_templates_rels: typeof lesson_templates_rels;
   events: typeof events;
+  exercises: typeof exercises;
   programs_schedule: typeof programs_schedule;
   programs: typeof programs;
   lesson_enrollments: typeof lesson_enrollments;
@@ -4386,6 +4421,7 @@ type DatabaseSchema = {
   relations_lesson_templates_rels: typeof relations_lesson_templates_rels;
   relations_lesson_templates: typeof relations_lesson_templates;
   relations_events: typeof relations_events;
+  relations_exercises: typeof relations_exercises;
   relations_programs_schedule: typeof relations_programs_schedule;
   relations_programs: typeof relations_programs;
   relations_lesson_enrollments: typeof relations_lesson_enrollments;

@@ -1,3 +1,4 @@
+import { isCoachOnlyAdminUser } from "@/access/isCoachOnlyAdminUser";
 import { revalidateRedirects } from "@/hooks/revalidateRedirects";
 import { Page, Post } from "@/payload-types";
 import { getServerSideURL } from "@/utilities/getURL";
@@ -100,6 +101,9 @@ export const plugins: Plugin[] = [
     redirectsPlugin({
         collections: ["pages", "posts"],
         overrides: {
+            admin: {
+                hidden: ({ user }) => isCoachOnlyAdminUser(user),
+            },
             // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
             fields: ({ defaultFields }) => {
                 return defaultFields.map((field) => {
@@ -184,6 +188,9 @@ export const plugins: Plugin[] = [
             },
         },
         formSubmissionOverrides: {
+            admin: {
+                hidden: ({ user }) => isCoachOnlyAdminUser(user),
+            },
             labels: {
                 singular: "Formulier Submissie",
                 plural: "Formulier Submissies",
@@ -193,6 +200,9 @@ export const plugins: Plugin[] = [
             },
         },
         formOverrides: {
+            admin: {
+                hidden: ({ user }) => isCoachOnlyAdminUser(user),
+            },
             labels: {
                 singular: "Formulier",
                 plural: "Formulieren",
