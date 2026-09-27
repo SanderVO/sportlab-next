@@ -1,17 +1,12 @@
-import {
-    CloudflareContext,
-    getCloudflareContext,
-} from "@opennextjs/cloudflare";
-import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
+import { postgresAdapter } from "@payloadcms/db-postgres";
 import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
-import { r2Storage } from "@payloadcms/storage-r2";
+import { s3Storage } from "@payloadcms/storage-s3";
 import { en as baseEn } from "@payloadcms/translations/languages/en";
 import { nl as baseNl } from "@payloadcms/translations/languages/nl";
 import path from "path";
 import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
-import type { GetPlatformProxyOptions } from "wrangler";
 import { Documents } from "./collections/Documents";
 import { EventRegistrations } from "./collections/EventRegistrations";
 import { Events } from "./collections/Events";
@@ -59,44 +54,52 @@ const en = {
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const isProduction = process.env.NODE_ENV === "production";
-const isDevelopment = process.env.NODE_ENV === "development";
-const isPreviewBuild = process.env.CLOUDFLARE_ENV === "preview";
+const r2PublicURL = process.env.R2_PUBLIC_URL?.replace(/\/$/, "");
+const r2ImagesPrefix = process.env.R2_IMAGES_PREFIX || "images/";
+const r2DocumentsPrefix = process.env.R2_DOCUMENTS_PREFIX || "documents/";
+const r2Prefix = (prefix: string | undefined, filename: string) =>
+    [prefix?.replace(/^\/+|\/+$/g, ""), filename].filter(Boolean).join("/");
 
-const cloudflare =
-    process.argv.find((value) => value.match(/^(generate|migrate):?/)) ||
-    isPreviewBuild ||
-    isDevelopment
-        ? await getCloudflareContextFromWrangler()
-        : await getCloudflareContext({ async: true });
-
-const r2ProductionStorage = () =>
-    r2Storage({
-        bucket: cloudflare.env.R2,
-        collections: {
-            media: {
-                disableLocalStorage: true,
-                prefix: cloudflare.env.R2_IMAGES_PREFIX,
-                generateFileURL: ({ filename }) =>
-                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}${filename}`,
-            },
-            documents: {
-                disableLocalStorage: true,
-                prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
-                generateFileURL: ({ filename }) =>
-                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}${filename}`,
-            },
+const r2StoragePlugin = s3Storage({
+    enabled: Boolean(
+        process.env.R2_BUCKET &&
+        process.env.R2_ENDPOINT &&
+        r2PublicURL &&
+        process.env.R2_ACCESS_KEY_ID &&
+        process.env.R2_SECRET_ACCESS_KEY,
+    ),
+    bucket: process.env.R2_BUCKET || "",
+    config: {
+        credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID || "",
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
         },
-    });
+        region: "auto",
+        endpoint: process.env.R2_ENDPOINT,
+        forcePathStyle: true,
+    },
+    collections: {
+        media: {
+            prefix: r2ImagesPrefix,
+            disablePayloadAccessControl: true,
+            generateFileURL: ({ filename, prefix }) =>
+                `${r2PublicURL}/${r2Prefix(prefix, filename)}`,
+        },
+        documents: {
+            prefix: r2DocumentsPrefix,
+            disablePayloadAccessControl: true,
+            generateFileURL: ({ filename, prefix }) =>
+                `${r2PublicURL}/${r2Prefix(prefix, filename)}`,
+        },
+    },
+});
 
-const r2StoragePlugin = r2ProductionStorage();
-
-const smtpEnabled = cloudflare.env.SMTP_ENABLED?.toString() === "true";
-const smtpHost = cloudflare.env.SMTP_HOST;
-const smtpUser = cloudflare.env.SMTP_USER;
-const smtpPass = cloudflare.env.SMTP_PASS;
-const smtpFromAddress = cloudflare.env.SMTP_FROM_ADDRESS;
-const smtpFromName = cloudflare.env.SMTP_FROM_NAME;
+const smtpEnabled = process.env.SMTP_ENABLED === "true";
+const smtpHost = process.env.SMTP_HOST;
+const smtpUser = process.env.SMTP_USER;
+const smtpPass = process.env.SMTP_PASS;
+const smtpFromAddress = process.env.SMTP_FROM_ADDRESS;
+const smtpFromName = process.env.SMTP_FROM_NAME;
 
 let missingVars: string[] = [];
 
@@ -182,11 +185,16 @@ export default buildConfig({
     globals: [Header, Footer, WhatsApp, Organization],
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
-    secret: cloudflare.env.PAYLOAD_SECRET || "ignore",
+    secret: process.env.PAYLOAD_SECRET || "ignore",
     typescript: {
         outputFile: path.resolve(dirname, "payload-types.ts"),
     },
-    db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
+    db: postgresAdapter({
+        pool: {
+            connectionString: process.env.DATABASE_URL,
+        },
+        migrationDir: path.resolve(dirname, "migrations-postgres"),
+    }),
     plugins: [...plugins, r2StoragePlugin],
     i18n: {
         supportedLanguages: { nl, en },
@@ -198,15 +206,3 @@ export default buildConfig({
         },
     },
 });
-
-// Adapted from https://github.com/opennextjs/opennextjs-cloudflare/blob/d00b3a13e42e65aad76fba41774815726422cc39/packages/cloudflare/src/api/cloudflare-context.ts#L328C36-L328C46
-function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
-    return import(
-        /* webpackIgnore: true */ `${"__wrangler".replaceAll("_", "")}`
-    ).then(({ getPlatformProxy }) =>
-        getPlatformProxy({
-            environment: process.env.CLOUDFLARE_ENV,
-            remoteBindings: isProduction,
-        } satisfies GetPlatformProxyOptions),
-    );
-}
