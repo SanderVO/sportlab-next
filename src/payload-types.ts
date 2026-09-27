@@ -75,6 +75,7 @@ export interface Config {
     lessons: Lesson;
     'lesson-templates': LessonTemplate;
     events: Event;
+    exercises: Exercise;
     programs: Program;
     'lesson-enrollments': LessonEnrollment;
     'lesson-exercise-tracking': LessonExerciseTracking;
@@ -99,6 +100,7 @@ export interface Config {
     lessons: LessonsSelect<false> | LessonsSelect<true>;
     'lesson-templates': LessonTemplatesSelect<false> | LessonTemplatesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    exercises: ExercisesSelect<false> | ExercisesSelect<true>;
     programs: ProgramsSelect<false> | ProgramsSelect<true>;
     'lesson-enrollments': LessonEnrollmentsSelect<false> | LessonEnrollmentsSelect<true>;
     'lesson-exercise-tracking': LessonExerciseTrackingSelect<false> | LessonExerciseTrackingSelect<true>;
@@ -782,6 +784,17 @@ export interface Event {
   createdAt: string;
 }
 /**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exercises".
+ */
+export interface Exercise {
+  id: number;
+  name: string;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Beheer programma's met een start- en einddatum, lessen en een optioneel eindevent (bijvoorbeeld: Performance Cycle).
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1257,6 +1270,10 @@ export interface PayloadLockedDocument {
         value: number | Event;
       } | null)
     | ({
+        relationTo: 'exercises';
+        value: number | Exercise;
+      } | null)
+    | ({
         relationTo: 'programs';
         value: number | Program;
       } | null)
@@ -1711,6 +1728,16 @@ export interface EventsSelect<T extends boolean = true> {
   signupCloseAt?: T;
   generateSlug?: T;
   slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "exercises_select".
+ */
+export interface ExercisesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
   updatedAt?: T;
   createdAt?: T;
 }
