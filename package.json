@@ -1,7 +1,6 @@
 {
     "name": "sportlab-next",
     "version": "1.0.0",
-    "packageManager": "pnpm@10.6.3",
     "private": true,
     "type": "module",
     "browserslist": {
@@ -105,10 +104,5 @@
         "tailwindcss": "^4.3.3",
         "typescript": "^5.9.3",
         "wrangler": "^4.141.0"
-    },
-    "pnpm": {
-        "patchedDependencies": {
-            "payload@3.90.2": ".pnpm-patches/payload@3.90.2.patch"
-        }
     }
 }
