@@ -33,7 +33,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                     )}
 
                     {introduction && (
-                        <p
+                        <div
                             className={cn(
                                 "max-w-3xl text-sm md:text-base leading-relaxed",
                             )}
@@ -43,7 +43,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                 enableGutter={false}
                                 enableProse={false}
                             />
-                        </p>
+                        </div>
                     )}
                 </div>
             )}

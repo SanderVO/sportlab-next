@@ -114,9 +114,15 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1142.0
+        version: 3.1142.0
       '@eslint/eslintrc':
         specifier: ^3.3.7
         version: 3.3.7
+      '@next/env':
+        specifier: ^16.3.6
+        version: 16.3.6
       '@next/eslint-plugin-next':
         specifier: ^16.3.6
         version: 16.3.6(eslint@9.39.5(jiti@2.7.0))
@@ -162,6 +168,9 @@ importers:
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -267,6 +276,10 @@ packages:
 
   '@aws-sdk/client-lambda@3.984.0':
     resolution: {integrity: sha512-kqwNBIGNxGVhINwgN/UQfdsQkaMjbu9PFV2EhATWouV+RT60uMjK9JENgLDwbgJmEVbbnPsh9HaZ5KKwPSdiDg==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/client-s3@3.1142.0':
+    resolution: {integrity: sha512-OC9AcGMFOsBc95YSPWH3O7DE6RUTy7jqeOpVvzO2Dv3rw3w4vQRK+YdLXIbO2yXfmx3N59Y55yAJdDRJFMQK3Q==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/client-s3@3.984.0':
@@ -5512,6 +5525,11 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
+  tsx@4.23.15:
+    resolution: {integrity: sha512-Yiex1Ovn8z2xPpOWckIiysV1SSyRMY9BkLF++q0yKiDxCqRhosKfMg3janKkiLBwZ5c/YryloKwGZcrEmtwxKw==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
@@ -6031,6 +6049,20 @@ snapshots:
       '@smithy/util-waiter': 4.6.2
       tslib: 2.8.1
 
+  '@aws-sdk/client-s3@3.1142.0':
+    dependencies:
+      '@aws-sdk/checksums': 3.1001.1
+      '@aws-sdk/core': 3.978.1
+      '@aws-sdk/credential-provider-node': 3.972.84
+      '@aws-sdk/middleware-sdk-s3': 3.972.77
+      '@aws-sdk/signature-v4-multi-region': 3.996.47
+      '@aws-sdk/types': 3.974.6
+      '@smithy/core': 3.35.0
+      '@smithy/fetch-http-handler': 5.8.0
+      '@smithy/node-http-handler': 4.12.1
+      '@smithy/types': 4.19.0
+      tslib: 2.8.1
+
   '@aws-sdk/client-s3@3.984.0':
     dependencies:
       '@aws-crypto/sha1-browser': 5.2.0
@@ -6240,9 +6272,9 @@ snapshots:
       mnemonist: 0.38.3
       tslib: 2.8.1
 
-  '@aws-sdk/lib-storage@3.1141.0(@aws-sdk/client-s3@3.984.0)':
+  '@aws-sdk/lib-storage@3.1141.0(@aws-sdk/client-s3@3.1142.0)':
     dependencies:
-      '@aws-sdk/client-s3': 3.984.0
+      '@aws-sdk/client-s3': 3.1142.0
       '@smithy/core': 3.35.0
       '@smithy/types': 4.19.0
       buffer: 5.6.0
@@ -8002,8 +8034,8 @@ snapshots:
 
   '@payloadcms/storage-s3@3.90.2(@types/react@19.3.0)(monaco-editor@0.55.1)(next@16.3.6(@babel/core@7.29.7)(@types/node@22.20.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))(payload@3.90.2(graphql@16.13.1)(typescript@5.9.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.9.3)':
     dependencies:
-      '@aws-sdk/client-s3': 3.984.0
-      '@aws-sdk/lib-storage': 3.1141.0(@aws-sdk/client-s3@3.984.0)
+      '@aws-sdk/client-s3': 3.1142.0
+      '@aws-sdk/lib-storage': 3.1141.0(@aws-sdk/client-s3@3.1142.0)
       '@aws-sdk/s3-request-presigner': 3.1141.0
       '@payloadcms/plugin-cloud-storage': 3.90.2(@types/react@19.3.0)(monaco-editor@0.55.1)(next@16.3.6(@babel/core@7.29.7)(@types/node@22.20.4)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(sass@1.77.4))(payload@3.90.2(graphql@16.13.1)(typescript@5.9.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.9.3)
       payload: 3.90.2(graphql@16.13.1)(typescript@5.9.3)
@@ -11789,6 +11821,12 @@ snapshots:
   tslib@2.8.1: {}
 
   tsx@4.22.4:
+    dependencies:
+      esbuild: 0.28.2
+    optionalDependencies:
+      fsevents: 2.3.3
+
+  tsx@4.23.15:
     dependencies:
       esbuild: 0.28.2
     optionalDependencies:

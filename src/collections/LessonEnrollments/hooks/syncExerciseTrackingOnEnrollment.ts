@@ -16,7 +16,11 @@ const toRelationId = (
 };
 
 export const syncExerciseTrackingOnEnrollment: CollectionAfterChangeHook =
-    async ({ doc, req, operation }) => {
+    async ({ doc, req, operation, context }) => {
+        if (context.skipImportSideEffects) {
+            return doc;
+        }
+
         if (operation !== "create" && operation !== "update") {
             return doc;
         }
