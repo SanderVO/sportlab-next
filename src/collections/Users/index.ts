@@ -29,8 +29,8 @@ export const Users: CollectionConfig = {
     timestamps: true,
     hooks: {
         beforeValidate: [
-            ({ data }) => {
-                if (data && !data.slug && data.name) {
+            ({ data, operation }) => {
+                if (operation === "create" && data && !data.slug && data.name) {
                     data.slug = data.name
                         .toLowerCase()
                         .replace(/\s+/g, "-")
