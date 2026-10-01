@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM node:22-trixie-slim AS base
+ARG NODE_VERSION=24.13.0-slim
+
+FROM node:${NODE_VERSION} AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 WORKDIR /app
@@ -17,7 +19,7 @@ ENV NEXT_OUTPUT=standalone
 RUN --mount=type=secret,id=build_env,target=/app/.env.production,required=true \
     pnpm build && rm -f .next/standalone/.env*
 
-FROM node:22-trixie-slim AS runner
+FROM node:${NODE_VERSION} AS runner
 WORKDIR /app
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
