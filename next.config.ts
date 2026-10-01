@@ -2,9 +2,8 @@ import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    cacheComponents: process.env.PAYLOAD_CACHE_COMPONENTS === "true",
-    output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
-    basePath: process.env?.NEXT_BASE_PATH || undefined,
+    cacheComponents: false,
+    output: "standalone",
     typescript: {
         ignoreBuildErrors: true,
     },
