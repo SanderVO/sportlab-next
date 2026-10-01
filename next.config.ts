@@ -10,6 +10,7 @@ const isCloudflareDeployEnv =
 
 const nextConfig: NextConfig = {
     cacheComponents: process.env.PAYLOAD_CACHE_COMPONENTS === "true",
+    output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
     basePath: process.env?.NEXT_BASE_PATH || undefined,
     typescript: {
         ignoreBuildErrors: true,

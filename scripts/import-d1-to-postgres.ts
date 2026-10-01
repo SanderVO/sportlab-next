@@ -77,7 +77,7 @@ const passwordFileArg =
     passwordFileIndex >= 0 ? process.argv[passwordFileIndex + 1] : undefined;
 const passwordFilePath =
     passwordFileArg && !passwordFileArg.startsWith("--")
-        ? path.resolve(passwordFileArg)
+        ? path.resolve(".cache", path.basename(passwordFileArg))
         : undefined;
 const sourceIdentity = "wrangler:D1:production";
 const sourceSQLIndex = process.argv.indexOf("--source-sql");
@@ -675,6 +675,58 @@ function exportWithWrangler(outputPath: string): Promise<void> {
     });
 }
 
+// Prod D1 may lag behind the current schema; add the missing tables/columns (empty) so Payload's queries run.
+function addMissingSourceSchema(database: DatabaseSync, payload: Payload) {
+    const schemaTables = (
+        payload.db as unknown as {
+            tables: Record<
+                string,
+                Record<string, { name?: string; getSQLType?: () => string }>
+            >;
+        }
+    ).tables;
+    const quote = (identifier: string) =>
+        `"${identifier.replaceAll('"', '""')}"`;
+
+    for (const [tableName, table] of Object.entries(schemaTables)) {
+        const columns = Object.values(table).filter(
+            (column): column is { name: string; getSQLType: () => string } =>
+                typeof column?.name === "string" &&
+                typeof column.getSQLType === "function",
+        );
+        if (columns.length === 0) continue;
+
+        const existing = new Set(
+            database
+                .prepare(`PRAGMA table_info(${quote(tableName)})`)
+                .all()
+                .map((row) => String(row.name)),
+        );
+
+        if (existing.size === 0) {
+            database.exec(
+                `CREATE TABLE ${quote(tableName)} (${columns
+                    .map((c) => `${quote(c.name)} ${c.getSQLType()}`)
+                    .join(", ")})`,
+            );
+            console.info(
+                `Source is missing table ${tableName}; created empty.`,
+            );
+            continue;
+        }
+
+        for (const column of columns) {
+            if (existing.has(column.name)) continue;
+            database.exec(
+                `ALTER TABLE ${quote(tableName)} ADD COLUMN ${quote(column.name)} ${column.getSQLType()}`,
+            );
+            console.info(
+                `Source table ${tableName} is missing column ${column.name}; added as empty.`,
+            );
+        }
+    }
+}
+
 async function openSourcePayload(config: unknown) {
     const temporaryDirectory = sourceSQLPath
         ? undefined
@@ -716,6 +768,7 @@ async function openSourcePayload(config: unknown) {
             config: sourceConfig as never,
             key: "sportlab-d1-import-source",
         });
+        addMissingSourceSchema(database, payload);
 
         return {
             payload,
@@ -973,7 +1026,7 @@ async function main() {
                 recursive: true,
                 mode: 0o700,
             });
-            passwordFile = await open(passwordFilePath, "wx", 0o600);
+            passwordFile = await open(passwordFilePath, "w", 0o600);
         }
 
         const pending = new Map<string, Set<string>>();

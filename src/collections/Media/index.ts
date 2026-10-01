@@ -89,7 +89,16 @@ export const Media: CollectionConfig = {
     ],
     upload: {
         mimeTypes: ["image/*", "video/h264", "video/mp4", "video/webm"],
-        crop: false,
-        focalPoint: false,
+        crop: true,
+        focalPoint: true,
+        imageSizes: [
+            { name: "thumbnail", width: 400, height: 300 },
+            { name: "square", width: 500, height: 500 },
+            { name: "small", width: 600 },
+            { name: "medium", width: 900 },
+            { name: "large", width: 1400 },
+            { name: "xlarge", width: 1920 },
+            { name: "og", width: 1200, height: 630, crop: "center" },
+        ],
     },
 };

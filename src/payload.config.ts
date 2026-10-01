@@ -11,6 +11,7 @@ import {
     type CollectionConfig,
     type GlobalConfig,
 } from "payload";
+import sharp from "sharp";
 import { fileURLToPath } from "url";
 import { isCoachOnlyAdminUser } from "./access/isCoachOnlyAdminUser";
 import { Documents } from "./collections/Documents";
@@ -242,6 +243,7 @@ export default buildConfig({
     cors: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
     secret: process.env.PAYLOAD_SECRET || "ignore",
+    sharp,
     typescript: {
         outputFile: path.resolve(dirname, "payload-types.ts"),
     },
