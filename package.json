@@ -27,7 +27,7 @@
         "db:sync-prod": "pnpm run db:export && pnpm run migrate && pnpm run db:disable-foreign-keys && pnpm run db:import",
         "db:import:preview": "wrangler d1 execute D1 --env=preview --remote --file=data-preview.sql",
         "db:sync-preview": "pnpm run deploy:database:preview && pnpm run db:export && pnpm run db:prepare-preview-sync && pnpm run db:import:preview",
-        "build": "cross-env NODE_OPTIONS=--max-old-space-size=1536 next build",
+        "build": "next build --webpack",
         "payload:generate": "pnpm run generate:types && pnpm run generate:types:cloudflare && pnpm run generate:db && pnpm run generate:importmap",
         "generate:importmap": "payload generate:importmap",
         "generate:types": "payload generate:types",
