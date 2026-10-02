@@ -25,7 +25,7 @@ export default async function SiteLayout({
     const organization = (await getCachedGlobal(
         "organization",
         1,
-    )()) as Organization;
+    )) as Organization;
 
     return (
         <>

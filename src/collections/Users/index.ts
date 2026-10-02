@@ -2,6 +2,7 @@ import { authenticated } from "@/access/authenticated";
 import { defaultLexical } from "@/fields/defaultLexical";
 import { slugField, type CollectionConfig } from "payload";
 import { User } from "../../payload-types";
+import { revalidateUser } from "./hooks/revalidateUser";
 
 export enum RolesEnum {
     ADMIN = "admin",
@@ -28,6 +29,7 @@ export const Users: CollectionConfig = {
     },
     timestamps: true,
     hooks: {
+        afterChange: [revalidateUser],
         beforeValidate: [
             ({ data }) => {
                 if (data && !data.slug && data.name) {

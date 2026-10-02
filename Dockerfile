@@ -15,9 +15,13 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ENV NEXT_OUTPUT=standalone
-RUN --mount=type=secret,id=build_env,target=/app/.env.production,required=true \
-    pnpm build && rm -f .next/standalone/.env*
+ENV NEXT_OUTPUT=standalone \
+    NEXT_TELEMETRY_DISABLED=1
+# Public values are inlined into the bundle at build time; not secrets.
+ARG NEXT_PUBLIC_SERVER_URL
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
+ARG NEXT_PUBLIC_GTM_ID
+RUN pnpm build
 
 FROM node:${NODE_VERSION} AS runner
 WORKDIR /app

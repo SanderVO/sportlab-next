@@ -12,8 +12,6 @@ type PageProps = {
     }>;
 };
 
-export const revalidate = 60;
-
 function formatDate(value?: string | null) {
     if (!value) return null;
 
@@ -73,6 +71,7 @@ export default async function TvLessonPage({
         id: Number(lessonId),
         depth: 2,
         overrideAccess: true,
+        disableErrors: true,
     });
 
     if (!lesson) {

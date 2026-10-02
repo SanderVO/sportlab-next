@@ -18,6 +18,7 @@ export const revalidatePage: CollectionAfterChangeHook<Page> = ({
 
             revalidatePath(path);
             revalidateTag("pages-sitemap", "max");
+            revalidateTag(`pages_${doc.id}`, "max");
         }
 
         // If the page was previously published, we need to revalidate the old path

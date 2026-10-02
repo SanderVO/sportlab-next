@@ -8,12 +8,12 @@ import { HeaderNav } from "./HeaderNav";
 import { ScrollHeader } from "./ScrollHeader";
 
 export async function Header() {
-    const headerData: Header = (await getCachedGlobal("header", 1)()) as Header;
+    const headerData: Header = (await getCachedGlobal("header", 1)) as Header;
 
     const whatsappData: WhatsApp = (await getCachedGlobal(
         "whatsApp",
         1,
-    )()) as WhatsApp;
+    )) as WhatsApp;
 
     const navItems = headerData?.navItems || [];
 

@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next/types";
 
-export const revalidate = 3600;
+// Runtime-only so ALLOW_INDEXING isn't baked in at build time.
+export const dynamic = "force-dynamic";
 
 export default function robots(): MetadataRoute.Robots {
     const canonicalSiteUrl = "https://sportlabgroningen.nl";

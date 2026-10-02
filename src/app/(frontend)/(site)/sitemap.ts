@@ -3,9 +3,10 @@ import type { MetadataRoute } from "next";
 import { unstable_cache } from "next/cache";
 import { getPayload } from "payload";
 
-// Fallback ISR window in case a revalidateTag("pages-sitemap") call is ever missed
-export const revalidate = 3600;
+// Not prerendered at build (needs the DB); the data itself is cached below.
+export const dynamic = "force-dynamic";
 
+// Fallback window in case a revalidateTag("pages-sitemap") call is ever missed
 const getPagesSitemap = unstable_cache(
     async () => {
         const payload = await getPayload({ config });
@@ -51,6 +52,7 @@ const getPagesSitemap = unstable_cache(
     ["pages-sitemap"],
     {
         tags: ["pages-sitemap"],
+        revalidate: 86400,
     },
 );
 

@@ -15,8 +15,6 @@ type PageProps = {
     }>;
 };
 
-export const revalidate = 60;
-
 export default async function TvDashboardPage({ searchParams }: PageProps) {
     const params = await searchParams;
     const rawDate = Array.isArray(params.date) ? params.date[0] : params.date;

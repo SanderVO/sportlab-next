@@ -22,7 +22,7 @@ async function getDocument(collection: Collection, slug: string, depth = 0) {
 }
 
 /**
- * Returns a unstable_cache function mapped with the cache tag for the slug
+ * Cached for a day per collection and slug, tagged `<collection>_<slug>`.
  */
 export const getCachedDocument = (collection: Collection, slug: string) =>
     unstable_cache(
@@ -30,5 +30,6 @@ export const getCachedDocument = (collection: Collection, slug: string) =>
         [collection, slug],
         {
             tags: [`${collection}_${slug}`],
+            revalidate: 86400,
         },
-    );
+    )();

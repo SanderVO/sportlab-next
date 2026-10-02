@@ -3,13 +3,12 @@ import { SetHeroMode } from "@/components/Header/SetHeroMode";
 import { Hero } from "@/components/Hero/Hero";
 import { LivePreviewListener } from "@/components/LivePreviewListener";
 import { PayloadRedirects } from "@/components/PayloadRedirects";
-import { buildFullSlug } from "@/utilities/buildFullSlug";
 import { generateMeta } from "@/utilities/generateMeta";
 import configPromise from "@payload-config";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import Script from "next/script";
-import { getPayload, PaginatedDocs } from "payload";
+import { getPayload } from "payload";
 import { cache } from "react";
 import PageClient from "./page.client";
 
@@ -19,7 +18,13 @@ type Args = {
     }>;
 };
 
-export const revalidate = 300;
+// Revalidated on edit via revalidatePath in the Pages hooks; this is the fallback window.
+export const revalidate = 86400;
+
+// Render on first visit instead of at build time, so the build needs no database.
+export async function generateStaticParams() {
+    return [];
+}
 
 const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
     const { isEnabled: draft } = await draftMode();
@@ -41,37 +46,6 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
 
     return result.docs?.[0] || null;
 });
-
-export async function generateStaticParams() {
-    const payload = await getPayload({ config: configPromise });
-
-    const pages = await payload.find({
-        collection: "pages",
-        draft: false,
-        limit: 1000,
-        overrideAccess: false,
-        pagination: false,
-        select: {
-            slug: true,
-        },
-    });
-
-    const params = await Promise.all(
-        pages.docs
-            ?.filter((doc: PaginatedDocs["docs"][0]) => doc.slug !== "home")
-            .map(async (page: PaginatedDocs["docs"][0]) => {
-                const fullSlug = await buildFullSlug(page, payload);
-                return {
-                    slugs: fullSlug
-                        .replace(/^\/+/, "")
-                        .split("/")
-                        .filter(Boolean),
-                };
-            }) ?? [],
-    );
-
-    return params;
-}
 
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
     const { slugs = ["home"] } = await params;

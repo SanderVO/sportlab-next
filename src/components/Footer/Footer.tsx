@@ -6,7 +6,7 @@ import SocialIcon from "../Social/Icons";
 import { CMSLink } from "../ui/Link";
 
 export async function Footer() {
-    const footerData: Footer = (await getCachedGlobal("footer", 1)()) as Footer;
+    const footerData: Footer = (await getCachedGlobal("footer", 1)) as Footer;
 
     return (
         <footer className="container mx-auto my-20">
