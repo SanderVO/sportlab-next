@@ -24,16 +24,6 @@ const nextConfig: NextConfig = {
         qualities: [75, 85, 100],
         minimumCacheTTL: 31536000,
     },
-    outputFileTracingExcludes: {
-        "*": [
-            "node_modules/wrangler/**",
-            "node_modules/@cloudflare/**",
-            "node_modules/@opennextjs/**",
-            "node_modules/typescript/**",
-            "node_modules/@swc/core-*/**",
-            "node_modules/@esbuild/**",
-        ],
-    },
     headers: async () => {
         return [
             {

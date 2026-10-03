@@ -1,6 +1,6 @@
 # Sportlab
 
-A website for Sportlab Groningen made in Next 15 and PayloadCMS. It deploys to Cloudflare Workers and works completely serverless.
+A website for Sportlab Groningen made in Next 16 and PayloadCMS. It is built as a Docker image (see `Dockerfile`) and runs on Postgres.
 
 ## Development
 
@@ -10,7 +10,7 @@ Before you begin, you must generate some schema's and type files for correct typ
 pnpm payload:generate
 ```
 
-After that, you should make a `.env.local` and a `.env.production.local` file with env variables. For the production file, it should contain env variables for the preview deployment.
+After that, you should make a `.env.local` and a `.env.production.local` file with env variables.
 
 Then, to run the development server locally, run the following commands:
 
@@ -25,14 +25,6 @@ To run a production build version of the application locally, run the following 
 pnpm dev:prod
 ```
 
-## Cloudflare Preview
+## Importing from Cloudflare D1
 
-You can also deploy a preview version to Cloudflare to test the application in Worker environments and remote bindings. To do this, run the following command:
-
-```bash
-pnpm db:generate
-pnpm deploy:database:preview
-pnpm preview
-```
-
-This will setup a preview version of the application in Cloudflare Workers for you to test on, with the remote D1 preview database.
+To import the production Cloudflare D1 data into Postgres, see `scripts/import-d1-to-postgres.ts` (`pnpm payload:import:d1 --help`). It exports the D1 database with Wrangler (configured in `wrangler.jsonc`).
