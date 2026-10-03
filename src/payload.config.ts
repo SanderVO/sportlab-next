@@ -32,6 +32,7 @@ import { Footer } from "./components/Footer/config";
 import { Header } from "./components/Header/config";
 import { Organization } from "./components/Organization/config";
 import { WhatsApp } from "./components/WhatsApp/config";
+import { migrations } from "./migrations-postgres";
 import { plugins } from "./plugins";
 import { getServerSideURL } from "./utilities/getURL";
 
@@ -228,6 +229,7 @@ export default buildConfig({
             connectionString: process.env.DATABASE_URL,
         },
         migrationDir: path.resolve(dirname, "migrations-postgres"),
+        prodMigrations: migrations,
     }),
     plugins: [...plugins, r2StoragePlugin],
     i18n: {
