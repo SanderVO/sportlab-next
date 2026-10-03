@@ -91,5 +91,26 @@ export const Media: CollectionConfig = {
         mimeTypes: ["image/*", "video/h264", "video/mp4", "video/webm"],
         crop: true,
         focalPoint: true,
+        // Small optimized thumbnail via Cloudflare Image Transformations.
+        // Requires transformations to be enabled on the R2 public domain's zone.
+        adminThumbnail: ({ doc }) => {
+            const { url, mimeType } = doc as {
+                url?: string;
+                mimeType?: string;
+            };
+
+            if (!url || !mimeType?.startsWith("image/")) {
+                return null;
+            }
+
+            // Leave SVGs and local (non-absolute) URLs untouched.
+            if (mimeType === "image/svg+xml" || !/^https?:\/\//.test(url)) {
+                return url;
+            }
+
+            const { origin, pathname } = new URL(url);
+
+            return `${origin}/cdn-cgi/image/width=96,height=96,fit=cover,quality=75,format=auto${pathname}`;
+        },
     },
 };
