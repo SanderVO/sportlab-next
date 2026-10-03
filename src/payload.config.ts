@@ -1,5 +1,5 @@
 import { postgresAdapter } from "@payloadcms/db-postgres";
-import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
+import { resendAdapter } from "@payloadcms/email-resend";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { s3Storage } from "@payloadcms/storage-s3";
 import { en as baseEn } from "@payloadcms/translations/languages/en";
@@ -102,41 +102,16 @@ const r2StoragePlugin = s3Storage({
     },
 });
 
-const smtpEnabled = process.env.SMTP_ENABLED === "true";
-const smtpHost = process.env.SMTP_HOST;
-const smtpUser = process.env.SMTP_USER;
-const smtpPass = process.env.SMTP_PASS;
-const smtpFromAddress = process.env.SMTP_FROM_ADDRESS;
-const smtpFromName = process.env.SMTP_FROM_NAME;
-
-let missingVars: string[] = [];
-
-if (smtpEnabled) {
-    missingVars = [
-        ["SMTP_HOST", smtpHost],
-        ["SMTP_USER", smtpUser],
-        ["SMTP_PASS", smtpPass],
-        ["SMTP_FROM_ADDRESS", smtpFromAddress],
-        ["SMTP_FROM_NAME", smtpFromName],
-    ]
-        .filter(([, value]) => !value)
-        .map(([key]) => key);
-}
+const resendApiKey = process.env.RESEND_API_KEY;
+const emailFromAddress = process.env.EMAIL_FROM_ADDRESS;
+const emailFromName = process.env.EMAIL_FROM_NAME;
 
 const emailAdapter =
-    smtpEnabled && missingVars.length === 0
-        ? nodemailerAdapter({
-              defaultFromAddress: smtpFromAddress || "",
-              defaultFromName: smtpFromName || "",
-              transportOptions: {
-                  host: smtpHost,
-                  port: 465,
-                  secure: true,
-                  auth: {
-                      user: smtpUser,
-                      pass: smtpPass,
-                  },
-              },
+    resendApiKey && emailFromAddress && emailFromName
+        ? resendAdapter({
+              apiKey: resendApiKey,
+              defaultFromAddress: emailFromAddress,
+              defaultFromName: emailFromName,
           })
         : undefined;
 

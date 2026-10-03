@@ -17,6 +17,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import type { CollectionConfig, Field, Payload } from "payload";
+import sharp from "sharp";
 
 const { loadEnvConfig } = createRequire(import.meta.url)(
     "@next/env",
@@ -573,12 +574,28 @@ async function getUploadFile(
     for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
         chunks.push(Buffer.from(chunk));
     }
-    const data = Buffer.concat(chunks);
+    let data = Buffer.concat(chunks);
+    const mimetype =
+        doc.mimeType || response.ContentType || "application/octet-stream";
+
+    // Some legacy JPEGs were cut off at the old 5MB upload limit; re-encode what is decodable so Payload can resize them.
+    if (mimetype === "image/jpeg") {
+        try {
+            await sharp(data).raw().toBuffer();
+        } catch {
+            console.warn(
+                `Upload ${doc.id} (${doc.filename}) is a truncated JPEG; re-encoding the decodable part.`,
+            );
+            data = await sharp(data, { failOn: "none", unlimited: true })
+                .jpeg({ quality: 95 })
+                .toBuffer();
+        }
+    }
+
     return {
         data,
         name: path.basename(doc.filename),
-        mimetype:
-            doc.mimeType || response.ContentType || "application/octet-stream",
+        mimetype,
         size: data.byteLength,
     };
 }
@@ -660,15 +677,19 @@ function exportWithWrangler(outputPath: string): Promise<void> {
                 outputPath,
                 "--skip-confirmation",
             ],
-            { cwd: process.cwd(), stdio: "ignore" },
+            { cwd: process.cwd(), stdio: ["ignore", "ignore", "pipe"] },
         );
+        let stderr = "";
+        child.stderr.on("data", (chunk) => {
+            stderr += chunk;
+        });
         child.once("error", reject);
         child.once("exit", (code) => {
             if (code === 0) resolve();
             else
                 reject(
                     new Error(
-                        `Wrangler D1 export failed (exit ${code ?? "unknown"}).`,
+                        `Wrangler D1 export failed (exit ${code ?? "unknown"}).\n${stderr.trim()}`,
                     ),
                 );
         });
