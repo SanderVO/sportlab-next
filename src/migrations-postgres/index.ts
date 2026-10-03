@@ -2,6 +2,7 @@ import * as migration_20260927_124450_coolify_initial_schema from './20260927_12
 import * as migration_20260927_133230_add_exercises_collection from './20260927_133230_add_exercises_collection';
 import * as migration_20261001_182326 from './20261001_182326';
 import * as migration_20261003_191209 from './20261003_191209';
+import * as migration_20261003_200000_update_cdn_urls from './20261003_200000_update_cdn_urls';
 
 export const migrations = [
   {
@@ -23,5 +24,10 @@ export const migrations = [
     up: migration_20261003_191209.up,
     down: migration_20261003_191209.down,
     name: '20261003_191209'
+  },
+  {
+    up: migration_20261003_200000_update_cdn_urls.up,
+    down: migration_20261003_200000_update_cdn_urls.down,
+    name: '20261003_200000_update_cdn_urls',
   },
 ];
