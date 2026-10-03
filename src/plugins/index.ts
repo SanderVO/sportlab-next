@@ -1,4 +1,5 @@
 import { isCoachOnlyAdminUser } from "@/access/isCoachOnlyAdminUser";
+import { emailLayout } from "@/emails/layout";
 import { revalidateRedirects } from "@/hooks/revalidateRedirects";
 import { Page, Post } from "@/payload-types";
 import { getServerSideURL } from "@/utilities/getURL";
@@ -151,6 +152,11 @@ export const plugins: Plugin[] = [
         },
     }),
     formBuilderPlugin({
+        beforeEmail: (emails) =>
+            emails.map((email) => ({
+                ...email,
+                html: emailLayout(email.html),
+            })),
         fields: {
             payment: false,
             state: false,

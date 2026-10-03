@@ -1,5 +1,10 @@
 import { authenticated } from "@/access/authenticated";
+import {
+    resetPasswordEmail,
+    resetPasswordSubject,
+} from "@/emails/resetPassword";
 import { defaultLexical } from "@/fields/defaultLexical";
+import { getServerSideURL } from "@/utilities/getURL";
 import { slugField, type CollectionConfig } from "payload";
 import { User } from "../../payload-types";
 import { revalidateUser } from "./hooks/revalidateUser";
@@ -13,7 +18,15 @@ export enum RolesEnum {
 
 export const Users: CollectionConfig = {
     slug: "users",
-    auth: true,
+    auth: {
+        forgotPassword: {
+            generateEmailSubject: () => resetPasswordSubject,
+            generateEmailHTML: (args) =>
+                resetPasswordEmail(
+                    `${getServerSideURL()}/reset-password?token=${args?.token}`,
+                ),
+        },
+    },
     labels: {
         singular: { en: "User", nl: "Gebruiker" },
         plural: { en: "Users", nl: "Gebruikers" },
