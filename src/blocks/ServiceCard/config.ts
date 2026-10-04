@@ -7,18 +7,18 @@ const fields: Field[] = [
     {
         name: "backgroundColor",
         type: "select",
-        label: "Achtergrondkleur",
+        label: { en: "Background color", nl: "Achtergrondkleur" },
         options: [
             {
-                label: "Wit",
+                label: { en: "White", nl: "Wit" },
                 value: "white",
             },
             {
-                label: "Beige",
+                label: { en: "Beige", nl: "Beige" },
                 value: "beige",
             },
             {
-                label: "Zwart",
+                label: { en: "Black", nl: "Zwart" },
                 value: "black",
             },
         ],
@@ -28,37 +28,37 @@ const fields: Field[] = [
     {
         name: "image",
         type: "upload",
-        label: "Afbeelding",
+        label: { en: "Image", nl: "Afbeelding" },
         relationTo: "media",
         required: true,
     },
     {
         name: "content",
         type: "richText",
-        label: "Content",
+        label: { en: "Content", nl: "Content" },
         editor: lexicalEditor({ features: [...defaultLexicalFeatures] }),
         required: true,
     },
     {
         name: "priceType",
         type: "text",
-        label: "Prijstype",
+        label: { en: "Price type", nl: "Prijstype" },
         required: true,
     },
     {
         name: "price",
         type: "number",
-        label: "Prijs",
+        label: { en: "Price", nl: "Prijs" },
         required: true,
     },
     {
         name: "priceAlignment",
         type: "select",
-        label: "Uitlijning prijssectie",
+        label: { en: "Price section alignment", nl: "Uitlijning prijssectie" },
         options: [
-            { label: "Links", value: "left" },
-            { label: "Midden", value: "center" },
-            { label: "Rechts", value: "right" },
+            { label: { en: "Left", nl: "Links" }, value: "left" },
+            { label: { en: "Center", nl: "Midden" }, value: "center" },
+            { label: { en: "Right", nl: "Rechts" }, value: "right" },
         ],
         defaultValue: "left",
         required: true,
@@ -70,18 +70,18 @@ export const ServiceCardBlock: Block = {
     slug: "serviceCardBlock",
     interfaceName: "ServiceCardBlock",
     labels: {
-        singular: "Service Blok",
-        plural: "Service Blokken",
+        singular: { en: "Service block", nl: "Service Blok" },
+        plural: { en: "Service blocks", nl: "Service Blokken" },
     },
     fields: [
         {
             name: "arrowBackgroundColor",
             type: "select",
-            label: "Achtergrondkleur pijlen",
+            label: { en: "Arrow background color", nl: "Achtergrondkleur pijlen" },
             options: [
-                { label: "Wit", value: "white" },
-                { label: "Beige", value: "beige" },
-                { label: "Zwart", value: "black" },
+                { label: { en: "White", nl: "Wit" }, value: "white" },
+                { label: { en: "Beige", nl: "Beige" }, value: "beige" },
+                { label: { en: "Black", nl: "Zwart" }, value: "black" },
             ],
             defaultValue: "black",
             required: true,
@@ -89,12 +89,12 @@ export const ServiceCardBlock: Block = {
         {
             name: "footerText",
             type: "text",
-            label: "Footertekst",
+            label: { en: "Footer text", nl: "Footertekst" },
         },
         {
             name: "columns",
             type: "array",
-            label: "Kolommen",
+            label: { en: "Columns", nl: "Kolommen" },
             required: true,
             fields: fields,
         },

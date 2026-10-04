@@ -5,7 +5,7 @@ import { FormBlock } from "../Form/config";
 
 export const columnFields: Field[] = [
     {
-        label: "Content",
+        label: { en: "Content", nl: "Content" },
         name: "richText",
         type: "richText",
         required: true,
@@ -20,14 +20,14 @@ export const columnFields: Field[] = [
 
 export const ColumnsBlock: Block = {
     labels: {
-        singular: "Kolom",
-        plural: "Kolommen",
+        singular: { en: "Column", nl: "Kolom" },
+        plural: { en: "Columns", nl: "Kolommen" },
     },
     slug: "columnsBlock",
     interfaceName: "ColumnsBlock",
     fields: [
         {
-            label: "Kolommen",
+            label: { en: "Columns", nl: "Kolommen" },
             name: "columns",
             type: "array",
             minRows: 2,

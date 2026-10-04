@@ -15,22 +15,22 @@ export const Footer: GlobalConfig = {
     },
     fields: [
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Subtitel",
+            label: { en: "Subtitle", nl: "Subtitel" },
             name: "description",
             type: "text",
             required: true,
         },
         link({
-            label: "Contactlink",
+            label: { en: "Contact link", nl: "Contactlink" },
         }),
         {
-            label: "Logo",
+            label: { en: "Logo", nl: "Logo" },
             name: "footerLogo",
             type: "upload",
             relationTo: "media",
@@ -40,33 +40,33 @@ export const Footer: GlobalConfig = {
             },
         },
         {
-            label: "Contact Informatie",
+            label: { en: "Contact information", nl: "Contact Informatie" },
             name: "contactText",
             type: "richText",
             editor: lexicalEditor(),
             required: false,
         },
         {
-            label: "Social Media Links",
+            label: { en: "Social media links", nl: "Social Media Links" },
             name: "socialMediaLinks",
             type: "array",
             required: false,
             fields: [
                 {
-                    label: "Platform",
+                    label: { en: "Platform", nl: "Platform" },
                     name: "platform",
                     type: "select",
                     options: [
-                        { label: "Facebook", value: "facebook" },
-                        { label: "Twitter/X", value: "twitter" },
-                        { label: "Instagram", value: "instagram" },
-                        { label: "YouTube", value: "youtube" },
-                        { label: "TikTok", value: "tiktok" },
+                        { label: { en: "Facebook", nl: "Facebook" }, value: "facebook" },
+                        { label: { en: "Twitter/X", nl: "Twitter/X" }, value: "twitter" },
+                        { label: { en: "Instagram", nl: "Instagram" }, value: "instagram" },
+                        { label: { en: "YouTube", nl: "YouTube" }, value: "youtube" },
+                        { label: { en: "TikTok", nl: "TikTok" }, value: "tiktok" },
                     ],
                     required: true,
                 },
                 {
-                    label: "URL",
+                    label: { en: "URL", nl: "URL" },
                     name: "url",
                     type: "text",
                     required: true,
@@ -74,44 +74,44 @@ export const Footer: GlobalConfig = {
             ],
         },
         {
-            label: "Footer Kolommen",
+            label: { en: "Footer columns", nl: "Footer Kolommen" },
             name: "footerColumns",
             type: "array",
             admin: {
                 description:
-                    "Voeg kolommen toe met links of rich text voor in de footer",
+                    { en: "Add columns with links or rich text to the footer", nl: "Voeg kolommen toe met links of rich text voor in de footer" },
             },
             fields: [
                 {
-                    label: "Kolom Titel",
+                    label: { en: "Column title", nl: "Kolom Titel" },
                     name: "columnTitle",
                     type: "text",
                     required: true,
                 },
                 {
-                    label: "Inhoudstype",
+                    label: { en: "Content type", nl: "Inhoudstype" },
                     name: "contentType",
                     type: "radio",
                     defaultValue: "links",
                     options: [
-                        { label: "Links", value: "links" },
-                        { label: "Rich Text", value: "richText" },
+                        { label: { en: "Links", nl: "Links" }, value: "links" },
+                        { label: { en: "Rich Text", nl: "Rich Text" }, value: "richText" },
                     ],
                     required: true,
                 },
                 {
-                    label: "Links",
+                    label: { en: "Links", nl: "Links" },
                     name: "links",
                     type: "array",
                     admin: {
-                        description: "Voeg links toe voor deze kolom",
+                        description: { en: "Add links for this column", nl: "Voeg links toe voor deze kolom" },
                         condition: (_, siblingData) =>
                             siblingData?.contentType === "links",
                     },
                     fields: [link()],
                 },
                 {
-                    label: "Rich Text",
+                    label: { en: "Rich Text", nl: "Rich Text" },
                     name: "richText",
                     type: "richText",
                     editor: lexicalEditor({

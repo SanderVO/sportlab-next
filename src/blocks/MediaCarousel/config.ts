@@ -2,7 +2,7 @@ import type { Block, Field } from "payload";
 
 const galleryImageFields: Field[] = [
     {
-        label: "Afbeelding",
+        label: { en: "Image", nl: "Afbeelding" },
         name: "media",
         type: "upload",
         relationTo: "media",
@@ -14,7 +14,7 @@ const galleryImageFields: Field[] = [
         },
     },
     {
-        label: "Beschrijving",
+        label: { en: "Description", nl: "Beschrijving" },
         name: "caption",
         type: "text",
         required: false,
@@ -25,46 +25,46 @@ export const MediaCarousel: Block = {
     slug: "mediaCarousel",
     interfaceName: "MediaCarouselBlock",
     labels: {
-        singular: "Media carousel",
-        plural: "Media carousels",
+        singular: { en: "Media carousel", nl: "Media carousel" },
+        plural: { en: "Media carousels", nl: "Media carousels" },
     },
     fields: [
         {
-            label: "Achtergrondkleur",
+            label: { en: "Background color", nl: "Achtergrondkleur" },
             name: "backgroundColor",
             type: "select",
             defaultValue: "backgroundLight",
             required: true,
             options: [
                 {
-                    label: "Zwart",
+                    label: { en: "Black", nl: "Zwart" },
                     value: "backgroundDark",
                 },
                 {
-                    label: "Beige",
+                    label: { en: "Beige", nl: "Beige" },
                     value: "backgroundLight",
                 },
                 {
-                    label: "Wit",
+                    label: { en: "White", nl: "Wit" },
                     value: "backgroundWhite",
                 },
             ],
         },
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Hoofdmedia (video of afbeelding)",
+            label: { en: "Main media (video or image)", nl: "Hoofdmedia (video of afbeelding)" },
             name: "mainMedia",
             type: "upload",
             relationTo: "media",
             required: true,
         },
         {
-            label: "Carousel afbeeldingen",
+            label: { en: "Carousel images", nl: "Carousel afbeeldingen" },
             name: "galleryImages",
             type: "array",
             required: true,
@@ -75,18 +75,18 @@ export const MediaCarousel: Block = {
             fields: galleryImageFields,
         },
         {
-            label: "Quote (optioneel)",
+            label: { en: "Quote (optional)", nl: "Quote (optioneel)" },
             name: "quote",
             type: "group",
             fields: [
                 {
-                    label: "Quote",
+                    label: { en: "Quote", nl: "Quote" },
                     name: "text",
                     type: "textarea",
                     required: false,
                 },
                 {
-                    label: "Auteur",
+                    label: { en: "Author", nl: "Auteur" },
                     name: "author",
                     type: "text",
                     required: false,

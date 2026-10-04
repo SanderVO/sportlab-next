@@ -105,7 +105,6 @@ export const plugins: Plugin[] = [
             admin: {
                 hidden: ({ user }) => isCoachOnlyAdminUser(user),
             },
-            // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
             fields: ({ defaultFields }) => {
                 return defaultFields.map((field) => {
                     if ("name" in field && field.name === "from") {
@@ -113,7 +112,7 @@ export const plugins: Plugin[] = [
                             ...field,
                             admin: {
                                 description:
-                                    "You will need to rebuild the website when changing this field.",
+                                    { en: "You will need to rebuild the website when changing this field.", nl: "Je moet de website opnieuw bouwen wanneer je dit veld wijzigt." },
                             },
                         };
                     }
@@ -133,16 +132,16 @@ export const plugins: Plugin[] = [
             return [
                 ...defaultFields,
                 {
-                    label: "Rich Snippets",
+                    label: { en: "Rich Snippets", nl: "Rich Snippets" },
                     name: "richSnippets",
                     type: "array",
                     admin: {
                         description:
-                            "Voeg JSON-LD rich snippets toe voor deze pagina om zoekmachines te helpen de inhoud van uw pagina beter te begrijpen.",
+                            { en: "Add JSON-LD rich snippets for this page to help search engines better understand its content.", nl: "Voeg JSON-LD rich snippets toe voor deze pagina om zoekmachines te helpen de inhoud van uw pagina beter te begrijpen." },
                     },
                     fields: [
                         {
-                            label: "Rich Snippet JSON-LD",
+                            label: { en: "Rich Snippet JSON-LD", nl: "Rich Snippet JSON-LD" },
                             name: "jsonLd",
                             type: "json",
                         },
@@ -164,32 +163,32 @@ export const plugins: Plugin[] = [
             date: false,
             text: {
                 labels: {
-                    singular: "Tekstveld",
-                    plural: "Tekstvelden",
+                    singular: { en: "Text field", nl: "Tekstveld" },
+                    plural: { en: "Text fields", nl: "Tekstvelden" },
                 },
             },
             textarea: {
                 labels: {
-                    singular: "Tekstgebied",
-                    plural: "Tekstgebieden",
+                    singular: { en: "Text area", nl: "Tekstgebied" },
+                    plural: { en: "Text areas", nl: "Tekstgebieden" },
                 },
             },
             email: {
                 labels: {
-                    singular: "E-mailveld",
-                    plural: "E-mailvelden",
+                    singular: { en: "Email field", nl: "E-mailveld" },
+                    plural: { en: "Email fields", nl: "E-mailvelden" },
                 },
             },
             select: {
                 labels: {
-                    singular: "Selectievakje",
-                    plural: "Selectievakjes",
+                    singular: { en: "Select field", nl: "Selectievakje" },
+                    plural: { en: "Select fields", nl: "Selectievakjes" },
                 },
             },
             checkbox: {
                 labels: {
-                    singular: "Checkbox veld",
-                    plural: "Checkbox velden",
+                    singular: { en: "Checkbox field", nl: "Checkbox veld" },
+                    plural: { en: "Checkbox fields", nl: "Checkbox velden" },
                 },
             },
         },
@@ -198,8 +197,8 @@ export const plugins: Plugin[] = [
                 hidden: ({ user }) => isCoachOnlyAdminUser(user),
             },
             labels: {
-                singular: "Formulier Submissie",
-                plural: "Formulier Submissies",
+                singular: { en: "Form submission", nl: "Formulier Submissie" },
+                plural: { en: "Form submissions", nl: "Formulier Submissies" },
             },
             hooks: {
                 beforeChange: [replaceSelectValuesWithLabels],
@@ -210,40 +209,40 @@ export const plugins: Plugin[] = [
                 hidden: ({ user }) => isCoachOnlyAdminUser(user),
             },
             labels: {
-                singular: "Formulier",
-                plural: "Formulieren",
+                singular: { en: "Form", nl: "Formulier" },
+                plural: { en: "Forms", nl: "Formulieren" },
             },
             fields: ({ defaultFields }: { defaultFields: Field[] }) => {
                 return defaultFields.map((field) => {
                     if ("name" in field && field.name === "title") {
                         return {
                             ...field,
-                            label: "Titel",
+                            label: { en: "Title", nl: "Titel" },
                         };
                     }
 
                     if ("name" in field && field.name === "submitButton") {
                         return {
                             ...field,
-                            label: "Bevestigknop tekst",
+                            label: { en: "Submit button text", nl: "Bevestigknop tekst" },
                         };
                     }
 
                     if ("name" in field && field.name === "submitButtonLabel") {
                         return {
                             ...field,
-                            label: "Bevestigknop tekst",
+                            label: { en: "Submit button text", nl: "Bevestigknop tekst" },
                         };
                     }
 
                     if ("name" in field && field.name === "confirmationType") {
                         return {
                             ...field,
-                            label: "Bevestig type",
+                            label: { en: "Confirmation type", nl: "Bevestig type" },
                             admin: {
                                 ...field.admin,
                                 description:
-                                    "Geef aan wat voor type bevestiging de gebruiker moet krijgen",
+                                    { en: "Indicate what type of confirmation the user should receive", nl: "Geef aan wat voor type bevestiging de gebruiker moet krijgen" },
                             },
                         };
                     }
@@ -254,7 +253,7 @@ export const plugins: Plugin[] = [
                     ) {
                         return {
                             ...field,
-                            label: "Bericht",
+                            label: { en: "Message", nl: "Bericht" },
                         };
                     }
 
@@ -264,7 +263,7 @@ export const plugins: Plugin[] = [
                     ) {
                         return {
                             ...field,
-                            label: "Verwijzing URL",
+                            label: { en: "Redirect URL", nl: "Verwijzing URL" },
                         };
                     }
 
@@ -274,7 +273,7 @@ export const plugins: Plugin[] = [
                     ) {
                         return {
                             ...field,
-                            label: "Bevestigingsbericht",
+                            label: { en: "Confirmation message", nl: "Bevestigingsbericht" },
                             editor: lexicalEditor({
                                 features: ({ rootFeatures }) => {
                                     return [
@@ -292,12 +291,12 @@ export const plugins: Plugin[] = [
                             admin: {
                                 ...field.admin,
                                 description:
-                                    "Stuur aangepaste e-mails wanneer het formulier wordt ingediend. Gebruik komma-gescheiden lijsten om dezelfde e-mail naar meerdere ontvangers te sturen. Om een waarde uit deze vorm te verwijzen, wikkel je de naam van dat veld in met dubbele krulhaken, bijvoorbeeld {{firstName}}. Je kunt een wildcard {{*}} gebruiken om alle data uit te voeren en {{*:table}} om het als een HTML-tabel in de e-mail te formatteren.",
+                                    { en: "Send custom emails when the form is submitted. Use comma-separated lists to send the same email to multiple recipients. To reference a value from this form, wrap the name of that field in double curly braces, for example {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.", nl: "Stuur aangepaste e-mails wanneer het formulier wordt ingediend. Gebruik komma-gescheiden lijsten om dezelfde e-mail naar meerdere ontvangers te sturen. Om een waarde uit deze vorm te verwijzen, wikkel je de naam van dat veld in met dubbele krulhaken, bijvoorbeeld {{firstName}}. Je kunt een wildcard {{*}} gebruiken om alle data uit te voeren en {{*:table}} om het als een HTML-tabel in de e-mail te formatteren." },
                             },
                         };
                     }
                     return field;
-                });
+                }) as Field[];
             },
         },
     }),

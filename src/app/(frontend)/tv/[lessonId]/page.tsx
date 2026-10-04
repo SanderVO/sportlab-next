@@ -34,6 +34,10 @@ function isMedia(
     return typeof value === "object" && value !== null && "url" in value;
 }
 
+function isProgram(value: unknown): value is { id: number; title?: string | null } {
+    return typeof value === "object" && value !== null && "id" in value;
+}
+
 function isUser(
     value: unknown,
 ): value is { id: number; name?: string | null; email?: string | null } {
@@ -78,18 +82,7 @@ export default async function TvLessonPage({
         notFound();
     }
 
-    const programResult = await payload.find({
-        collection: "programs",
-        where: {
-            "schedule.lessons": {
-                equals: lesson.id,
-            },
-        },
-        limit: 1,
-        depth: 0,
-        overrideAccess: true,
-    });
-    const program = programResult.docs[0];
+    const program = isProgram(lesson.program) ? lesson.program : null;
     const lessonImage = isMedia(lesson.image) ? lesson.image : null;
     const lessonStartDate = formatDate(lesson.startDate);
     const lessonDateParam = toDateParam(lesson.startDate);

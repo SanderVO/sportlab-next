@@ -3,26 +3,26 @@ import type { Block, Field } from "payload";
 
 const stageFields: Field[] = [
     {
-        label: "Afbeelding",
+        label: { en: "Image", nl: "Afbeelding" },
         name: "image",
         type: "upload",
         relationTo: "media",
         required: false,
     },
     {
-        label: "Weeklabel",
+        label: { en: "Week label", nl: "Weeklabel" },
         name: "weekLabel",
         type: "text",
         required: true,
     },
     {
-        label: "Fase titel",
+        label: { en: "Phase title", nl: "Fase titel" },
         name: "phaseTitle",
         type: "text",
         required: true,
     },
     {
-        label: "Beschrijving",
+        label: { en: "Description", nl: "Beschrijving" },
         name: "description",
         type: "textarea",
         required: true,
@@ -33,45 +33,45 @@ export const CycleTimeline: Block = {
     slug: "cycleTimeline",
     interfaceName: "CycleTimelineBlock",
     labels: {
-        singular: "Cycle timeline",
-        plural: "Cycle timelines",
+        singular: { en: "Cycle timeline", nl: "Cycle timeline" },
+        plural: { en: "Cycle timelines", nl: "Cycle timelines" },
     },
     fields: [
         {
-            label: "Achtergrondkleur",
+            label: { en: "Background color", nl: "Achtergrondkleur" },
             name: "backgroundColor",
             type: "select",
             defaultValue: "backgroundDark",
             required: true,
             options: [
                 {
-                    label: "Zwart",
+                    label: { en: "Black", nl: "Zwart" },
                     value: "backgroundDark",
                 },
                 {
-                    label: "Beige",
+                    label: { en: "Beige", nl: "Beige" },
                     value: "backgroundLight",
                 },
                 {
-                    label: "Wit",
+                    label: { en: "White", nl: "Wit" },
                     value: "backgroundWhite",
                 },
             ],
         },
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Subtitel",
+            label: { en: "Subtitle", nl: "Subtitel" },
             name: "subtitle",
             type: "text",
             required: false,
         },
         {
-            label: "Fases",
+            label: { en: "Phases", nl: "Fases" },
             name: "stages",
             type: "array",
             minRows: 2,
@@ -83,13 +83,13 @@ export const CycleTimeline: Block = {
             fields: stageFields,
         },
         {
-            label: "Voettekst",
+            label: { en: "Footer", nl: "Voettekst" },
             name: "footerText",
             type: "text",
             required: false,
         },
         {
-            label: "Voettekst content",
+            label: { en: "Footer content", nl: "Voettekst content" },
             name: "footerContent",
             type: "richText",
             editor: defaultLexical,

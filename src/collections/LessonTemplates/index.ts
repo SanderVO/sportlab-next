@@ -18,7 +18,7 @@ export const LessonTemplates: CollectionConfig = {
         useAsTitle: "title",
         defaultColumns: ["title", "type", "updatedAt"],
         description:
-            "Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen.",
+            { en: "Templates for recurring lessons. Create a template for each fixed lesson (e.g. 'Monday PT 09:00') and link it to individual lessons.", nl: "Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen." },
         components: {
             views: {
                 list: {

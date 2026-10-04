@@ -8,30 +8,30 @@ export const hero: Field = {
     required: false,
     fields: [
         {
-            label: "Afbeelding / Video",
+            label: { en: "Image / Video", nl: "Afbeelding / Video" },
             name: "media",
             type: "upload",
             relationTo: "media",
             required: true,
         },
         {
-            label: "Content",
+            label: { en: "Content", nl: "Content" },
             name: "text",
             type: "richText",
             editor: defaultLexical,
         },
         {
-            label: "Content positie",
+            label: { en: "Content position", nl: "Content positie" },
             name: "contentPosition",
             type: "select",
             defaultValue: "left",
             options: [
                 {
-                    label: "Links",
+                    label: { en: "Left", nl: "Links" },
                     value: "left",
                 },
                 {
-                    label: "Midden",
+                    label: { en: "Center", nl: "Midden" },
                     value: "center",
                 },
             ],

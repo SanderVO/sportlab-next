@@ -2,26 +2,26 @@ import type { Block, Field } from "payload";
 
 const carouselItemFields: Field[] = [
     {
-        label: "Avatar",
+        label: { en: "Avatar", nl: "Avatar" },
         name: "media",
         type: "upload",
         relationTo: "media",
         required: false,
     },
     {
-        label: "Tekst",
+        label: { en: "Text", nl: "Tekst" },
         name: "text",
         type: "textarea",
         required: true,
     },
     {
-        label: "Naam",
+        label: { en: "Name", nl: "Naam" },
         name: "name",
         type: "text",
         required: true,
     },
     {
-        label: "Google Review URL",
+        label: { en: "Google Review URL", nl: "Google Review URL" },
         name: "google_url",
         type: "text",
         required: false,
@@ -33,34 +33,34 @@ export const Carousel: Block = {
     interfaceName: "CarouselBlock",
     fields: [
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Subtitel",
+            label: { en: "Subtitle", nl: "Subtitel" },
             name: "subtitle",
             type: "text",
             required: true,
         },
         {
-            label: "Achtergrondkleur",
+            label: { en: "Background color", nl: "Achtergrondkleur" },
             name: "backgroundColor",
             type: "select",
             defaultValue: "backgroundDark",
             required: true,
             options: [
                 {
-                    label: "Zwart",
+                    label: { en: "Black", nl: "Zwart" },
                     value: "backgroundDark",
                 },
                 {
-                    label: "Beige",
+                    label: { en: "Beige", nl: "Beige" },
                     value: "backgroundLight",
                 },
                 {
-                    label: "Wit",
+                    label: { en: "White", nl: "Wit" },
                     value: "backgroundWhite",
                 },
             ],

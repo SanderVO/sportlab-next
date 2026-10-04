@@ -4,14 +4,14 @@ import type { Block, Field } from "payload";
 
 const fields: Field[] = [
     {
-        label: "Afbeelding",
+        label: { en: "Image", nl: "Afbeelding" },
         name: "media",
         type: "upload",
         relationTo: "media",
         required: false,
     },
     {
-        label: "Heeft een link",
+        label: { en: "Has a link", nl: "Heeft een link" },
         name: "enableLink",
         type: "checkbox",
     },
@@ -27,64 +27,64 @@ const fields: Field[] = [
 export const Instagram: Block = {
     slug: "instagram",
     labels: {
-        singular: "Foto gallerij",
-        plural: "Foto gallerijen",
+        singular: { en: "Photo gallery", nl: "Foto gallerij" },
+        plural: { en: "Photo galleries", nl: "Foto gallerijen" },
     },
     interfaceName: "InstagramBlock",
     fields: [
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Content",
+            label: { en: "Content", nl: "Content" },
             name: "content",
             type: "richText",
             editor: defaultLexical,
             required: true,
         },
         {
-            label: "Type",
+            label: { en: "Type", nl: "Type" },
             name: "type",
             type: "select",
             defaultValue: "carousel",
             required: true,
             options: [
                 {
-                    label: "Carousel",
+                    label: { en: "Carousel", nl: "Carousel" },
                     value: "carousel",
                 },
                 {
-                    label: "Grid",
+                    label: { en: "Grid", nl: "Grid" },
                     value: "grid",
                 },
             ],
         },
         {
-            label: "Achtergrondkleur",
+            label: { en: "Background color", nl: "Achtergrondkleur" },
             name: "backgroundColor",
             type: "select",
             defaultValue: "backgroundDark",
             required: true,
             options: [
                 {
-                    label: "Zwart",
+                    label: { en: "Black", nl: "Zwart" },
                     value: "backgroundDark",
                 },
                 {
-                    label: "Beige",
+                    label: { en: "Beige", nl: "Beige" },
                     value: "backgroundLight",
                 },
                 {
-                    label: "Wit",
+                    label: { en: "White", nl: "Wit" },
                     value: "backgroundWhite",
                 },
             ],
         },
         {
-            label: "Foto's",
+            label: { en: "Photos", nl: "Foto's" },
             name: "images",
             type: "array",
             admin: {

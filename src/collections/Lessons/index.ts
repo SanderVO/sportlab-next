@@ -22,7 +22,7 @@ export const Lessons: CollectionConfig = {
     },
     admin: {
         useAsTitle: "title",
-        defaultColumns: ["title", "type", "updatedAt", "startDate"],
+        defaultColumns: ["title", "startDate", "type", "updatedAt"],
     },
     hooks: {
         afterChange: [syncExerciseTrackingOnLessonUpdate],
@@ -31,6 +31,15 @@ export const Lessons: CollectionConfig = {
         beforeChange: [applyTemplate],
     },
     fields: [
+        {
+            name: "importCsv",
+            type: "ui",
+            admin: {
+                components: {
+                    Field: "./collections/Lessons/components/ImportCsvField#ImportCsvField",
+                },
+            },
+        },
         {
             label: { en: "Template", nl: "Sjabloon" },
             name: "template",
@@ -44,6 +53,25 @@ export const Lessons: CollectionConfig = {
                     nl: "Selecteer een sjabloon om type, coaches en standaard oefeningen automatisch over te nemen.",
                 },
                 position: "sidebar",
+            },
+        },
+        {
+            label: { en: "Program", nl: "Programma" },
+            name: "program",
+            type: "relationship",
+            relationTo: "programs",
+            hasMany: false,
+            required: false,
+            index: true,
+            admin: {
+                description: {
+                    en: "Optional: the program this lesson belongs to. Selected automatically based on the start date.",
+                    nl: "Optioneel: het programma waar deze les bij hoort. Wordt automatisch gekozen op basis van de startdatum.",
+                },
+                position: "sidebar",
+                components: {
+                    Field: "./collections/Lessons/components/ProgramField#ProgramField",
+                },
             },
         },
         {
@@ -202,6 +230,10 @@ export const Lessons: CollectionConfig = {
                 plural: { en: "Workout blocks", nl: "Workoutblokken" },
             },
             admin: {
+                components: {
+                    RowLabel:
+                        "./collections/Lessons/components/WorkoutBlockRowLabel#WorkoutBlockRowLabel",
+                },
                 description: {
                     en: "Create workout blocks in the desired order and fill in each block's workout details and exercises.",
                     nl: "Maak workoutblokken aan in de gewenste volgorde en vul per blok de workoutgegevens en oefeningen in.",

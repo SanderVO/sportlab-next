@@ -1,6 +1,24 @@
 "use client";
 
+import { useTranslation } from "@payloadcms/ui";
 import React, { useCallback, useEffect, useState } from "react";
+
+const messages = {
+    en: {
+        unknownError: "Unknown error",
+        done: "Done.",
+        failed: "Generation failed",
+        generating: "Generating…",
+        generate: "Generate lessons (next 31 days)",
+    },
+    nl: {
+        unknownError: "Onbekende fout",
+        done: "Klaar.",
+        failed: "Genereren mislukt",
+        generating: "Bezig met genereren…",
+        generate: "Genereer lessen (komende 31 dagen)",
+    },
+};
 
 type Status =
     | { type: "idle" }
@@ -9,6 +27,8 @@ type Status =
     | { type: "error"; message: string };
 
 export const GenerateLessonsButton: React.FC = () => {
+    const { i18n } = useTranslation();
+    const m = i18n.language === "nl" ? messages.nl : messages.en;
     const [status, setStatus] = useState<Status>({ type: "idle" });
 
     useEffect(() => {
@@ -36,16 +56,16 @@ export const GenerateLessonsButton: React.FC = () => {
                 message?: string;
                 error?: string;
             };
-            if (!res.ok) throw new Error(data.error ?? "Onbekende fout");
-            setStatus({ type: "success", message: data.message ?? "Klaar." });
+            if (!res.ok) throw new Error(data.error ?? m.unknownError);
+            setStatus({ type: "success", message: data.message ?? m.done });
         } catch (err) {
             setStatus({
                 type: "error",
                 message:
-                    err instanceof Error ? err.message : "Genereren mislukt",
+                    err instanceof Error ? err.message : m.failed,
             });
         }
-    }, []);
+    }, [m]);
 
     return (
         <button
@@ -73,10 +93,10 @@ export const GenerateLessonsButton: React.FC = () => {
             }}
         >
             {status.type === "loading"
-                ? "Bezig met genereren…"
+                ? m.generating
                 : status.type === "success" || status.type === "error"
                   ? status.message
-                  : "Genereer lessen (komende 31 dagen)"}
+                  : m.generate}
         </button>
     );
 };

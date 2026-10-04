@@ -90,7 +90,11 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    programs: {
+      lessons: 'lessons';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -356,15 +360,15 @@ export interface Page {
 export interface ContentBlock {
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
   /**
-   * Vast gebruikt de standaard blokhoogte. Automatisch past de hoogte aan op de inhoud.
+   * Fixed uses the default block height. Automatic adjusts the height to the content.
    */
   blockHeight: 'fixed' | 'auto';
   /**
-   * Optioneel: Voeg een titel toe boven de kolommen. Laat leeg als je geen titel wilt.
+   * Optional: add a title above the columns. Leave empty if you don't want a title.
    */
   title?: string | null;
   /**
-   * Optioneel: Voeg een introductie toe boven de kolommen. Laat leeg als je geen introductie wilt.
+   * Optional: add an introduction above the columns. Leave empty if you don't want an introduction.
    */
   introduction?: {
     root: {
@@ -382,7 +386,7 @@ export interface ContentBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Voeg kolommen toe en configureer de inhoud voor elke kolom.
+   * Add columns and configure the content for each column.
    */
   columns?:
     | {
@@ -444,22 +448,22 @@ export interface TeamBlock {
   type: 'carousel' | 'grid';
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
   /**
-   * Optioneel: kies specifieke coaches om te tonen. Laat leeg om automatisch alle coaches te tonen.
+   * Optional: choose specific coaches to display. Leave empty to automatically show all coaches.
    */
   selectedCoaches?: (number | User)[] | null;
   enableLink?: boolean | null;
   link?: {
     type?: ('reference' | 'custom') | null;
     /**
-     * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+     * Enable if you want the link to open in a new tab.
      */
     newTab?: boolean | null;
     /**
-     * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+     * Enable if you want a label to be added to the link.
      */
     addLabel?: boolean | null;
     /**
-     * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+     * Choose a page, blog post or user to link to.
      */
     reference?:
       | ({
@@ -563,15 +567,15 @@ export interface InstagramBlock {
         link?: {
           type?: ('reference' | 'custom') | null;
           /**
-           * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+           * Enable if you want the link to open in a new tab.
            */
           newTab?: boolean | null;
           /**
-           * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+           * Enable if you want a label to be added to the link.
            */
           addLabel?: boolean | null;
           /**
-           * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+           * Choose a page, blog post or user to link to.
            */
           reference?:
             | ({
@@ -663,6 +667,10 @@ export interface Lesson {
    * Select a template to automatically apply its type, coaches, and default exercises.
    */
   template?: (number | null) | LessonTemplate;
+  /**
+   * Optional: the program this lesson belongs to. Selected automatically based on the start date.
+   */
+  program?: (number | null) | Program;
   title?: string | null;
   type?: ('pt' | 'semi_pt' | 'group' | 'open_gym') | null;
   /**
@@ -705,7 +713,7 @@ export interface Lesson {
   createdAt: string;
 }
 /**
- * Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen.
+ * Templates for recurring lessons. Create a template for each fixed lesson (e.g. 'Monday PT 09:00') and link it to individual lessons.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lesson-templates".
@@ -761,7 +769,51 @@ export interface LessonTemplate {
   createdAt: string;
 }
 /**
- * Beheer evenementen zoals hardloopwedstrijden, hyrox en speciale events.
+ * Manage programs with a start and end date, lessons and an optional final event (for example: Performance Cycle).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "programs".
+ */
+export interface Program {
+  id: number;
+  title: string;
+  startDate: string;
+  endDate: string;
+  bannerImage: number | Media;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Lessons linked to this program. Link a lesson to a program from the lesson form.
+   */
+  lessons?: {
+    docs?: (number | Lesson)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  finalEvent?: (number | null) | Event;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage events such as running races, Hyrox and special events.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
@@ -793,50 +845,6 @@ export interface Exercise {
   id: number;
   name: string;
   description?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Beheer programma's met een start- en einddatum, lessen en een optioneel eindevent (bijvoorbeeld: Performance Cycle).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "programs".
- */
-export interface Program {
-  id: number;
-  title: string;
-  startDate: string;
-  endDate: string;
-  bannerImage: number | Media;
-  description: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  schedule: {
-    /**
-     * Choose a date within the program's start and end date.
-     */
-    date: string;
-    lessons: number | Lesson;
-    id?: string | null;
-  }[];
-  finalEvent?: (number | null) | Event;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1053,7 +1061,7 @@ export interface Form {
     | null;
   submitButtonLabel?: string | null;
   /**
-   * Geef aan wat voor type bevestiging de gebruiker moet krijgen
+   * Indicate what type of confirmation the user should receive
    */
   confirmationType?: ('message' | 'redirect') | null;
   confirmationMessage?: {
@@ -1075,7 +1083,7 @@ export interface Form {
     url: string;
   };
   /**
-   * Stuur aangepaste e-mails wanneer het formulier wordt ingediend. Gebruik komma-gescheiden lijsten om dezelfde e-mail naar meerdere ontvangers te sturen. Om een waarde uit deze vorm te verwijzen, wikkel je de naam van dat veld in met dubbele krulhaken, bijvoorbeeld {{firstName}}. Je kunt een wildcard {{*}} gebruiken om alle data uit te voeren en {{*:table}} om het als een HTML-tabel in de e-mail te formatteren.
+   * Send custom emails when the form is submitted. Use comma-separated lists to send the same email to multiple recipients. To reference a value from this form, wrap the name of that field in double curly braces, for example {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.
    */
   emails?:
     | {
@@ -1653,6 +1661,7 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface LessonsSelect<T extends boolean = true> {
   template?: T;
+  program?: T;
   title?: T;
   type?: T;
   status?: T;
@@ -1755,13 +1764,7 @@ export interface ProgramsSelect<T extends boolean = true> {
   endDate?: T;
   bannerImage?: T;
   description?: T;
-  schedule?:
-    | T
-    | {
-        date?: T;
-        lessons?: T;
-        id?: T;
-      };
+  lessons?: T;
   finalEvent?: T;
   generateSlug?: T;
   slug?: T;
@@ -2060,26 +2063,26 @@ export interface Header {
   id: number;
   headerLogo: number | Media;
   /**
-   * Voeg navigatie items toe aan de header
+   * Add navigation items to the header
    */
   navItems?:
     | {
         /**
-         * Bepaalt of dit item standaard zichtbaar is in de header navigatie
+         * Determines whether this item is visible by default in the header navigation
          */
         initiallyVisible?: boolean | null;
         link?: {
           type?: ('reference' | 'custom') | null;
           /**
-           * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+           * Enable if you want the link to open in a new tab.
            */
           newTab?: boolean | null;
           /**
-           * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+           * Enable if you want a label to be added to the link.
            */
           addLabel?: boolean | null;
           /**
-           * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+           * Choose a page, blog post or user to link to.
            */
           reference?:
             | ({
@@ -2115,15 +2118,15 @@ export interface Footer {
   link?: {
     type?: ('reference' | 'custom') | null;
     /**
-     * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+     * Enable if you want the link to open in a new tab.
      */
     newTab?: boolean | null;
     /**
-     * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+     * Enable if you want a label to be added to the link.
      */
     addLabel?: boolean | null;
     /**
-     * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+     * Choose a page, blog post or user to link to.
      */
     reference?:
       | ({
@@ -2166,29 +2169,29 @@ export interface Footer {
       }[]
     | null;
   /**
-   * Voeg kolommen toe met links of rich text voor in de footer
+   * Add columns with links or rich text to the footer
    */
   footerColumns?:
     | {
         columnTitle: string;
         contentType: 'links' | 'richText';
         /**
-         * Voeg links toe voor deze kolom
+         * Add links for this column
          */
         links?:
           | {
               link?: {
                 type?: ('reference' | 'custom') | null;
                 /**
-                 * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+                 * Enable if you want the link to open in a new tab.
                  */
                 newTab?: boolean | null;
                 /**
-                 * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+                 * Enable if you want a label to be added to the link.
                  */
                 addLabel?: boolean | null;
                 /**
-                 * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+                 * Choose a page, blog post or user to link to.
                  */
                 reference?:
                   | ({
@@ -2238,7 +2241,7 @@ export interface Footer {
 export interface WhatsApp {
   id: number;
   /**
-   * Voer het telefoonnummer in in internationaal formaat, bijvoorbeeld: +31612345678
+   * Enter the phone number in international format, for example: +31612345678
    */
   phoneNumber: string;
   textPreFilled: string;
@@ -2604,15 +2607,15 @@ export interface ServiceCardBlock {
     link?: {
       type?: ('reference' | 'custom') | null;
       /**
-       * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+       * Enable if you want the link to open in a new tab.
        */
       newTab?: boolean | null;
       /**
-       * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+       * Enable if you want a label to be added to the link.
        */
       addLabel?: boolean | null;
       /**
-       * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+       * Choose a page, blog post or user to link to.
        */
       reference?:
         | ({

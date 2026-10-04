@@ -6,19 +6,19 @@ export const FormBlock: Block = {
     interfaceName: "FormBlock",
     fields: [
         {
-            label: "Formulier",
+            label: { en: "Form", nl: "Formulier" },
             name: "form",
             type: "relationship",
             relationTo: "forms",
             required: true,
         },
         {
-            label: "Met introtekst",
+            label: { en: "With intro text", nl: "Met introtekst" },
             name: "enableIntro",
             type: "checkbox",
         },
         {
-            label: "Introtekst",
+            label: { en: "Intro text", nl: "Introtekst" },
             name: "introContent",
             type: "richText",
             admin: {
@@ -31,7 +31,7 @@ export const FormBlock: Block = {
         singularName: "FormBlock",
     },
     labels: {
-        plural: "Formulieren",
-        singular: "Formulier",
+        plural: { en: "Forms", nl: "Formulieren" },
+        singular: { en: "Form", nl: "Formulier" },
     },
 };

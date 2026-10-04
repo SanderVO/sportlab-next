@@ -1771,6 +1771,9 @@ export const lessons = pgTable(
     template: integer("template_id").references(() => lesson_templates.id, {
       onDelete: "set null",
     }),
+    program: integer("program_id").references(() => programs.id, {
+      onDelete: "set null",
+    }),
     title: varchar("title"),
     type: enum_lessons_type("type"),
     status: enum_lessons_status("status").default("closed"),
@@ -1805,6 +1808,7 @@ export const lessons = pgTable(
   },
   (columns) => [
     index("lessons_template_idx").on(columns.template),
+    index("lessons_program_idx").on(columns.program),
     index("lessons_start_date_idx").on(columns.startDate),
     index("lessons_image_idx").on(columns.image),
     index("lessons_updated_at_idx").on(columns.updatedAt),
@@ -2058,35 +2062,6 @@ export const exercises = pgTable(
   (columns) => [
     index("exercises_updated_at_idx").on(columns.updatedAt),
     index("exercises_created_at_idx").on(columns.createdAt),
-  ],
-);
-
-export const programs_schedule = pgTable(
-  "programs_schedule",
-  {
-    _order: integer("_order").notNull(),
-    _parentID: integer("_parent_id").notNull(),
-    id: varchar("id").primaryKey(),
-    date: timestamp("date", {
-      mode: "string",
-      withTimezone: true,
-      precision: 3,
-    }).notNull(),
-    lessons: integer("lessons_id")
-      .notNull()
-      .references(() => lessons.id, {
-        onDelete: "set null",
-      }),
-  },
-  (columns) => [
-    index("programs_schedule_order_idx").on(columns._order),
-    index("programs_schedule_parent_id_idx").on(columns._parentID),
-    index("programs_schedule_lessons_idx").on(columns.lessons),
-    foreignKey({
-      columns: [columns["_parentID"]],
-      foreignColumns: [programs.id],
-      name: "programs_schedule_parent_id_fk",
-    }).onDelete("cascade"),
   ],
 );
 
@@ -4103,6 +4078,11 @@ export const relations_lessons = relations(lessons, ({ one, many }) => ({
     references: [lesson_templates.id],
     relationName: "template",
   }),
+  program: one(programs, {
+    fields: [lessons.program],
+    references: [programs.id],
+    relationName: "program",
+  }),
   image: one(media, {
     fields: [lessons.image],
     references: [media.id],
@@ -4188,29 +4168,11 @@ export const relations_events = relations(events, ({ one }) => ({
   }),
 }));
 export const relations_exercises = relations(exercises, () => ({}));
-export const relations_programs_schedule = relations(
-  programs_schedule,
-  ({ one }) => ({
-    _parentID: one(programs, {
-      fields: [programs_schedule._parentID],
-      references: [programs.id],
-      relationName: "schedule",
-    }),
-    lessons: one(lessons, {
-      fields: [programs_schedule.lessons],
-      references: [lessons.id],
-      relationName: "lessons",
-    }),
-  }),
-);
-export const relations_programs = relations(programs, ({ one, many }) => ({
+export const relations_programs = relations(programs, ({ one }) => ({
   bannerImage: one(media, {
     fields: [programs.bannerImage],
     references: [media.id],
     relationName: "bannerImage",
-  }),
-  schedule: many(programs_schedule, {
-    relationName: "schedule",
   }),
   finalEvent: one(events, {
     fields: [programs.finalEvent],
@@ -4916,7 +4878,6 @@ type DatabaseSchema = {
   lesson_templates_rels: typeof lesson_templates_rels;
   events: typeof events;
   exercises: typeof exercises;
-  programs_schedule: typeof programs_schedule;
   programs: typeof programs;
   lesson_enrollments: typeof lesson_enrollments;
   lesson_exercise_tracking_workout_blocks_exercises: typeof lesson_exercise_tracking_workout_blocks_exercises;
@@ -5009,7 +4970,6 @@ type DatabaseSchema = {
   relations_lesson_templates: typeof relations_lesson_templates;
   relations_events: typeof relations_events;
   relations_exercises: typeof relations_exercises;
-  relations_programs_schedule: typeof relations_programs_schedule;
   relations_programs: typeof relations_programs;
   relations_lesson_enrollments: typeof relations_lesson_enrollments;
   relations_lesson_exercise_tracking_workout_blocks_exercises: typeof relations_lesson_exercise_tracking_workout_blocks_exercises;

@@ -6,71 +6,71 @@ export const Team: Block = {
     interfaceName: "TeamBlock",
     fields: [
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
         },
         {
-            label: "Limiet",
+            label: { en: "Limit", nl: "Limiet" },
             name: "limit",
             type: "number",
             defaultValue: 0,
         },
         {
-            label: "Sortering",
+            label: { en: "Sorting", nl: "Sortering" },
             name: "sortBy",
             type: "select",
             defaultValue: "name",
             required: true,
             options: [
-                { label: "Naam (A-Z)", value: "name" },
-                { label: "Naam (Z-A)", value: "-name" },
-                { label: "Nieuwste eerst", value: "-createdAt" },
-                { label: "Oudste eerst", value: "createdAt" },
-                { label: "Aangepaste volgorde", value: "position" },
+                { label: { en: "Name (A-Z)", nl: "Naam (A-Z)" }, value: "name" },
+                { label: { en: "Name (Z-A)", nl: "Naam (Z-A)" }, value: "-name" },
+                { label: { en: "Newest first", nl: "Nieuwste eerst" }, value: "-createdAt" },
+                { label: { en: "Oldest first", nl: "Oudste eerst" }, value: "createdAt" },
+                { label: { en: "Custom order", nl: "Aangepaste volgorde" }, value: "position" },
             ],
         },
         {
-            label: "Type",
+            label: { en: "Type", nl: "Type" },
             name: "type",
             type: "select",
             defaultValue: "carousel",
             required: true,
             options: [
                 {
-                    label: "Carousel",
+                    label: { en: "Carousel", nl: "Carousel" },
                     value: "carousel",
                 },
                 {
-                    label: "Grid",
+                    label: { en: "Grid", nl: "Grid" },
                     value: "grid",
                 },
             ],
         },
         {
-            label: "Achtergrondkleur",
+            label: { en: "Background color", nl: "Achtergrondkleur" },
             name: "backgroundColor",
             type: "select",
             defaultValue: "backgroundDark",
             required: true,
             options: [
                 {
-                    label: "Zwart",
+                    label: { en: "Black", nl: "Zwart" },
                     value: "backgroundDark",
                 },
                 {
-                    label: "Beige",
+                    label: { en: "Beige", nl: "Beige" },
                     value: "backgroundLight",
                 },
                 {
-                    label: "Wit",
+                    label: { en: "White", nl: "Wit" },
                     value: "backgroundWhite",
                 },
             ],
         },
         {
-            label: "Geselecteerde coaches",
+            label: { en: "Selected coaches", nl: "Geselecteerde coaches" },
             name: "selectedCoaches",
             type: "relationship",
             relationTo: "users",
@@ -78,7 +78,7 @@ export const Team: Block = {
             required: false,
             admin: {
                 description:
-                    "Optioneel: kies specifieke coaches om te tonen. Laat leeg om automatisch alle coaches te tonen.",
+                    { en: "Optional: choose specific coaches to display. Leave empty to automatically show all coaches.", nl: "Optioneel: kies specifieke coaches om te tonen. Laat leeg om automatisch alle coaches te tonen." },
             },
             filterOptions: {
                 isCoach: {
@@ -90,7 +90,7 @@ export const Team: Block = {
             },
         },
         {
-            label: "Heeft een link",
+            label: { en: "Has a link", nl: "Heeft een link" },
             name: "enableLink",
             type: "checkbox",
         },

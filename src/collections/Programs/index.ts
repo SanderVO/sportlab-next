@@ -26,7 +26,7 @@ export const Programs: CollectionConfig = {
         useAsTitle: "title",
         defaultColumns: ["title", "startDate", "endDate", "updatedAt"],
         description:
-            "Beheer programma's met een start- en einddatum, lessen en een optioneel eindevent (bijvoorbeeld: Performance Cycle).",
+            { en: "Manage programs with a start and end date, lessons and an optional final event (for example: Performance Cycle).", nl: "Beheer programma's met een start- en einddatum, lessen en een optioneel eindevent (bijvoorbeeld: Performance Cycle)." },
     },
     fields: [
         {
@@ -78,47 +78,20 @@ export const Programs: CollectionConfig = {
         },
         {
             label: { en: "Lessons", nl: "Lessen" },
-            name: "schedule",
-            type: "array",
-            required: true,
-            fields: [
-                {
-                    label: { en: "Date", nl: "Datum" },
-                    name: "date",
-                    type: "date",
-                    required: true,
-                    admin: {
-                        date: { pickerAppearance: "dayAndTime" },
-                        description: {
-                            en: "Choose a date within the program's start and end date.",
-                            nl: "Kies een datum binnen de start- en einddatum van het programma.",
-                        },
-                    },
-                    validate: (
-                        value: Date | null | undefined,
-                        { data }: { data: Record<string, unknown> },
-                    ) => {
-                        if (!value) return true;
-                        const start = data?.startDate as string | undefined;
-                        const end = data?.endDate as string | undefined;
-                        if (start && new Date(value) < new Date(start)) {
-                            return "Date must be after the program start date.";
-                        }
-                        if (end && new Date(value) > new Date(end)) {
-                            return "Date must be before the program end date.";
-                        }
-                        return true;
-                    },
+            name: "lessons",
+            type: "join",
+            collection: "lessons",
+            on: "program",
+            defaultSort: "startDate",
+            defaultLimit: 0,
+            admin: {
+                allowCreate: false,
+                defaultColumns: ["title", "startDate", "type"],
+                description: {
+                    en: "Lessons linked to this program. Link a lesson to a program from the lesson form.",
+                    nl: "Lessen die aan dit programma zijn gekoppeld. Koppel een les aan een programma via het lesformulier.",
                 },
-                {
-                    label: { en: "Lesson", nl: "Les" },
-                    name: "lessons",
-                    type: "relationship",
-                    relationTo: "lessons",
-                    hasMany: false,
-                    required: true,
-                },
-            ],
+            },
         },
         {
             label: { en: "Final event", nl: "Eindevent" },
