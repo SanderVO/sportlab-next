@@ -3,6 +3,7 @@
 import customImageLoader from "@/utilities/imageLoader";
 import { cn } from "@/utilities/ui";
 import React, { useEffect, useRef, useState } from "react";
+import { ImageMedia } from "../ImageMedia";
 import type { Props as MediaProps } from "../types";
 
 export const VideoMedia: React.FC<MediaProps> = (props) => {
@@ -11,7 +12,10 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
     const [shouldAutoplay, setShouldAutoplay] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
 
+    // Priority videos defer their source until the page (including the LCP
+    // poster image) has loaded, so the MP4 never competes with it.
     useEffect(() => {
         if (!priority || shouldLoadVideo) return;
 
@@ -20,7 +24,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
 
         const loadVideo = () => setShouldLoadVideo(true);
 
-        if (typeof window !== "undefined") {
+        const schedule = () => {
             if (typeof window.requestIdleCallback === "function") {
                 idleId = window.requestIdleCallback(loadVideo, {
                     timeout: 1800,
@@ -28,12 +32,19 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
             } else {
                 timeoutId = window.setTimeout(loadVideo, 1200);
             }
+        };
+
+        if (document.readyState === "complete") {
+            schedule();
+        } else {
+            window.addEventListener("load", schedule, { once: true });
         }
 
         return () => {
+            window.removeEventListener("load", schedule);
+
             if (
                 typeof idleId === "number" &&
-                typeof window !== "undefined" &&
                 typeof window.cancelIdleCallback === "function"
             ) {
                 window.cancelIdleCallback(idleId);
@@ -46,7 +57,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
     }, [priority, shouldLoadVideo]);
 
     useEffect(() => {
-        if (shouldLoadVideo) return;
+        if (priority || shouldLoadVideo) return;
 
         const node = videoRef.current;
 
@@ -71,7 +82,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
         return () => {
             observer.disconnect();
         };
-    }, [shouldLoadVideo]);
+    }, [priority, shouldLoadVideo]);
 
     useEffect(() => {
         const node = videoRef.current;
@@ -84,7 +95,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
             if (!entry) return;
 
             if (entry.isIntersecting) {
-                setShouldLoadVideo(true);
+                if (!priority) setShouldLoadVideo(true);
                 setShouldAutoplay(true);
 
                 return;
@@ -98,7 +109,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
         return () => {
             observer.disconnect();
         };
-    }, []);
+    }, [priority]);
 
     useEffect(() => {
         const node = videoRef.current;
@@ -127,20 +138,28 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
             videoPoster = customImageLoader({
                 src: poster.url!,
                 width: 1080,
-                quality: 85,
+                quality: 75,
             });
         } else if (thumbnailURL) {
             videoPoster = encodeURI(thumbnailURL);
         }
 
+        // Render the poster as a real <img> for priority videos so it is a
+        // proper LCP candidate (fetchpriority=high, responsive srcset).
+        const posterResource =
+            typeof poster === "object" && poster?.url ? poster : thumbnailURL;
+        const showPosterImage = !!priority && !!posterResource;
+
         return (
             <>
-                {priority && videoPoster && videoPoster !== "" && (
-                    <link
-                        rel="preload"
-                        as="image"
-                        href={videoPoster}
-                        fetchPriority="high"
+                {showPosterImage && (
+                    <ImageMedia
+                        fill
+                        priority
+                        resource={posterResource}
+                        pictureClassName="absolute inset-0 h-full w-full overflow-hidden"
+                        imgClassName="object-cover"
+                        size="100vw"
                     />
                 )}
 
@@ -149,7 +168,11 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
                         className={cn(
                             fill ? "absolute inset-0 h-full w-full" : "",
                             videoClassName,
+                            showPosterImage &&
+                                "transition-opacity duration-500",
+                            showPosterImage && !isPlaying && "opacity-0",
                         )}
+                        onPlaying={() => setIsPlaying(true)}
                         controls={false}
                         loop
                         muted
@@ -157,7 +180,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
                         playsInline
                         preload="none"
                         ref={videoRef}
-                        poster={videoPoster}
+                        poster={showPosterImage ? undefined : videoPoster}
                         width={!fill ? width || undefined : undefined}
                         height={!fill ? height || undefined : undefined}
                         style={

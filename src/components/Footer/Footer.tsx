@@ -27,6 +27,7 @@ export async function Footer() {
                         {footerData.footerLogo && (
                             <Media
                                 imgHeight={40}
+                                size="200px"
                                 imgWidth={200}
                                 className="relative w-full lg:w-50 h-12.5 flex justify-center"
                                 resource={footerData.footerLogo}

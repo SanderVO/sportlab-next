@@ -78,7 +78,7 @@ export default async function Coach({ params: paramsPromise }: Args) {
                 {user.avatar && (
                     <Media
                         resource={user.avatar}
-                        size="(max-width: 768px) 400px, 480px"
+                        size="(max-width: 640px) 100vw, (max-width: 1024px) 250px, 480px"
                         htmlElement={null}
                         pictureClassName="relative md:absolute left-0 bottom-0 w-full sm:w-[250px] lg:w-[480px] h-[400px] md:h-full"
                         imgClassName="h-full object-cover object-top md:object-center"

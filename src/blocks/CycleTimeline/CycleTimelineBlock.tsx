@@ -137,6 +137,7 @@ export const CycleTimelineBlock: React.FC<CycleTimelineBlockProps> = (
                                             <div className="relative aspect-4/3 w-full">
                                                 <Media
                                                     fill
+                                                    size="(max-width: 768px) 88vw, (max-width: 1366px) 50vw, 20vw"
                                                     resource={stage.image}
                                                     imgClassName="object-cover"
                                                 />
@@ -198,6 +199,7 @@ export const CycleTimelineBlock: React.FC<CycleTimelineBlockProps> = (
                                 <div className="relative aspect-4/3 w-full">
                                     <Media
                                         fill
+                                        size="(max-width: 768px) 88vw, (max-width: 1366px) 50vw, 20vw"
                                         resource={stage.image}
                                         imgClassName="object-cover"
                                     />

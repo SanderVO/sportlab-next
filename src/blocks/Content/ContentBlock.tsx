@@ -79,7 +79,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                             {media && contentPosition === "contentRight" && (
                                 <Media
                                     resource={media}
-                                    size="(max-width: 768px) 400px, 480px"
+                                    size="(max-width: 1024px) 100vw, 480px"
                                     htmlElement={null}
                                     pictureClassName={cn(
                                         imageSize === "imageTopCut" &&
@@ -109,7 +109,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                 {media && (
                                     <Media
                                         resource={media}
-                                        size="(max-width: 768px) 400px, 480px"
+                                        size="(max-width: 1024px) 100vw, 480px"
                                         htmlElement={null}
                                         pictureClassName={cn(
                                             "h-[400px] sm:h-[400px] lg:h-[200px] w-full relative mb-4",
@@ -137,7 +137,7 @@ export const ContentBlock: React.FC<ContentBlockProps> = (props) => {
                                 <Media
                                     resource={media}
                                     htmlElement={null}
-                                    size="(max-width: 768px) 400px, 480px"
+                                    size="(max-width: 1024px) 100vw, 480px"
                                     pictureClassName={cn(
                                         imageSize === "imageTopCut" &&
                                             "absolute right-0 -bottom-12 w-[480px] hidden lg:block h-full",

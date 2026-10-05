@@ -23,9 +23,9 @@ export async function Header() {
                 <Link href="/" className="flex items-center shrink-0">
                     <Media
                         resource={headerData?.headerLogo}
-                        priority
+                        loading="eager"
                         htmlElement={null}
-                        size="(max-width: 768px) 175px, 200px"
+                        size="(max-width: 1024px) 150px, 200px"
                         pictureClassName="h-8 w-[150px] lg:h-10 lg:w-[200px] relative"
                         imgClassName="h-full"
                         imgWidth={200}
