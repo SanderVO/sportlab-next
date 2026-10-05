@@ -4,6 +4,7 @@ import * as migration_20261001_182326 from './20261001_182326';
 import * as migration_20261003_191209 from './20261003_191209';
 import * as migration_20261003_200000_update_cdn_urls from './20261003_200000_update_cdn_urls';
 import * as migration_20261004_120000_add_lesson_program from './20261004_120000_add_lesson_program';
+import * as migration_20261005_181519 from './20261005_181519';
 
 export const migrations = [
   {
@@ -24,7 +25,7 @@ export const migrations = [
   {
     up: migration_20261003_191209.up,
     down: migration_20261003_191209.down,
-    name: '20261003_191209'
+    name: '20261003_191209',
   },
   {
     up: migration_20261003_200000_update_cdn_urls.up,
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20261004_120000_add_lesson_program.up,
     down: migration_20261004_120000_add_lesson_program.down,
     name: '20261004_120000_add_lesson_program',
+  },
+  {
+    up: migration_20261005_181519.up,
+    down: migration_20261005_181519.down,
+    name: '20261005_181519'
   },
 ];
