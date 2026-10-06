@@ -2,6 +2,7 @@ import configPromise from "@payload-config";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
+import { WorkoutBlocks } from "./WorkoutBlocks";
 
 type PageProps = {
     params: Promise<{
@@ -34,7 +35,9 @@ function isMedia(
     return typeof value === "object" && value !== null && "url" in value;
 }
 
-function isProgram(value: unknown): value is { id: number; title?: string | null } {
+function isProgram(
+    value: unknown,
+): value is { id: number; title?: string | null } {
     return typeof value === "object" && value !== null && "id" in value;
 }
 
@@ -91,16 +94,16 @@ export default async function TvLessonPage({
         : `/tv${resolvedSearchParams.category ? `?category=${resolvedSearchParams.category}` : ""}`;
 
     return (
-        <div className="relative min-h-screen overflow-hidden px-4 py-4 text-warm-white sm:px-6 sm:py-6 lg:box-border lg:flex lg:h-dvh lg:min-h-0 lg:flex-col lg:px-8 lg:py-8">
+        <div className="relative box-border flex h-full flex-col overflow-hidden px-8 py-8 text-warm-white">
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 <div className="absolute left-1/2 top-0 h-64 w-2xl -translate-x-1/2 rounded-full bg-cta/10 blur-3xl" />
                 <div className="absolute right-0 top-1/4 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
                 <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-steel/10 blur-3xl" />
             </div>
 
-            <div className="relative z-10 min-h-[calc(100vh-7rem)] overflow-hidden rounded-4xl border border-white/10 bg-ink/80 shadow-2xl shadow-black/25 backdrop-blur lg:min-h-0 lg:flex-1">
-                <div className="grid min-h-[calc(100vh-7rem)] md:grid-cols-[minmax(16rem,26vw)_1fr] lg:min-h-0 lg:h-full">
-                    <aside className="relative min-h-80 overflow-hidden border-b border-white/10 bg-black md:min-h-full md:border-b-0 md:border-r lg:min-h-0">
+            <div className="relative z-10 min-h-0 flex-1 overflow-hidden rounded-4xl border border-white/10 bg-ink/80 shadow-2xl shadow-black/25 backdrop-blur">
+                <div className="grid h-full min-h-0 grid-cols-[380px_1fr]">
+                    <aside className="relative min-h-0 overflow-hidden border-r border-white/10 bg-black">
                         {lessonImage?.url ? (
                             <Image
                                 src={lessonImage.url}
@@ -113,21 +116,21 @@ export default async function TvLessonPage({
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_36%),linear-gradient(180deg,rgba(20,17,13,0.2),rgba(20,17,13,0.9))]" />
                         )}
 
-                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,17,13,0.08)_0%,rgba(20,17,13,0.24)_36%,rgba(20,17,13,0.94)_100%)]" />
+                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.65)_0%,rgba(0,0,0,0.25)_25%,rgba(0,0,0,0.3)_50%,rgba(0,0,0,0.9)_100%)]" />
 
-                        <div className="absolute left-5 top-5 z-20 font-sl-archivo text-[2.75rem] uppercase tracking-[0.16em] text-warm-white xl:left-8 xl:top-7 xl:text-[3.25rem]">
+                        <div className="absolute left-8 top-7 z-20 font-sl-archivo text-[2.5rem] uppercase tracking-[0.16em] text-warm-white">
                             Sportlab
                         </div>
 
                         {program?.title ? (
-                            <div className="absolute right-5 top-5 z-20 max-w-[45%] rounded-full border border-cta/35 bg-cta/15 px-3 py-1 text-right text-[0.6rem] uppercase tracking-[0.16em] text-[#f7d7b8] shadow-lg shadow-black/20 backdrop-blur xl:right-8 xl:top-7">
+                            <div className="absolute left-8 top-24 z-20 max-w-[calc(100%-4rem)] rounded-full border border-cta/35 bg-cta/15 px-3 py-1 text-[0.8rem] uppercase tracking-[0.16em] text-[#f7d7b8] shadow-lg shadow-black/20 backdrop-blur">
                                 {program.title}
                             </div>
                         ) : null}
 
-                        <div className="absolute inset-0 flex items-end p-6 xl:p-10">
+                        <div className="absolute inset-0 flex items-end p-10">
                             <div className="max-w-xl">
-                                <p className="mt-3 text-[0.65rem] uppercase tracking-[0.25em] text-warm-white/70">
+                                <p className="mt-3 text-sm uppercase tracking-[0.25em] text-warm-white/80">
                                     {lesson.coaches
                                         ?.map((coach) =>
                                             isUser(coach) && coach.name
@@ -137,91 +140,15 @@ export default async function TvLessonPage({
                                         .join(" · ") || "Geen coach gekoppeld"}
                                 </p>
 
-                                <h1 className="mt-3 text-3xl uppercase tracking-widest text-warm-white sm:text-4xl xl:text-5xl font-sl-archivo">
+                                <h1 className="mt-3 text-4xl uppercase tracking-widest text-warm-white font-sl-archivo">
                                     {lesson.title || `Les ${lesson.id}`}
                                 </h1>
                             </div>
                         </div>
                     </aside>
 
-                    <div className="min-h-0 overflow-y-auto p-4 xl:p-6">
-                        <div className="grid gap-4 md:grid-cols-2 xl:gap-5">
-                            {(lesson.workoutBlocks ?? []).map(
-                                (block, index) => {
-                                    const exercises = Array.isArray(
-                                        (block as { exercises?: unknown[] })
-                                            .exercises,
-                                    )
-                                        ? ((block as { exercises?: unknown[] })
-                                              .exercises as Array<{
-                                              id?: string;
-                                              name?: string;
-                                              description?: string;
-                                          }>)
-                                        : [];
-                                    const workoutDescription = (
-                                        block as {
-                                            description?: string;
-                                        }
-                                    ).description;
-
-                                    return (
-                                        <section
-                                            key={
-                                                block.id ??
-                                                `${lesson.id}-${index}`
-                                            }
-                                            className="rounded-3xl border border-white/10 bg-warm-white/6 p-4"
-                                        >
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div className="min-w-0">
-                                                    <h2 className="text-3xl uppercase tracking-[0.12em] text-warm-white font-sl-archivo">
-                                                        {(
-                                                            block as {
-                                                                name?: string;
-                                                            }
-                                                        ).name || "Workout"}
-                                                    </h2>
-
-                                                    {workoutDescription ? (
-                                                        <p className="mt-1 text-lg leading-5 text-warm-white/65">
-                                                            {workoutDescription}
-                                                        </p>
-                                                    ) : null}
-                                                </div>
-
-                                                <span className="shrink-0 rounded-full border border-cta/35 bg-cta/15 px-2.5 py-1 text-base uppercase tracking-[0.18em] text-[#f7d7b8]">
-                                                    {block.duration} min
-                                                </span>
-                                            </div>
-
-                                            <div className="mt-3 flex flex-col gap-2">
-                                                {exercises.map((exercise) => (
-                                                    <div
-                                                        key={
-                                                            exercise.id ??
-                                                            exercise.name
-                                                        }
-                                                        className="rounded-2xl border border-white/10 bg-black/20 p-3"
-                                                    >
-                                                        <h3 className="text-xl uppercase tracking-[0.06em] text-warm-white font-sl-archivo">
-                                                            {exercise.name ||
-                                                                "Oefening"}
-                                                        </h3>
-
-                                                        <p className="mt-1 text-lg leading-5 text-warm-white/65">
-                                                            {
-                                                                exercise.description
-                                                            }
-                                                        </p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </section>
-                                    );
-                                },
-                            )}
-                        </div>
+                    <div className="min-h-0 overflow-y-auto p-6">
+                        <WorkoutBlocks blocks={lesson.workoutBlocks ?? []} />
                     </div>
                 </div>
             </div>

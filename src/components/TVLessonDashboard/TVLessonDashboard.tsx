@@ -140,7 +140,7 @@ export function TVLessonDashboard({
     const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
     const [nextPage, setNextPage] = useState<number | null>(initialNextPage);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [activeIndex, setActiveIndex] = useState(0);
+    const [requestedIndex, setActiveIndex] = useState(0);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [calendarMonthKey, setCalendarMonthKey] = useState(
         selectedDate.slice(0, 7),
@@ -250,30 +250,11 @@ export function TVLessonDashboard({
         setIsCalendarOpen(true);
     };
 
-    useEffect(() => {
-        setLoadedLessons(lessons);
-        setHasNextPage(initialHasNextPage);
-        setNextPage(initialNextPage);
-        setIsLoadingMore(false);
-        setActiveIndex(0);
-    }, [lessons, initialHasNextPage, initialNextPage]);
-
-    const visibleLessons = useMemo(() => loadedLessons, [loadedLessons]);
-
-    useEffect(() => {
-        setCalendarMonthKey(selectedDate.slice(0, 7));
-    }, [selectedDate]);
-
-    useEffect(() => {
-        if (visibleLessons.length === 0) {
-            setActiveIndex(0);
-            return;
-        }
-
-        setActiveIndex((current) =>
-            Math.min(current, visibleLessons.length - 1),
-        );
-    }, [visibleLessons.length]);
+    const visibleLessons = loadedLessons;
+    const activeIndex = Math.min(
+        requestedIndex,
+        Math.max(visibleLessons.length - 1, 0),
+    );
 
     const focusCard = (index: number) => {
         if (index < 0 || index >= visibleLessons.length) {
@@ -462,7 +443,7 @@ export function TVLessonDashboard({
     }, [isCalendarOpen]);
 
     return (
-        <div className="relative min-h-screen overflow-hidden px-4 py-4 text-white sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <div className="relative min-h-full overflow-hidden px-8 py-8 text-white">
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 <div className="absolute left-1/2 top-0 h-64 w-2xl -translate-x-1/2 rounded-full bg-cta/10 blur-3xl" />
                 <div className="absolute right-0 top-1/4 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
@@ -470,7 +451,7 @@ export function TVLessonDashboard({
             </div>
 
             <main className="relative z-10">
-                <div className="mb-4 flex items-center justify-between gap-3 rounded-3xl border border-white/15 bg-[#120f0c]/80 px-3 py-3 backdrop-blur sm:mb-6 sm:px-4">
+                <div className="mb-6 flex items-center justify-between gap-3 rounded-3xl border border-white/15 bg-[#120f0c]/80 px-4 py-3 backdrop-blur">
                     <button
                         type="button"
                         onClick={() =>
@@ -521,12 +502,12 @@ export function TVLessonDashboard({
                 </div>
 
                 {visibleLessons.length === 0 ? (
-                    <div className="flex min-h-[75vh] items-center justify-center rounded-4xl border border-dashed border-white/15 bg-warm-white/4 p-8 text-center text-white/60">
+                    <div className="flex min-h-200 items-center justify-center rounded-4xl border border-dashed border-white/15 bg-warm-white/4 p-8 text-center text-white/60">
                         Geen lessen gevonden voor deze filter.
                     </div>
                 ) : (
                     <>
-                        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                        <div className="grid grid-cols-4 gap-4">
                             {visibleLessons.map((lesson, index) => {
                                 const href = buildHref(pathname, lesson.id);
 

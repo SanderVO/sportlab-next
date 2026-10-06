@@ -32,6 +32,7 @@ import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 }
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { ImportCsvField as ImportCsvField_8fbae033319cd7874a1f399cec211fd3 } from '../../../collections/Lessons/components/ImportCsvField'
 import { ProgramField as ProgramField_1741ed31f8d3237dc5f15043a10b3889 } from '../../../collections/Lessons/components/ProgramField'
+import { StartDateCell as StartDateCell_ac29e67b0d652b6433050eaa2389094d } from '../../../collections/Lessons/components/StartDateCell'
 import { WorkoutBlockRowLabel as WorkoutBlockRowLabel_57685c22d099c0ef4306483e73964776 } from '../../../collections/Lessons/components/WorkoutBlockRowLabel'
 import { GenerateLessonsButton as GenerateLessonsButton_62298332f54a1a61436879b8e4f2a85f } from '../../../collections/LessonTemplates/components/GenerateLessonsButton'
 import { RowLabel as RowLabel_32a51e6e3af330e56588397e714b8f89 } from '@/components/Header/RowLabel'
@@ -75,6 +76,7 @@ export const importMap = {
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
   "./collections/Lessons/components/ImportCsvField#ImportCsvField": ImportCsvField_8fbae033319cd7874a1f399cec211fd3,
   "./collections/Lessons/components/ProgramField#ProgramField": ProgramField_1741ed31f8d3237dc5f15043a10b3889,
+  "./collections/Lessons/components/StartDateCell#StartDateCell": StartDateCell_ac29e67b0d652b6433050eaa2389094d,
   "./collections/Lessons/components/WorkoutBlockRowLabel#WorkoutBlockRowLabel": WorkoutBlockRowLabel_57685c22d099c0ef4306483e73964776,
   "./collections/LessonTemplates/components/GenerateLessonsButton#GenerateLessonsButton": GenerateLessonsButton_62298332f54a1a61436879b8e4f2a85f,
   "@/components/Header/RowLabel#RowLabel": RowLabel_32a51e6e3af330e56588397e714b8f89,

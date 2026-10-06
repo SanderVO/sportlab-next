@@ -698,7 +698,7 @@ export interface Lesson {
     | {
         name: string;
         description?: string | null;
-        duration: number;
+        duration?: number | null;
         exercises?:
           | {
               name: string;

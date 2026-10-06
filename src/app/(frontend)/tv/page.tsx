@@ -45,6 +45,7 @@ export default async function TvDashboardPage({ searchParams }: PageProps) {
 
     return (
         <TVLessonDashboard
+            key={selectedDate}
             lessons={lessonsResult.docs}
             initialHasNextPage={lessonsResult.hasNextPage}
             initialNextPage={lessonsResult.nextPage ?? null}

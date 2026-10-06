@@ -158,6 +158,9 @@ export const Lessons: CollectionConfig = {
             index: true,
             admin: {
                 condition: (_, siblingData) => !siblingData?.template,
+                components: {
+                    Cell: "./collections/Lessons/components/StartDateCell#StartDateCell",
+                },
                 date: {
                     pickerAppearance: "dayAndTime",
                 },
@@ -259,7 +262,7 @@ export const Lessons: CollectionConfig = {
                     label: { en: "Time (minutes)", nl: "Tijd (in minuten)" },
                     name: "duration",
                     type: "number",
-                    required: true,
+                    required: false,
                 },
                 {
                     label: { en: "Exercises", nl: "Oefeningen" },
