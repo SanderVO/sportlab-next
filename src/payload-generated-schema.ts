@@ -1751,7 +1751,7 @@ export const lessons_workout_blocks = pgTable(
     id: varchar("id").primaryKey(),
     name: varchar("name").notNull(),
     description: varchar("description"),
-    duration: numeric("duration", { mode: "number" }).notNull(),
+    duration: numeric("duration", { mode: "number" }),
   },
   (columns) => [
     index("lessons_workout_blocks_order_idx").on(columns._order),
