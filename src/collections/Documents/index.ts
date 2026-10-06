@@ -1,4 +1,5 @@
 import { isAdmin } from "@/access/admin";
+import { sanitizeUploadFilename } from "@/hooks/sanitizeUploadFilename";
 import type { CollectionConfig } from "payload";
 
 export const Documents: CollectionConfig = {
@@ -21,6 +22,9 @@ export const Documents: CollectionConfig = {
             required: true,
         },
     ],
+    hooks: {
+        beforeOperation: [sanitizeUploadFilename],
+    },
     upload: {
         mimeTypes: [
             "application/pdf",
