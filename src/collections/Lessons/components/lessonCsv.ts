@@ -19,7 +19,24 @@ export const CSV_HEADERS = [
 ] as const;
 
 // Optional columns: older files without them still import.
-export const OPTIONAL_CSV_HEADERS = ["block_poa", "exercise_quantity"] as const;
+export const OPTIONAL_CSV_HEADERS = [
+    "block_poa",
+    "block_timer_mode",
+    "block_interval_seconds",
+    "block_rounds",
+    "block_work_seconds",
+    "block_rest_seconds",
+    "exercise_quantity",
+    "exercise_rotating",
+] as const;
+
+export const TIMER_MODES = [
+    "countdown",
+    "emom",
+    "amrap",
+    "rounds",
+    "intervals",
+] as const;
 
 export const CSV_EXAMPLE = `${CSV_HEADERS.join(",")}
 Friday Strength,group,open,2026-10-09T18:00,2026-10-09T19:00,12,coach@example.com|other@example.com,Warm-up,Get the joints moving,10,Jumping jacks,3 x 30 seconds
@@ -52,10 +69,15 @@ Block columns:
 Exercise columns:
 - exercise_name: name of the exercise (leave empty for a block without exercises)
 - exercise_description: coaching cue shown under the exercise, e.g. "Focus on soft landing" (optional)
+- exercise_rotating: true if this exercise takes turns with the other rotating ones, one per round (AMRAP / rounds). Leave empty otherwise
 - exercise_quantity: short quantity shown next to the exercise, e.g. 3x15-20, 30 sec, 10x per kant (optional column)
 
-Optional block column:
-- block_poa: points of attention for the block, one per line inside the quoted value (optional column, taken from the block's first row)
+Optional block columns (taken from the block's first row):
+- block_timer_mode: one of countdown, emom, amrap, rounds, intervals (default countdown)
+- block_interval_seconds: whole seconds per interval, EMOM only (default 60)
+- block_rounds: number of rounds (rounds mode), or how often the exercise list repeats (intervals mode)
+- block_work_seconds, block_rest_seconds: intervals mode only. Every exercise gets this work and rest time, then the next exercise starts
+- block_poa: points of attention for the block as plain text (optional column, taken from the block's first row)
 
 Rules: wrap any value that contains a comma or a line break in double quotes.
 
@@ -81,10 +103,16 @@ export type ParsedLesson = {
         description: string;
         duration: number;
         poa: string;
+        timerMode?: (typeof TIMER_MODES)[number];
+        intervalSeconds?: number;
+        rounds?: number;
+        workSeconds?: number;
+        restSeconds?: number;
         exercises: Array<{
             name: string;
             description: string;
             quantity: string;
+            rotating: boolean;
         }>;
     }>;
 };
@@ -214,6 +242,37 @@ export const parseLessonCsv = (
                 poa: row.block_poa,
                 exercises: [],
             };
+
+            const mode = row.block_timer_mode.toLowerCase();
+            if (mode) {
+                if (
+                    TIMER_MODES.includes(mode as (typeof TIMER_MODES)[number])
+                ) {
+                    current.timerMode = mode as (typeof TIMER_MODES)[number];
+                } else {
+                    errors.push(
+                        `Row ${line}: block_timer_mode must be one of ${TIMER_MODES.join(", ")}.`,
+                    );
+                }
+            }
+            for (const [column, key] of [
+                ["block_interval_seconds", "intervalSeconds"],
+                ["block_rounds", "rounds"],
+                ["block_work_seconds", "workSeconds"],
+                ["block_rest_seconds", "restSeconds"],
+            ] as const) {
+                if (!row[column]) continue;
+                const value = Number(row[column]);
+                if (
+                    Number.isInteger(value) &&
+                    (value > 0 || (key === "restSeconds" && value === 0))
+                )
+                    current[key] = value;
+                else
+                    errors.push(
+                        `Row ${line}: ${column} must be a whole number.`,
+                    );
+            }
             lesson.workoutBlocks.push(current);
         }
 
@@ -229,6 +288,9 @@ export const parseLessonCsv = (
                 name: row.exercise_name,
                 description: row.exercise_description,
                 quantity: row.exercise_quantity,
+                rotating: ["true", "1", "yes", "ja"].includes(
+                    row.exercise_rotating.toLowerCase(),
+                ),
             });
         } else if (row.exercise_description) {
             errors.push(`Row ${line}: exercise_name is required.`);

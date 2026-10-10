@@ -22,9 +22,15 @@ type WorkoutTemplateBlock = {
     description?: string | null;
     duration?: number | null;
     poa?: string | null;
+    timerMode?: "countdown" | "emom" | "amrap" | "rounds" | "intervals" | null;
+    intervalSeconds?: number | null;
+    rounds?: number | null;
+    workSeconds?: number | null;
+    restSeconds?: number | null;
     exercises?: Array<{
         name?: string | null;
         quantity?: string | null;
+        rotating?: boolean | null;
         description?: string | null;
         videoUrl?: string | null;
     }>;
@@ -83,9 +89,15 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
         description?: string;
         duration?: number;
         poa?: string;
+        timerMode?: "countdown" | "emom" | "amrap" | "rounds" | "intervals";
+        intervalSeconds?: number;
+        rounds?: number;
+        workSeconds?: number;
+        restSeconds?: number;
         exercises: Array<{
             name: string;
             quantity?: string;
+            rotating?: boolean;
             description?: string;
             videoUrl?: string;
         }>;
@@ -103,6 +115,7 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
             .map((exercise) => ({
                 name: exercise?.name ?? "",
                 quantity: exercise?.quantity ?? undefined,
+                rotating: exercise?.rotating ?? undefined,
                 description: exercise?.description ?? undefined,
                 videoUrl: exercise?.videoUrl ?? undefined,
             }));
@@ -117,6 +130,11 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
             duration:
                 typeof block.duration === "number" ? block.duration : undefined,
             poa: block.poa ?? undefined,
+            timerMode: block.timerMode ?? undefined,
+            intervalSeconds: block.intervalSeconds ?? undefined,
+            rounds: block.rounds ?? undefined,
+            workSeconds: block.workSeconds ?? undefined,
+            restSeconds: block.restSeconds ?? undefined,
             exercises,
         });
     }

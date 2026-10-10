@@ -1,8 +1,7 @@
+import { TvClock } from "@/components/TvClock/TvClock";
 import configPromise from "@payload-config";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
-import { TvClock } from "@/components/TvClock/TvClock";
 import { WorkoutBlocks } from "./WorkoutBlocks";
 
 type PageProps = {
@@ -104,7 +103,6 @@ export default async function TvLessonPage({
     }
 
     const program = isProgram(lesson.program) ? lesson.program : null;
-    const lessonImage = isMedia(lesson.image) ? lesson.image : null;
     const blocks = lesson.workoutBlocks ?? [];
     const totalMinutes = blocks.reduce(
         (sum, block) => sum + (block.duration ?? 0),
@@ -137,24 +135,6 @@ export default async function TvLessonPage({
 
     return (
         <main className="relative box-border flex h-[1080px] flex-col overflow-hidden px-tv-safe-x py-tv-safe-y text-white">
-            <div
-                className="pointer-events-none absolute top-0 right-0 h-[460px] w-[1000px] opacity-80 [mask-image:radial-gradient(85%_95%_at_100%_0%,black_25%,transparent_75%)]"
-                aria-hidden="true"
-            >
-                {lessonImage?.url ? (
-                    <Image
-                        src={lessonImage.url}
-                        alt=""
-                        fill
-                        sizes="1000px"
-                        className="object-cover"
-                        priority
-                    />
-                ) : (
-                    <div className="absolute inset-0 bg-[radial-gradient(70%_90%_at_70%_30%,var(--steel),var(--steel-glow)_70%)]" />
-                )}
-            </div>
-
             <header className="relative z-10 flex h-[72px] flex-none items-center justify-between">
                 <span className="font-label text-[32px] leading-none font-extrabold tracking-[0.25em] uppercase">
                     Sportlab

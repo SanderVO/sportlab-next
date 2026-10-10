@@ -700,7 +700,27 @@ export interface Lesson {
         description?: string | null;
         duration?: number | null;
         /**
-         * Optional. One point of attention per line, shown on the TV next to the exercises.
+         * How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: every exercise gets a work and a rest period, then the next exercise starts.
+         */
+        timerMode?: ('countdown' | 'emom' | 'amrap' | 'rounds' | 'intervals') | null;
+        /**
+         * EMOM only. Default 60 (every minute). Use 120 for every 2 minutes.
+         */
+        intervalSeconds?: number | null;
+        /**
+         * Intervals: how many times the whole exercise list is repeated. Leave empty to repeat until the time (minutes) runs out.
+         */
+        rounds?: number | null;
+        /**
+         * Intervals only, e.g. 40.
+         */
+        workSeconds?: number | null;
+        /**
+         * Intervals only, e.g. 20.
+         */
+        restSeconds?: number | null;
+        /**
+         * Optional. Shown on the TV in the workout block popup, not on the lesson page.
          */
         poa?: string | null;
         exercises?:
@@ -711,6 +731,10 @@ export interface Lesson {
                */
               quantity?: string | null;
               description?: string | null;
+              /**
+               * AMRAP / rounds: exercises with this checked take turns, one per round ("Elke ronde wisselend"). The others are done every round.
+               */
+              rotating?: boolean | null;
               id?: string | null;
             }[]
           | null;
@@ -764,7 +788,27 @@ export interface LessonTemplate {
         description?: string | null;
         duration?: number | null;
         /**
-         * Optional. One point of attention per line, shown on the TV next to the exercises.
+         * How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: every exercise gets a work and a rest period, then the next exercise starts.
+         */
+        timerMode?: ('countdown' | 'emom' | 'amrap' | 'rounds' | 'intervals') | null;
+        /**
+         * EMOM only. Default 60 (every minute). Use 120 for every 2 minutes.
+         */
+        intervalSeconds?: number | null;
+        /**
+         * Intervals: how many times the whole exercise list is repeated. Leave empty to repeat until the time (minutes) runs out.
+         */
+        rounds?: number | null;
+        /**
+         * Intervals only, e.g. 40.
+         */
+        workSeconds?: number | null;
+        /**
+         * Intervals only, e.g. 20.
+         */
+        restSeconds?: number | null;
+        /**
+         * Optional. Shown on the TV in the workout block popup, not on the lesson page.
          */
         poa?: string | null;
         exercises?:
@@ -775,6 +819,10 @@ export interface LessonTemplate {
                */
               quantity?: string | null;
               description?: string | null;
+              /**
+               * AMRAP / rounds: exercises with this checked take turns, one per round ("Elke ronde wisselend"). The others are done every round.
+               */
+              rotating?: boolean | null;
               id?: string | null;
             }[]
           | null;
@@ -1692,6 +1740,11 @@ export interface LessonsSelect<T extends boolean = true> {
         name?: T;
         description?: T;
         duration?: T;
+        timerMode?: T;
+        intervalSeconds?: T;
+        rounds?: T;
+        workSeconds?: T;
+        restSeconds?: T;
         poa?: T;
         exercises?:
           | T
@@ -1699,6 +1752,7 @@ export interface LessonsSelect<T extends boolean = true> {
               name?: T;
               quantity?: T;
               description?: T;
+              rotating?: T;
               id?: T;
             };
         id?: T;
@@ -1731,6 +1785,11 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
         name?: T;
         description?: T;
         duration?: T;
+        timerMode?: T;
+        intervalSeconds?: T;
+        rounds?: T;
+        workSeconds?: T;
+        restSeconds?: T;
         poa?: T;
         exercises?:
           | T
@@ -1738,6 +1797,7 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
               name?: T;
               quantity?: T;
               description?: T;
+              rotating?: T;
               id?: T;
             };
         id?: T;

@@ -202,6 +202,10 @@ export const enum__posts_v_version_status = pgEnum(
     "enum__posts_v_version_status",
     ["draft", "published"],
 );
+export const enum_lessons_workout_blocks_timer_mode = pgEnum(
+    "enum_lessons_workout_blocks_timer_mode",
+    ["countdown", "emom", "amrap", "rounds", "intervals"],
+);
 export const enum_lessons_type = pgEnum("enum_lessons_type", [
     "pt",
     "semi_pt",
@@ -223,6 +227,10 @@ export const enum_lesson_templates_schedule_day_of_week = pgEnum(
         "saturday",
         "sunday",
     ],
+);
+export const enum_lesson_templates_default_workout_blocks_timer_mode = pgEnum(
+    "enum_lesson_templates_default_workout_blocks_timer_mode",
+    ["countdown", "emom", "amrap", "rounds", "intervals"],
 );
 export const enum_lesson_templates_type = pgEnum("enum_lesson_templates_type", [
     "pt",
@@ -1776,6 +1784,7 @@ export const lessons_workout_blocks_exercises = pgTable(
         name: varchar("name").notNull(),
         quantity: varchar("quantity"),
         description: varchar("description"),
+        rotating: boolean("rotating").default(false),
     },
     (columns) => [
         index("lessons_workout_blocks_exercises_order_idx").on(columns._order),
@@ -1799,6 +1808,14 @@ export const lessons_workout_blocks = pgTable(
         name: varchar("name").notNull(),
         description: varchar("description"),
         duration: numeric("duration", { mode: "number" }),
+        timerMode:
+            enum_lessons_workout_blocks_timer_mode("timer_mode").default(
+                "countdown",
+            ),
+        intervalSeconds: numeric("interval_seconds", { mode: "number" }),
+        rounds: numeric("rounds", { mode: "number" }),
+        workSeconds: numeric("work_seconds", { mode: "number" }),
+        restSeconds: numeric("rest_seconds", { mode: "number" }),
         poa: varchar("poa"),
     },
     (columns) => [
@@ -1930,6 +1947,7 @@ export const lesson_templates_default_workout_blocks_exercises = pgTable(
         name: varchar("name").notNull(),
         quantity: varchar("quantity"),
         description: varchar("description"),
+        rotating: boolean("rotating").default(false),
     },
     (columns) => [
         index("lesson_templates_default_workout_blocks_exercises_order_idx").on(
@@ -1955,6 +1973,14 @@ export const lesson_templates_default_workout_blocks = pgTable(
         name: varchar("name").notNull(),
         description: varchar("description"),
         duration: numeric("duration", { mode: "number" }),
+        timerMode:
+            enum_lesson_templates_default_workout_blocks_timer_mode(
+                "timer_mode",
+            ).default("countdown"),
+        intervalSeconds: numeric("interval_seconds", { mode: "number" }),
+        rounds: numeric("rounds", { mode: "number" }),
+        workSeconds: numeric("work_seconds", { mode: "number" }),
+        restSeconds: numeric("rest_seconds", { mode: "number" }),
         poa: varchar("poa"),
     },
     (columns) => [
@@ -4878,9 +4904,11 @@ type DatabaseSchema = {
     enum__pages_v_version_status: typeof enum__pages_v_version_status;
     enum_posts_status: typeof enum_posts_status;
     enum__posts_v_version_status: typeof enum__posts_v_version_status;
+    enum_lessons_workout_blocks_timer_mode: typeof enum_lessons_workout_blocks_timer_mode;
     enum_lessons_type: typeof enum_lessons_type;
     enum_lessons_status: typeof enum_lessons_status;
     enum_lesson_templates_schedule_day_of_week: typeof enum_lesson_templates_schedule_day_of_week;
+    enum_lesson_templates_default_workout_blocks_timer_mode: typeof enum_lesson_templates_default_workout_blocks_timer_mode;
     enum_lesson_templates_type: typeof enum_lesson_templates_type;
     enum_events_event_type: typeof enum_events_event_type;
     enum_lesson_enrollments_status: typeof enum_lesson_enrollments_status;

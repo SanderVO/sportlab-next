@@ -2,6 +2,8 @@
 
 import { TvClock } from "@/components/TvClock/TvClock";
 import { cn } from "@/utilities/ui";
+import { getTimerState, type TimerMode } from "./timerState";
+import { useTimerTones } from "./useTimerTones";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export type WorkoutBlock = {
@@ -10,10 +12,16 @@ export type WorkoutBlock = {
     description?: string | null;
     duration?: number | null;
     poa?: string | null;
+    timerMode?: TimerMode | null;
+    intervalSeconds?: number | null;
+    rounds?: number | null;
+    workSeconds?: number | null;
+    restSeconds?: number | null;
     exercises?: Array<{
         id?: string | null;
         name: string;
         quantity?: string | null;
+        rotating?: boolean | null;
         description?: string | null;
     }> | null;
 };
@@ -27,12 +35,14 @@ const accents = [
         bar: "bg-orange-300",
         text: "text-orange-300",
         border: "border-orange-300",
+        fill: "bg-orange-300",
         pill: "border-orange-700 bg-orange-700 text-white",
     },
     {
         bar: "bg-orange-200",
         text: "text-orange-200",
         border: "border-orange-200",
+        fill: "bg-orange-200",
         pill: "border-orange-200 bg-orange-200 text-ink",
     },
 ];
@@ -269,8 +279,8 @@ export function WorkoutBlocks({
                                 )}
                             />
 
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="min-w-0">
+                            <div>
+                                <div className="flex items-start justify-between gap-4">
                                     <div
                                         className={cn(
                                             "font-display text-[40px] leading-none",
@@ -279,23 +289,23 @@ export function WorkoutBlocks({
                                     >
                                         {String(index + 1).padStart(2, "0")}
                                     </div>
-                                    <h2
-                                        className={cn(
-                                            "mt-2 font-display leading-none uppercase",
-                                            compact
-                                                ? "text-[44px]"
-                                                : "type-tv-block-title",
-                                        )}
-                                    >
-                                        {block.name || "Workout"}
-                                    </h2>
+                                    {block.duration ? (
+                                        <DurationPill
+                                            minutes={block.duration}
+                                            className={accent.pill}
+                                        />
+                                    ) : null}
                                 </div>
-                                {block.duration ? (
-                                    <DurationPill
-                                        minutes={block.duration}
-                                        className={accent.pill}
-                                    />
-                                ) : null}
+                                <h2
+                                    className={cn(
+                                        "mt-2 truncate font-display leading-none uppercase",
+                                        compact
+                                            ? "text-[44px]"
+                                            : "type-tv-block-title",
+                                    )}
+                                >
+                                    {block.name || "Workout"}
+                                </h2>
                             </div>
 
                             {block.description ? (
@@ -312,21 +322,11 @@ export function WorkoutBlocks({
                                 </div>
                             ) : null}
 
-                            <div
-                                className={cn(
-                                    "min-h-0 flex-1 overflow-hidden",
-                                    !compact && block.poa
-                                        ? "grid grid-cols-[1fr_380px] items-start gap-8"
-                                        : "flex flex-col gap-5",
-                                )}
-                            >
+                            <div className="min-h-0 flex-1 overflow-hidden">
                                 <ExerciseList
                                     exercises={block.exercises}
                                     variant={compact ? "compact" : "card"}
                                 />
-                                {block.poa ? (
-                                    <PoaBox poa={block.poa} compact={compact} />
-                                ) : null}
                             </div>
                         </button>
                     );
@@ -370,7 +370,7 @@ function DurationPill({
     return (
         <span
             className={cn(
-                "inline-flex h-[52px] flex-none items-center rounded-pill border-2 px-[22px] font-label text-2xl leading-none font-bold tracking-[0.14em] whitespace-nowrap uppercase",
+                "inline-flex h-11 flex-none items-center rounded-pill border-2 px-4 font-label text-2xl leading-none font-bold tracking-[0.1em] whitespace-nowrap uppercase",
                 className,
             )}
         >
@@ -384,23 +384,6 @@ function formatTime(totalSeconds: number) {
     const seconds = totalSeconds % 60;
 
     return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
-
-type TimerMode = "emom" | "amrap" | "countdown";
-
-/** The mode only lives in the free-text format line ("EMOM 10 minutes (RPE 7)", "AMRAP 24 min"). */
-function getTimerMode(block: WorkoutBlock): TimerMode {
-    const format = block.description ?? "";
-
-    if (/\bemom\b/i.test(format) && (block.exercises?.length ?? 0) > 0) {
-        return "emom";
-    }
-
-    if (/\bamrap\b/i.test(format)) {
-        return "amrap";
-    }
-
-    return "countdown";
 }
 
 /** "Min 1. Bike" -> "Bike": the station label already says which minute it is. */
@@ -432,75 +415,137 @@ function BlockModal({
     accent: (typeof accents)[number];
     onClose: () => void;
 }) {
-    const mode = getTimerMode(block);
     const exercises = block.exercises ?? [];
-    const totalSeconds = Math.round((block.duration ?? 0) * 60);
-    const hasTimer = totalSeconds > 0;
-    const [remaining, setRemaining] = useState(totalSeconds);
+    const [elapsed, setElapsed] = useState(0);
     const [running, setRunning] = useState(false);
-    const [rounds, setRounds] = useState(0);
-    const remainingRef = useRef(remaining);
+    const [roundsDone, setRoundsDone] = useState(0);
+    // Elapsed time in ms, kept with its fraction so pausing never loses a partial second
+    const elapsedMsRef = useRef(0);
+
+    const timer = getTimerState(block, elapsed, roundsDone);
+    const totalSeconds = timer.totalSeconds;
+    const { mode, hasTimer } = timer;
+    const isRoundMode = mode === "amrap" || mode === "rounds";
+    const roundsComplete =
+        timer.roundTarget !== null && roundsDone >= timer.roundTarget;
+    const finished = hasTimer ? timer.finished : roundsComplete;
+    const started = elapsed > 0;
+    // Final 10 seconds: the bar goes fully sand. No flashing, no orange.
+    const finalStretch =
+        hasTimer &&
+        mode !== "emom" &&
+        mode !== "intervals" &&
+        totalSeconds - elapsed <= 10;
+    // While running the bar aims at where it will be one second from now, so a 1s linear
+    // transition arrives exactly when the display ticks over. Across a phase/interval
+    // boundary (progress would restart) it just fills up.
+    const ahead = running
+        ? getTimerState(block, elapsed + 1, roundsDone).progress
+        : timer.progress;
+    const target = ahead >= timer.progress ? ahead : 100;
+    const barPercent = Math.min(Math.max(finalStretch ? 100 : target, 0), 100);
+    const [bar, setBar] = useState({ percent: barPercent, jumps: false });
+    if (bar.percent !== barPercent) {
+        setBar({ percent: barPercent, jumps: barPercent < bar.percent });
+    }
+    const barJumps = bar.jumps;
+    const { unlock, play } = useTimerTones();
+    const prevStepKey = useRef(0);
+    const prevFinished = useRef(false);
+    const intervalSeconds = block.intervalSeconds ?? 60;
+    const unit = intervalSeconds === 60 ? "Min" : "Stap";
+
+    // "go" / "rest" when EMOM starts a new interval or Intervals switches phase
+    useEffect(() => {
+        const changed = timer.stepKey !== prevStepKey.current;
+        prevStepKey.current = timer.stepKey;
+
+        if (!running || !changed || timer.stepKey === 0) {
+            return;
+        }
+
+        if (mode === "emom") {
+            play("go");
+        } else if (mode === "intervals") {
+            play(timer.phase === "work" ? "go" : "rest");
+        }
+    }, [timer.stepKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // "countdown": a tick for each of the last 3 seconds before an interval / phase changes
+    useEffect(() => {
+        if (
+            running &&
+            !finished &&
+            (mode === "emom" || mode === "intervals") &&
+            timer.displaySeconds >= 1 &&
+            timer.displaySeconds <= 3
+        ) {
+            play("countdown");
+        }
+    }, [timer.displaySeconds]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // "finish" once, when the block ends
+    useEffect(() => {
+        if (finished && !prevFinished.current) {
+            play("finish");
+        }
+
+        prevFinished.current = finished;
+    }, [finished]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (!running) {
             return;
         }
 
-        // Based on a timestamp so throttled/background tabs don't drift
-        const endAt = Date.now() + remainingRef.current * 1000;
+        // performance.now() is monotonic: unlike Date.now() it doesn't jump when the TV
+        // syncs its clock. Based on a timestamp so throttled/background tabs don't drift.
+        const startedAt = performance.now() - elapsedMsRef.current;
+        const totalMs = totalSeconds * 1000;
+        const currentMs = () =>
+            Math.min(performance.now() - startedAt, totalMs);
 
         const interval = setInterval(() => {
-            const left = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+            const ms = currentMs();
 
-            remainingRef.current = left;
-            setRemaining(left);
+            elapsedMsRef.current = ms;
+            setElapsed(Math.floor(ms / 1000));
 
-            if (left === 0) {
+            if (ms >= totalMs) {
                 setRunning(false);
             }
         }, 250);
 
-        return () => clearInterval(interval);
-    }, [running]);
-
-    const elapsed = totalSeconds - remaining;
-    const finished = hasTimer && remaining === 0;
-    const started = elapsed > 0;
-    // Final 10 seconds: the bar goes fully sand. No flashing, no orange.
-    const finalStretch = hasTimer && remaining <= 10;
-
-    // EMOM: every minute is one station; the list repeats when there are fewer exercises than minutes.
-    const minutes = Math.max(Math.ceil(totalSeconds / 60), 1);
-    const currentMinute = Math.min(Math.floor(elapsed / 60), minutes - 1);
-    const nowStation = exercises.length ? currentMinute % exercises.length : -1;
-    const nextStation =
-        exercises.length && currentMinute + 1 < minutes
-            ? (currentMinute + 1) % exercises.length
-            : -1;
-    const leftInMinute = Math.min(60 - (elapsed % 60), remaining);
-
-    const bigTime = mode === "emom" ? leftInMinute : remaining;
-    const progress =
-        mode === "emom"
-            ? ((elapsed % 60) / 60) * 100
-            : totalSeconds > 0
-              ? (elapsed / totalSeconds) * 100
-              : 0;
+        return () => {
+            clearInterval(interval);
+            // Keep the exact position when pausing
+            elapsedMsRef.current = currentMs();
+        };
+    }, [running, totalSeconds]);
 
     useEffect(() => {
         containerRef.current
             ?.querySelector("[data-now]")
             ?.scrollIntoView({ block: "nearest" });
-    }, [containerRef, currentMinute]);
+    }, [containerRef, timer.activeIndex]);
 
     const reset = () => {
-        remainingRef.current = totalSeconds;
-        setRemaining(totalSeconds);
+        elapsedMsRef.current = 0;
+        setElapsed(0);
         setRunning(false);
-        setRounds(0);
+        setRoundsDone(0);
     };
 
     const toggle = () => {
+        // Starting the timer is the user gesture that allows sound
+        unlock();
+
+        const startingFresh = finished || (!running && elapsed === 0);
+
+        if (startingFresh && (mode === "emom" || mode === "intervals")) {
+            play("go");
+        }
+
         if (finished) {
             reset();
             setRunning(true);
@@ -509,6 +554,18 @@ function BlockModal({
 
         setRunning((current) => !current);
     };
+
+    const nextRound = () => {
+        unlock();
+        setRoundsDone((current) =>
+            timer.roundTarget !== null
+                ? Math.min(current + 1, timer.roundTarget)
+                : current + 1,
+        );
+    };
+
+    const activeExercise =
+        timer.activeIndex >= 0 ? exercises[timer.activeIndex] : null;
 
     return (
         <div className="absolute inset-0 z-50">
@@ -553,17 +610,24 @@ function BlockModal({
                             <div
                                 className={cn(
                                     "type-tv-label uppercase",
-                                    accent.text,
+                                    mode === "intervals" &&
+                                        timer.phase === "rest"
+                                        ? "text-sand"
+                                        : accent.text,
                                 )}
                             >
                                 {finished
                                     ? "Klaar"
-                                    : mode === "emom"
-                                      ? "Deze minuut · nog"
-                                      : "Resterend"}
+                                    : mode === "intervals"
+                                      ? timer.phase === "work"
+                                          ? "Werk · nog"
+                                          : "Rust · nog"
+                                      : mode === "emom"
+                                        ? `${unit === "Min" ? "Deze minuut" : "Dit interval"} · nog`
+                                        : "Resterend"}
                             </div>
                             <div className="type-tv-timer tabular-nums">
-                                {formatTime(bigTime)}
+                                {formatTime(timer.displaySeconds)}
                             </div>
                             <div
                                 className="h-5 overflow-hidden rounded-pill bg-line-tv"
@@ -572,19 +636,28 @@ function BlockModal({
                                 <div
                                     className={cn(
                                         "h-full rounded-pill",
-                                        finalStretch
+                                        finalStretch ||
+                                            (mode === "intervals" &&
+                                                timer.phase === "rest")
                                             ? "bg-sand"
                                             : "bg-linear-to-r from-orange-700 to-orange-300",
                                     )}
                                     style={{
-                                        width: `${finalStretch ? 100 : progress}%`,
+                                        // translate3d + will-change keep the bar on the GPU
+                                        // compositor: no layout work per frame on TV hardware
+                                        transform: `translate3d(${barPercent - 100}%, 0, 0)`,
+                                        transition: barJumps
+                                            ? "none"
+                                            : "transform 1000ms linear",
+                                        willChange: "transform",
                                     }}
                                 />
                             </div>
-                            {mode === "emom" ? (
+                            {mode === "intervals" ? (
                                 <div className="flex items-baseline justify-between">
                                     <span className="type-tv-heading">
-                                        Minuut {currentMinute + 1} / {minutes}
+                                        Ronde {timer.cycleIndex + 1} /{" "}
+                                        {timer.cycleCount}
                                     </span>
                                     <span className="type-tv-body text-text-on-panel-muted">
                                         Totaal {formatTime(elapsed)} /{" "}
@@ -592,35 +665,84 @@ function BlockModal({
                                     </span>
                                 </div>
                             ) : null}
-                            {mode === "amrap" ? (
-                                <div className="flex items-center gap-7">
-                                    <div
-                                        className={cn(
-                                            "flex size-36 flex-col items-center justify-center rounded-[36px] bg-orange-300 font-display text-[84px] leading-[0.9] text-ink",
-                                            accent.border ===
-                                                "border-orange-200" &&
-                                                "bg-orange-200",
-                                        )}
-                                    >
-                                        {rounds}
-                                        <span className="mt-[6px] font-label text-2xl leading-none font-extrabold tracking-[0.2em]">
-                                            RONDE
-                                        </span>
-                                    </div>
+                            {mode === "emom" ? (
+                                <div className="flex items-baseline justify-between">
+                                    <span className="type-tv-heading">
+                                        {unit === "Min" ? "Minuut" : "Interval"}{" "}
+                                        {timer.intervalIndex + 1} /{" "}
+                                        {timer.intervalCount}
+                                    </span>
+                                    <span className="type-tv-body text-text-on-panel-muted">
+                                        Totaal {formatTime(elapsed)} /{" "}
+                                        {formatTime(totalSeconds)}
+                                    </span>
                                 </div>
                             ) : null}
                         </>
-                    ) : (
+                    ) : null}
+
+                    {isRoundMode ? (
+                        <div className="flex items-center gap-7">
+                            <div
+                                className={cn(
+                                    "flex size-36 flex-none flex-col items-center justify-center rounded-[36px] font-display text-[84px] leading-[0.9] text-ink",
+                                    accent.fill,
+                                )}
+                            >
+                                {mode === "rounds" && timer.roundTarget !== null
+                                    ? Math.min(
+                                          roundsDone + 1,
+                                          timer.roundTarget,
+                                      )
+                                    : roundsDone}
+                                <span className="mt-[6px] font-label text-2xl leading-none font-extrabold tracking-[0.2em]">
+                                    RONDE
+                                </span>
+                            </div>
+                            <div className="min-w-0">
+                                {mode === "rounds" &&
+                                timer.roundTarget !== null ? (
+                                    <div className="type-tv-heading">
+                                        {roundsComplete
+                                            ? "Klaar"
+                                            : `Ronde ${roundsDone + 1} / ${timer.roundTarget}`}
+                                    </div>
+                                ) : null}
+                                {activeExercise && !roundsComplete ? (
+                                    <>
+                                        <div
+                                            className={cn(
+                                                "type-tv-label uppercase",
+                                                accent.text,
+                                            )}
+                                        >
+                                            Deze ronde wisselend
+                                        </div>
+                                        <div className="type-tv-heading mt-[6px] truncate">
+                                            {activeExercise.quantity
+                                                ? `${formatQuantity(activeExercise.quantity)} `
+                                                : ""}
+                                            {activeExercise.name}
+                                        </div>
+                                    </>
+                                ) : null}
+                            </div>
+                        </div>
+                    ) : null}
+
+                    {!hasTimer && !isRoundMode ? (
                         <div className="type-tv-heading text-text-on-panel-muted">
                             Geen tijd ingesteld
                         </div>
-                    )}
+                    ) : null}
                 </div>
 
                 <ol className="m-0 flex min-h-0 list-none flex-col gap-[14px] overflow-y-auto p-0 scrollbar-none">
                     {exercises.map((exercise, i) => {
-                        const isNow = mode === "emom" && i === nowStation;
-                        const isNext = mode === "emom" && i === nextStation;
+                        const isNow = i === timer.activeIndex;
+                        const isNext =
+                            (mode === "emom" || mode === "intervals") &&
+                            i === timer.nextIndex;
                         const name =
                             mode === "emom"
                                 ? stripMinutePrefix(exercise.name)
@@ -645,7 +767,7 @@ function BlockModal({
                                             isNow ? "text-ink" : accent.text,
                                         )}
                                     >
-                                        Min {i + 1}
+                                        {unit} {i + 1}
                                     </b>
                                 ) : exercise.quantity ? (
                                     <b
@@ -720,11 +842,11 @@ function BlockModal({
                             </button>
                         </>
                     ) : null}
-                    {mode === "amrap" && hasTimer ? (
+                    {isRoundMode ? (
                         <button
                             type="button"
                             data-tv-nav
-                            onClick={() => setRounds((current) => current + 1)}
+                            onClick={nextRound}
                             className={cn(buttonBase, ghostButton, focusRing)}
                         >
                             +1 Ronde
@@ -804,41 +926,22 @@ function ExerciseList({
     );
 }
 
-/** Points of attention: one per line, in a faintly orange-tinted box. */
-function PoaBox({
-    poa,
-    compact,
-    className,
-}: {
-    poa: string;
-    compact?: boolean;
-    className?: string;
-}) {
-    const lines = poa
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean);
+/** Points of attention: plain text in a faintly orange-tinted box (block popup only). */
+function PoaBox({ poa, className }: { poa: string; className?: string }) {
+    const text = poa.trim();
 
-    if (lines.length === 0) {
+    if (!text) {
         return null;
     }
 
     return (
         <div
             className={cn(
-                "rounded-card border-2 border-orange-300/35 bg-orange-700/20 text-text-on-panel-muted",
-                compact
-                    ? "px-5 py-4 text-[26px] leading-9"
-                    : "px-7 py-[22px] text-[28px] leading-10",
+                "rounded-card border-2 border-orange-300/35 bg-orange-700/20 px-7 py-[22px] text-[28px] leading-10 text-text-on-panel-muted",
                 className,
             )}
         >
-            <div className="type-tv-label mb-[10px] text-orange-300 uppercase">
-                POA&apos;s
-            </div>
-            {lines.map((line, i) => (
-                <div key={i}>{line}</div>
-            ))}
+            {text}
         </div>
     );
 }

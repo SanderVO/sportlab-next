@@ -82,7 +82,7 @@ export const FormBlock: React.FC<
 
     const router = useRouter();
 
-    const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
     const onSubmit = useCallback(
         (data: Record<string, unknown>) => {
