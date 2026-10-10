@@ -5,11 +5,7 @@ import {
 } from "payload";
 
 type TemplateRelation =
-    | { id?: string | number }
-    | string
-    | number
-    | null
-    | undefined;
+    { id?: string | number } | string | number | null | undefined;
 
 type LessonData = {
     template?: TemplateRelation;
@@ -25,8 +21,10 @@ type WorkoutTemplateBlock = {
     name?: string | null;
     description?: string | null;
     duration?: number | null;
+    poa?: string | null;
     exercises?: Array<{
         name?: string | null;
+        quantity?: string | null;
         description?: string | null;
         videoUrl?: string | null;
     }>;
@@ -84,8 +82,10 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
         name: string;
         description?: string;
         duration?: number;
+        poa?: string;
         exercises: Array<{
             name: string;
+            quantity?: string;
             description?: string;
             videoUrl?: string;
         }>;
@@ -102,6 +102,7 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
             .filter((exercise) => Boolean(exercise?.name))
             .map((exercise) => ({
                 name: exercise?.name ?? "",
+                quantity: exercise?.quantity ?? undefined,
                 description: exercise?.description ?? undefined,
                 videoUrl: exercise?.videoUrl ?? undefined,
             }));
@@ -115,6 +116,7 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
             description: block.description ?? undefined,
             duration:
                 typeof block.duration === "number" ? block.duration : undefined,
+            poa: block.poa ?? undefined,
             exercises,
         });
     }

@@ -18,6 +18,9 @@ export const CSV_HEADERS = [
     "exercise_description",
 ] as const;
 
+// Optional columns: older files without them still import.
+export const OPTIONAL_CSV_HEADERS = ["block_poa", "exercise_quantity"] as const;
+
 export const CSV_EXAMPLE = `${CSV_HEADERS.join(",")}
 Friday Strength,group,open,2026-10-09T18:00,2026-10-09T19:00,12,coach@example.com|other@example.com,Warm-up,Get the joints moving,10,Jumping jacks,3 x 30 seconds
 ,,,,,,,Warm-up,,,Air squats,15 reps
@@ -48,7 +51,11 @@ Block columns:
 
 Exercise columns:
 - exercise_name: name of the exercise (leave empty for a block without exercises)
-- exercise_description: sets, reps, load, notes (optional)
+- exercise_description: coaching cue shown under the exercise, e.g. "Focus on soft landing" (optional)
+- exercise_quantity: short quantity shown next to the exercise, e.g. 3x15-20, 30 sec, 10x per kant (optional column)
+
+Optional block column:
+- block_poa: points of attention for the block, one per line inside the quoted value (optional column, taken from the block's first row)
 
 Rules: wrap any value that contains a comma or a line break in double quotes.
 
@@ -73,13 +80,17 @@ export type ParsedLesson = {
         name: string;
         description: string;
         duration: number;
-        exercises: Array<{ name: string; description: string }>;
+        poa: string;
+        exercises: Array<{
+            name: string;
+            description: string;
+            quantity: string;
+        }>;
     }>;
 };
 
 export type ParseResult =
-    | { ok: true; lesson: ParsedLesson }
-    | { ok: false; errors: string[] };
+    { ok: true; lesson: ParsedLesson } | { ok: false; errors: string[] };
 
 const toIsoDate = (value: string) => {
     const date = new Date(value);
@@ -91,14 +102,11 @@ export const parseLessonCsv = (
     options: { hasTemplate: boolean },
 ): ParseResult => {
     const errors: string[] = [];
-    const parsed = Papa.parse<Record<string, string>>(
-        text.replace(/^﻿/, ""),
-        {
-            header: true,
-            skipEmptyLines: "greedy",
-            transformHeader: (header) => header.trim().toLowerCase(),
-        },
-    );
+    const parsed = Papa.parse<Record<string, string>>(text.replace(/^﻿/, ""), {
+        header: true,
+        skipEmptyLines: "greedy",
+        transformHeader: (header) => header.trim().toLowerCase(),
+    });
 
     const missing = CSV_HEADERS.filter(
         (header) => !parsed.meta.fields?.includes(header),
@@ -115,7 +123,7 @@ export const parseLessonCsv = (
 
     const rows = parsed.data.map((row) => {
         const clean: Record<string, string> = {};
-        for (const header of CSV_HEADERS) {
+        for (const header of [...CSV_HEADERS, ...OPTIONAL_CSV_HEADERS]) {
             clean[header] = (row[header] ?? "").trim();
         }
         return clean;
@@ -203,6 +211,7 @@ export const parseLessonCsv = (
                 name: row.block_name,
                 description: row.block_description,
                 duration: Number.isFinite(duration) ? duration : 0,
+                poa: row.block_poa,
                 exercises: [],
             };
             lesson.workoutBlocks.push(current);
@@ -219,6 +228,7 @@ export const parseLessonCsv = (
             current.exercises.push({
                 name: row.exercise_name,
                 description: row.exercise_description,
+                quantity: row.exercise_quantity,
             });
         } else if (row.exercise_description) {
             errors.push(`Row ${line}: exercise_name is required.`);

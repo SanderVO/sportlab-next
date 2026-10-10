@@ -699,9 +699,17 @@ export interface Lesson {
         name: string;
         description?: string | null;
         duration?: number | null;
+        /**
+         * Optional. One point of attention per line, shown on the TV next to the exercises.
+         */
+        poa?: string | null;
         exercises?:
           | {
               name: string;
+              /**
+               * Optional. Short, e.g. "3x15-20", "30 sec" or "10x per kant".
+               */
+              quantity?: string | null;
               description?: string | null;
               id?: string | null;
             }[]
@@ -755,9 +763,17 @@ export interface LessonTemplate {
         name: string;
         description?: string | null;
         duration?: number | null;
+        /**
+         * Optional. One point of attention per line, shown on the TV next to the exercises.
+         */
+        poa?: string | null;
         exercises?:
           | {
               name: string;
+              /**
+               * Optional. Short, e.g. "3x15-20", "30 sec" or "10x per kant".
+               */
+              quantity?: string | null;
               description?: string | null;
               id?: string | null;
             }[]
@@ -1676,10 +1692,12 @@ export interface LessonsSelect<T extends boolean = true> {
         name?: T;
         description?: T;
         duration?: T;
+        poa?: T;
         exercises?:
           | T
           | {
               name?: T;
+              quantity?: T;
               description?: T;
               id?: T;
             };
@@ -1713,10 +1731,12 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
         name?: T;
         description?: T;
         duration?: T;
+        poa?: T;
         exercises?:
           | T
           | {
               name?: T;
+              quantity?: T;
               description?: T;
               id?: T;
             };

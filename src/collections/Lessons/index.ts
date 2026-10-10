@@ -265,6 +265,18 @@ export const Lessons: CollectionConfig = {
                     required: false,
                 },
                 {
+                    label: { en: "Points of attention", nl: "POA's" },
+                    name: "poa",
+                    type: "textarea",
+                    required: false,
+                    admin: {
+                        description: {
+                            en: "Optional. One point of attention per line, shown on the TV next to the exercises.",
+                            nl: "Optioneel. Eén aandachtspunt per regel, getoond op de TV naast de oefeningen.",
+                        },
+                    },
+                },
+                {
                     label: { en: "Exercises", nl: "Oefeningen" },
                     name: "exercises",
                     type: "array",
@@ -279,6 +291,18 @@ export const Lessons: CollectionConfig = {
                             name: "name",
                             type: "text",
                             required: true,
+                        },
+                        {
+                            label: { en: "Quantity", nl: "Hoeveelheid" },
+                            name: "quantity",
+                            type: "text",
+                            required: false,
+                            admin: {
+                                description: {
+                                    en: 'Optional. Short, e.g. "3x15-20", "30 sec" or "10x per kant".',
+                                    nl: 'Optioneel. Kort, bijv. "3x15-20", "30 sec" of "10x per kant".',
+                                },
+                            },
                         },
                         {
                             label: { en: "Description", nl: "Omschrijving" },

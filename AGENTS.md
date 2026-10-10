@@ -1,60 +1,62 @@
 # AGENTS
 
-This repository’s styling instructions are based on the visual design source in `oNe More Reason.pdf`.
+This repository's styling follows the **One More Reason** design system for Sportlab Groningen.
 
 ## Source of truth
 
-- The PDF is the visual authority for brand styling, spacing, typography, and UI patterns.
-- The repository should treat the Markdown style guide in [docs/style-guide.md](docs/style-guide.md) as the agent-friendly working summary of that design.
-- If the PDF and implementation differ, prefer the PDF and update the tokenized styles in the codebase to match it.
+- The design system artifact on claude.ai is the visual authority: https://claude.ai/code/artifact/b85d45fc-1044-491b-ab0c-827f00966109
+- The repo holds no copy of it. Read the artifact (`project/README.md` for the brand rules, `project/components/<Name>/README.md` and `preview.html` per component) before writing UI. If it can't be read, say so and flag that the result is unverified.
+- [src/app/(frontend)/sportlab-theme.css](<src/app/(frontend)/sportlab-theme.css>) is the only token layer in the repo: a hand-maintained Tailwind snapshot of the artifact's `tokens.json` (see its header for the `lastChange.at` it matches). When the artifact's tokens change, update this file by hand.
+- [docs/style-guide.md](docs/style-guide.md) predates the design system. If it conflicts with the artifact, the artifact wins.
 
 ## Styling rules for AI-generated UI changes
 
-When making or updating UI styling, agents must:
+1. **Use the tokens.** Never hard-code hex values, font sizes or spacing that exist as tokens. Colour utilities (`bg-ink`, `text-cta`, `bg-surface-card`, `text-text-on-panel-muted`, `border-line-tv`, `bg-orange-300`), spacing (`p-space-24`, `gap-tv-gap`), radii (`rounded-card`, `rounded-tv`, `rounded-pill`), fonts (`font-display`, `font-sans`, `font-label`) and type styles (`type-tv-body`, `type-display-l`, `type-eyebrow`) live in [src/app/(frontend)/sportlab-theme.css](<src/app/(frontend)/sportlab-theme.css>). If something is missing, propose adding it to the design system instead of inventing a value.
+2. **Start from the artifact's component.** Recreate its `preview.html` in React with Tailwind utilities and the tokens. The `sl-*` / `tv-*` classes are not in this repo.
+3. **Orange rule.** `cta` (#e8842b) is only for buttons and links, with `on-cta` (ink) text, never white. The one exception is `/tv`, which uses the orange family (`orange-200/300/700` and the ember glows) for details and keeps solid `cta` for the single action and the main block.
+4. **Fonts.**
+   - Anton (`font-display`) is for display text and is always uppercase.
+   - Poppins (`font-sans`) is for body text, warm headings and buttons.
+   - Archivo (`font-label`) is for the wordmark (`SPORTLAB`, 800, 0.25em tracking) and spaced-caps labels.
+   - Never mix the roles.
+5. **Contrast.** Every text/background pair must meet WCAG AA. Use `text-*` tokens on light grounds and `text-on-panel-*` tokens on dark.
+6. **Focus.** Use the `focus-ring` outline: 2px on the web, 6px with a 6px offset on TV (`.tv-focusable`).
+7. **Content stays as entered.** Content comes from Payload as written: Dutch UI copy in sentence case, English UPPERCASE campaign lines in Anton.
+8. **No drop shadows, extra icon sets or emoji**, per the design system README.
+9. **Keep changes minimal and intentional.** Favour consistency over novelty.
 
-1. Use existing design tokens first.
-    - Prefer the variables defined in [src/app/(frontend)/globals.css](<src/app/(frontend)/globals.css>).
-    - Prefer classes such as `bg-cta`, `bg-cta-dark`, `text-ink`, `text-warm-white`, `border-cta`, and the brand font classes.
+### `/tv` screens
 
-2. Match the approved brand palette.
-    - CTA orange: `#e8842b`
-    - CTA dark: `#d7741f`
-    - Ink: `#14110d`
-    - Charcoal: `#241e17`
-    - Sand: `#e8e0ce`
-    - Warm white: `#f6f2ea`
-    - Steel: `#46555f`
-    - Olive: `#5e5f47`
+- 1920×1080 and always dark: `.tv-screen.sl-dark`.
+- Keep content inside the `tv-safe-x` / `tv-safe-y` safe area, and nothing smaller than 24px.
+- Block accents alternate `.acc-ember` / `.acc-peach`, with `.acc-cta` for the main block.
+- The current timer station is a `sand` fill.
+- If content doesn't fit, split it over pages or columns instead of shrinking the type.
 
-3. Respect the visual language in the PDF.
-    - Keep buttons and actions confident and high-contrast.
-    - Preserve the warm, premium brand aesthetic rather than introducing generic neutral UI styles.
-    - Avoid arbitrary colors, shadows, border radii, or spacing values that are not aligned with the approved design system.
+### Legacy tokens
 
-4. Use layout and type conventions already established in the app.
-    - Prefer the existing breakpoints in [src/cssVariables.js](src/cssVariables.js).
-    - Prefer the existing font families configured in [src/app/(frontend)/globals.css](<src/app/(frontend)/globals.css>).
-    - Keep spacing and proportions consistent with the rest of the UI instead of inventing a new pattern.
+[src/app/(frontend)/globals.css](<src/app/(frontend)/globals.css>) still carries tokens from before the design system, used by existing pages and components:
 
-5. Prefer tokenized updates over ad hoc styling.
-    - If a new style is required, add it to the shared theme tokens first when it is clearly part of the approved brand system.
-    - Avoid repeated one-off hex values spread across files.
+- `cta-dark` (hover state of `bg-cta` buttons)
+- the `font-sl-*` families (Montserrat, Open Sans, Bebas, plus Anton, Archivo and Poppins aliases)
+- the Montserrat body font and the charcoal page background
 
-6. Keep changes minimal and intentional.
-    - Do not add decorative styling just because it looks modern if it is not in the approved design direction.
-    - Favor consistency over novelty.
+Don't use these in new design-system UI. Prefer the design-system equivalents, and migrate old usages when you touch them.
 
 ## Workflow
 
-- Before changing styling, review both the PDF and the style guide summary.
-- Implement the styling using the shared tokens and existing classes where possible.
-- If a component is missing a style token that is clearly required by the design, add the token in the central theme file and then apply it consistently.
+- Before changing styling, read the artifact README and the relevant component README.
+- Prefer the existing breakpoints in [src/cssVariables.js](src/cssVariables.js).
+- Before finishing, grep your diff for raw hex codes and px font sizes that should be tokens, check orange usage and contrast, and on `/tv` check 1920×1080 for overflow and text under 24px.
+- Mention which design-system version (`lastChange.at` from the artifact) you built against.
 
-## Files to consult first
+# This is NOT the Next.js you know
 
-- [src/app/(frontend)/globals.css](<src/app/(frontend)/globals.css>)
-- [src/cssVariables.js](src/cssVariables.js)
-- [docs/style-guide.md](docs/style-guide.md)
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
 
 <!-- BEGIN:nextjs-agent-rules -->
 

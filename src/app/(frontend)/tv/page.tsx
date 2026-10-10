@@ -1,6 +1,5 @@
 import { TVLessonDashboard } from "@/components/TVLessonDashboard/TVLessonDashboard";
 import {
-    clampTvDateParam,
     getTvDateRange,
     getTvLessons,
     parseTvDateParam,
@@ -30,11 +29,7 @@ export default async function TvDashboardPage({ searchParams }: PageProps) {
         redirect(`/tv?date=${range.today}`);
     }
 
-    const selectedDate = clampTvDateParam(parsedDate, range);
-
-    if (selectedDate !== parsedDate) {
-        redirect(`/tv?date=${selectedDate}`);
-    }
+    const selectedDate = parsedDate;
 
     const payload = await getPayload({ config: configPromise });
 
@@ -50,8 +45,6 @@ export default async function TvDashboardPage({ searchParams }: PageProps) {
             initialHasNextPage={lessonsResult.hasNextPage}
             initialNextPage={lessonsResult.nextPage ?? null}
             selectedDate={selectedDate}
-            minDate={range.min}
-            maxDate={range.max}
         />
     );
 }

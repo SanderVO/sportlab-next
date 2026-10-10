@@ -1,5 +1,4 @@
 import {
-    clampTvDateParam,
     getTvDateRange,
     getTvLessons,
     parseTvDateParam,
@@ -18,7 +17,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         const rawDate = request.nextUrl.searchParams.get("date");
         const range = getTvDateRange();
         const parsedDate = parseTvDateParam(rawDate);
-        const selectedDate = clampTvDateParam(parsedDate ?? range.today, range);
+        const selectedDate = parsedDate ?? range.today;
 
         const result = await getTvLessons(payload, {
             page,

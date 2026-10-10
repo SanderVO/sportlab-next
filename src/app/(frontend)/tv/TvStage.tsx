@@ -32,7 +32,7 @@ export function TvStage({ children }: { children: React.ReactNode }) {
     return (
         <div className="fixed inset-0 overflow-hidden bg-black">
             <div
-                className="absolute left-1/2 top-1/2 overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(255,153,51,0.22),transparent_34%),radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_26%),linear-gradient(135deg,#06090f_0%,#0c121d_45%,#05070c_100%)] text-white"
+                className="absolute left-1/2 top-1/2 overflow-hidden bg-ink bg-[radial-gradient(55%_65%_at_0%_0%,var(--tv-glow-ember)_0%,transparent_100%),radial-gradient(50%_60%_at_100%_0%,var(--panel-glow)_0%,transparent_100%),radial-gradient(60%_70%_at_100%_100%,var(--tv-glow-ember-deep)_0%,transparent_100%),linear-gradient(180deg,var(--charcoal)_0%,var(--ink)_55%,var(--panel-deep)_100%)] font-sans text-white"
                 style={{
                     width: STAGE_WIDTH,
                     height: STAGE_HEIGHT,

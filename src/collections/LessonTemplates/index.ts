@@ -17,8 +17,10 @@ export const LessonTemplates: CollectionConfig = {
     admin: {
         useAsTitle: "title",
         defaultColumns: ["title", "type", "updatedAt"],
-        description:
-            { en: "Templates for recurring lessons. Create a template for each fixed lesson (e.g. 'Monday PT 09:00') and link it to individual lessons.", nl: "Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen." },
+        description: {
+            en: "Templates for recurring lessons. Create a template for each fixed lesson (e.g. 'Monday PT 09:00') and link it to individual lessons.",
+            nl: "Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen.",
+        },
         components: {
             views: {
                 list: {
@@ -232,6 +234,18 @@ export const LessonTemplates: CollectionConfig = {
                     required: false,
                 },
                 {
+                    label: { en: "Points of attention", nl: "POA's" },
+                    name: "poa",
+                    type: "textarea",
+                    required: false,
+                    admin: {
+                        description: {
+                            en: "Optional. One point of attention per line, shown on the TV next to the exercises.",
+                            nl: "Optioneel. Eén aandachtspunt per regel, getoond op de TV naast de oefeningen.",
+                        },
+                    },
+                },
+                {
                     label: { en: "Exercises", nl: "Oefeningen" },
                     name: "exercises",
                     type: "array",
@@ -246,6 +260,18 @@ export const LessonTemplates: CollectionConfig = {
                             name: "name",
                             type: "text",
                             required: true,
+                        },
+                        {
+                            label: { en: "Quantity", nl: "Hoeveelheid" },
+                            name: "quantity",
+                            type: "text",
+                            required: false,
+                            admin: {
+                                description: {
+                                    en: 'Optional. Short, e.g. "3x15-20", "30 sec" or "10x per kant".',
+                                    nl: 'Optioneel. Kort, bijv. "3x15-20", "30 sec" of "10x per kant".',
+                                },
+                            },
                         },
                         {
                             label: { en: "Description", nl: "Omschrijving" },

@@ -2,6 +2,7 @@ import configPromise from "@payload-config";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
+import { TvClock } from "@/components/TvClock/TvClock";
 import { WorkoutBlocks } from "./WorkoutBlocks";
 
 type PageProps = {
@@ -13,7 +14,9 @@ type PageProps = {
     }>;
 };
 
-function formatDate(value?: string | null) {
+const TV_TIME_ZONE = "Europe/Amsterdam";
+
+function formatShortDate(value?: string | null) {
     if (!value) return null;
 
     const date = new Date(value);
@@ -24,8 +27,23 @@ function formatDate(value?: string | null) {
         weekday: "short",
         day: "numeric",
         month: "short",
+        timeZone: TV_TIME_ZONE,
+    })
+        .format(date)
+        .replace(/\./g, "");
+}
+
+function formatTime(value?: string | null) {
+    if (!value) return null;
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return null;
+
+    return new Intl.DateTimeFormat("nl-NL", {
         hour: "2-digit",
         minute: "2-digit",
+        timeZone: TV_TIME_ZONE,
     }).format(date);
 }
 
@@ -87,80 +105,90 @@ export default async function TvLessonPage({
 
     const program = isProgram(lesson.program) ? lesson.program : null;
     const lessonImage = isMedia(lesson.image) ? lesson.image : null;
-    const lessonStartDate = formatDate(lesson.startDate);
+    const blocks = lesson.workoutBlocks ?? [];
+    const totalMinutes = blocks.reduce(
+        (sum, block) => sum + (block.duration ?? 0),
+        0,
+    );
+    const coaches = (lesson.coaches ?? [])
+        .map((coach) =>
+            isUser(coach) ? coach.name || coach.email || null : null,
+        )
+        .filter(Boolean)
+        .join(", ");
+    const eyebrow = [
+        program?.title,
+        formatShortDate(lesson.startDate),
+        formatTime(lesson.startDate),
+    ]
+        .filter(Boolean)
+        .join(" · ");
+    const summary = [
+        coaches || null,
+        `${blocks.length} ${blocks.length === 1 ? "blok" : "blokken"}`,
+        totalMinutes > 0 ? `${totalMinutes} min` : null,
+    ]
+        .filter(Boolean)
+        .join(" · ");
     const lessonDateParam = toDateParam(lesson.startDate);
     const backHref = lessonDateParam
         ? `/tv?date=${lessonDateParam}${resolvedSearchParams.category ? `&category=${resolvedSearchParams.category}` : ""}`
         : `/tv${resolvedSearchParams.category ? `?category=${resolvedSearchParams.category}` : ""}`;
 
     return (
-        <div className="relative box-border flex h-full flex-col overflow-hidden px-8 py-8 text-warm-white">
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div className="absolute left-1/2 top-0 h-64 w-2xl -translate-x-1/2 rounded-full bg-cta/10 blur-3xl" />
-                <div className="absolute right-0 top-1/4 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
-                <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-steel/10 blur-3xl" />
+        <main className="relative box-border flex h-[1080px] flex-col overflow-hidden px-tv-safe-x py-tv-safe-y text-white">
+            <div
+                className="pointer-events-none absolute top-0 right-0 h-[460px] w-[1000px] opacity-80 [mask-image:radial-gradient(85%_95%_at_100%_0%,black_25%,transparent_75%)]"
+                aria-hidden="true"
+            >
+                {lessonImage?.url ? (
+                    <Image
+                        src={lessonImage.url}
+                        alt=""
+                        fill
+                        sizes="1000px"
+                        className="object-cover"
+                        priority
+                    />
+                ) : (
+                    <div className="absolute inset-0 bg-[radial-gradient(70%_90%_at_70%_30%,var(--steel),var(--steel-glow)_70%)]" />
+                )}
             </div>
 
-            <div className="relative z-10 min-h-0 flex-1 overflow-hidden rounded-4xl border border-white/10 bg-ink/80 shadow-2xl shadow-black/25 backdrop-blur">
-                <div className="grid h-full min-h-0 grid-cols-[380px_1fr]">
-                    <aside className="relative min-h-0 overflow-hidden border-r border-white/10 bg-black">
-                        {lessonImage?.url ? (
-                            <Image
-                                src={lessonImage.url}
-                                alt={lessonImage.alt || lesson.title || "Les"}
-                                fill
-                                className="object-cover"
-                                priority
-                            />
-                        ) : (
-                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_36%),linear-gradient(180deg,rgba(20,17,13,0.2),rgba(20,17,13,0.9))]" />
-                        )}
+            <header className="relative z-10 flex h-[72px] flex-none items-center justify-between">
+                <span className="font-label text-[32px] leading-none font-extrabold tracking-[0.25em] uppercase">
+                    Sportlab
+                </span>
+                <span className="flex items-center gap-10">
+                    <a
+                        id="tv-back"
+                        href={backHref}
+                        className="inline-flex h-[72px] items-center rounded-pill border-[3px] border-white px-[34px] font-sans text-[28px] leading-none font-semibold text-white no-underline outline-none focus-visible:outline-[6px] focus-visible:outline-offset-[6px] focus-visible:outline-focus-ring"
+                    >
+                        ← Terug naar overzicht
+                    </a>
+                    <TvClock />
+                </span>
+            </header>
 
-                        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.65)_0%,rgba(0,0,0,0.25)_25%,rgba(0,0,0,0.3)_50%,rgba(0,0,0,0.9)_100%)]" />
-
-                        <div className="absolute left-8 top-7 z-20 font-sl-archivo text-[2.5rem] uppercase tracking-[0.16em] text-warm-white">
-                            Sportlab
-                        </div>
-
-                        {program?.title ? (
-                            <div className="absolute left-8 top-24 z-20 max-w-[calc(100%-4rem)] rounded-full border border-cta/35 bg-cta/15 px-3 py-1 text-[0.8rem] uppercase tracking-[0.16em] text-[#f7d7b8] shadow-lg shadow-black/20 backdrop-blur">
-                                {program.title}
-                            </div>
-                        ) : null}
-
-                        <div className="absolute inset-0 flex items-end p-10">
-                            <div className="max-w-xl">
-                                <p className="mt-3 text-sm uppercase tracking-[0.25em] text-warm-white/80">
-                                    {lesson.coaches
-                                        ?.map((coach) =>
-                                            isUser(coach) && coach.name
-                                                ? coach.name
-                                                : "Coach",
-                                        )
-                                        .join(" · ") || "Geen coach gekoppeld"}
-                                </p>
-
-                                <h1 className="mt-3 text-4xl uppercase tracking-widest text-warm-white font-sl-archivo">
-                                    {lesson.title || `Les ${lesson.id}`}
-                                </h1>
-                            </div>
-                        </div>
-                    </aside>
-
-                    <div className="min-h-0 overflow-y-auto p-6">
-                        <WorkoutBlocks blocks={lesson.workoutBlocks ?? []} />
+            <section className="relative z-10 mt-8">
+                {eyebrow ? (
+                    <div className="type-tv-label text-sand uppercase">
+                        {eyebrow}
                     </div>
+                ) : null}
+                <h1 className="type-tv-title mt-4 text-[96px]">
+                    {lesson.title || `Les ${lesson.id}`}
+                </h1>
+                <div className="type-tv-body mt-3 text-text-on-panel-muted">
+                    {summary}
                 </div>
-            </div>
+            </section>
 
-            <div className="relative z-10 mt-4 flex shrink-0 justify-start">
-                <a
-                    href={backHref}
-                    className="inline-flex items-center rounded-full border border-white/10 bg-black/40 px-5 py-3 text-base uppercase tracking-[0.22em] text-warm-white transition hover:border-cta/40 hover:bg-black/60"
-                >
-                    Terug naar overzicht
-                </a>
-            </div>
-        </div>
+            <WorkoutBlocks
+                blocks={blocks}
+                lessonTitle={lesson.title || `Les ${lesson.id}`}
+            />
+        </main>
     );
 }

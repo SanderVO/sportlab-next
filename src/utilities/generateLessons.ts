@@ -53,8 +53,10 @@ const buildWorkoutBlocks = async (
         name: string;
         description?: string;
         duration?: number;
+        poa?: string;
         exercises: Array<{
             name: string;
+            quantity?: string;
             description?: string;
         }>;
     }> = [];
@@ -67,10 +69,12 @@ const buildWorkoutBlocks = async (
             description: block.description ?? undefined,
             duration:
                 typeof block.duration === "number" ? block.duration : undefined,
+            poa: block.poa ?? undefined,
             exercises: (Array.isArray(block.exercises) ? block.exercises : [])
                 .filter((exercise) => Boolean(exercise?.name))
                 .map((exercise) => ({
                     name: exercise?.name ?? "",
+                    quantity: exercise?.quantity ?? undefined,
                     description: exercise?.description ?? undefined,
                 })),
         });
