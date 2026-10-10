@@ -1,0 +1,1 @@
+{"kind":"FETCH","data":{"headers":{"apigw-requestid":"XWVA0gSjIAMEYlw=","connection":"keep-alive","content-length":"4","content-type":"application/json","date":"Sat, 17 Jan 2026 21:41:24 GMT"},"body":"bnVsbA==","status":200,"url":"https://telemetry.payloadcms.com/events"},"revalidate":600,"tags":[]}

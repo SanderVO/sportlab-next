@@ -1,5 +1,4 @@
 src/payload-generated-schema.ts
 src/payload-types.ts
 src/migrations-postgres
-.open-next
 .next

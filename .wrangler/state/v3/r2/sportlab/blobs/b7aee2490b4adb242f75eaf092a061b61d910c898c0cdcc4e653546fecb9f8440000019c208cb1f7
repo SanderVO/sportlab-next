@@ -1,0 +1,1 @@
+{"kind":"FETCH","data":{"headers":{},"body":"[{\"loc\":\"http://localhost:3000/blog\",\"lastmod\":\"2026-02-02T22:43:16.788Z\"},{\"loc\":\"http://localhost:3000\",\"lastmod\":\"2026-01-29T19:30:06.504Z\"}]","status":200,"url":""},"revalidate":31536000,"tags":["pages-sitemap"]}

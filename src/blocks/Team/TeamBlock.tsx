@@ -33,6 +33,14 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
         limit: hasSelectedCoaches ? 0 : type === "carousel" ? (limit ?? 0) : 0,
         sort: sortBy,
         where,
+        // These users are passed to a client component: only send what the cards render.
+        select: {
+            name: true,
+            slug: true,
+            subtitle: true,
+            about: true,
+            avatar: true,
+        },
     });
 
     const orderedUsers = hasSelectedCoaches

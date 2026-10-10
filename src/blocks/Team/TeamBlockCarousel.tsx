@@ -1,6 +1,12 @@
 "use client";
 
 import type { User } from "@/payload-types";
+
+// Only the fields the cards render; the server query selects exactly these.
+export type TeamMember = Pick<
+    User,
+    "id" | "name" | "slug" | "subtitle" | "about" | "avatar"
+>;
 import { cn } from "@/utilities/ui";
 import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
@@ -10,7 +16,7 @@ import { TeamBlockCarouselItem } from "./TeamBlockCarouselItem";
 interface Props {
     type: string;
     backgroundColor: string;
-    users: User[];
+    users: TeamMember[];
 }
 
 export const TeamBlockCarousel: React.FC<Props> = ({
@@ -59,7 +65,7 @@ export const TeamBlockCarousel: React.FC<Props> = ({
     const teamItemContent = () => (
         <>
             {users &&
-                users.map((user: User, index: number) => (
+                users.map((user: TeamMember, index: number) => (
                     <div
                         key={index}
                         ref={(el) => {

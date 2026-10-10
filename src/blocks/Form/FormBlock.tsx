@@ -2,6 +2,7 @@
 
 import RichText from "@/components/RichText";
 import { Button } from "@/components/ui/Button";
+import { TURNSTILE_HEADER } from "@/hooks/turnstileHeader";
 import { getClientSideURL } from "@/utilities/getURL";
 import type { Form as FormType } from "@payloadcms/plugin-form-builder/types";
 import type { DefaultTypedEditorState } from "@payloadcms/richtext-lexical";
@@ -115,6 +116,7 @@ export const FormBlock: React.FC<
                             }),
                             headers: {
                                 "Content-Type": "application/json",
+                                [TURNSTILE_HEADER]: token,
                             },
                             method: "POST",
                         },

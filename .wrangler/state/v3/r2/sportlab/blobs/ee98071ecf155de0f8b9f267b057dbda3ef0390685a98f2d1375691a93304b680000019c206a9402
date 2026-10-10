@@ -1,0 +1,1 @@
+{"kind":"FETCH","data":{"headers":{},"body":"{\"id\":1,\"phoneNumber\":\"+31612345678\",\"textPreFilled\":\"Tekst vooraf\",\"buttonText\":\"Chat met ons\",\"updatedAt\":\"2026-02-02T21:13:28.945Z\",\"createdAt\":\"2026-02-02T21:13:28.945Z\",\"globalType\":\"whatsApp\"}","status":200,"url":""},"revalidate":31536000,"tags":["global_whatsApp"]}

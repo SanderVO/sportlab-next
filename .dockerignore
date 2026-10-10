@@ -3,9 +3,6 @@
 .vscode
 node_modules
 .next
-.open-next
-.wrangler
 .cache
 .env*
 *.sql
-d1-user-passwords*.jsonl

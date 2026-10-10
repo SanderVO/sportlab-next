@@ -1,11 +1,18 @@
-import { authenticated } from "@/access/authenticated";
+import { isAdmin, userHasAdminAccess } from "@/access/admin";
 import {
     resetPasswordEmail,
     resetPasswordSubject,
 } from "@/emails/resetPassword";
 import { defaultLexical } from "@/fields/defaultLexical";
 import { getServerSideURL } from "@/utilities/getURL";
-import { slugField, type CollectionConfig } from "payload";
+import {
+    slugField,
+    type Access,
+    type AccessResult,
+    type CollectionConfig,
+    type FieldAccess,
+    type Where,
+} from "payload";
 import { User } from "../../payload-types";
 import { revalidateUser } from "./hooks/revalidateUser";
 
@@ -15,6 +22,66 @@ export enum RolesEnum {
     USER = "user",
     COACH = "coach",
 }
+
+const hasStaffRole = (user: User | null | undefined): boolean => {
+    const roles = Array.isArray(user?.roles) ? user.roles : [];
+
+    return (
+        roles.includes(RolesEnum.ADMIN) ||
+        roles.includes(RolesEnum.EDITOR) ||
+        roles.includes(RolesEnum.COACH)
+    );
+};
+
+// Anonymous visitors only see coach profiles; staff see everyone; members see coaches and themselves.
+const readUsers: Access = ({ req }): AccessResult => {
+    const user = req.user as User | null;
+
+    if (hasStaffRole(user)) return true;
+
+    if (user?.id) {
+        const where: Where = {
+            or: [{ isCoach: { equals: true } }, { id: { equals: user.id } }],
+        };
+
+        return where;
+    }
+
+    return { isCoach: { equals: true } };
+};
+
+// Admins and content managers manage accounts; everyone else may only edit their own profile.
+const updateUsers: Access = async ({ req }) => {
+    const user = req.user as User | null;
+
+    if (!user?.id) return false;
+
+    if (await userHasAdminAccess({ payload: req.payload, user })) {
+        return true;
+    }
+
+    if (Array.isArray(user.roles) && user.roles.includes(RolesEnum.EDITOR)) {
+        return true;
+    }
+
+    return { id: { equals: user.id } };
+};
+
+// Roles and status decide what an account may do, so only admins may change them.
+const adminOnlyFieldUpdate: FieldAccess = ({ req }) =>
+    userHasAdminAccess({
+        payload: req.payload,
+        user: (req.user as User | null) ?? null,
+    });
+
+// Email addresses are personal data: only staff and the account owner may read them.
+const readEmail: FieldAccess = ({ req, id }) => {
+    const user = req.user as User | null;
+
+    if (!user) return false;
+
+    return hasStaffRole(user) || String(user.id) === String(id);
+};
 
 export const Users: CollectionConfig = {
     slug: "users",
@@ -105,14 +172,23 @@ export const Users: CollectionConfig = {
                 roles.includes(RolesEnum.COACH)
             );
         },
-        create: authenticated,
-        delete: authenticated,
-        // Read access is open - sensitive data like email/hash is protected by field-level access
-        // Components should filter for coaches where needed using where: { isCoach: { equals: true } }
-        read: () => true,
-        update: authenticated,
+        create: isAdmin,
+        delete: isAdmin,
+        read: readUsers,
+        update: updateUsers,
     },
     fields: [
+        {
+            name: "email",
+            type: "email",
+            required: true,
+            unique: true,
+            index: true,
+            label: { en: "Email", nl: "E-mail" },
+            access: {
+                read: readEmail,
+            },
+        },
         {
             label: { en: "Name", nl: "Naam" },
             name: "name",
@@ -141,6 +217,10 @@ export const Users: CollectionConfig = {
             type: "select",
             defaultValue: "active",
             required: true,
+            access: {
+                create: adminOnlyFieldUpdate,
+                update: adminOnlyFieldUpdate,
+            },
             options: [
                 {
                     label: { en: "Active", nl: "Actief" },
@@ -165,6 +245,8 @@ export const Users: CollectionConfig = {
                     // Only authenticated users can see roles
                     return !!req?.user;
                 },
+                create: adminOnlyFieldUpdate,
+                update: adminOnlyFieldUpdate,
             },
             options: [
                 { label: { en: "Admin", nl: "Admin" }, value: RolesEnum.ADMIN },
