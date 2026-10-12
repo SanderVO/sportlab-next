@@ -77,7 +77,6 @@ export const tvLessonSelect = {
     coaches: {
         name: true,
         slug: true,
-        avatar: true,
         position: true,
     },
     workoutBlocks: {
@@ -90,6 +89,16 @@ export const tvLessonSelect = {
             videoUrl: true,
         },
     },
+} as const;
+
+/** Fields the lesson detail page renders; keeps coach emails out of the page payload. */
+export const tvLessonDetailSelect = {
+    title: true,
+    startDate: true,
+    image: true,
+    program: { title: true },
+    coaches: { name: true },
+    workoutBlocks: true,
 } as const;
 
 export async function getTvLessons(
@@ -106,7 +115,7 @@ export async function getTvLessons(
 
     return payload.find({
         collection: "lessons",
-        depth: 2,
+        depth: 1,
         limit: TV_LESSON_PAGE_SIZE,
         page,
         pagination: true,

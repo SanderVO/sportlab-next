@@ -43,15 +43,6 @@ const nextConfig: NextConfig = {
                 source: "/(.*)",
                 headers: securityHeaders,
             },
-            {
-                source: "/(.*).(jpg|jpeg|png|webp|avif|gif|svg)",
-                headers: [
-                    {
-                        key: "Cache-Control",
-                        value: "public, s-maxage=31536000, max-age=31536000, immutable",
-                    },
-                ],
-            },
         ];
     },
     redirects: async () => {
