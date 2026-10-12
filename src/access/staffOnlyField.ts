@@ -1,4 +1,4 @@
-import { RolesEnum } from "@/collections/Users";
+import { RolesEnum } from "@/collections/Users/roles";
 import type { FieldAccess } from "payload";
 
 /** Field-level access for ownership fields: members must not reassign their own records. */

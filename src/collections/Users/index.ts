@@ -16,13 +16,9 @@ import {
 } from "payload";
 import { User } from "../../payload-types";
 import { revalidateUser } from "./hooks/revalidateUser";
+import { RolesEnum } from "./roles";
 
-export enum RolesEnum {
-  ADMIN = "admin",
-  EDITOR = "editor",
-  USER = "user",
-  COACH = "coach",
-}
+export { RolesEnum };
 
 const hasStaffRole = (user: User | null | undefined): boolean => {
   const roles = Array.isArray(user?.roles) ? user.roles : [];

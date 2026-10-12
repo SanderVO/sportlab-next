@@ -1,4 +1,4 @@
-import { RolesEnum } from "@/collections/Users";
+import { RolesEnum } from "@/collections/Users/roles";
 import type { Access } from "payload";
 
 export const editorOrAdmin: Access = ({ req: { user } }) => {
