@@ -1,6 +1,7 @@
 import { isCoachOnlyAdminUser } from "@/access/isCoachOnlyAdminUser";
 import { emailLayout } from "@/emails/layout";
 import { revalidateRedirects } from "@/hooks/revalidateRedirects";
+import { verifyTurnstile } from "@/hooks/verifyTurnstile";
 import { Page, Post } from "@/payload-types";
 import { getServerSideURL } from "@/utilities/getURL";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
@@ -201,6 +202,7 @@ export const plugins: Plugin[] = [
                 plural: { en: "Form submissions", nl: "Formulier Submissies" },
             },
             hooks: {
+                beforeValidate: [verifyTurnstile],
                 beforeChange: [replaceSelectValuesWithLabels],
             },
         },

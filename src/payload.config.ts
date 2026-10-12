@@ -103,6 +103,13 @@ const r2StoragePlugin = s3Storage({
     },
 });
 
+const payloadSecret = process.env.PAYLOAD_SECRET;
+
+// Without a real secret anyone could forge login tokens, so never fall back in production.
+if (!payloadSecret && process.env.NODE_ENV === "production") {
+    throw new Error("PAYLOAD_SECRET must be set in production");
+}
+
 const resendApiKey = process.env.RESEND_API_KEY;
 const emailFromAddress = process.env.EMAIL_FROM_ADDRESS;
 const emailFromName = process.env.EMAIL_FROM_NAME;
@@ -217,8 +224,9 @@ export default buildConfig({
         withCoachGlobalVisibility(Organization),
     ],
     cors: [getServerSideURL()].filter(Boolean),
+    csrf: [getServerSideURL()].filter(Boolean),
     editor: lexicalEditor(),
-    secret: process.env.PAYLOAD_SECRET || "ignore",
+    secret: payloadSecret || "ignore",
     sharp,
     typescript: {
         outputFile: path.resolve(dirname, "payload-types.ts"),

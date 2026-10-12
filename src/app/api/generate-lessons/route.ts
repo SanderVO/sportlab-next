@@ -1,9 +1,26 @@
 import { userHasAdminAccess } from "@/access/admin";
 import { generateLessons } from "@/utilities/generateLessons";
 import config from "@payload-config";
+import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import type { PayloadRequest } from "payload";
 import { getPayload } from "payload";
+
+const MAX_DAYS_AHEAD = 120;
+
+const isValidCronSecret = (header: string | null): boolean => {
+    const secret = process.env.CRON_SECRET;
+
+    if (!secret || !header) return false;
+
+    const expected = Buffer.from(`Bearer ${secret}`);
+    const received = Buffer.from(header);
+
+    return (
+        expected.length === received.length &&
+        timingSafeEqual(expected, received)
+    );
+};
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
     try {
@@ -19,10 +36,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             user,
         });
 
-        const authHeader = req.headers.get("Authorization");
-        const cronSecret = process.env.CRON_SECRET;
-        const hasCronSecret =
-            !!cronSecret && authHeader === `Bearer ${cronSecret}`;
+        const hasCronSecret = isValidCronSecret(
+            req.headers.get("Authorization"),
+        );
 
         if (!isAdmin && !hasCronSecret) {
             return NextResponse.json(
@@ -35,8 +51,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             daysAhead?: number;
         };
 
-        const daysAhead =
-            typeof body?.daysAhead === "number" ? body.daysAhead : 31;
+        const requested =
+            typeof body?.daysAhead === "number" &&
+            Number.isFinite(body.daysAhead)
+                ? Math.floor(body.daysAhead)
+                : 31;
+        const daysAhead = Math.min(Math.max(requested, 1), MAX_DAYS_AHEAD);
 
         const result = await generateLessons(payload, daysAhead);
 

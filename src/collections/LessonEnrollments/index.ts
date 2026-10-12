@@ -1,4 +1,5 @@
 import { adminCoachOrSelf } from "@/access/adminCoachOrSelf";
+import { staffOnlyField } from "@/access/staffOnlyField";
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
 import type { CollectionConfig } from "payload";
 import { syncExerciseTrackingOnEnrollment } from "./hooks/syncExerciseTrackingOnEnrollment";
@@ -27,6 +28,7 @@ export const LessonEnrollments: CollectionConfig = {
             label: { en: "User", nl: "Gebruiker" },
             name: "user",
             type: "relationship",
+            access: { create: staffOnlyField, update: staffOnlyField },
             relationTo: "users",
             required: true,
         },
@@ -34,6 +36,7 @@ export const LessonEnrollments: CollectionConfig = {
             label: { en: "Lesson", nl: "Les" },
             name: "lesson",
             type: "relationship",
+            access: { create: staffOnlyField, update: staffOnlyField },
             relationTo: "lessons",
             required: true,
         },
@@ -63,6 +66,7 @@ export const LessonEnrollments: CollectionConfig = {
             label: { en: "Added by", nl: "Toegevoegd door" },
             name: "addedBy",
             type: "relationship",
+            access: { create: staffOnlyField, update: staffOnlyField },
             relationTo: "users",
             required: false,
             admin: {

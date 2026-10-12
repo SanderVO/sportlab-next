@@ -24,7 +24,3 @@ To run a production build version of the application locally, run the following 
 ```bash
 pnpm dev:prod
 ```
-
-## Importing from Cloudflare D1
-
-To import the production Cloudflare D1 data into Postgres, see `scripts/import-d1-to-postgres.ts` (`pnpm payload:import:d1 --help`). It exports the D1 database with Wrangler (configured in `wrangler.jsonc`).

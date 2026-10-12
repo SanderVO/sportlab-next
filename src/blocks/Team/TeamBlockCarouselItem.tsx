@@ -2,7 +2,7 @@
 
 import { Media } from "@/components/Media";
 import { Button } from "@/components/ui/Button";
-import { User } from "@/payload-types";
+import type { TeamMember } from "./TeamBlockCarousel";
 import { cn } from "@/utilities/ui";
 
 export const TeamBlockCarouselItem = ({
@@ -13,7 +13,7 @@ export const TeamBlockCarouselItem = ({
     onHide,
 }: {
     backgroundColor: string;
-    user: User;
+    user: TeamMember;
     showInfo: boolean;
     onShow: () => void;
     onHide: () => void;
