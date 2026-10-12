@@ -1812,6 +1812,7 @@ export const lessons_workout_blocks = pgTable(
             enum_lessons_workout_blocks_timer_mode("timer_mode").default(
                 "countdown",
             ),
+        highlightExercises: boolean("highlight_exercises").default(false),
         intervalSeconds: numeric("interval_seconds", { mode: "number" }),
         rounds: numeric("rounds", { mode: "number" }),
         workSeconds: numeric("work_seconds", { mode: "number" }),
@@ -1977,6 +1978,7 @@ export const lesson_templates_default_workout_blocks = pgTable(
             enum_lesson_templates_default_workout_blocks_timer_mode(
                 "timer_mode",
             ).default("countdown"),
+        highlightExercises: boolean("highlight_exercises").default(false),
         intervalSeconds: numeric("interval_seconds", { mode: "number" }),
         rounds: numeric("rounds", { mode: "number" }),
         workSeconds: numeric("work_seconds", { mode: "number" }),

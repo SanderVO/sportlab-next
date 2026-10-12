@@ -13,6 +13,7 @@ export type WorkoutBlock = {
     duration?: number | null;
     poa?: string | null;
     timerMode?: TimerMode | null;
+    highlightExercises?: boolean | null;
     intervalSeconds?: number | null;
     rounds?: number | null;
     workSeconds?: number | null;

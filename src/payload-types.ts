@@ -704,6 +704,10 @@ export interface Lesson {
          */
         timerMode?: ('countdown' | 'emom' | 'amrap' | 'rounds' | 'intervals') | null;
         /**
+         * On the TV, mark the exercise that is active and move to the next one when the timer runs out (EMOM, Intervals, and the rotating exercises of AMRAP / Rounds). Off: the exercises are only listed.
+         */
+        highlightExercises?: boolean | null;
+        /**
          * EMOM only. Default 60 (every minute). Use 120 for every 2 minutes.
          */
         intervalSeconds?: number | null;
@@ -791,6 +795,10 @@ export interface LessonTemplate {
          * How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: every exercise gets a work and a rest period, then the next exercise starts.
          */
         timerMode?: ('countdown' | 'emom' | 'amrap' | 'rounds' | 'intervals') | null;
+        /**
+         * On the TV, mark the exercise that is active and move to the next one when the timer runs out (EMOM, Intervals, and the rotating exercises of AMRAP / Rounds). Off: the exercises are only listed.
+         */
+        highlightExercises?: boolean | null;
         /**
          * EMOM only. Default 60 (every minute). Use 120 for every 2 minutes.
          */
@@ -1741,6 +1749,7 @@ export interface LessonsSelect<T extends boolean = true> {
         description?: T;
         duration?: T;
         timerMode?: T;
+        highlightExercises?: T;
         intervalSeconds?: T;
         rounds?: T;
         workSeconds?: T;
@@ -1786,6 +1795,7 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
         description?: T;
         duration?: T;
         timerMode?: T;
+        highlightExercises?: T;
         intervalSeconds?: T;
         rounds?: T;
         workSeconds?: T;

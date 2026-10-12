@@ -306,6 +306,23 @@ export const Lessons: CollectionConfig = {
                 },
                 {
                     label: {
+                        en: "Highlight active exercise",
+                        nl: "Actieve oefening markeren",
+                    },
+                    name: "highlightExercises",
+                    type: "checkbox",
+                    defaultValue: false,
+                    admin: {
+                        condition: (_, siblingData) =>
+                            siblingData?.timerMode !== "countdown",
+                        description: {
+                            en: "On the TV, mark the exercise that is active and move to the next one when the timer runs out (EMOM, Intervals, and the rotating exercises of AMRAP / Rounds). Off: the exercises are only listed.",
+                            nl: "Markeer op de TV de actieve oefening en ga naar de volgende als de timer afloopt (EMOM, Intervallen en de wisselende oefeningen van AMRAP / Rondes). Uit: de oefeningen worden alleen getoond.",
+                        },
+                    },
+                },
+                {
+                    label: {
                         en: "Interval (seconds)",
                         nl: "Interval (seconden)",
                     },

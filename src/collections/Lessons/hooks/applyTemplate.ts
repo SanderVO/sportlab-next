@@ -23,6 +23,7 @@ type WorkoutTemplateBlock = {
     duration?: number | null;
     poa?: string | null;
     timerMode?: "countdown" | "emom" | "amrap" | "rounds" | "intervals" | null;
+    highlightExercises?: boolean | null;
     intervalSeconds?: number | null;
     rounds?: number | null;
     workSeconds?: number | null;
@@ -90,6 +91,7 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
         duration?: number;
         poa?: string;
         timerMode?: "countdown" | "emom" | "amrap" | "rounds" | "intervals";
+        highlightExercises?: boolean;
         intervalSeconds?: number;
         rounds?: number;
         workSeconds?: number;
@@ -131,6 +133,7 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
                 typeof block.duration === "number" ? block.duration : undefined,
             poa: block.poa ?? undefined,
             timerMode: block.timerMode ?? undefined,
+            highlightExercises: block.highlightExercises ?? undefined,
             intervalSeconds: block.intervalSeconds ?? undefined,
             rounds: block.rounds ?? undefined,
             workSeconds: block.workSeconds ?? undefined,

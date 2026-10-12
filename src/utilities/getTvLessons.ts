@@ -60,6 +60,7 @@ export const tvLessonSelect = {
         duration: true,
         poa: true,
         timerMode: true,
+        highlightExercises: true,
         intervalSeconds: true,
         rounds: true,
         workSeconds: true,

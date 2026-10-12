@@ -55,6 +55,7 @@ const buildWorkoutBlocks = async (
         duration?: number;
         poa?: string;
         timerMode?: "countdown" | "emom" | "amrap" | "rounds" | "intervals";
+        highlightExercises?: boolean;
         intervalSeconds?: number;
         rounds?: number;
         workSeconds?: number;
@@ -77,6 +78,7 @@ const buildWorkoutBlocks = async (
                 typeof block.duration === "number" ? block.duration : undefined,
             poa: block.poa ?? undefined,
             timerMode: block.timerMode ?? undefined,
+            highlightExercises: block.highlightExercises ?? undefined,
             intervalSeconds: block.intervalSeconds ?? undefined,
             rounds: block.rounds ?? undefined,
             workSeconds: block.workSeconds ?? undefined,

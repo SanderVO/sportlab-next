@@ -4,6 +4,8 @@ export type TimerExercise = { rotating?: boolean | null };
 
 export type TimerBlock = {
     timerMode?: TimerMode | null;
+    /** Only mark an active / next exercise when the CMS option is on. */
+    highlightExercises?: boolean | null;
     duration?: number | null;
     intervalSeconds?: number | null;
     rounds?: number | null;
@@ -153,6 +155,12 @@ export function getTimerState(
         if (rotating.length > 0) {
             state.activeIndex = rotating[roundsDone % rotating.length]!;
         }
+    }
+
+    // Exercises only become active when the block opts in via the CMS.
+    if (!block.highlightExercises) {
+        state.activeIndex = -1;
+        state.nextIndex = -1;
     }
 
     return state;
