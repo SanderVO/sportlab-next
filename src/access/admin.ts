@@ -1,4 +1,4 @@
-import { RolesEnum } from "@/collections/Users";
+import { RolesEnum } from "@/collections/Users/roles";
 import type { User } from "@/payload-types";
 import type { Access, Payload } from "payload";
 

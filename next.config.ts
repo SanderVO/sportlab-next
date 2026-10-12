@@ -1,12 +1,25 @@
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
+// A strict script/style CSP would break GTM, Turnstile and the Payload admin, so only
+// framing is restricted. The admin live preview embeds the site from the same origin.
+const securityHeaders = [
+    {
+        key: "Strict-Transport-Security",
+        value: "max-age=63072000; includeSubDomains",
+    },
+    { key: "X-Content-Type-Options", value: "nosniff" },
+    { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+    {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=(), payment=()",
+    },
+    { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+];
+
 const nextConfig: NextConfig = {
     cacheComponents: false,
     output: "standalone",
-    typescript: {
-        ignoreBuildErrors: true,
-    },
     trailingSlash: false,
     experimental: {
         serverActions: {
@@ -27,13 +40,8 @@ const nextConfig: NextConfig = {
     headers: async () => {
         return [
             {
-                source: "/(.*).(jpg|jpeg|png|webp|avif|gif|svg)",
-                headers: [
-                    {
-                        key: "Cache-Control",
-                        value: "public, s-maxage=31536000, max-age=31536000, immutable",
-                    },
-                ],
+                source: "/(.*)",
+                headers: securityHeaders,
             },
         ];
     },

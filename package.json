@@ -32,7 +32,7 @@
     },
     "dependencies": {
         "@hookform/resolvers": "^5.9.1",
-        "@next/third-parties": "^16.3.6",
+        "@next/third-parties": "^16.4.0",
         "@payloadcms/admin-bar": "3.90.2",
         "@payloadcms/db-postgres": "3.90.2",
         "@payloadcms/email-resend": "3.90.2",
@@ -53,8 +53,7 @@
         "embla-carousel-react": "^8.6.0",
         "he": "^1.2.0",
         "lucide-react": "^0.554.0",
-        "next": "^16.3.6",
-        "next-sitemap": "^4.2.3",
+        "next": "^16.4.0",
         "next-turnstile": "^1.0.7",
         "papaparse": "^5.7.0",
         "payload": "3.90.2",
@@ -69,8 +68,8 @@
     "devDependencies": {
         "@aws-sdk/client-s3": "^3.1142.0",
         "@eslint/eslintrc": "^3.3.7",
-        "@next/env": "^16.3.6",
-        "@next/eslint-plugin-next": "^16.3.6",
+        "@next/env": "^16.4.0",
+        "@next/eslint-plugin-next": "^16.4.0",
         "@tailwindcss/postcss": "^4.3.3",
         "@tailwindcss/typography": "^0.5.20",
         "@types/he": "^1.2.3",
@@ -84,7 +83,7 @@
         "eslint-config-next": "16.3.3",
         "eslint-plugin-react-hooks": "^7.1.1",
         "postcss": "^8.5.28",
-        "serve": "^14.2.6",
+        "prettier": "^3.9.10",
         "tailwindcss": "^4.3.3",
         "typescript": "^5.9.3"
     }

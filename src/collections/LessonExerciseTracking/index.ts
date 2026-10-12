@@ -1,4 +1,5 @@
 import { adminCoachOrSelf } from "@/access/adminCoachOrSelf";
+import { staffOnlyField } from "@/access/staffOnlyField";
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
 import { buildTrackingWorkoutBlocks } from "@/utilities/lessonExerciseTracking";
 import type { CollectionBeforeChangeHook, CollectionConfig } from "payload";
@@ -74,6 +75,7 @@ export const LessonExerciseTracking: CollectionConfig = {
             label: { en: "User", nl: "Gebruiker" },
             name: "user",
             type: "relationship",
+            access: { create: staffOnlyField, update: staffOnlyField },
             relationTo: "users",
             required: true,
         },
@@ -81,6 +83,7 @@ export const LessonExerciseTracking: CollectionConfig = {
             label: { en: "Lesson", nl: "Les" },
             name: "lesson",
             type: "relationship",
+            access: { create: staffOnlyField, update: staffOnlyField },
             relationTo: "lessons",
             required: true,
         },

@@ -47,6 +47,29 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
     return result.docs?.[0] || null;
 });
 
+// One query for every breadcrumb segment instead of one per segment.
+const queryPageTitlesBySlugs = cache(async (slugs: string[]) => {
+    const { isEnabled: draft } = await draftMode();
+
+    const payload = await getPayload({ config: configPromise });
+
+    const result = await payload.find({
+        collection: "pages",
+        draft,
+        limit: slugs.length,
+        pagination: false,
+        overrideAccess: draft,
+        select: { title: true, slug: true },
+        where: {
+            slug: {
+                in: slugs,
+            },
+        },
+    });
+
+    return new Map(result.docs.map((doc) => [doc.slug, doc.title]));
+});
+
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
     const { slugs = ["home"] } = await params;
     const slug = slugs.at(-1) || "home";
@@ -80,19 +103,17 @@ export default async function Page({ params }: Args) {
 
     const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "";
 
-    const breadcrumbItems = await Promise.all(
-        slugs.map(async (slug, index) => {
-            const doc = await queryPageBySlug({
-                slug: decodeURIComponent(slug),
-            });
-            return {
-                "@type": "ListItem",
-                position: index + 1,
-                name: doc?.title ?? decodeURIComponent(slug),
-                item: `${baseUrl}/${slugs.slice(0, index + 1).join("/")}`,
-            };
-        }),
-    );
+    const titles =
+        slugs.length > 1
+            ? await queryPageTitlesBySlugs(slugs.map(decodeURIComponent))
+            : new Map<string, string>();
+
+    const breadcrumbItems = slugs.map((slug, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: titles.get(decodeURIComponent(slug)) ?? decodeURIComponent(slug),
+        item: `${baseUrl}/${slugs.slice(0, index + 1).join("/")}`,
+    }));
 
     const breadcrumbJsonLd =
         slugs.length > 1

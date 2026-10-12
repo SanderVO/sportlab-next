@@ -1,4 +1,5 @@
 import { TvClock } from "@/components/TvClock/TvClock";
+import { tvLessonDetailSelect } from "@/utilities/getTvLessons";
 import configPromise from "@payload-config";
 import { notFound } from "next/navigation";
 import { getPayload } from "payload";
@@ -93,8 +94,11 @@ export default async function TvLessonPage({
     const lesson = await payload.findByID({
         collection: "lessons",
         id: Number(lessonId),
-        depth: 2,
+        depth: 1,
         overrideAccess: true,
+        // Payload's select typing rejects nested relation selects.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        select: tvLessonDetailSelect as any,
         disableErrors: true,
     });
 
