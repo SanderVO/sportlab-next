@@ -1,12 +1,10 @@
 import { TVLessonDashboard } from "@/components/TVLessonDashboard/TVLessonDashboard";
 import {
     getTvDateRange,
-    getTvLessons,
     parseTvDateParam,
 } from "@/utilities/getTvLessons";
-import configPromise from "@payload-config";
+import { getCachedTvLessons } from "@/utilities/getCachedTvLessons";
 import { redirect } from "next/navigation";
-import { getPayload } from "payload";
 
 type PageProps = {
     searchParams: Promise<{
@@ -31,9 +29,7 @@ export default async function TvDashboardPage({ searchParams }: PageProps) {
 
     const selectedDate = parsedDate;
 
-    const payload = await getPayload({ config: configPromise });
-
-    const lessonsResult = await getTvLessons(payload, {
+    const lessonsResult = await getCachedTvLessons({
         page: 1,
         dateParam: selectedDate,
     });

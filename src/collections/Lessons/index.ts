@@ -6,6 +6,10 @@ import {
     applyTemplateBeforeValidate,
 } from "./hooks/applyTemplate";
 import { resolveCardImage } from "./hooks/resolveCardImage";
+import {
+    revalidateTvLessonsOnChange,
+    revalidateTvLessonsOnDelete,
+} from "./hooks/revalidateTvLessons";
 import { syncExerciseTrackingOnLessonUpdate } from "./hooks/syncExerciseTrackingOnLessonUpdate";
 
 export const Lessons: CollectionConfig = {
@@ -25,7 +29,11 @@ export const Lessons: CollectionConfig = {
         defaultColumns: ["title", "startDate", "type", "updatedAt"],
     },
     hooks: {
-        afterChange: [syncExerciseTrackingOnLessonUpdate],
+        afterChange: [
+            syncExerciseTrackingOnLessonUpdate,
+            revalidateTvLessonsOnChange,
+        ],
+        afterDelete: [revalidateTvLessonsOnDelete],
         afterRead: [resolveCardImage],
         beforeValidate: [applyTemplateBeforeValidate],
         beforeChange: [applyTemplate],
