@@ -1,4 +1,4 @@
-import type { BasePayload } from "payload";
+import type { BasePayload, SelectType } from "payload";
 
 export const TV_LESSON_PAGE_SIZE = 12;
 
@@ -104,7 +104,7 @@ export async function getTvLessons(
         pagination: true,
         overrideAccess: true,
         sort: "startDate",
-        select: tvLessonSelect as any,
+        select: tvLessonSelect as SelectType,
         where: {
             and: [
                 {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 const parseConsentCookie = (cookie: string): "granted" | "denied" | null => {
     const consentCookie = cookie
@@ -20,8 +20,27 @@ const parseConsentCookie = (cookie: string): "granted" | "denied" | null => {
     return null;
 };
 
+const consentListeners = new Set<() => void>();
+
+const subscribeToConsent = (listener: () => void) => {
+    consentListeners.add(listener);
+
+    return () => {
+        consentListeners.delete(listener);
+    };
+};
+
+const notifyConsentChanged = () => {
+    consentListeners.forEach((listener) => listener());
+};
+
 export default function CookieBanner() {
-    const [hasGivenConsent, setHasGivenConsent] = useState(true);
+    // The server renders without the banner; the client shows it when no choice is stored yet.
+    const hasGivenConsent = useSyncExternalStore(
+        subscribeToConsent,
+        () => parseConsentCookie(document.cookie) !== null,
+        () => true,
+    );
 
     const getConsentCookie = (): "granted" | "denied" | null => {
         return parseConsentCookie(document.cookie);
@@ -51,19 +70,17 @@ export default function CookieBanner() {
             window.location.protocol === "https:" ? "; Secure" : "";
 
         document.cookie = `ga_consent=${value}; Path=/; Max-Age=31536000; SameSite=Lax${secureAttribute}`;
+
+        notifyConsentChanged();
     };
 
     const acceptAll = () => {
         setConsentCookie("granted");
-
-        setHasGivenConsent(true);
         updateGoogleConsent("granted");
     };
 
     const rejectAll = () => {
         setConsentCookie("denied");
-
-        setHasGivenConsent(true);
         updateGoogleConsent("denied");
     };
 
@@ -72,11 +89,7 @@ export default function CookieBanner() {
 
         if (storedConsent) {
             updateGoogleConsent(storedConsent);
-            setHasGivenConsent(true);
-            return;
         }
-
-        setHasGivenConsent(false);
     }, []);
 
     return (

@@ -14,6 +14,15 @@ export const CycleTimelineBlock: React.FC<CycleTimelineBlockProps> = (
     const [activeIndex, setActiveIndex] = useState(0);
     const [isUserInteracting, setIsUserInteracting] = useState(false);
     const [isPageVisible, setIsPageVisible] = useState(true);
+
+    // Restart at the first stage when the stage count changes (state adjusted during render).
+    const stageCount = stages?.length;
+    const [previousStageCount, setPreviousStageCount] = useState(stageCount);
+
+    if (previousStageCount !== stageCount) {
+        setPreviousStageCount(stageCount);
+        setActiveIndex(0);
+    }
     const [emblaRef, emblaApi] = useEmblaCarousel({
         loop: true,
         align: "start",
@@ -92,10 +101,6 @@ export const CycleTimelineBlock: React.FC<CycleTimelineBlockProps> = (
             window.clearInterval(intervalId);
         };
     }, [emblaApi, isPageVisible, isUserInteracting, stages?.length]);
-
-    useEffect(() => {
-        setActiveIndex(0);
-    }, [stages?.length]);
 
     return (
         <div className="container m-auto py-14 lg:py-20">

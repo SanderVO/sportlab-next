@@ -2,7 +2,7 @@
 
 import { getClientSideURL } from "@/utilities/getURL";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function ResetPasswordForm() {
     const router = useRouter();
@@ -11,15 +11,11 @@ export default function ResetPasswordForm() {
 
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(
+        token ? null : "Geen reset token gevonden. Controleer je e-mail link.",
+    );
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (!token) {
-            setError("Geen reset token gevonden. Controleer je e-mail link.");
-        }
-    }, [token]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

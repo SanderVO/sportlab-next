@@ -2,7 +2,7 @@ import { TvClock } from "@/components/TvClock/TvClock";
 import { tvLessonDetailSelect } from "@/utilities/getTvLessons";
 import configPromise from "@payload-config";
 import { notFound } from "next/navigation";
-import { getPayload } from "payload";
+import { getPayload, type SelectType } from "payload";
 import { WorkoutBlocks } from "./WorkoutBlocks";
 
 type PageProps = {
@@ -96,9 +96,7 @@ export default async function TvLessonPage({
         id: Number(lessonId),
         depth: 1,
         overrideAccess: true,
-        // Payload's select typing rejects nested relation selects.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        select: tvLessonDetailSelect as any,
+        select: tvLessonDetailSelect as SelectType,
         disableErrors: true,
     });
 
