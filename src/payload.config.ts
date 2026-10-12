@@ -105,8 +105,13 @@ const r2StoragePlugin = s3Storage({
 
 const payloadSecret = process.env.PAYLOAD_SECRET;
 
-// Without a real secret anyone could forge login tokens, so never fall back in production.
-if (!payloadSecret && process.env.NODE_ENV === "production") {
+// Without a real secret anyone could forge login tokens, so never fall back at runtime in
+// production. `next build` has no runtime secrets (the Docker build passes none), so skip it there.
+if (
+    !payloadSecret &&
+    process.env.NODE_ENV === "production" &&
+    process.env.NEXT_PHASE !== "phase-production-build"
+) {
     throw new Error("PAYLOAD_SECRET must be set in production");
 }
 
