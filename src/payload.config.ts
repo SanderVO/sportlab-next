@@ -171,6 +171,14 @@ const withCoachGlobalVisibility = <T extends GlobalConfig>(global: T): T => {
     } as T;
 };
 
+// Exact string match against the request Origin, so strip stray whitespace and trailing slashes.
+const allowedOrigins = [getServerSideURL()]
+    .map((url) => url.trim().replace(/\/+$/, ""))
+    .filter(Boolean);
+
+// TEMPORARY: verify the allowlist the running app uses (logout 403 debugging).
+console.log("[csrf]", JSON.stringify(allowedOrigins));
+
 export default buildConfig({
     admin: {
         user: Users.slug,
@@ -228,8 +236,8 @@ export default buildConfig({
         withCoachGlobalVisibility(WhatsApp),
         withCoachGlobalVisibility(Organization),
     ],
-    cors: [getServerSideURL()].filter(Boolean),
-    csrf: [getServerSideURL()].filter(Boolean),
+    cors: allowedOrigins,
+    csrf: allowedOrigins,
     editor: lexicalEditor(),
     secret: payloadSecret || "ignore",
     sharp,
