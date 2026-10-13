@@ -176,9 +176,6 @@ const allowedOrigins = [getServerSideURL()]
     .map((url) => url.trim().replace(/\/+$/, ""))
     .filter(Boolean);
 
-// TEMPORARY: verify the allowlist the running app uses (logout 403 debugging).
-console.log("[csrf]", JSON.stringify(allowedOrigins));
-
 export default buildConfig({
     admin: {
         user: Users.slug,

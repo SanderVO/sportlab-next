@@ -1,8 +1,9 @@
 "use client";
 
-import type { Lesson, Program, User } from "@/payload-types";
 import { TvClock } from "@/components/TvClock/TvClock";
+import type { Lesson, Program, User } from "@/payload-types";
 import { getTvDateRange, type TvDaySummary } from "@/utilities/getTvLessons";
+import { getTvKey, isTvBackKey } from "@/utilities/tvKeys";
 import { cn } from "@/utilities/ui";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -27,24 +28,13 @@ const lessonTypeLabels: Record<NonNullable<Lesson["type"]>, string> = {
     open_gym: "Open Gym",
 };
 
-const lessonStatusLabels: Record<NonNullable<Lesson["status"]>, string> = {
-    open: "Open",
-    closed: "Gesloten",
-};
-
 const focusRing =
     "outline-none focus-visible:outline-[6px] focus-visible:outline-offset-[6px] focus-visible:outline-focus-ring";
 
-const accents = [
-    {
-        bar: "bg-orange-300",
-        fill: "border-orange-700 bg-orange-700 text-white",
-    },
-    {
-        bar: "bg-orange-200",
-        fill: "border-orange-200 bg-orange-200 text-ink",
-    },
-];
+const accent = {
+    bar: "bg-orange-300",
+    fill: "border-orange-700 bg-orange-700 text-white",
+};
 
 function isUser(value: unknown): value is User {
     return typeof value === "object" && value !== null;
@@ -340,16 +330,18 @@ export function TVLessonDashboard({
         }
 
         const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "ArrowLeft") {
+            const key = getTvKey(event);
+
+            if (key === "ArrowLeft") {
                 event.preventDefault();
                 navigateToDate(addDays(selectedDate, -1));
-            } else if (event.key === "ArrowRight") {
+            } else if (key === "ArrowRight") {
                 event.preventDefault();
                 navigateToDate(addDays(selectedDate, 1));
-            } else if (event.key === "ArrowUp") {
+            } else if (key === "ArrowUp") {
                 event.preventDefault();
                 moveVerticalCard(-1);
-            } else if (event.key === "ArrowDown") {
+            } else if (key === "ArrowDown") {
                 event.preventDefault();
                 moveVerticalCard(1);
             }
@@ -371,26 +363,27 @@ export function TVLessonDashboard({
             setCalendarFocusDate((current) => addDays(current, days));
 
         const onKeyDown = (event: KeyboardEvent) => {
+            const key = getTvKey(event);
             const onButton =
                 event.target instanceof HTMLElement &&
                 event.target.tagName === "BUTTON";
 
-            if (event.key === "Escape" || event.key === "Backspace") {
+            if (isTvBackKey(event)) {
                 event.preventDefault();
                 setIsCalendarOpen(false);
-            } else if (event.key === "ArrowLeft") {
+            } else if (key === "ArrowLeft") {
                 event.preventDefault();
                 move(-1);
-            } else if (event.key === "ArrowRight") {
+            } else if (key === "ArrowRight") {
                 event.preventDefault();
                 move(1);
-            } else if (event.key === "ArrowUp") {
+            } else if (key === "ArrowUp") {
                 event.preventDefault();
                 move(-7);
-            } else if (event.key === "ArrowDown") {
+            } else if (key === "ArrowDown") {
                 event.preventDefault();
                 move(7);
-            } else if (event.key === "Enter" && !onButton) {
+            } else if (key === "Enter" && !onButton) {
                 event.preventDefault();
                 pickDate(calendarFocusDate);
             }
@@ -441,7 +434,7 @@ export function TVLessonDashboard({
                     </h1>
                     {!isDense ? (
                         <div className="type-tv-body mt-3 text-text-on-panel-muted">
-                            {labels.year} · {visibleLessons.length}{" "}
+                            {visibleLessons.length}{" "}
                             {visibleLessons.length === 1 ? "les" : "lessen"}
                         </div>
                     ) : null}
@@ -496,7 +489,6 @@ export function TVLessonDashboard({
                     )}
                 >
                     {visibleLessons.map((lesson, index) => {
-                        const accent = accents[index % accents.length];
                         const program = isProgram(lesson.program)
                             ? lesson.program
                             : null;
@@ -508,16 +500,9 @@ export function TVLessonDashboard({
                         const category = lesson.type
                             ? lessonTypeLabels[lesson.type]
                             : null;
-                        const meta = [program?.title ?? category, coaches]
+                        const meta = [category, coaches]
                             .filter(Boolean)
                             .join(" · ");
-                        const status = lesson.status
-                            ? lessonStatusLabels[lesson.status]
-                            : null;
-                        const statusClass =
-                            lesson.status === "closed"
-                                ? "border-text-on-panel-eyebrow bg-transparent text-white"
-                                : accent.fill;
 
                         return (
                             <Link
@@ -552,9 +537,6 @@ export function TVLessonDashboard({
                                     )}
                                 >
                                     {formatTime(lesson.startDate)}
-                                    <small className="type-tv-label mt-[6px] block text-orange-300 uppercase">
-                                        {formatShortDate(lesson.startDate)}
-                                    </small>
                                 </div>
 
                                 <div className="min-w-0">
@@ -569,14 +551,16 @@ export function TVLessonDashboard({
                                     </h2>
                                     {isDense ? (
                                         <div className="mt-[14px] flex min-w-0 items-center gap-5">
-                                            {status ? (
+                                            {program ? (
                                                 <span
                                                     className={cn(
-                                                        "inline-flex h-12 flex-none items-center gap-[14px] rounded-pill border-[3px] px-5 font-label text-2xl leading-none font-extrabold tracking-[0.2em] uppercase",
-                                                        statusClass,
+                                                        "inline-flex h-12 max-w-[55%] flex-none items-center rounded-pill border-[3px] px-5 font-sans text-2xl leading-none font-semibold",
+                                                        accent.fill,
                                                     )}
                                                 >
-                                                    {status}
+                                                    <span className="truncate">
+                                                        {program.title}
+                                                    </span>
                                                 </span>
                                             ) : null}
                                             <span className="min-w-0 truncate text-[28px] leading-[38px] text-text-on-panel-muted">
@@ -592,17 +576,16 @@ export function TVLessonDashboard({
 
                                 {!isDense ? (
                                     <>
-                                        {status ? (
+                                        {program ? (
                                             <span
                                                 className={cn(
-                                                    "inline-flex h-[60px] items-center gap-[14px] rounded-pill border-[3px] px-7 font-label text-[26px] leading-none font-extrabold tracking-[0.2em] uppercase",
-                                                    statusClass,
+                                                    "inline-flex h-[60px] max-w-[480px] items-center rounded-pill border-[3px] px-7 font-sans text-[30px] leading-none font-semibold",
+                                                    accent.fill,
                                                 )}
                                             >
-                                                {lesson.status === "open" ? (
-                                                    <span className="size-[14px] rounded-pill bg-orange-300" />
-                                                ) : null}
-                                                {status}
+                                                <span className="truncate">
+                                                    {program.title}
+                                                </span>
                                             </span>
                                         ) : (
                                             <span />
@@ -620,20 +603,6 @@ export function TVLessonDashboard({
                     })}
                 </section>
             )}
-
-            <footer
-                className={cn(
-                    "flex items-center justify-between",
-                    isDense || visibleLessons.length === 0 ? "mt-8" : "mt-auto",
-                )}
-            >
-                <span className="type-tv-label text-orange-200 uppercase">
-                    One more reason · to keep going
-                </span>
-                <span className="type-tv-label text-text-on-panel-eyebrow uppercase">
-                    ‹ › dag wisselen · OK openen
-                </span>
-            </footer>
 
             {isCalendarOpen ? (
                 <div className="absolute inset-0 z-40">

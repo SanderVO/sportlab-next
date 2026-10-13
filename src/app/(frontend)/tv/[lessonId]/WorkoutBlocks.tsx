@@ -1,10 +1,11 @@
 "use client";
 
 import { TvClock } from "@/components/TvClock/TvClock";
+import { getTvKey, isTvBackKey } from "@/utilities/tvKeys";
 import { cn } from "@/utilities/ui";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getTimerState, type TimerMode } from "./timerState";
 import { useTimerTones } from "./useTimerTones";
-import { useCallback, useEffect, useRef, useState } from "react";
 
 export type WorkoutBlock = {
     id?: string | null;
@@ -27,39 +28,16 @@ export type WorkoutBlock = {
     }> | null;
 };
 
-// Back-button key codes sent by TV remotes (Tizen, webOS) besides Escape.
-const BACK_KEY_CODES = new Set([10009, 461]);
-
-// Block accents alternate ember / peach (see TvWorkout).
-const accents = [
-    {
-        bar: "bg-orange-300",
-        text: "text-orange-300",
-        border: "border-orange-300",
-        fill: "bg-orange-300",
-        pill: "border-orange-700 bg-orange-700 text-white",
-    },
-    {
-        bar: "bg-orange-200",
-        text: "text-orange-200",
-        border: "border-orange-200",
-        fill: "bg-orange-200",
-        pill: "border-orange-200 bg-orange-200 text-ink",
-    },
-];
+const accent = {
+    bar: "bg-orange-300",
+    text: "text-orange-300",
+    border: "border-orange-300",
+    fill: "bg-orange-300",
+    pill: "border-orange-700 bg-orange-700 text-white",
+};
 
 const focusRing =
     "outline-none focus-visible:outline-[6px] focus-visible:outline-offset-[6px] focus-visible:outline-focus-ring";
-
-function isBackKey(event: KeyboardEvent) {
-    return (
-        event.key === "Escape" ||
-        event.key === "Backspace" ||
-        event.key === "BrowserBack" ||
-        event.key === "GoBack" ||
-        BACK_KEY_CODES.has(event.keyCode)
-    );
-}
 
 /** 6+ blocks are split over pages instead of shrinking the type. */
 function getPageSize(count: number) {
@@ -127,25 +105,27 @@ export function WorkoutBlocks({
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent) => {
+            const key = getTvKey(event);
+
             if (openIndex !== null) {
-                if (isBackKey(event)) {
+                if (isTvBackKey(event)) {
                     event.preventDefault();
                     close();
                 } else if (
-                    event.key === "ArrowLeft" ||
-                    event.key === "ArrowRight"
+                    key === "ArrowLeft" ||
+                    key === "ArrowRight"
                 ) {
                     // Remote: left / right = previous / next block
                     event.preventDefault();
                     const next =
-                        openIndex + (event.key === "ArrowLeft" ? -1 : 1);
+                        openIndex + (key === "ArrowLeft" ? -1 : 1);
 
                     if (next >= 0 && next < blocks.length) {
                         open(next);
                     }
                 } else if (
-                    event.key === "ArrowUp" ||
-                    event.key === "ArrowDown"
+                    key === "ArrowUp" ||
+                    key === "ArrowDown"
                 ) {
                     // Up / down moves between the buttons at the bottom
                     event.preventDefault();
@@ -157,7 +137,7 @@ export function WorkoutBlocks({
                     const current = buttons.indexOf(
                         document.activeElement as HTMLElement,
                     );
-                    const next = current + (event.key === "ArrowUp" ? -1 : 1);
+                    const next = current + (key === "ArrowUp" ? -1 : 1);
                     buttons[
                         Math.min(Math.max(next, 0), buttons.length - 1)
                     ]?.focus();
@@ -169,7 +149,7 @@ export function WorkoutBlocks({
             const currentAttr = active?.dataset.blockIndex;
             const onBack = active?.id === "tv-back";
 
-            if (onBack && event.key === "ArrowDown") {
+            if (onBack && key === "ArrowDown") {
                 event.preventDefault();
                 document
                     .querySelector<HTMLElement>(
@@ -179,13 +159,13 @@ export function WorkoutBlocks({
                 return;
             }
 
-            if (event.key === "ArrowUp" && currentAttr !== undefined) {
+            if (key === "ArrowUp" && currentAttr !== undefined) {
                 event.preventDefault();
                 document.getElementById("tv-back")?.focus();
                 return;
             }
 
-            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+            if (key !== "ArrowLeft" && key !== "ArrowRight") {
                 return;
             }
 
@@ -193,7 +173,7 @@ export function WorkoutBlocks({
 
             const current =
                 currentAttr !== undefined ? Number(currentAttr) : pageStart;
-            const next = current + (event.key === "ArrowLeft" ? -1 : 1);
+            const next = current + (key === "ArrowLeft" ? -1 : 1);
 
             if (next < 0 || next >= blocks.length) {
                 return;
@@ -251,7 +231,6 @@ export function WorkoutBlocks({
             >
                 {visible.map((block, offset) => {
                     const index = pageStart + offset;
-                    const accent = accents[index % accents.length];
 
                     return (
                         <button
@@ -353,7 +332,6 @@ export function WorkoutBlocks({
                     index={openIndex}
                     total={blocks.length}
                     lessonTitle={lessonTitle}
-                    accent={accents[openIndex % accents.length]}
                     onClose={close}
                 />
             ) : null}
@@ -405,7 +383,6 @@ function BlockModal({
     index,
     total,
     lessonTitle,
-    accent,
     onClose,
 }: {
     containerRef: React.RefObject<HTMLDivElement | null>;
@@ -413,7 +390,6 @@ function BlockModal({
     index: number;
     total: number;
     lessonTitle: string;
-    accent: (typeof accents)[number];
     onClose: () => void;
 }) {
     const exercises = block.exercises ?? [];
@@ -861,9 +837,6 @@ function BlockModal({
                     >
                         Sluiten
                     </button>
-                    <span className="type-tv-label ml-auto text-text-on-panel-eyebrow uppercase">
-                        ‹ › vorig / volgend blok
-                    </span>
                 </div>
             </div>
         </div>
