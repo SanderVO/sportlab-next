@@ -26,8 +26,10 @@ type WorkoutTemplateBlock = {
     highlightExercises?: boolean | null;
     intervalSeconds?: number | null;
     rounds?: number | null;
-    workSeconds?: number | null;
-    restSeconds?: number | null;
+    roundTypes?: Array<{
+        type?: "work" | "rest" | "active_rest" | null;
+        seconds?: number | null;
+    }> | null;
     exercises?: Array<{
         name?: string | null;
         quantity?: string | null;
@@ -94,8 +96,10 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
         highlightExercises?: boolean;
         intervalSeconds?: number;
         rounds?: number;
-        workSeconds?: number;
-        restSeconds?: number;
+        roundTypes?: Array<{
+            type: "work" | "rest" | "active_rest";
+            seconds: number;
+        }>;
         exercises: Array<{
             name: string;
             quantity?: string;
@@ -136,8 +140,11 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
             highlightExercises: block.highlightExercises ?? undefined,
             intervalSeconds: block.intervalSeconds ?? undefined,
             rounds: block.rounds ?? undefined,
-            workSeconds: block.workSeconds ?? undefined,
-            restSeconds: block.restSeconds ?? undefined,
+            roundTypes: (block.roundTypes ?? []).flatMap((round) =>
+                round.type && typeof round.seconds === "number"
+                    ? [{ type: round.type, seconds: round.seconds }]
+                    : [],
+            ),
             exercises,
         });
     }

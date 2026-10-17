@@ -4,7 +4,11 @@ import { TvClock } from "@/components/TvClock/TvClock";
 import { getTvKey, isTvBackKey } from "@/utilities/tvKeys";
 import { cn } from "@/utilities/ui";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getTimerState, type TimerMode } from "./timerState";
+import {
+    getTimerState,
+    type TimerMode,
+    type TimerRoundType,
+} from "./timerState";
 import { useTimerTones } from "./useTimerTones";
 
 export type WorkoutBlock = {
@@ -17,8 +21,7 @@ export type WorkoutBlock = {
     highlightExercises?: boolean | null;
     intervalSeconds?: number | null;
     rounds?: number | null;
-    workSeconds?: number | null;
-    restSeconds?: number | null;
+    roundTypes?: TimerRoundType[] | null;
     exercises?: Array<{
         id?: string | null;
         name: string;
@@ -111,22 +114,15 @@ export function WorkoutBlocks({
                 if (isTvBackKey(event)) {
                     event.preventDefault();
                     close();
-                } else if (
-                    key === "ArrowLeft" ||
-                    key === "ArrowRight"
-                ) {
+                } else if (key === "ArrowLeft" || key === "ArrowRight") {
                     // Remote: left / right = previous / next block
                     event.preventDefault();
-                    const next =
-                        openIndex + (key === "ArrowLeft" ? -1 : 1);
+                    const next = openIndex + (key === "ArrowLeft" ? -1 : 1);
 
                     if (next >= 0 && next < blocks.length) {
                         open(next);
                     }
-                } else if (
-                    key === "ArrowUp" ||
-                    key === "ArrowDown"
-                ) {
+                } else if (key === "ArrowUp" || key === "ArrowDown") {
                     // Up / down moves between the buttons at the bottom
                     event.preventDefault();
                     const buttons = Array.from(
@@ -444,7 +440,7 @@ function BlockModal({
         if (mode === "emom") {
             play("go");
         } else if (mode === "intervals") {
-            play(timer.phase === "work" ? "go" : "rest");
+            play(timer.phase === "rest" ? "rest" : "go");
         }
     }, [timer.stepKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -588,7 +584,7 @@ function BlockModal({
                                 className={cn(
                                     "type-tv-label uppercase",
                                     mode === "intervals" &&
-                                        timer.phase === "rest"
+                                        timer.phase !== "work"
                                         ? "text-sand"
                                         : accent.text,
                                 )}
@@ -598,7 +594,9 @@ function BlockModal({
                                     : mode === "intervals"
                                       ? timer.phase === "work"
                                           ? "Werk · nog"
-                                          : "Rust · nog"
+                                          : timer.phase === "active_rest"
+                                            ? "Actieve rust · nog"
+                                            : "Rust · nog"
                                       : mode === "emom"
                                         ? `${unit === "Min" ? "Deze minuut" : "Dit interval"} · nog`
                                         : "Resterend"}
@@ -615,7 +613,7 @@ function BlockModal({
                                         "h-full rounded-pill",
                                         finalStretch ||
                                             (mode === "intervals" &&
-                                                timer.phase === "rest")
+                                                timer.phase !== "work")
                                             ? "bg-sand"
                                             : "bg-linear-to-r from-orange-700 to-orange-300",
                                     )}
@@ -633,8 +631,11 @@ function BlockModal({
                             {mode === "intervals" ? (
                                 <div className="flex items-baseline justify-between">
                                     <span className="type-tv-heading">
-                                        Ronde {timer.cycleIndex + 1} /{" "}
-                                        {timer.cycleCount}
+                                        Ronde {timer.stepIndex + 1} /{" "}
+                                        {timer.stepCount}
+                                        {timer.cycleCount > 1
+                                            ? ` · Herhaling ${timer.cycleIndex + 1} / ${timer.cycleCount}`
+                                            : ""}
                                     </span>
                                     <span className="type-tv-body text-text-on-panel-muted">
                                         Totaal {formatTime(elapsed)} /{" "}

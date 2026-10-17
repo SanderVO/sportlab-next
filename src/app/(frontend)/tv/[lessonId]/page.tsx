@@ -1,4 +1,5 @@
 import { TvClock } from "@/components/TvClock/TvClock";
+import { getTimerState } from "./timerState";
 import { tvLessonDetailSelect } from "@/utilities/getTvLessons";
 import configPromise from "@payload-config";
 import { notFound } from "next/navigation";
@@ -106,9 +107,12 @@ export default async function TvLessonPage({
 
     const program = isProgram(lesson.program) ? lesson.program : null;
     const blocks = lesson.workoutBlocks ?? [];
-    const totalMinutes = blocks.reduce(
-        (sum, block) => sum + (block.duration ?? 0),
-        0,
+    // Intervals blocks take their length from the round types, not from the minutes field.
+    const totalMinutes = Math.round(
+        blocks.reduce(
+            (sum, block) => sum + getTimerState(block, 0, 0).totalSeconds,
+            0,
+        ) / 60,
     );
     const coaches = (lesson.coaches ?? [])
         .map((coach) =>

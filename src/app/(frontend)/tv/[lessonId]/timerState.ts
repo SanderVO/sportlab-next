@@ -2,6 +2,15 @@ export type TimerMode = "countdown" | "emom" | "amrap" | "rounds" | "intervals";
 
 export type TimerExercise = { rotating?: boolean | null };
 
+export type IntervalPhase = "work" | "rest" | "active_rest";
+
+export type TimerRoundType = {
+    type?: IntervalPhase | null;
+    seconds?: number | null;
+};
+
+type IntervalStep = { phase: IntervalPhase; seconds: number };
+
 export type TimerBlock = {
     timerMode?: TimerMode | null;
     /** Only mark an active / next exercise when the CMS option is on. */
@@ -9,8 +18,7 @@ export type TimerBlock = {
     duration?: number | null;
     intervalSeconds?: number | null;
     rounds?: number | null;
-    workSeconds?: number | null;
-    restSeconds?: number | null;
+    roundTypes?: TimerRoundType[] | null;
     exercises?: TimerExercise[] | null;
 };
 
@@ -33,7 +41,10 @@ export type TimerState = {
     /** Changes whenever EMOM starts a new interval or Intervals switches work/rest (0 otherwise). */
     stepKey: number;
     /** Intervals: which phase of the current exercise's slot we're in. */
-    phase: "work" | "rest" | null;
+    phase: IntervalPhase | null;
+    /** Intervals: position in the round sequence (0-based) and its length. */
+    stepIndex: number;
+    stepCount: number;
     /** Intervals: current / total repeat of the whole exercise list (0-based index). */
     cycleIndex: number;
     cycleCount: number;
@@ -43,6 +54,15 @@ export type TimerState = {
 };
 
 const DEFAULT_INTERVAL_SECONDS = 60;
+
+/** One pass of an Intervals block: every round type runs for its own time. */
+function getIntervalSteps(block: TimerBlock): IntervalStep[] {
+    return (block.roundTypes ?? []).flatMap((round) =>
+        round.type && (round.seconds ?? 0) > 0
+            ? [{ phase: round.type, seconds: round.seconds ?? 0 }]
+            : [],
+    );
+}
 
 /**
  * Everything the TV shows is derived from the elapsed time (and the manual round
@@ -54,14 +74,14 @@ export function getTimerState(
     roundsDone: number,
 ): TimerState {
     const exercises = block.exercises ?? [];
-    const work = Math.max(block.workSeconds ?? 0, 0);
-    const rest = Math.max(block.restSeconds ?? 0, 0);
-    const slot = work + rest;
-    const cycleSeconds = slot * exercises.length;
-    // Intervals: every exercise gets its own work + rest slot, then the next one starts.
+    const steps = getIntervalSteps(block);
+    const cycleSeconds = steps.reduce((sum, step) => sum + step.seconds, 0);
+    // Work and active rest both go with an exercise from the list; plain rest does not.
+    const exerciseSteps = steps.filter((step) => step.phase !== "rest").length;
+    // Intervals: the steps run in order, then the whole pass repeats.
     // The total comes from the number of repeats, or else from the block duration.
     const intervalsTotal =
-        work > 0 && exercises.length > 0
+        cycleSeconds > 0
             ? (block.rounds ?? 0) > 0
                 ? cycleSeconds * (block.rounds ?? 0)
                 : Math.round((block.duration ?? 0) * 60)
@@ -96,6 +116,8 @@ export function getTimerState(
         nextIndex: -1,
         stepKey: 0,
         phase: null,
+        stepIndex: 0,
+        stepCount: 0,
         cycleIndex: 0,
         cycleCount: 0,
         roundsDone,
@@ -125,25 +147,60 @@ export function getTimerState(
     }
 
     if (mode === "intervals") {
-        const slotCount = Math.max(Math.ceil(totalSeconds / slot), 1);
-        const slotIndex = Math.min(Math.floor(elapsed / slot), slotCount - 1);
-        const within = elapsed - slotIndex * slot;
-        const phase = within < work ? "work" : "rest";
-        const phaseLength = phase === "work" ? work : rest;
-        const phaseElapsed = phase === "work" ? within : within - work;
+        const cycleCount = Math.max(Math.ceil(totalSeconds / cycleSeconds), 1);
+        const cycleIndex = Math.min(
+            Math.floor(elapsed / cycleSeconds),
+            cycleCount - 1,
+        );
+        const withinCycle = elapsed - cycleIndex * cycleSeconds;
 
-        state.phase = phase;
-        state.stepKey = slotIndex * 2 + (phase === "rest" ? 1 : 0);
-        state.cycleCount = Math.max(Math.ceil(slotCount / exercises.length), 1);
-        state.cycleIndex = Math.floor(slotIndex / exercises.length);
-        // Only the exercise being worked is highlighted; during rest nothing is.
+        let stepIndex = 0;
+        let stepStart = 0;
+        while (
+            stepIndex < steps.length - 1 &&
+            withinCycle >= stepStart + steps[stepIndex]!.seconds
+        ) {
+            stepStart += steps[stepIndex]!.seconds;
+            stepIndex++;
+        }
+        const step = steps[stepIndex]!;
+        const stepElapsed = Math.min(withinCycle - stepStart, step.seconds);
+
+        // How many exercise steps came before step `index` of cycle `cycle`.
+        const workBefore = (cycle: number, index: number) =>
+            cycle * exerciseSteps +
+            steps.slice(0, index).filter((s) => s.phase !== "rest").length;
+        const exerciseFor = (ordinal: number) =>
+            exercises.length > 0 ? ordinal % exercises.length : -1;
+
+        // The next exercise step that still starts before the block ends.
+        let next = -1;
+        let nextStart = cycleIndex * cycleSeconds + stepStart + step.seconds;
+        for (let g = 1; g <= steps.length && nextStart < totalSeconds; g++) {
+            const flat = cycleIndex * steps.length + stepIndex + g;
+            const cycle = Math.floor(flat / steps.length);
+            const index = flat % steps.length;
+            if (steps[index]!.phase !== "rest") {
+                next = exerciseFor(workBefore(cycle, index));
+                break;
+            }
+            nextStart += steps[index]!.seconds;
+        }
+
+        state.phase = step.phase;
+        state.stepKey = cycleIndex * steps.length + stepIndex;
+        state.cycleCount = cycleCount;
+        state.cycleIndex = cycleIndex;
+        state.stepIndex = stepIndex;
+        state.stepCount = steps.length;
+        // Work and active rest highlight their exercise; plain rest highlights nothing.
         state.activeIndex =
-            phase === "work" ? slotIndex % exercises.length : -1;
-        state.nextIndex =
-            slotIndex + 1 < slotCount ? (slotIndex + 1) % exercises.length : -1;
-        state.displaySeconds = Math.min(phaseLength - phaseElapsed, remaining);
-        state.progress =
-            phaseLength > 0 ? (phaseElapsed / phaseLength) * 100 : 100;
+            step.phase !== "rest"
+                ? exerciseFor(workBefore(cycleIndex, stepIndex))
+                : -1;
+        state.nextIndex = next;
+        state.displaySeconds = Math.min(step.seconds - stepElapsed, remaining);
+        state.progress = (stepElapsed / step.seconds) * 100;
     }
 
     if (mode === "amrap" || mode === "rounds") {

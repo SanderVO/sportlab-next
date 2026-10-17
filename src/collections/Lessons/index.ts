@@ -291,16 +291,16 @@ export const Lessons: CollectionConfig = {
                         },
                         {
                             label: {
-                                en: "Intervals (work / rest)",
-                                nl: "Intervallen (werk / rust)",
+                                en: "Intervals",
+                                nl: "Intervallen",
                             },
                             value: "intervals",
                         },
                     ],
                     admin: {
                         description: {
-                            en: "How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: every exercise gets a work and a rest period, then the next exercise starts.",
-                            nl: "Hoe de timer op de TV loopt. EMOM: elke oefening krijgt een eigen interval. AMRAP: tel rondes binnen de tijd. Rondes: een vast aantal rondes. Intervallen: elke oefening krijgt een werk- en rustperiode, daarna volgt de volgende oefening.",
+                            en: "How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: a sequence of work / rest / active rest rounds, each with its own timer.",
+                            nl: "Hoe de timer op de TV loopt. EMOM: elke oefening krijgt een eigen interval. AMRAP: tel rondes binnen de tijd. Rondes: een vast aantal rondes. Intervallen: een reeks werk- / rust- / actieve-rustrondes, elk met een eigen timer.",
                         },
                     },
                 },
@@ -350,40 +350,72 @@ export const Lessons: CollectionConfig = {
                             siblingData?.timerMode === "rounds" ||
                             siblingData?.timerMode === "intervals",
                         description: {
-                            en: "Intervals: how many times the whole exercise list is repeated. Leave empty to repeat until the time (minutes) runs out.",
-                            nl: "Intervallen: hoe vaak de hele lijst met oefeningen wordt herhaald. Laat leeg om te herhalen tot de tijd (minuten) op is.",
+                            en: "Intervals: how many times the whole round sequence is repeated. Leave empty to repeat until the time (minutes) runs out.",
+                            nl: "Intervallen: hoe vaak de hele reeks rondes wordt herhaald. Laat leeg om te herhalen tot de tijd (minuten) op is.",
                         },
                     },
                 },
                 {
-                    label: { en: "Work (seconds)", nl: "Werk (seconden)" },
-                    name: "workSeconds",
-                    type: "number",
+                    label: { en: "Round types", nl: "Rondetypes" },
+                    name: "roundTypes",
+                    type: "array",
                     required: false,
-                    min: 1,
+                    minRows: 1,
+                    maxRows: 10,
+                    labels: {
+                        singular: { en: "Round type", nl: "Rondetype" },
+                        plural: { en: "Round types", nl: "Rondetypes" },
+                    },
                     admin: {
                         condition: (_, siblingData) =>
                             siblingData?.timerMode === "intervals",
                         description: {
-                            en: "Intervals only, e.g. 40.",
-                            nl: "Alleen voor intervallen, bijv. 40.",
+                            en: "Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer. Active rest is light movement: add its exercise to the exercise list, in order with the work rounds.",
+                            nl: "Alleen voor intervallen. Voeg 1 tot 10 rondes toe in de volgorde waarin ze lopen, elk met een eigen timer. Actieve rust is lichte beweging: voeg de oefening hiervoor toe aan de oefeningenlijst, in volgorde met de werkrondes.",
                         },
                     },
-                },
-                {
-                    label: { en: "Rest (seconds)", nl: "Rust (seconden)" },
-                    name: "restSeconds",
-                    type: "number",
-                    required: false,
-                    min: 0,
-                    admin: {
-                        condition: (_, siblingData) =>
-                            siblingData?.timerMode === "intervals",
-                        description: {
-                            en: "Intervals only, e.g. 20.",
-                            nl: "Alleen voor intervallen, bijv. 20.",
+                    fields: [
+                        {
+                            label: { en: "Type", nl: "Type" },
+                            name: "type",
+                            type: "select",
+                            required: true,
+                            defaultValue: "work",
+                            options: [
+                                {
+                                    label: { en: "Work", nl: "Werk" },
+                                    value: "work",
+                                },
+                                {
+                                    label: { en: "Rest", nl: "Rust" },
+                                    value: "rest",
+                                },
+                                {
+                                    label: {
+                                        en: "Active rest",
+                                        nl: "Actieve rust",
+                                    },
+                                    value: "active_rest",
+                                },
+                            ],
                         },
-                    },
+                        {
+                            label: {
+                                en: "Time (seconds)",
+                                nl: "Tijd (seconden)",
+                            },
+                            name: "seconds",
+                            type: "number",
+                            required: true,
+                            min: 1,
+                            admin: {
+                                description: {
+                                    en: "How long this round lasts, e.g. 40.",
+                                    nl: "Hoe lang deze ronde duurt, bijv. 40.",
+                                },
+                            },
+                        },
+                    ],
                 },
                 {
                     label: { en: "Points of attention", nl: "POA's" },

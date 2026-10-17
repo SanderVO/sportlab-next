@@ -202,6 +202,10 @@ export const enum__posts_v_version_status = pgEnum(
     "enum__posts_v_version_status",
     ["draft", "published"],
 );
+export const enum_lessons_workout_blocks_round_types_type = pgEnum(
+    "enum_lessons_workout_blocks_round_types_type",
+    ["work", "rest", "active_rest"],
+);
 export const enum_lessons_workout_blocks_timer_mode = pgEnum(
     "enum_lessons_workout_blocks_timer_mode",
     ["countdown", "emom", "amrap", "rounds", "intervals"],
@@ -228,6 +232,11 @@ export const enum_lesson_templates_schedule_day_of_week = pgEnum(
         "sunday",
     ],
 );
+export const enum_round_types_type = pgEnum("enum_round_types_type", [
+    "work",
+    "rest",
+    "active_rest",
+]);
 export const enum_lesson_templates_default_workout_blocks_timer_mode = pgEnum(
     "enum_lesson_templates_default_workout_blocks_timer_mode",
     ["countdown", "emom", "amrap", "rounds", "intervals"],
@@ -1775,6 +1784,32 @@ export const _posts_v_rels = pgTable(
     ],
 );
 
+export const lessons_workout_blocks_round_types = pgTable(
+    "lessons_workout_blocks_round_types",
+    {
+        _order: integer("_order").notNull(),
+        _parentID: varchar("_parent_id").notNull(),
+        id: varchar("id").primaryKey(),
+        type: enum_lessons_workout_blocks_round_types_type("type").default(
+            "work",
+        ),
+        seconds: numeric("seconds", { mode: "number" }),
+    },
+    (columns) => [
+        index("lessons_workout_blocks_round_types_order_idx").on(
+            columns._order,
+        ),
+        index("lessons_workout_blocks_round_types_parent_id_idx").on(
+            columns._parentID,
+        ),
+        foreignKey({
+            columns: [columns["_parentID"]],
+            foreignColumns: [lessons_workout_blocks.id],
+            name: "lessons_workout_blocks_round_types_parent_id_fk",
+        }).onDelete("cascade"),
+    ],
+);
+
 export const lessons_workout_blocks_exercises = pgTable(
     "lessons_workout_blocks_exercises",
     {
@@ -1815,8 +1850,6 @@ export const lessons_workout_blocks = pgTable(
         highlightExercises: boolean("highlight_exercises").default(false),
         intervalSeconds: numeric("interval_seconds", { mode: "number" }),
         rounds: numeric("rounds", { mode: "number" }),
-        workSeconds: numeric("work_seconds", { mode: "number" }),
-        restSeconds: numeric("rest_seconds", { mode: "number" }),
         poa: varchar("poa"),
     },
     (columns) => [
@@ -1939,6 +1972,26 @@ export const lesson_templates_schedule = pgTable(
     ],
 );
 
+export const round_types = pgTable(
+    "round_types",
+    {
+        _order: integer("_order").notNull(),
+        _parentID: varchar("_parent_id").notNull(),
+        id: varchar("id").primaryKey(),
+        type: enum_round_types_type("type").default("work"),
+        seconds: numeric("seconds", { mode: "number" }),
+    },
+    (columns) => [
+        index("round_types_order_idx").on(columns._order),
+        index("round_types_parent_id_idx").on(columns._parentID),
+        foreignKey({
+            columns: [columns["_parentID"]],
+            foreignColumns: [lesson_templates_default_workout_blocks.id],
+            name: "round_types_parent_id_fk",
+        }).onDelete("cascade"),
+    ],
+);
+
 export const lesson_templates_default_workout_blocks_exercises = pgTable(
     "lesson_templates_default_workout_blocks_exercises",
     {
@@ -1981,8 +2034,6 @@ export const lesson_templates_default_workout_blocks = pgTable(
         highlightExercises: boolean("highlight_exercises").default(false),
         intervalSeconds: numeric("interval_seconds", { mode: "number" }),
         rounds: numeric("rounds", { mode: "number" }),
-        workSeconds: numeric("work_seconds", { mode: "number" }),
-        restSeconds: numeric("rest_seconds", { mode: "number" }),
         poa: varchar("poa"),
     },
     (columns) => [
@@ -4131,6 +4182,16 @@ export const relations__posts_v = relations(_posts_v, ({ one, many }) => ({
         relationName: "_rels",
     }),
 }));
+export const relations_lessons_workout_blocks_round_types = relations(
+    lessons_workout_blocks_round_types,
+    ({ one }) => ({
+        _parentID: one(lessons_workout_blocks, {
+            fields: [lessons_workout_blocks_round_types._parentID],
+            references: [lessons_workout_blocks.id],
+            relationName: "roundTypes",
+        }),
+    }),
+);
 export const relations_lessons_workout_blocks_exercises = relations(
     lessons_workout_blocks_exercises,
     ({ one }) => ({
@@ -4148,6 +4209,9 @@ export const relations_lessons_workout_blocks = relations(
             fields: [lessons_workout_blocks._parentID],
             references: [lessons.id],
             relationName: "workoutBlocks",
+        }),
+        roundTypes: many(lessons_workout_blocks_round_types, {
+            relationName: "roundTypes",
         }),
         exercises: many(lessons_workout_blocks_exercises, {
             relationName: "exercises",
@@ -4199,6 +4263,13 @@ export const relations_lesson_templates_schedule = relations(
         }),
     }),
 );
+export const relations_round_types = relations(round_types, ({ one }) => ({
+    _parentID: one(lesson_templates_default_workout_blocks, {
+        fields: [round_types._parentID],
+        references: [lesson_templates_default_workout_blocks.id],
+        relationName: "roundTypes",
+    }),
+}));
 export const relations_lesson_templates_default_workout_blocks_exercises =
     relations(lesson_templates_default_workout_blocks_exercises, ({ one }) => ({
         _parentID: one(lesson_templates_default_workout_blocks, {
@@ -4216,6 +4287,9 @@ export const relations_lesson_templates_default_workout_blocks = relations(
             fields: [lesson_templates_default_workout_blocks._parentID],
             references: [lesson_templates.id],
             relationName: "defaultWorkoutBlocks",
+        }),
+        roundTypes: many(round_types, {
+            relationName: "roundTypes",
         }),
         exercises: many(lesson_templates_default_workout_blocks_exercises, {
             relationName: "exercises",
@@ -4906,10 +4980,12 @@ type DatabaseSchema = {
     enum__pages_v_version_status: typeof enum__pages_v_version_status;
     enum_posts_status: typeof enum_posts_status;
     enum__posts_v_version_status: typeof enum__posts_v_version_status;
+    enum_lessons_workout_blocks_round_types_type: typeof enum_lessons_workout_blocks_round_types_type;
     enum_lessons_workout_blocks_timer_mode: typeof enum_lessons_workout_blocks_timer_mode;
     enum_lessons_type: typeof enum_lessons_type;
     enum_lessons_status: typeof enum_lessons_status;
     enum_lesson_templates_schedule_day_of_week: typeof enum_lesson_templates_schedule_day_of_week;
+    enum_round_types_type: typeof enum_round_types_type;
     enum_lesson_templates_default_workout_blocks_timer_mode: typeof enum_lesson_templates_default_workout_blocks_timer_mode;
     enum_lesson_templates_type: typeof enum_lesson_templates_type;
     enum_events_event_type: typeof enum_events_event_type;
@@ -4969,11 +5045,13 @@ type DatabaseSchema = {
     _posts_v_version_populated_authors: typeof _posts_v_version_populated_authors;
     _posts_v: typeof _posts_v;
     _posts_v_rels: typeof _posts_v_rels;
+    lessons_workout_blocks_round_types: typeof lessons_workout_blocks_round_types;
     lessons_workout_blocks_exercises: typeof lessons_workout_blocks_exercises;
     lessons_workout_blocks: typeof lessons_workout_blocks;
     lessons: typeof lessons;
     lessons_rels: typeof lessons_rels;
     lesson_templates_schedule: typeof lesson_templates_schedule;
+    round_types: typeof round_types;
     lesson_templates_default_workout_blocks_exercises: typeof lesson_templates_default_workout_blocks_exercises;
     lesson_templates_default_workout_blocks: typeof lesson_templates_default_workout_blocks;
     lesson_templates: typeof lesson_templates;
@@ -5061,11 +5139,13 @@ type DatabaseSchema = {
     relations__posts_v_version_populated_authors: typeof relations__posts_v_version_populated_authors;
     relations__posts_v_rels: typeof relations__posts_v_rels;
     relations__posts_v: typeof relations__posts_v;
+    relations_lessons_workout_blocks_round_types: typeof relations_lessons_workout_blocks_round_types;
     relations_lessons_workout_blocks_exercises: typeof relations_lessons_workout_blocks_exercises;
     relations_lessons_workout_blocks: typeof relations_lessons_workout_blocks;
     relations_lessons_rels: typeof relations_lessons_rels;
     relations_lessons: typeof relations_lessons;
     relations_lesson_templates_schedule: typeof relations_lesson_templates_schedule;
+    relations_round_types: typeof relations_round_types;
     relations_lesson_templates_default_workout_blocks_exercises: typeof relations_lesson_templates_default_workout_blocks_exercises;
     relations_lesson_templates_default_workout_blocks: typeof relations_lesson_templates_default_workout_blocks;
     relations_lesson_templates_rels: typeof relations_lesson_templates_rels;

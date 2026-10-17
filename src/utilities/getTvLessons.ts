@@ -63,8 +63,10 @@ export const tvLessonSelect = {
         highlightExercises: true,
         intervalSeconds: true,
         rounds: true,
-        workSeconds: true,
-        restSeconds: true,
+        roundTypes: {
+            type: true,
+            seconds: true,
+        },
         exercises: {
             name: true,
             quantity: true,

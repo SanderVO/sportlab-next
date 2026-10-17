@@ -24,11 +24,12 @@ export const OPTIONAL_CSV_HEADERS = [
     "block_timer_mode",
     "block_interval_seconds",
     "block_rounds",
-    "block_work_seconds",
-    "block_rest_seconds",
+    "block_round_types",
     "exercise_quantity",
     "exercise_rotating",
 ] as const;
+
+export const ROUND_TYPES = ["work", "rest", "active_rest"] as const;
 
 export const TIMER_MODES = [
     "countdown",
@@ -75,8 +76,8 @@ Exercise columns:
 Optional block columns (taken from the block's first row):
 - block_timer_mode: one of countdown, emom, amrap, rounds, intervals (default countdown)
 - block_interval_seconds: whole seconds per interval, EMOM only (default 60)
-- block_rounds: number of rounds (rounds mode), or how often the exercise list repeats (intervals mode)
-- block_work_seconds, block_rest_seconds: intervals mode only. Every exercise gets this work and rest time, then the next exercise starts
+- block_rounds: number of rounds (rounds mode), or how often the round sequence repeats (intervals mode)
+- block_round_types: intervals mode only. 1 to 10 rounds in running order, each as type:seconds separated by |, where type is work, rest or active_rest, e.g. work:40|rest:20|active_rest:30
 - block_poa: points of attention for the block as plain text (optional column, taken from the block's first row)
 
 Rules: wrap any value that contains a comma or a line break in double quotes.
@@ -106,8 +107,10 @@ export type ParsedLesson = {
         timerMode?: (typeof TIMER_MODES)[number];
         intervalSeconds?: number;
         rounds?: number;
-        workSeconds?: number;
-        restSeconds?: number;
+        roundTypes?: Array<{
+            type: (typeof ROUND_TYPES)[number];
+            seconds: number;
+        }>;
         exercises: Array<{
             name: string;
             description: string;
@@ -255,19 +258,46 @@ export const parseLessonCsv = (
                     );
                 }
             }
+            if (row.block_round_types) {
+                const rounds = row.block_round_types
+                    .split("|")
+                    .map((part) => part.trim())
+                    .filter(Boolean)
+                    .map((part) => {
+                        const [type = "", seconds = ""] = part.split(":");
+                        return {
+                            type: type.trim().toLowerCase(),
+                            seconds: Number(seconds),
+                        };
+                    });
+                if (
+                    rounds.length < 1 ||
+                    rounds.length > 10 ||
+                    !rounds.every(
+                        (round) =>
+                            ROUND_TYPES.includes(
+                                round.type as (typeof ROUND_TYPES)[number],
+                            ) &&
+                            Number.isInteger(round.seconds) &&
+                            round.seconds > 0,
+                    )
+                ) {
+                    errors.push(
+                        `Row ${line}: block_round_types must be 1 to 10 entries like work:40|rest:20|active_rest:30.`,
+                    );
+                } else {
+                    current.roundTypes = rounds as NonNullable<
+                        typeof current.roundTypes
+                    >;
+                }
+            }
             for (const [column, key] of [
                 ["block_interval_seconds", "intervalSeconds"],
                 ["block_rounds", "rounds"],
-                ["block_work_seconds", "workSeconds"],
-                ["block_rest_seconds", "restSeconds"],
             ] as const) {
                 if (!row[column]) continue;
                 const value = Number(row[column]);
-                if (
-                    Number.isInteger(value) &&
-                    (value > 0 || (key === "restSeconds" && value === 0))
-                )
-                    current[key] = value;
+                if (Number.isInteger(value) && value > 0) current[key] = value;
                 else
                     errors.push(
                         `Row ${line}: ${column} must be a whole number.`,

@@ -700,7 +700,7 @@ export interface Lesson {
         description?: string | null;
         duration?: number | null;
         /**
-         * How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: every exercise gets a work and a rest period, then the next exercise starts.
+         * How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: a sequence of work / rest / active rest rounds, each with its own timer.
          */
         timerMode?: ('countdown' | 'emom' | 'amrap' | 'rounds' | 'intervals') | null;
         /**
@@ -712,17 +712,22 @@ export interface Lesson {
          */
         intervalSeconds?: number | null;
         /**
-         * Intervals: how many times the whole exercise list is repeated. Leave empty to repeat until the time (minutes) runs out.
+         * Intervals: how many times the whole round sequence is repeated. Leave empty to repeat until the time (minutes) runs out.
          */
         rounds?: number | null;
         /**
-         * Intervals only, e.g. 40.
+         * Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer.
          */
-        workSeconds?: number | null;
-        /**
-         * Intervals only, e.g. 20.
-         */
-        restSeconds?: number | null;
+        roundTypes?:
+          | {
+              type: 'work' | 'rest' | 'active_rest';
+              /**
+               * How long this round lasts, e.g. 40.
+               */
+              seconds: number;
+              id?: string | null;
+            }[]
+          | null;
         /**
          * Optional. Shown on the TV in the workout block popup, not on the lesson page.
          */
@@ -792,7 +797,7 @@ export interface LessonTemplate {
         description?: string | null;
         duration?: number | null;
         /**
-         * How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: every exercise gets a work and a rest period, then the next exercise starts.
+         * How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: a sequence of work / rest / active rest rounds, each with its own timer.
          */
         timerMode?: ('countdown' | 'emom' | 'amrap' | 'rounds' | 'intervals') | null;
         /**
@@ -804,17 +809,22 @@ export interface LessonTemplate {
          */
         intervalSeconds?: number | null;
         /**
-         * Intervals: how many times the whole exercise list is repeated. Leave empty to repeat until the time (minutes) runs out.
+         * Intervals: how many times the whole round sequence is repeated. Leave empty to repeat until the time (minutes) runs out.
          */
         rounds?: number | null;
         /**
-         * Intervals only, e.g. 40.
+         * Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer.
          */
-        workSeconds?: number | null;
-        /**
-         * Intervals only, e.g. 20.
-         */
-        restSeconds?: number | null;
+        roundTypes?:
+          | {
+              type: 'work' | 'rest' | 'active_rest';
+              /**
+               * How long this round lasts, e.g. 40.
+               */
+              seconds: number;
+              id?: string | null;
+            }[]
+          | null;
         /**
          * Optional. Shown on the TV in the workout block popup, not on the lesson page.
          */
@@ -1752,8 +1762,13 @@ export interface LessonsSelect<T extends boolean = true> {
         highlightExercises?: T;
         intervalSeconds?: T;
         rounds?: T;
-        workSeconds?: T;
-        restSeconds?: T;
+        roundTypes?:
+          | T
+          | {
+              type?: T;
+              seconds?: T;
+              id?: T;
+            };
         poa?: T;
         exercises?:
           | T
@@ -1798,8 +1813,13 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
         highlightExercises?: T;
         intervalSeconds?: T;
         rounds?: T;
-        workSeconds?: T;
-        restSeconds?: T;
+        roundTypes?:
+          | T
+          | {
+              type?: T;
+              seconds?: T;
+              id?: T;
+            };
         poa?: T;
         exercises?:
           | T
