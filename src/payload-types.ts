@@ -716,7 +716,7 @@ export interface Lesson {
          */
         rounds?: number | null;
         /**
-         * Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer.
+         * Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer. Active rest is light movement: add its exercise to the exercise list, in order with the work rounds.
          */
         roundTypes?:
           | {
@@ -813,7 +813,7 @@ export interface LessonTemplate {
          */
         rounds?: number | null;
         /**
-         * Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer.
+         * Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer. Active rest is light movement: add its exercise to the exercise list, in order with the work rounds.
          */
         roundTypes?:
           | {

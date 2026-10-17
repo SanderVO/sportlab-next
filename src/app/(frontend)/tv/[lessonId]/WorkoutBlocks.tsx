@@ -370,7 +370,10 @@ const buttonBase =
     "inline-flex h-24 items-center justify-center whitespace-nowrap rounded-pill border-[3px] px-12 font-sans text-[34px] leading-none font-semibold";
 const ghostButton = "border-white bg-transparent text-white";
 const stationBase =
-    "flex items-center gap-7 rounded-card border-[3px] border-transparent px-[30px] py-[22px] text-[36px] leading-[44px] font-semibold text-text-on-panel-muted";
+    "box-border flex h-16 items-center gap-7 rounded-card border-[3px] border-transparent px-[25px] text-[36px] leading-[44px] font-semibold whitespace-nowrap text-text-on-panel-muted";
+
+/** Up to 8 stations fit without scrolling; more are paged, never shrunk. */
+const STATIONS_PER_PAGE = 8;
 
 /** TvBlockTimer: one block full-screen with a big countdown, its exercises and the controls. */
 function BlockModal({
@@ -496,12 +499,6 @@ function BlockModal({
         };
     }, [running, totalSeconds]);
 
-    useEffect(() => {
-        containerRef.current
-            ?.querySelector("[data-now]")
-            ?.scrollIntoView({ block: "nearest" });
-    }, [containerRef, timer.activeIndex]);
-
     const reset = () => {
         elapsedMsRef.current = 0;
         setElapsed(0);
@@ -540,6 +537,28 @@ function BlockModal({
     const activeExercise =
         timer.activeIndex >= 0 ? exercises[timer.activeIndex] : null;
 
+    // Keep the page that holds the current station on screen
+    const stationPages = Math.max(
+        Math.ceil(exercises.length / STATIONS_PER_PAGE),
+        1,
+    );
+    const stationPage = Math.floor(
+        Math.max(timer.activeIndex, 0) / STATIONS_PER_PAGE,
+    );
+    const stationStart = stationPage * STATIONS_PER_PAGE;
+    const stations = exercises.slice(
+        stationStart,
+        stationStart + STATIONS_PER_PAGE,
+    );
+    const stationNoun =
+        mode === "emom" || mode === "intervals" ? "Stations" : "Oefeningen";
+    const stationsLabel =
+        stationPages > 1
+            ? `${stationNoun} ${stationStart + 1}–${stationStart + stations.length} / ${exercises.length}`
+            : isRoundMode
+              ? `Per ronde · ${exercises.length} oefeningen`
+              : `${exercises.length} ${stationNoun.toLowerCase()}`;
+
     return (
         <div className="absolute inset-0 z-50">
             <div
@@ -553,31 +572,28 @@ function BlockModal({
                 role="dialog"
                 aria-modal="true"
                 aria-label={`Blok ${index + 1}, ${block.name || "Workout"}`}
-                className="absolute inset-x-20 inset-y-12 box-border grid grid-cols-[1fr_700px] grid-rows-[auto_1fr_auto] gap-x-[72px] gap-y-8 rounded-tv border-[3px] border-line-tv bg-ink bg-[radial-gradient(60%_70%_at_0%_0%,var(--tv-glow-ember)_0%,transparent_100%),radial-gradient(55%_65%_at_100%_100%,var(--tv-glow-ember-deep)_0%,transparent_100%),radial-gradient(50%_60%_at_100%_0%,var(--panel-glow)_0%,transparent_100%),linear-gradient(180deg,var(--charcoal),var(--ink))] px-16 py-12"
+                className="absolute inset-x-20 inset-y-12 box-border grid grid-cols-[1fr_760px] grid-rows-[auto_1fr_auto] gap-x-[72px] gap-y-6 rounded-tv border-[3px] border-line-tv bg-ink bg-[radial-gradient(60%_70%_at_0%_0%,var(--tv-glow-ember)_0%,transparent_100%),radial-gradient(55%_65%_at_100%_100%,var(--tv-glow-ember-deep)_0%,transparent_100%),radial-gradient(50%_60%_at_100%_0%,var(--panel-glow)_0%,transparent_100%),linear-gradient(180deg,var(--charcoal),var(--ink))] px-16 py-12"
             >
-                <div className="col-span-2 flex items-start justify-between gap-8">
-                    <div className="min-w-0">
-                        <div className="type-tv-label text-sand uppercase">
-                            Blok {index + 1} / {total} · {lessonTitle}
-                        </div>
-                        <h2 className="type-tv-title mt-[14px] truncate">
-                            {block.name || "Workout"}
-                        </h2>
-                        {block.description ? (
-                            <div
-                                className={cn(
-                                    "mt-2 text-[30px] leading-10 font-semibold whitespace-pre-line",
-                                    accent.text,
-                                )}
-                            >
-                                {block.description}
-                            </div>
-                        ) : null}
+                <div className="col-start-1 row-start-1 min-w-0">
+                    <div className="type-tv-label truncate text-sand uppercase">
+                        Blok {index + 1} / {total} · {lessonTitle}
                     </div>
-                    <TvClock />
+                    <h2 className="type-tv-title mt-[14px] truncate">
+                        {block.name || "Workout"}
+                    </h2>
+                    {block.description ? (
+                        <div
+                            className={cn(
+                                "mt-2 truncate text-[30px] leading-10 font-semibold",
+                                accent.text,
+                            )}
+                        >
+                            {block.description}
+                        </div>
+                    ) : null}
                 </div>
 
-                <div className="flex min-w-0 flex-col justify-center gap-9">
+                <div className="col-start-1 row-start-2 flex min-w-0 flex-col justify-center gap-6">
                     {hasTimer ? (
                         <>
                             <div
@@ -715,77 +731,75 @@ function BlockModal({
                     ) : null}
                 </div>
 
-                <ol className="m-0 flex min-h-0 list-none flex-col gap-[14px] overflow-y-auto p-0 scrollbar-none">
-                    {exercises.map((exercise, i) => {
-                        const isNow = i === timer.activeIndex;
-                        const isNext =
-                            (mode === "emom" || mode === "intervals") &&
-                            i === timer.nextIndex;
-                        const name =
-                            mode === "emom"
-                                ? stripMinutePrefix(exercise.name)
-                                : exercise.name;
+                <div className="col-start-2 row-span-2 row-start-1 flex min-h-0 flex-col">
+                    <div className="mb-5 flex h-16 flex-none items-center justify-between">
+                        <span className="type-tv-label text-text-on-panel-eyebrow uppercase">
+                            {stationsLabel}
+                        </span>
+                        <TvClock />
+                    </div>
+                    <ol className="m-0 flex list-none flex-col gap-[6px] p-0">
+                        {stations.map((exercise, offset) => {
+                            const i = stationStart + offset;
+                            const isNow = i === timer.activeIndex;
+                            const isNext =
+                                (mode === "emom" || mode === "intervals") &&
+                                i === timer.nextIndex;
+                            const name =
+                                mode === "emom"
+                                    ? stripMinutePrefix(exercise.name)
+                                    : exercise.name;
 
-                        return (
-                            <li
-                                key={exercise.id ?? i}
-                                data-now={isNow ? "" : undefined}
-                                aria-current={isNow ? "step" : undefined}
-                                className={cn(
-                                    stationBase,
-                                    mode !== "emom" && "text-white",
-                                    isNow && "bg-sand text-ink",
-                                    isNext && cn("text-white", accent.border),
-                                )}
-                            >
-                                {mode === "emom" ? (
-                                    <b
-                                        className={cn(
-                                            "w-[120px] flex-none font-display text-4xl leading-none font-normal uppercase",
-                                            isNow ? "text-ink" : accent.text,
-                                        )}
-                                    >
-                                        {unit} {i + 1}
-                                    </b>
-                                ) : exercise.quantity ? (
-                                    <b
-                                        className={cn(
-                                            "min-w-[120px] flex-none font-display text-4xl leading-none font-normal uppercase",
-                                            accent.text,
-                                        )}
-                                    >
-                                        {formatQuantity(exercise.quantity)}
-                                    </b>
-                                ) : null}
-                                <span className="min-w-0">
-                                    {name || "Oefening"}
-                                    {exercise.description ? (
-                                        <span
+                            return (
+                                <li
+                                    key={exercise.id ?? i}
+                                    aria-current={isNow ? "step" : undefined}
+                                    className={cn(
+                                        stationBase,
+                                        mode !== "emom" && "text-white",
+                                        isNow && "bg-sand text-ink",
+                                        isNext &&
+                                            cn("text-white", accent.border),
+                                    )}
+                                >
+                                    {mode === "emom" ? (
+                                        <b
                                             className={cn(
-                                                "type-tv-cue block font-normal whitespace-pre-line",
+                                                "w-[120px] flex-none font-display text-4xl leading-none font-normal uppercase",
                                                 isNow
                                                     ? "text-ink"
-                                                    : "text-text-on-panel-eyebrow",
+                                                    : accent.text,
                                             )}
                                         >
-                                            {exercise.description}
+                                            {unit} {i + 1}
+                                        </b>
+                                    ) : exercise.quantity ? (
+                                        <b
+                                            className={cn(
+                                                "min-w-[120px] flex-none font-display text-4xl leading-none font-normal uppercase",
+                                                isNow
+                                                    ? "text-ink"
+                                                    : accent.text,
+                                            )}
+                                        >
+                                            {formatQuantity(exercise.quantity)}
+                                        </b>
+                                    ) : null}
+                                    <span className="min-w-0 truncate">
+                                        {name || "Oefening"}
+                                    </span>
+                                    {isNext ? (
+                                        <span className="type-tv-label ml-auto flex-none text-text-on-panel-eyebrow uppercase">
+                                            Hierna
                                         </span>
                                     ) : null}
-                                </span>
-                                {isNext ? (
-                                    <span className="type-tv-label ml-auto text-text-on-panel-eyebrow uppercase">
-                                        Hierna
-                                    </span>
-                                ) : null}
-                            </li>
-                        );
-                    })}
-                    {block.poa ? (
-                        <PoaBox poa={block.poa} className="mt-3" />
-                    ) : null}
-                </ol>
+                                </li>
+                            );
+                        })}
+                    </ol>
+                </div>
 
-                <div className="col-span-2 flex items-center gap-7">
+                <div className="col-span-2 row-start-3 flex min-w-0 items-center gap-7">
                     {hasTimer ? (
                         <>
                             <button
@@ -838,6 +852,16 @@ function BlockModal({
                     >
                         Sluiten
                     </button>
+                    {block.poa?.trim() ? (
+                        <PoaBox
+                            poa={block.poa}
+                            className="ml-auto max-w-[720px] px-6 py-[10px] leading-9"
+                        />
+                    ) : (
+                        <span className="type-tv-label ml-auto text-text-on-panel-eyebrow uppercase">
+                            ‹ › vorig / volgend blok
+                        </span>
+                    )}
                 </div>
             </div>
         </div>
