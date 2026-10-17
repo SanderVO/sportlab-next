@@ -82,20 +82,6 @@ function addMonths(dateParam: string, months: number) {
     return toDateParam(date);
 }
 
-function formatTime(value?: string | null) {
-    if (!value) return "--:--";
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) return "--:--";
-
-    return new Intl.DateTimeFormat("nl-NL", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: TV_TIME_ZONE,
-    }).format(date);
-}
-
 function formatShortDate(value?: string | null) {
     if (!value) return "";
 
@@ -516,8 +502,8 @@ export function TVLessonDashboard({
                                 className={cn(
                                     "relative grid items-center overflow-hidden rounded-tv bg-charcoal text-white no-underline",
                                     isDense
-                                        ? "grid-cols-[200px_1fr] gap-7 px-9 py-[26px]"
-                                        : "grid-cols-[260px_1fr_auto_96px] gap-tv-gap px-12 py-10",
+                                        ? "grid-cols-1 px-9 py-[26px]"
+                                        : "grid-cols-[1fr_auto_96px] gap-tv-gap px-12 py-10",
                                     focusRing,
                                 )}
                             >
@@ -527,17 +513,6 @@ export function TVLessonDashboard({
                                         accent.bar,
                                     )}
                                 />
-
-                                <div
-                                    className={cn(
-                                        "font-display leading-[0.9]",
-                                        isDense
-                                            ? "text-[76px]"
-                                            : "type-tv-time",
-                                    )}
-                                >
-                                    {formatTime(lesson.startDate)}
-                                </div>
 
                                 <div className="min-w-0">
                                     <h2
@@ -721,12 +696,9 @@ export function TVLessonDashboard({
                                     .slice(0, 4)
                                     .map((item, i) => (
                                         <li
-                                            key={`${item.time}-${i}`}
+                                            key={`${item.title}-${i}`}
                                             className="truncate text-[30px] leading-10 font-semibold text-white"
                                         >
-                                            <span className="mr-4 text-orange-300">
-                                                {item.time}
-                                            </span>
                                             {item.title}
                                         </li>
                                     ))}

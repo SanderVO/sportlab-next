@@ -34,20 +34,6 @@ function formatShortDate(value?: string | null) {
         .replace(/\./g, "");
 }
 
-function formatTime(value?: string | null) {
-    if (!value) return null;
-
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) return null;
-
-    return new Intl.DateTimeFormat("nl-NL", {
-        hour: "2-digit",
-        minute: "2-digit",
-        timeZone: TV_TIME_ZONE,
-    }).format(date);
-}
-
 function isMedia(
     value: unknown,
 ): value is { url?: string | null; alt?: string | null } {
@@ -123,7 +109,6 @@ export default async function TvLessonPage({
     const eyebrow = [
         program?.title,
         formatShortDate(lesson.startDate),
-        formatTime(lesson.startDate),
     ]
         .filter(Boolean)
         .join(" · ");

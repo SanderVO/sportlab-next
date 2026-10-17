@@ -87,6 +87,44 @@ export const tvLessonDetailSelect = {
     workoutBlocks: true,
 } as const;
 
+/** Drops row ids so two lessons with the same content produce the same string. */
+function withoutIds(value: unknown): unknown {
+    if (Array.isArray(value)) return value.map(withoutIds);
+
+    if (value && typeof value === "object") {
+        return Object.fromEntries(
+            Object.entries(value)
+                .filter(([key]) => key !== "id")
+                .map(([key, entry]) => [key, withoutIds(entry)]),
+        );
+    }
+
+    return value;
+}
+
+/**
+ * Lessons on one day that only differ by time (morning / evening) carry the
+ * same workout. The TV shows the earliest of each; enrolment keeps both.
+ * Input must be sorted by startDate.
+ */
+export function dedupeTvLessons<
+    T extends { title?: string | null; type?: string | null },
+>(lessons: T[]): T[] {
+    const seen = new Set<string>();
+
+    return lessons.filter((lesson) => {
+        const key = JSON.stringify([
+            lesson.title,
+            lesson.type,
+            withoutIds((lesson as { workoutBlocks?: unknown }).workoutBlocks),
+        ]);
+
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
 export async function getTvLessons(
     payload: BasePayload,
     args?: {
@@ -99,12 +137,12 @@ export async function getTvLessons(
     const dayStart = `${dateParam}T00:00:00.000Z`;
     const dayEnd = `${addDays(dateParam, 1)}T00:00:00.000Z`;
 
-    return payload.find({
+    // A day has a handful of lessons, so dedupe first and paginate in memory.
+    const result = await payload.find({
         collection: "lessons",
         depth: 1,
-        limit: TV_LESSON_PAGE_SIZE,
-        page,
-        pagination: true,
+        limit: 100,
+        pagination: false,
         overrideAccess: true,
         sort: "startDate",
         select: tvLessonSelect as SelectType,
@@ -123,6 +161,17 @@ export async function getTvLessons(
             ],
         },
     });
+
+    const unique = dedupeTvLessons(result.docs);
+    const start = (page - 1) * TV_LESSON_PAGE_SIZE;
+    const hasNextPage = start + TV_LESSON_PAGE_SIZE < unique.length;
+
+    return {
+        docs: unique.slice(start, start + TV_LESSON_PAGE_SIZE),
+        hasNextPage,
+        nextPage: hasNextPage ? page + 1 : null,
+        page,
+    };
 }
 
 export function parseTvMonthParam(value?: string | null) {
@@ -133,10 +182,7 @@ export function parseTvMonthParam(value?: string | null) {
     return value;
 }
 
-export type TvDaySummary = Record<
-    string,
-    Array<{ time: string; title: string }>
->;
+export type TvDaySummary = Record<string, Array<{ title: string }>>;
 
 /** Lessons of a whole month, grouped by day (same UTC day boundaries as getTvLessons). */
 export async function getTvMonthSummary(
@@ -154,7 +200,12 @@ export async function getTvMonthSummary(
         pagination: false,
         overrideAccess: true,
         sort: "startDate",
-        select: { title: true, startDate: true },
+        select: {
+            title: true,
+            type: true,
+            startDate: true,
+            workoutBlocks: true,
+        },
         where: {
             and: [
                 {
@@ -169,21 +220,18 @@ export async function getTvMonthSummary(
 
     const summary: TvDaySummary = {};
 
+    const byDay: Record<string, typeof result.docs> = {};
+
     for (const lesson of result.docs) {
         if (!lesson.startDate) continue;
 
-        const date = new Date(lesson.startDate);
-        const key = toDateParam(date);
-        const time = new Intl.DateTimeFormat("nl-NL", {
-            hour: "2-digit",
-            minute: "2-digit",
-            timeZone: "Europe/Amsterdam",
-        }).format(date);
+        (byDay[toDateParam(new Date(lesson.startDate))] ??= []).push(lesson);
+    }
 
-        (summary[key] ??= []).push({
-            time,
+    for (const [key, lessons] of Object.entries(byDay)) {
+        summary[key] = dedupeTvLessons(lessons).map((lesson) => ({
             title: lesson.title || `Les ${lesson.id}`,
-        });
+        }));
     }
 
     return summary;
