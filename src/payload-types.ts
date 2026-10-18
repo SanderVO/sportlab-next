@@ -735,10 +735,6 @@ export interface Lesson {
         exercises?:
           | {
               name: string;
-              /**
-               * Optional. Short, e.g. "3x15-20", "30 sec" or "10x per kant".
-               */
-              quantity?: string | null;
               description?: string | null;
               /**
                * AMRAP / rounds: exercises with this checked take turns, one per round ("Elke ronde wisselend"). The others are done every round.
@@ -832,10 +828,6 @@ export interface LessonTemplate {
         exercises?:
           | {
               name: string;
-              /**
-               * Optional. Short, e.g. "3x15-20", "30 sec" or "10x per kant".
-               */
-              quantity?: string | null;
               description?: string | null;
               /**
                * AMRAP / rounds: exercises with this checked take turns, one per round ("Elke ronde wisselend"). The others are done every round.
@@ -1774,7 +1766,6 @@ export interface LessonsSelect<T extends boolean = true> {
           | T
           | {
               name?: T;
-              quantity?: T;
               description?: T;
               rotating?: T;
               id?: T;
@@ -1825,7 +1816,6 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
           | T
           | {
               name?: T;
-              quantity?: T;
               description?: T;
               rotating?: T;
               id?: T;

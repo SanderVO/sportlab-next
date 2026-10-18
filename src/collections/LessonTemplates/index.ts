@@ -408,18 +408,6 @@ export const LessonTemplates: CollectionConfig = {
                             required: true,
                         },
                         {
-                            label: { en: "Quantity", nl: "Hoeveelheid" },
-                            name: "quantity",
-                            type: "text",
-                            required: false,
-                            admin: {
-                                description: {
-                                    en: 'Optional. Short, e.g. "3x15-20", "30 sec" or "10x per kant".',
-                                    nl: 'Optioneel. Kort, bijv. "3x15-20", "30 sec" of "10x per kant".',
-                                },
-                            },
-                        },
-                        {
                             label: { en: "Description", nl: "Omschrijving" },
                             name: "description",
                             type: "textarea",

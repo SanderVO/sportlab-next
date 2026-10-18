@@ -25,7 +25,6 @@ export const OPTIONAL_CSV_HEADERS = [
     "block_interval_seconds",
     "block_rounds",
     "block_round_types",
-    "exercise_quantity",
     "exercise_rotating",
 ] as const;
 
@@ -71,7 +70,6 @@ Exercise columns:
 - exercise_name: name of the exercise (leave empty for a block without exercises)
 - exercise_description: coaching cue shown under the exercise, e.g. "Focus on soft landing" (optional)
 - exercise_rotating: true if this exercise takes turns with the other rotating ones, one per round (AMRAP / rounds). Leave empty otherwise
-- exercise_quantity: short quantity shown next to the exercise, e.g. 3x15-20, 30 sec, 10x per kant (optional column)
 
 Optional block columns (taken from the block's first row):
 - block_timer_mode: one of countdown, emom, amrap, rounds, intervals (default countdown)
@@ -114,7 +112,6 @@ export type ParsedLesson = {
         exercises: Array<{
             name: string;
             description: string;
-            quantity: string;
             rotating: boolean;
         }>;
     }>;
@@ -317,7 +314,6 @@ export const parseLessonCsv = (
             current.exercises.push({
                 name: row.exercise_name,
                 description: row.exercise_description,
-                quantity: row.exercise_quantity,
                 rotating: ["true", "1", "yes", "ja"].includes(
                     row.exercise_rotating.toLowerCase(),
                 ),

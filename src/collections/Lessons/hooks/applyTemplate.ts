@@ -32,7 +32,6 @@ type WorkoutTemplateBlock = {
     }> | null;
     exercises?: Array<{
         name?: string | null;
-        quantity?: string | null;
         rotating?: boolean | null;
         description?: string | null;
         videoUrl?: string | null;
@@ -102,7 +101,6 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
         }>;
         exercises: Array<{
             name: string;
-            quantity?: string;
             rotating?: boolean;
             description?: string;
             videoUrl?: string;
@@ -120,7 +118,6 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
             .filter((exercise) => Boolean(exercise?.name))
             .map((exercise) => ({
                 name: exercise?.name ?? "",
-                quantity: exercise?.quantity ?? undefined,
                 rotating: exercise?.rotating ?? undefined,
                 description: exercise?.description ?? undefined,
                 videoUrl: exercise?.videoUrl ?? undefined,

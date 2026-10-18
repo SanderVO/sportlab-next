@@ -69,7 +69,6 @@ export const tvLessonSelect = {
         },
         exercises: {
             name: true,
-            quantity: true,
             rotating: true,
             description: true,
             videoUrl: true,

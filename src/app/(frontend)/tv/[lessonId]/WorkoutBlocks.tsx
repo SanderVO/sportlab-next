@@ -25,7 +25,6 @@ export type WorkoutBlock = {
     exercises?: Array<{
         id?: string | null;
         name: string;
-        quantity?: string | null;
         rotating?: boolean | null;
         description?: string | null;
     }> | null;
@@ -374,6 +373,41 @@ const stationBase =
 
 /** Up to 8 stations fit without scrolling; more are paged, never shrunk. */
 const STATIONS_PER_PAGE = 8;
+/** Height (px) available for the station list, and what one station takes with / without a description. */
+const STATIONS_HEIGHT = 660;
+const STATION_HEIGHT = 64;
+const STATION_HEIGHT_WITH_CUE = 100;
+const STATION_GAP = 6;
+
+/** Splits the stations into pages that fit on screen; a description makes a station taller. */
+function paginateStations(
+    exercises: NonNullable<WorkoutBlock["exercises"]>,
+): Array<{ start: number; end: number }> {
+    const pages: Array<{ start: number; end: number }> = [];
+    let start = 0;
+    let used = 0;
+
+    exercises.forEach((exercise, i) => {
+        const height = exercise.description?.trim()
+            ? STATION_HEIGHT_WITH_CUE
+            : STATION_HEIGHT;
+        const needed = used > 0 ? height + STATION_GAP : height;
+
+        if (
+            i > start &&
+            (used + needed > STATIONS_HEIGHT || i - start >= STATIONS_PER_PAGE)
+        ) {
+            pages.push({ start, end: i });
+            start = i;
+            used = height;
+        } else {
+            used += needed;
+        }
+    });
+    pages.push({ start, end: exercises.length });
+
+    return pages;
+}
 
 /** TvBlockTimer: one block full-screen with a big countdown, its exercises and the controls. */
 function BlockModal({
@@ -538,18 +572,18 @@ function BlockModal({
         timer.activeIndex >= 0 ? exercises[timer.activeIndex] : null;
 
     // Keep the page that holds the current station on screen
-    const stationPages = Math.max(
-        Math.ceil(exercises.length / STATIONS_PER_PAGE),
-        1,
+    const pages = paginateStations(exercises);
+    const stationPages = pages.length;
+    const activePage = Math.max(
+        pages.findIndex(
+            (page) =>
+                Math.max(timer.activeIndex, 0) >= page.start &&
+                Math.max(timer.activeIndex, 0) < page.end,
+        ),
+        0,
     );
-    const stationPage = Math.floor(
-        Math.max(timer.activeIndex, 0) / STATIONS_PER_PAGE,
-    );
-    const stationStart = stationPage * STATIONS_PER_PAGE;
-    const stations = exercises.slice(
-        stationStart,
-        stationStart + STATIONS_PER_PAGE,
-    );
+    const stationStart = pages[activePage]!.start;
+    const stations = exercises.slice(stationStart, pages[activePage]!.end);
     const stationNoun =
         mode === "emom" || mode === "intervals" ? "Stations" : "Oefeningen";
     const stationsLabel =
@@ -713,9 +747,6 @@ function BlockModal({
                                             Deze ronde wisselend
                                         </div>
                                         <div className="type-tv-heading mt-[6px] truncate">
-                                            {activeExercise.quantity
-                                                ? `${formatQuantity(activeExercise.quantity)} `
-                                                : ""}
                                             {activeExercise.name}
                                         </div>
                                     </>
@@ -757,6 +788,8 @@ function BlockModal({
                                     className={cn(
                                         stationBase,
                                         mode !== "emom" && "text-white",
+                                        exercise.description?.trim() &&
+                                            "h-auto min-h-16 py-2",
                                         isNow && "bg-sand text-ink",
                                         isNext &&
                                             cn("text-white", accent.border),
@@ -773,20 +806,23 @@ function BlockModal({
                                         >
                                             {unit} {i + 1}
                                         </b>
-                                    ) : exercise.quantity ? (
-                                        <b
-                                            className={cn(
-                                                "min-w-[120px] flex-none font-display text-4xl leading-none font-normal uppercase",
-                                                isNow
-                                                    ? "text-ink"
-                                                    : accent.text,
-                                            )}
-                                        >
-                                            {formatQuantity(exercise.quantity)}
-                                        </b>
                                     ) : null}
-                                    <span className="min-w-0 truncate">
-                                        {name || "Oefening"}
+                                    <span className="min-w-0">
+                                        <span className="block truncate">
+                                            {name || "Oefening"}
+                                        </span>
+                                        {exercise.description?.trim() ? (
+                                            <span
+                                                className={cn(
+                                                    "type-tv-cue block truncate",
+                                                    isNow
+                                                        ? "text-ink"
+                                                        : "text-text-on-panel-eyebrow",
+                                                )}
+                                            >
+                                                {exercise.description}
+                                            </span>
+                                        ) : null}
                                     </span>
                                     {isNext ? (
                                         <span className="type-tv-label ml-auto flex-none text-text-on-panel-eyebrow uppercase">
@@ -868,11 +904,6 @@ function BlockModal({
     );
 }
 
-/** Trainers type a plain "x"; the TV sets it as "×" ("3x15" -> "3×15"). */
-function formatQuantity(quantity: string) {
-    return quantity.replace(/(\d)(\s*)x(?=\s|\d|$)/gi, "$1$2×");
-}
-
 function ExerciseList({
     exercises,
     variant,
@@ -896,11 +927,6 @@ function ExerciseList({
                 >
                     <span className="min-w-0">
                         {exercise.name || "Oefening"}
-                        {compact && exercise.quantity ? (
-                            <span className="ml-[10px] font-normal text-text-on-panel-muted">
-                                {formatQuantity(exercise.quantity)}
-                            </span>
-                        ) : null}
                         {exercise.description ? (
                             <span
                                 className={cn(
@@ -914,11 +940,6 @@ function ExerciseList({
                             </span>
                         ) : null}
                     </span>
-                    {!compact && exercise.quantity ? (
-                        <span className="flex-none font-normal whitespace-nowrap text-text-on-panel-muted">
-                            {formatQuantity(exercise.quantity)}
-                        </span>
-                    ) : null}
                 </li>
             ))}
         </ul>

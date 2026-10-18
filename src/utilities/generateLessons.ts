@@ -64,7 +64,6 @@ const buildWorkoutBlocks = async (
         }>;
         exercises: Array<{
             name: string;
-            quantity?: string;
             rotating?: boolean;
             description?: string;
         }>;
@@ -92,7 +91,6 @@ const buildWorkoutBlocks = async (
                 .filter((exercise) => Boolean(exercise?.name))
                 .map((exercise) => ({
                     name: exercise?.name ?? "",
-                    quantity: exercise?.quantity ?? undefined,
                     rotating: exercise?.rotating ?? undefined,
                     description: exercise?.description ?? undefined,
                 })),
