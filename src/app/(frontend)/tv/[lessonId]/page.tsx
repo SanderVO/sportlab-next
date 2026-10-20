@@ -1,6 +1,6 @@
 import { TvClock } from "@/components/TvClock/TvClock";
 import { getTimerState } from "./timerState";
-import { tvLessonDetailSelect } from "@/utilities/getTvLessons";
+import { tvLessonDetailSelect, tvPopulate } from "@/utilities/getTvLessons";
 import configPromise from "@payload-config";
 import { notFound } from "next/navigation";
 import { getPayload, type SelectType } from "payload";
@@ -48,7 +48,7 @@ function isProgram(
 
 function isUser(
     value: unknown,
-): value is { id: number; name?: string | null; email?: string | null } {
+): value is { id: number; firstName?: string | null } {
     return typeof value === "object" && value !== null;
 }
 
@@ -84,6 +84,7 @@ export default async function TvLessonPage({
         depth: 1,
         overrideAccess: true,
         select: tvLessonDetailSelect as SelectType,
+        populate: tvPopulate,
         disableErrors: true,
     });
 
@@ -102,7 +103,7 @@ export default async function TvLessonPage({
     );
     const coaches = (lesson.coaches ?? [])
         .map((coach) =>
-            isUser(coach) ? coach.name || coach.email || null : null,
+            isUser(coach) ? coach.firstName || null : null,
         )
         .filter(Boolean)
         .join(", ");

@@ -50,7 +50,7 @@ export const tvLessonSelect = {
         title: true,
     },
     coaches: {
-        name: true,
+        firstName: true,
         slug: true,
         position: true,
     },
@@ -76,13 +76,21 @@ export const tvLessonSelect = {
     },
 } as const;
 
+/**
+ * Populated coaches would otherwise use the Users `defaultPopulate`, which carries the full name.
+ * The TV only shows first names.
+ */
+export const tvPopulate = {
+    users: { firstName: true, slug: true, position: true },
+} as const;
+
 /** Fields the lesson detail page renders; keeps coach emails out of the page payload. */
 export const tvLessonDetailSelect = {
     title: true,
     startDate: true,
     image: true,
     program: { title: true },
-    coaches: { name: true },
+    coaches: { firstName: true },
     workoutBlocks: true,
 } as const;
 
@@ -145,6 +153,7 @@ export async function getTvLessons(
         overrideAccess: true,
         sort: "startDate",
         select: tvLessonSelect as SelectType,
+        populate: tvPopulate,
         where: {
             and: [
                 {

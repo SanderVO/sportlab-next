@@ -138,6 +138,24 @@ export const Users: CollectionConfig = {
       deleteUserRecords("event-registrations"),
     ],
     beforeValidate: [
+      // `name` is the full name, derived from firstName + lastName so sorting, titles and
+      // existing readers keep working.
+      ({ data, originalDoc }) => {
+        if (!data) return data;
+
+        if ("firstName" in data || "lastName" in data) {
+          const firstName = "firstName" in data ? data.firstName : originalDoc?.firstName;
+          const lastName = "lastName" in data ? data.lastName : originalDoc?.lastName;
+
+          data.name =
+            [firstName, lastName]
+              .map((part) => (typeof part === "string" ? part.trim() : ""))
+              .filter(Boolean)
+              .join(" ") || null;
+        }
+
+        return data;
+      },
       ({ data }) => {
         if (data && !data.slug && data.name) {
           data.slug = data.name
@@ -215,9 +233,23 @@ export const Users: CollectionConfig = {
       },
     },
     {
+      label: { en: "First name", nl: "Voornaam" },
+      name: "firstName",
+      type: "text",
+    },
+    {
+      label: { en: "Last name", nl: "Achternaam" },
+      name: "lastName",
+      type: "text",
+    },
+    {
       label: { en: "Name", nl: "Naam" },
       name: "name",
       type: "text",
+      admin: {
+        hidden: true,
+        readOnly: true,
+      },
     },
     slugField({
       required: false,

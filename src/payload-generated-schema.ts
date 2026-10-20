@@ -254,7 +254,7 @@ export const enum_events_event_type = pgEnum("enum_events_event_type", [
 ]);
 export const enum_lesson_enrollments_status = pgEnum(
     "enum_lesson_enrollments_status",
-    ["assigned", "started", "completed", "cancelled"],
+    ["assigned", "started", "completed", "cancelled", "waitlisted"],
 );
 export const enum_program_enrollments_status = pgEnum(
     "enum_program_enrollments_status",
@@ -380,6 +380,8 @@ export const users = pgTable(
     "users",
     {
         id: serial("id").primaryKey(),
+        firstName: varchar("first_name"),
+        lastName: varchar("last_name"),
         name: varchar("name"),
         generateSlug: boolean("generate_slug").default(true),
         slug: varchar("slug"),
@@ -2259,6 +2261,16 @@ export const lesson_enrollments = pgTable(
         status: enum_lesson_enrollments_status("status")
             .notNull()
             .default("assigned"),
+        waitlistedAt: timestamp("waitlisted_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
+        waitlistNotifiedAt: timestamp("waitlist_notified_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
         addedBy: integer("added_by_id").references(() => users.id, {
             onDelete: "set null",
         }),

@@ -10,6 +10,8 @@ Access rules live in code and are not listed here. Collections marked *dashboard
 
 Gebruiker · auth
 
+- `firstName` (text): Voornaam
+- `lastName` (text): Achternaam
 - `name` (text): Naam
 - `generateSlug` (checkbox, default true): Generate Slug
 - `slug` (text): Slug
@@ -333,7 +335,9 @@ Les deelname
 
 - `user` (relationship, required, → users): Gebruiker
 - `lesson` (relationship, required, → lessons): Les
-- `status` (select, required, one of: assigned, started, completed, cancelled, default "assigned"): Status
+- `status` (select, required, one of: assigned, started, completed, cancelled, waitlisted, default "assigned"): Status
+- `waitlistedAt` (date): Op wachtlijst sinds
+- `waitlistNotifiedAt` (date): Plek aangeboden op
 - `addedBy` (relationship, → users): Toegevoegd door
 - `updatedAt` (date)
 - `createdAt` (date)

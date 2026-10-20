@@ -2,6 +2,11 @@ import { adminCoachOrSelf } from "@/access/adminCoachOrSelf";
 import { staffOnlyField } from "@/access/staffOnlyField";
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
 import type { CollectionConfig } from "payload";
+import { enforceLessonCapacity } from "./hooks/enforceLessonCapacity";
+import {
+    notifyWaitlistOnEnrollmentChange,
+    notifyWaitlistOnEnrollmentDelete,
+} from "./hooks/notifyWaitlist";
 import { syncExerciseTrackingOnEnrollment } from "./hooks/syncExerciseTrackingOnEnrollment";
 
 export const LessonEnrollments: CollectionConfig = {
@@ -21,7 +26,12 @@ export const LessonEnrollments: CollectionConfig = {
         defaultColumns: ["user", "lesson", "status", "updatedAt"],
     },
     hooks: {
-        afterChange: [syncExerciseTrackingOnEnrollment],
+        beforeChange: [enforceLessonCapacity],
+        afterChange: [
+            syncExerciseTrackingOnEnrollment,
+            notifyWaitlistOnEnrollmentChange,
+        ],
+        afterDelete: [notifyWaitlistOnEnrollmentDelete],
     },
     fields: [
         {
@@ -60,7 +70,36 @@ export const LessonEnrollments: CollectionConfig = {
                     label: { en: "Cancelled", nl: "Geannuleerd" },
                     value: "cancelled",
                 },
+                {
+                    label: { en: "Waitlisted", nl: "Wachtlijst" },
+                    value: "waitlisted",
+                },
             ],
+        },
+        {
+            label: { en: "On waitlist since", nl: "Op wachtlijst sinds" },
+            name: "waitlistedAt",
+            type: "date",
+            admin: {
+                readOnly: true,
+                condition: (_, siblingData) => siblingData?.status === "waitlisted",
+                date: { pickerAppearance: "dayAndTime" },
+            },
+        },
+        {
+            label: { en: "Spot offered at", nl: "Plek aangeboden op" },
+            name: "waitlistNotifiedAt",
+            type: "date",
+            access: { create: staffOnlyField, update: staffOnlyField },
+            admin: {
+                readOnly: true,
+                condition: (_, siblingData) => siblingData?.status === "waitlisted",
+                description: {
+                    en: "Set when the user was notified that a spot became free. The spot is reserved for them.",
+                    nl: "Wordt gezet zodra de gebruiker bericht kreeg dat er een plek vrij is. De plek is voor hen gereserveerd.",
+                },
+                date: { pickerAppearance: "dayAndTime" },
+            },
         },
         {
             label: { en: "Added by", nl: "Toegevoegd door" },

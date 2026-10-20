@@ -1,3 +1,4 @@
+import { notifyWaitlistOnSpotsChange } from "./hooks/notifyWaitlistOnSpotsChange";
 import { authenticated } from "@/access/authenticated";
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
 import { type CollectionConfig } from "payload";
@@ -31,6 +32,7 @@ export const Lessons: CollectionConfig = {
     hooks: {
         afterChange: [
             syncExerciseTrackingOnLessonUpdate,
+            notifyWaitlistOnSpotsChange,
             revalidateTvLessonsOnChange,
         ],
         afterDelete: [revalidateTvLessonsOnDelete],

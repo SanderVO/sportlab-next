@@ -46,7 +46,7 @@ function isProgram(value: unknown): value is Program {
 
 function getLessonCoachLabel(coach: number | User) {
     if (isUser(coach)) {
-        return coach.name || coach.email || `Coach ${coach.id}`;
+        return coach.firstName || `Coach ${coach.id}`;
     }
 
     return `Coach ${coach}`;

@@ -177,6 +177,8 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  firstName?: string | null;
+  lastName?: string | null;
   name?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
@@ -932,7 +934,12 @@ export interface LessonEnrollment {
   id: number;
   user: number | User;
   lesson: number | Lesson;
-  status: 'assigned' | 'started' | 'completed' | 'cancelled';
+  status: 'assigned' | 'started' | 'completed' | 'cancelled' | 'waitlisted';
+  waitlistedAt?: string | null;
+  /**
+   * Set when the user was notified that a spot became free. The spot is reserved for them.
+   */
+  waitlistNotifiedAt?: string | null;
   /**
    * Automatically set via a hook.
    */
@@ -1493,6 +1500,8 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  firstName?: T;
+  lastName?: T;
   name?: T;
   generateSlug?: T;
   slug?: T;
@@ -1936,6 +1945,8 @@ export interface LessonEnrollmentsSelect<T extends boolean = true> {
   user?: T;
   lesson?: T;
   status?: T;
+  waitlistedAt?: T;
+  waitlistNotifiedAt?: T;
   addedBy?: T;
   updatedAt?: T;
   createdAt?: T;
