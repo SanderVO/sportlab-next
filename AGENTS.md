@@ -43,6 +43,16 @@ This repository's styling follows the **One More Reason** design system for Spor
 
 Don't use these in new design-system UI. Prefer the design-system equivalents, and migrate old usages when you touch them.
 
+## Data schema in the design system
+
+The design system carries the Payload data schema as `project/data-schema.md`, so new pages are designed around real fields. The repo copy is [docs/data-schema.md](docs/data-schema.md), generated from the Payload config (never edit it by hand).
+
+On **every schema change** (a collection or global added, removed or renamed; a field added, removed or changed; a `payload.config.ts` collection list change), before finishing:
+
+1. Run `pnpm generate:schema-doc` and include the updated `docs/data-schema.md` in the diff.
+2. Publish it to the design system: read `project/data-schema.md` from the artifact (so you build on the live version), copy `docs/data-schema.md` over it under a scratch folder as `project/data-schema.md`, and publish with the Artifact tool (`url`: the design system artifact, `root`: that folder, `file_path`: the absolute path of the copy). Send only this file. Leave `project/design-system.json` alone: its `lastChange.at` is the token version that [sportlab-theme.css](<src/app/(frontend)/sportlab-theme.css>) snapshots, and a schema change is not a token change.
+3. If the artifact can't be written, say so and flag that the design system's schema is out of date.
+
 ## Workflow
 
 - Before changing styling, read the artifact README and the relevant component README.

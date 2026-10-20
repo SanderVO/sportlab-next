@@ -9,6 +9,7 @@ import * as migration_20261006_210947 from './20261006_210947';
 import * as migration_20261012_202615 from './20261012_202615';
 import * as migration_20261017_134058_add_round_types from './20261017_134058_add_round_types';
 import * as migration_20261018_132522_remove_exercise_quantity from './20261018_132522_remove_exercise_quantity';
+import * as migration_20261020_112208_add_health_measurements from './20261020_112208_add_health_measurements';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20261018_132522_remove_exercise_quantity.up,
     down: migration_20261018_132522_remove_exercise_quantity.down,
-    name: '20261018_132522_remove_exercise_quantity'
+    name: '20261018_132522_remove_exercise_quantity',
+  },
+  {
+    up: migration_20261020_112208_add_health_measurements.up,
+    down: migration_20261020_112208_add_health_measurements.down,
+    name: '20261020_112208_add_health_measurements'
   },
 ];

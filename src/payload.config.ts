@@ -18,6 +18,7 @@ import { Documents } from "./collections/Documents";
 import { EventRegistrations } from "./collections/EventRegistrations";
 import { Events } from "./collections/Events";
 import { Exercises } from "./collections/Exercises";
+import { HealthMeasurements } from "./collections/HealthMeasurements";
 import { LessonEnrollments } from "./collections/LessonEnrollments";
 import { LessonExerciseTracking } from "./collections/LessonExerciseTracking";
 import { LessonTemplates } from "./collections/LessonTemplates";
@@ -226,6 +227,7 @@ export default buildConfig({
         withCoachCollectionVisibility(LessonExerciseTracking),
         withCoachCollectionVisibility(ProgramEnrollments),
         withCoachCollectionVisibility(EventRegistrations),
+        withCoachCollectionVisibility(HealthMeasurements),
     ],
     globals: [
         withCoachGlobalVisibility(Header),

@@ -25,6 +25,7 @@
         "generate:importmap": "payload generate:importmap",
         "generate:types": "payload generate:types",
         "generate:db": "payload generate:db-schema",
+        "generate:schema-doc": "payload run scripts/generate-schema-doc.ts",
         "migrate": "payload migrate",
         "migrate:fresh": "payload migrate:fresh",
         "payload": "payload",

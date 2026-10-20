@@ -81,6 +81,7 @@ export interface Config {
     'lesson-exercise-tracking': LessonExerciseTracking;
     'program-enrollments': ProgramEnrollment;
     'event-registrations': EventRegistration;
+    'health-measurements': HealthMeasurement;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -110,6 +111,7 @@ export interface Config {
     'lesson-exercise-tracking': LessonExerciseTrackingSelect<false> | LessonExerciseTrackingSelect<true>;
     'program-enrollments': ProgramEnrollmentsSelect<false> | ProgramEnrollmentsSelect<true>;
     'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
+    'health-measurements': HealthMeasurementsSelect<false> | HealthMeasurementsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1011,6 +1013,57 @@ export interface EventRegistration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "health-measurements".
+ */
+export interface HealthMeasurement {
+  id: number;
+  user: number | User;
+  measuredAt: string;
+  /**
+   * cm
+   */
+  height?: number | null;
+  /**
+   * kg
+   */
+  weight?: number | null;
+  /**
+   * %
+   */
+  bodyFatPercentage?: number | null;
+  /**
+   * kg
+   */
+  muscleMass?: number | null;
+  /**
+   * rating
+   */
+  visceralFat?: number | null;
+  /**
+   * kg
+   */
+  boneMass?: number | null;
+  /**
+   * kg/m²
+   */
+  bmi?: number | null;
+  /**
+   * kcal / day
+   */
+  bmr?: number | null;
+  /**
+   * years
+   */
+  metabolicAge?: number | null;
+  /**
+   * %
+   */
+  bodyWaterPercentage?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1376,6 +1429,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'event-registrations';
         value: number | EventRegistration;
+      } | null)
+    | ({
+        relationTo: 'health-measurements';
+        value: number | HealthMeasurement;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1936,6 +1993,26 @@ export interface EventRegistrationsSelect<T extends boolean = true> {
   event?: T;
   status?: T;
   addedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "health-measurements_select".
+ */
+export interface HealthMeasurementsSelect<T extends boolean = true> {
+  user?: T;
+  measuredAt?: T;
+  height?: T;
+  weight?: T;
+  bodyFatPercentage?: T;
+  muscleMass?: T;
+  visceralFat?: T;
+  boneMass?: T;
+  bmi?: T;
+  bmr?: T;
+  metabolicAge?: T;
+  bodyWaterPercentage?: T;
   updatedAt?: T;
   createdAt?: T;
 }

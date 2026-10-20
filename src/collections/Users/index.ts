@@ -15,6 +15,7 @@ import {
   type Where,
 } from "payload";
 import { User } from "../../payload-types";
+import { deleteUserRecords } from "./hooks/deleteUserRecords";
 import { revalidateUser } from "./hooks/revalidateUser";
 import { RolesEnum } from "./roles";
 
@@ -129,6 +130,13 @@ export const Users: CollectionConfig = {
   timestamps: true,
   hooks: {
     afterChange: [revalidateUser],
+    beforeDelete: [
+      deleteUserRecords("health-measurements"),
+      deleteUserRecords("lesson-exercise-tracking"),
+      deleteUserRecords("lesson-enrollments"),
+      deleteUserRecords("program-enrollments"),
+      deleteUserRecords("event-registrations"),
+    ],
     beforeValidate: [
       ({ data }) => {
         if (data && !data.slug && data.name) {

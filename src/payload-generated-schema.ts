@@ -2475,6 +2475,55 @@ export const event_registrations = pgTable(
     ],
 );
 
+export const health_measurements = pgTable(
+    "health_measurements",
+    {
+        id: serial("id").primaryKey(),
+        user: integer("user_id")
+            .notNull()
+            .references(() => users.id, {
+                onDelete: "set null",
+            }),
+        measuredAt: timestamp("measured_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }).notNull(),
+        height: numeric("height", { mode: "number" }),
+        weight: numeric("weight", { mode: "number" }),
+        bodyFatPercentage: numeric("body_fat_percentage", { mode: "number" }),
+        muscleMass: numeric("muscle_mass", { mode: "number" }),
+        visceralFat: numeric("visceral_fat", { mode: "number" }),
+        boneMass: numeric("bone_mass", { mode: "number" }),
+        bmi: numeric("bmi", { mode: "number" }),
+        bmr: numeric("bmr", { mode: "number" }),
+        metabolicAge: numeric("metabolic_age", { mode: "number" }),
+        bodyWaterPercentage: numeric("body_water_percentage", {
+            mode: "number",
+        }),
+        updatedAt: timestamp("updated_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+        createdAt: timestamp("created_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+    },
+    (columns) => [
+        index("health_measurements_user_idx").on(columns.user),
+        index("health_measurements_updated_at_idx").on(columns.updatedAt),
+        index("health_measurements_created_at_idx").on(columns.createdAt),
+        index("user_measuredAt_idx").on(columns.user, columns.measuredAt),
+    ],
+);
+
 export const redirects = pgTable(
     "redirects",
     {
@@ -2994,6 +3043,7 @@ export const payload_locked_documents_rels = pgTable(
         "lesson-exercise-trackingID": integer("lesson_exercise_tracking_id"),
         "program-enrollmentsID": integer("program_enrollments_id"),
         "event-registrationsID": integer("event_registrations_id"),
+        "health-measurementsID": integer("health_measurements_id"),
         redirectsID: integer("redirects_id"),
         formsID: integer("forms_id"),
         "form-submissionsID": integer("form_submissions_id"),
@@ -3035,6 +3085,9 @@ export const payload_locked_documents_rels = pgTable(
         ),
         index("payload_locked_documents_rels_event_registrations_id_idx").on(
             columns["event-registrationsID"],
+        ),
+        index("payload_locked_documents_rels_health_measurements_id_idx").on(
+            columns["health-measurementsID"],
         ),
         index("payload_locked_documents_rels_redirects_id_idx").on(
             columns.redirectsID,
@@ -3117,6 +3170,11 @@ export const payload_locked_documents_rels = pgTable(
             columns: [columns["event-registrationsID"]],
             foreignColumns: [event_registrations.id],
             name: "payload_locked_documents_rels_event_registrations_fk",
+        }).onDelete("cascade"),
+        foreignKey({
+            columns: [columns["health-measurementsID"]],
+            foreignColumns: [health_measurements.id],
+            name: "payload_locked_documents_rels_health_measurements_fk",
         }).onDelete("cascade"),
         foreignKey({
             columns: [columns["redirectsID"]],
@@ -4449,6 +4507,16 @@ export const relations_event_registrations = relations(
         }),
     }),
 );
+export const relations_health_measurements = relations(
+    health_measurements,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [health_measurements.user],
+            references: [users.id],
+            relationName: "user",
+        }),
+    }),
+);
 export const relations_redirects_rels = relations(
     redirects_rels,
     ({ one }) => ({
@@ -4708,6 +4776,11 @@ export const relations_payload_locked_documents_rels = relations(
             fields: [payload_locked_documents_rels["event-registrationsID"]],
             references: [event_registrations.id],
             relationName: "event-registrations",
+        }),
+        "health-measurementsID": one(health_measurements, {
+            fields: [payload_locked_documents_rels["health-measurementsID"]],
+            references: [health_measurements.id],
+            relationName: "health-measurements",
         }),
         redirectsID: one(redirects, {
             fields: [payload_locked_documents_rels.redirectsID],
@@ -5063,6 +5136,7 @@ type DatabaseSchema = {
     lesson_exercise_tracking: typeof lesson_exercise_tracking;
     program_enrollments: typeof program_enrollments;
     event_registrations: typeof event_registrations;
+    health_measurements: typeof health_measurements;
     redirects: typeof redirects;
     redirects_rels: typeof redirects_rels;
     forms_blocks_checkbox: typeof forms_blocks_checkbox;
@@ -5157,6 +5231,7 @@ type DatabaseSchema = {
     relations_lesson_exercise_tracking: typeof relations_lesson_exercise_tracking;
     relations_program_enrollments: typeof relations_program_enrollments;
     relations_event_registrations: typeof relations_event_registrations;
+    relations_health_measurements: typeof relations_health_measurements;
     relations_redirects_rels: typeof relations_redirects_rels;
     relations_redirects: typeof relations_redirects;
     relations_forms_blocks_checkbox: typeof relations_forms_blocks_checkbox;
