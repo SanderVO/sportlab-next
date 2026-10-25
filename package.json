@@ -33,7 +33,7 @@
     },
     "dependencies": {
         "@hookform/resolvers": "^5.9.1",
-        "@next/third-parties": "^16.4.0",
+        "@next/third-parties": "^16.4.3",
         "@payloadcms/admin-bar": "3.90.2",
         "@payloadcms/db-postgres": "3.90.2",
         "@payloadcms/email-resend": "3.90.2",
@@ -54,7 +54,7 @@
         "embla-carousel-react": "^8.6.0",
         "he": "^1.2.0",
         "lucide-react": "^0.554.0",
-        "next": "^16.4.0",
+        "next": "^16.4.3",
         "next-turnstile": "^1.0.7",
         "papaparse": "^5.7.0",
         "payload": "3.90.2",
@@ -69,8 +69,8 @@
     "devDependencies": {
         "@aws-sdk/client-s3": "^3.1142.0",
         "@eslint/eslintrc": "^3.3.7",
-        "@next/env": "^16.4.0",
-        "@next/eslint-plugin-next": "^16.4.0",
+        "@next/env": "^16.4.3",
+        "@next/eslint-plugin-next": "^16.4.3",
         "@tailwindcss/postcss": "^4.3.3",
         "@tailwindcss/typography": "^0.5.20",
         "@types/he": "^1.2.3",
