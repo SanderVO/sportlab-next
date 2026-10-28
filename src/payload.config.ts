@@ -32,6 +32,7 @@ import { Users } from "./collections/Users";
 import { Footer } from "./components/Footer/config";
 import { Header } from "./components/Header/config";
 import { Organization } from "./components/Organization/config";
+import { TvAccess } from "./components/TvAccess/config";
 import { WhatsApp } from "./components/WhatsApp/config";
 import { migrations } from "./migrations-postgres";
 import { plugins } from "./plugins";
@@ -234,6 +235,7 @@ export default buildConfig({
         withCoachGlobalVisibility(Footer),
         withCoachGlobalVisibility(WhatsApp),
         withCoachGlobalVisibility(Organization),
+        TvAccess,
     ],
     cors: allowedOrigins,
     csrf: allowedOrigins,

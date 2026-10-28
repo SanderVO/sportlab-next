@@ -1,12 +1,18 @@
 import { getCachedTvLessons } from "@/utilities/getCachedTvLessons";
 import { getTvDateRange, parseTvDateParam } from "@/utilities/getTvLessons";
+import { hasTvAccess } from "@/utilities/tvAccess";
 import { NextRequest, NextResponse } from "next/server";
 
-// Short edge cache: the TV polls this and lessons rarely change within a minute.
-const TV_CACHE_CONTROL = "public, s-maxage=30, stale-while-revalidate=60";
+// Short browser cache: the TV polls this and lessons rarely change within a minute.
+// Private so a shared CDN never serves it to clients without the PIN cookie.
+const TV_CACHE_CONTROL = "private, max-age=30";
 const MAX_PAGE = 50;
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+    if (!(await hasTvAccess())) {
+        return NextResponse.json({ error: "Geen toegang" }, { status: 401 });
+    }
+
     try {
         const pageParam = Number(
             request.nextUrl.searchParams.get("page") ?? "1",

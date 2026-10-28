@@ -11,6 +11,7 @@ import * as migration_20261017_134058_add_round_types from './20261017_134058_ad
 import * as migration_20261018_132522_remove_exercise_quantity from './20261018_132522_remove_exercise_quantity';
 import * as migration_20261020_112208_add_health_measurements from './20261020_112208_add_health_measurements';
 import * as migration_20261020_155608_add_user_names_and_lesson_waitlist from './20261020_155608_add_user_names_and_lesson_waitlist';
+import * as migration_20261028_164809_add_tv_access from './20261028_164809_add_tv_access';
 
 export const migrations = [
   {
@@ -76,6 +77,11 @@ export const migrations = [
   {
     up: migration_20261020_155608_add_user_names_and_lesson_waitlist.up,
     down: migration_20261020_155608_add_user_names_and_lesson_waitlist.down,
-    name: '20261020_155608_add_user_names_and_lesson_waitlist'
+    name: '20261020_155608_add_user_names_and_lesson_waitlist',
+  },
+  {
+    up: migration_20261028_164809_add_tv_access.up,
+    down: migration_20261028_164809_add_tv_access.down,
+    name: '20261028_164809_add_tv_access'
   },
 ];

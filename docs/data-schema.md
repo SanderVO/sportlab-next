@@ -606,3 +606,10 @@ Formulier Submissie
   - `id` (text): ID
 - `updatedAt` (date)
 - `createdAt` (date)
+
+### tvAccess
+
+- `enabled` (checkbox, default false): Pincode vereist
+- `pin` (text): Pincode
+- `updatedAt` (date)
+- `createdAt` (date)

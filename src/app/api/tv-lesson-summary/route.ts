@@ -1,8 +1,13 @@
 import { getCachedTvMonthSummary } from "@/utilities/getCachedTvLessons";
 import { parseTvMonthParam } from "@/utilities/getTvLessons";
+import { hasTvAccess } from "@/utilities/tvAccess";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+    if (!(await hasTvAccess())) {
+        return NextResponse.json({ error: "Geen toegang" }, { status: 401 });
+    }
+
     const month = parseTvMonthParam(request.nextUrl.searchParams.get("month"));
 
     if (!month) {
@@ -15,7 +20,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             {
                 headers: {
                     "Cache-Control":
-                        "public, s-maxage=60, stale-while-revalidate=300",
+                        "private, max-age=60",
                 },
             },
         );
