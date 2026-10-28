@@ -31,13 +31,16 @@ export const isValidTvPin = (input: string, pin: string) =>
 
 /** True when the PIN gate is off, or the request carries a cookie for the current PIN. */
 export async function hasTvAccess(): Promise<boolean> {
+    // Read cookies first: it opts the caller into dynamic rendering before any DB access,
+    // so builds without a database (CI) don't try to prerender the TV routes.
+    const cookieStore = await cookies();
     const { enabled, pin } = await getTvAccessSettings();
 
     if (!enabled) {
         return true;
     }
 
-    const token = (await cookies()).get(TV_ACCESS_COOKIE)?.value;
+    const token = cookieStore.get(TV_ACCESS_COOKIE)?.value;
 
     return Boolean(token) && safeEqual(token as string, sign(pin));
 }
