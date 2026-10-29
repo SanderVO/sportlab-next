@@ -612,7 +612,7 @@ function BlockModal({
                     <div className="type-tv-label truncate text-sand uppercase">
                         Blok {index + 1} / {total} · {lessonTitle}
                     </div>
-                    <h2 className="type-tv-title mt-3.5 leading-none">
+                    <h2 className="type-tv-title mt-3.5 leading-none text-[110px]">
                         {block.name || "Workout"}
                     </h2>
                     {block.description ? (
