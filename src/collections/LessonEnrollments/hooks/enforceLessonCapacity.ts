@@ -1,3 +1,4 @@
+import { rolesOf } from "@/access/rolesOf";
 import { RolesEnum } from "@/collections/Users/roles";
 import { APIError, type CollectionBeforeChangeHook } from "payload";
 import { isLessonFull, isOccupyingStatus, lockLesson, toId } from "../waitlist";
@@ -29,7 +30,7 @@ export const enforceLessonCapacity: CollectionBeforeChangeHook = async ({
 
     if (!lessonId) return data;
 
-    const roles = Array.isArray(req.user?.roles) ? req.user.roles : [];
+    const roles = rolesOf(req.user);
     const isStaff =
         roles.includes(RolesEnum.ADMIN) || roles.includes(RolesEnum.COACH);
 

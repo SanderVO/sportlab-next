@@ -5,6 +5,7 @@ import { verifyTurnstile } from "@/hooks/verifyTurnstile";
 import { Page, Post } from "@/payload-types";
 import { getServerSideURL } from "@/utilities/getURL";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
+import { mcpPlugin } from "@payloadcms/plugin-mcp";
 import { redirectsPlugin } from "@payloadcms/plugin-redirects";
 import { seoPlugin } from "@payloadcms/plugin-seo";
 import { GenerateURL } from "@payloadcms/plugin-seo/types";
@@ -12,6 +13,7 @@ import {
     FixedToolbarFeature,
     lexicalEditor,
 } from "@payloadcms/richtext-lexical";
+import { translateMcpApiKeyCollection } from "./mcpApiKeyCollection";
 import type { CollectionBeforeChangeHook, Field, Plugin } from "payload";
 
 const generateURL: GenerateURL<Post | Page> = ({
@@ -100,6 +102,38 @@ const replaceSelectValuesWithLabels: CollectionBeforeChangeHook = async ({
 };
 
 export const plugins: Plugin[] = [
+    // Lets LLM clients work with content over MCP (POST /api/mcp). Only the collections below
+    // are exposed, no globals. Workout blocks are part of lessons, so they follow `lessons`.
+    // Keys act as the user they belong to, so each collection's access control still applies.
+    mcpPlugin({
+        collections: {
+            pages: {
+                description:
+                    "Website pages of Sportlab Groningen, including their content blocks, hero and SEO fields. Can be read and updated, not created or deleted.",
+                enabled: { find: true, update: true },
+            },
+            lessons: {
+                description:
+                    "Lessons of Sportlab Groningen, including their workout blocks (workout details and exercises).",
+                enabled: true,
+            },
+            exercises: {
+                description: "Exercises that can be used in workout blocks.",
+                enabled: true,
+            },
+        },
+        overrideApiKeyCollection: (collection) => {
+            const translated = translateMcpApiKeyCollection(collection);
+
+            return {
+                ...translated,
+                admin: {
+                    ...translated.admin,
+                    hidden: ({ user }) => isCoachOnlyAdminUser(user),
+                },
+            };
+        },
+    }),
     redirectsPlugin({
         collections: ["pages", "posts"],
         overrides: {

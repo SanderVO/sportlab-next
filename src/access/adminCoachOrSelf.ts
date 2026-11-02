@@ -1,3 +1,4 @@
+import { rolesOf } from "@/access/rolesOf";
 import { RolesEnum } from "@/collections/Users/roles";
 import type { Access } from "payload";
 
@@ -6,7 +7,7 @@ export const adminCoachOrSelf: Access = ({ req: { user } }) => {
         return false;
     }
 
-    const roles = Array.isArray(user.roles) ? user.roles : [];
+    const roles = rolesOf(user);
 
     if (roles.includes(RolesEnum.ADMIN) || roles.includes(RolesEnum.COACH)) {
         return true;

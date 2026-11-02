@@ -1,3 +1,4 @@
+import { rolesOf } from "@/access/rolesOf";
 import { RolesEnum } from "@/collections/Users/roles";
 import type { Access, GlobalConfig, TextFieldSingleValidation } from "payload";
 import { revalidateTvAccess } from "./hooks/revalidateTvAccess";
@@ -5,7 +6,7 @@ import { revalidateTvAccess } from "./hooks/revalidateTvAccess";
 const hasRole =
     (...allowed: RolesEnum[]): Access =>
     ({ req: { user } }) => {
-        const roles: string[] = Array.isArray(user?.roles) ? user.roles : [];
+        const roles = rolesOf(user);
 
         return allowed.some((role) => roles.includes(role));
     };

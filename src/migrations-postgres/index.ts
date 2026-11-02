@@ -12,6 +12,7 @@ import * as migration_20261018_132522_remove_exercise_quantity from './20261018_
 import * as migration_20261020_112208_add_health_measurements from './20261020_112208_add_health_measurements';
 import * as migration_20261020_155608_add_user_names_and_lesson_waitlist from './20261020_155608_add_user_names_and_lesson_waitlist';
 import * as migration_20261028_164809_add_tv_access from './20261028_164809_add_tv_access';
+import * as migration_20261102_202600_add_mcp_api_keys from './20261102_202600_add_mcp_api_keys';
 
 export const migrations = [
   {
@@ -82,6 +83,11 @@ export const migrations = [
   {
     up: migration_20261028_164809_add_tv_access.up,
     down: migration_20261028_164809_add_tv_access.down,
-    name: '20261028_164809_add_tv_access'
+    name: '20261028_164809_add_tv_access',
+  },
+  {
+    up: migration_20261102_202600_add_mcp_api_keys.up,
+    down: migration_20261102_202600_add_mcp_api_keys.down,
+    name: '20261102_202600_add_mcp_api_keys'
   },
 ];
