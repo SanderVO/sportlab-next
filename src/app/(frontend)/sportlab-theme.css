@@ -1,5 +1,5 @@
 /* Sportlab theme: tokens from the One More Reason design system (https://claude.ai/code/artifact/b85d45fc-1044-491b-ab0c-827f00966109),
-   snapshot of lastChange.at 2026-10-10T20:17:01Z. Maintained by hand; the artifact is the reference, nothing is synced. */
+   snapshot of lastChange.at 2026-10-28T17:05:00Z. Maintained by hand; the artifact is the reference, nothing is synced. */
 @import "tailwindcss";
 
 :root,
@@ -36,6 +36,8 @@
     --tv-glow-ember: #3d2714;
     --tv-glow-ember-deep: #302012;
     --line-tv: #4a433a;
+    --line-panel: #4a433a;
+    --control-border: #7a7368;
 }
 [data-theme="dark"] {
     --surface-page: #14110d;
@@ -84,6 +86,8 @@
     --color-tv-glow-ember: var(--tv-glow-ember);
     --color-tv-glow-ember-deep: var(--tv-glow-ember-deep);
     --color-line-tv: var(--line-tv);
+    --color-line-panel: var(--line-panel);
+    --color-control-border: var(--control-border);
 }
 
 @theme static {
@@ -103,6 +107,11 @@
     --spacing-tv-safe-x: 96px;
     --spacing-tv-safe-y: 64px;
     --spacing-tv-gap: 40px;
+    --spacing-web-container: 1200px;
+    --spacing-web-measure: 680px;
+    --spacing-web-gutter: 24px;
+    --spacing-app-container: 1200px;
+    --spacing-app-gutter: 24px;
     --radius-sticker: 5px;
     --radius-chip: 6px;
     --radius-card: 8px;
@@ -123,6 +132,11 @@
     --tv-safe-x: 96px;
     --tv-safe-y: 64px;
     --tv-gap: 40px;
+    --web-container: 1200px;
+    --web-measure: 680px;
+    --web-gutter: 24px;
+    --app-container: 1200px;
+    --app-gutter: 24px;
 }
 
 @utility type-display-xl {
@@ -309,4 +323,126 @@
     line-height: 32px;
     font-weight: 700;
     letter-spacing: 0.16em;
+}
+@utility type-web-display {
+    font-family: var(--font-display);
+    font-size: 96px;
+    line-height: 0.9;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+@utility type-web-h1 {
+    font-family: var(--font-sans);
+    font-size: 56px;
+    line-height: 62px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+@utility type-web-h2 {
+    font-family: var(--font-sans);
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+@utility type-web-h3 {
+    font-family: var(--font-sans);
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 700;
+}
+@utility type-web-lead {
+    font-family: var(--font-sans);
+    font-size: 21px;
+    line-height: 34px;
+    font-weight: 400;
+}
+@utility type-web-body {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    line-height: 31px;
+    font-weight: 400;
+}
+@utility type-web-small {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 24px;
+    font-weight: 400;
+}
+@utility type-web-meta {
+    font-family: var(--font-label);
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+@utility type-web-pull {
+    font-family: var(--font-display);
+    font-size: 40px;
+    line-height: 1.05;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+@utility type-app-h1 {
+    font-family: var(--font-sans);
+    font-size: 40px;
+    line-height: 46px;
+    font-weight: 700;
+}
+@utility type-app-h2 {
+    font-family: var(--font-sans);
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 700;
+}
+@utility type-app-panel-title {
+    font-family: var(--font-sans);
+    font-size: 30px;
+    line-height: 36px;
+    font-weight: 700;
+}
+@utility type-app-time {
+    font-family: var(--font-display);
+    font-size: 104px;
+    line-height: 0.86;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+@utility type-app-number {
+    font-family: var(--font-display);
+    font-size: 40px;
+    line-height: 0.9;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+@utility type-app-row-title {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+}
+@utility type-app-meta {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+}
+@utility type-app-input {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+}
+@utility type-app-tag {
+    font-family: var(--font-label);
+    font-size: 10px;
+    line-height: 14px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+}
+@utility type-app-tab {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    line-height: 12px;
+    font-weight: 500;
 }

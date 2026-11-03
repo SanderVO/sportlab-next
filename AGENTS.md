@@ -5,14 +5,16 @@ This repository's styling follows the **One More Reason** design system for Spor
 ## Source of truth
 
 - The design system artifact on claude.ai is the visual authority: https://claude.ai/code/artifact/b85d45fc-1044-491b-ab0c-827f00966109
-- The repo holds no copy of it. Read the artifact (`project/README.md` for the brand rules, `project/components/<Name>/README.md` and `preview.html` per component) before writing UI. If it can't be read, say so and flag that the result is unverified.
+- [docs/design-system/](docs/design-system/SNAPSHOT.md) is a read-only snapshot of the artifact, for tools that can't open it (OpenCode and other LLMs). Read `docs/design-system/README.md` for the brand rules and `docs/design-system/components/<Name>/README.md` per component before writing UI. The snapshot version is in [docs/design-system/SNAPSHOT.md](docs/design-system/SNAPSHOT.md). Never edit the snapshot by hand.
+- If you can read the artifact (Claude Code, Claude on the web), read it instead of the snapshot: it is newer if they differ. Compare its `project/design-system.json` `lastChange.at` with the snapshot's, and if the snapshot is behind, refresh it (steps in `SNAPSHOT.md`) and flag that `sportlab-theme.css` may need a token update.
+- If neither can be read, say so and flag that the result is unverified. The snapshot has the READMEs only, no `preview.html` files: they don't render outside the artifact and use `sl-*` / `app-*` classes that aren't in this repo.
 - [src/app/(frontend)/sportlab-theme.css](<src/app/(frontend)/sportlab-theme.css>) is the only token layer in the repo: a hand-maintained Tailwind snapshot of the artifact's `tokens.json` (see its header for the `lastChange.at` it matches). When the artifact's tokens change, update this file by hand.
 - [docs/style-guide.md](docs/style-guide.md) predates the design system. If it conflicts with the artifact, the artifact wins.
 
 ## Styling rules for AI-generated UI changes
 
 1. **Use the tokens.** Never hard-code hex values, font sizes or spacing that exist as tokens. Colour utilities (`bg-ink`, `text-cta`, `bg-surface-card`, `text-text-on-panel-muted`, `border-line-tv`, `bg-orange-300`), spacing (`p-space-24`, `gap-tv-gap`), radii (`rounded-card`, `rounded-tv`, `rounded-pill`), fonts (`font-display`, `font-sans`, `font-label`) and type styles (`type-tv-body`, `type-display-l`, `type-eyebrow`) live in [src/app/(frontend)/sportlab-theme.css](<src/app/(frontend)/sportlab-theme.css>). If something is missing, propose adding it to the design system instead of inventing a value.
-2. **Start from the artifact's component.** Recreate its `preview.html` in React with Tailwind utilities and the tokens. The `sl-*` / `tv-*` classes are not in this repo.
+2. **Start from the design system's component.** Recreate it in React with Tailwind utilities and the tokens, following its README (and its `preview.html` when you can open the artifact). The `sl-*` / `tv-*` / `app-*` / `web-*` classes the READMEs mention are not in this repo: map them to the tokens instead of using the class names.
 3. **Orange rule.** `cta` (#e8842b) is only for buttons and links, with `on-cta` (ink) text, never white. The one exception is `/tv`, which uses the orange family (`orange-200/300/700` and the ember glows) for details and keeps solid `cta` for the single action and the main block.
 4. **Fonts.**
    - Anton (`font-display`) is for display text and is always uppercase.
@@ -55,10 +57,10 @@ On **every schema change** (a collection or global added, removed or renamed; a 
 
 ## Workflow
 
-- Before changing styling, read the artifact README and the relevant component README.
+- Before changing styling, read the design system README and the relevant component README (from the artifact, or from `docs/design-system/` when you can't open it).
 - Prefer the existing breakpoints in [src/cssVariables.js](src/cssVariables.js).
 - Before finishing, grep your diff for raw hex codes and px font sizes that should be tokens, check orange usage and contrast, and on `/tv` check 1920×1080 for overflow and text under 24px.
-- Mention which design-system version (`lastChange.at` from the artifact) you built against.
+- Mention which design-system version (`lastChange.at`, from the artifact or the snapshot) you built against, and which of the two it came from.
 
 # This is NOT the Next.js you know
 
