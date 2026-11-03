@@ -34,6 +34,7 @@ export const enum_users_status = pgEnum("enum_users_status", [
     "active",
     "inactive",
 ]);
+export const enum_users_language = pgEnum("enum_users_language", ["nl", "en"]);
 export const enum_media_object_position_desktop = pgEnum(
     "enum_media_object_position_desktop",
     ["center", "top", "bottom", "left", "right"],
@@ -252,6 +253,28 @@ export const enum_events_event_type = pgEnum("enum_events_event_type", [
     "hyrox",
     "special",
 ]);
+export const enum_subscription_plan_prices_interval = pgEnum(
+    "enum_subscription_plan_prices_interval",
+    ["week", "month", "year"],
+);
+export const enum_subscriptions_status = pgEnum("enum_subscriptions_status", [
+    "trialing",
+    "active",
+    "past_due",
+    "canceled",
+    "unpaid",
+    "incomplete",
+    "incomplete_expired",
+    "paused",
+]);
+export const enum_credit_adjustments_credit_type = pgEnum(
+    "enum_credit_adjustments_credit_type",
+    ["group", "pt"],
+);
+export const enum_credit_adjustments_source = pgEnum(
+    "enum_credit_adjustments_source",
+    ["manual", "stripe", "system"],
+);
 export const enum_lesson_enrollments_status = pgEnum(
     "enum_lesson_enrollments_status",
     ["assigned", "started", "completed", "cancelled", "waitlisted"],
@@ -386,10 +409,12 @@ export const users = pgTable(
         generateSlug: boolean("generate_slug").default(true),
         slug: varchar("slug"),
         status: enum_users_status("status").notNull().default("active"),
+        language: enum_users_language("language").notNull().default("nl"),
         isCoach: boolean("is_coach").default(false),
         avatar: integer("avatar_id").references(() => media.id, {
             onDelete: "set null",
         }),
+        stripeCustomerId: varchar("stripe_customer_id"),
         subtitle: varchar("subtitle"),
         about: varchar("about"),
         position: numeric("position", { mode: "number" }),
@@ -432,6 +457,7 @@ export const users = pgTable(
     (columns) => [
         uniqueIndex("users_slug_idx").on(columns.slug),
         index("users_avatar_idx").on(columns.avatar),
+        index("users_stripe_customer_id_idx").on(columns.stripeCustomerId),
         index("users_updated_at_idx").on(columns.updatedAt),
         index("users_created_at_idx").on(columns.createdAt),
         uniqueIndex("users_email_idx").on(columns.email),
@@ -2244,6 +2270,246 @@ export const programs = pgTable(
     ],
 );
 
+export const subscription_plans = pgTable(
+    "subscription_plans",
+    {
+        id: serial("id").primaryKey(),
+        name: varchar("name").notNull(),
+        description: varchar("description"),
+        groupCreditsPerMonth: numeric("group_credits_per_month", {
+            mode: "number",
+        })
+            .notNull()
+            .default(0),
+        ptCreditsPerWeek: numeric("pt_credits_per_week", { mode: "number" })
+            .notNull()
+            .default(0),
+        currentPrice: integer("current_price_id").references(
+            (): AnyPgColumn => subscription_plan_prices.id,
+            {
+                onDelete: "set null",
+            },
+        ),
+        stripeProductId: varchar("stripe_product_id"),
+        active: boolean("active").notNull().default(true),
+        updatedAt: timestamp("updated_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+        createdAt: timestamp("created_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+    },
+    (columns) => [
+        index("subscription_plans_current_price_idx").on(columns.currentPrice),
+        index("subscription_plans_stripe_product_id_idx").on(
+            columns.stripeProductId,
+        ),
+        index("subscription_plans_updated_at_idx").on(columns.updatedAt),
+        index("subscription_plans_created_at_idx").on(columns.createdAt),
+    ],
+);
+
+export const subscription_plan_prices = pgTable(
+    "subscription_plan_prices",
+    {
+        id: serial("id").primaryKey(),
+        plan: integer("plan_id")
+            .notNull()
+            .references((): AnyPgColumn => subscription_plans.id, {
+                onDelete: "set null",
+            }),
+        stripePriceId: varchar("stripe_price_id"),
+        amountCents: numeric("amount_cents", { mode: "number" })
+            .notNull()
+            .default(0),
+        currency: varchar("currency").notNull().default("eur"),
+        interval: enum_subscription_plan_prices_interval("interval")
+            .notNull()
+            .default("month"),
+        active: boolean("active").notNull().default(true),
+        updatedAt: timestamp("updated_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+        createdAt: timestamp("created_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+    },
+    (columns) => [
+        index("subscription_plan_prices_plan_idx").on(columns.plan),
+        uniqueIndex("subscription_plan_prices_stripe_price_id_idx").on(
+            columns.stripePriceId,
+        ),
+        index("subscription_plan_prices_updated_at_idx").on(columns.updatedAt),
+        index("subscription_plan_prices_created_at_idx").on(columns.createdAt),
+    ],
+);
+
+export const subscriptions = pgTable(
+    "subscriptions",
+    {
+        id: serial("id").primaryKey(),
+        user: integer("user_id")
+            .notNull()
+            .references(() => users.id, {
+                onDelete: "set null",
+            }),
+        plan: integer("plan_id")
+            .notNull()
+            .references(() => subscription_plans.id, {
+                onDelete: "set null",
+            }),
+        price: integer("price_id").references(
+            () => subscription_plan_prices.id,
+            {
+                onDelete: "set null",
+            },
+        ),
+        status: enum_subscriptions_status("status").notNull().default("active"),
+        stripeSubscriptionId: varchar("stripe_subscription_id"),
+        currentPeriodStart: timestamp("current_period_start", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
+        currentPeriodEnd: timestamp("current_period_end", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
+        cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
+        canceledAt: timestamp("canceled_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
+        trialEndsAt: timestamp("trial_ends_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
+        startedAt: timestamp("started_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
+        notes: varchar("notes"),
+        updatedAt: timestamp("updated_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+        createdAt: timestamp("created_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+    },
+    (columns) => [
+        index("subscriptions_user_idx").on(columns.user),
+        index("subscriptions_plan_idx").on(columns.plan),
+        index("subscriptions_price_idx").on(columns.price),
+        uniqueIndex("subscriptions_stripe_subscription_id_idx").on(
+            columns.stripeSubscriptionId,
+        ),
+        index("subscriptions_current_period_end_idx").on(
+            columns.currentPeriodEnd,
+        ),
+        index("subscriptions_updated_at_idx").on(columns.updatedAt),
+        index("subscriptions_created_at_idx").on(columns.createdAt),
+        index("user_status_idx").on(columns.user, columns.status),
+    ],
+);
+
+export const credit_adjustments = pgTable(
+    "credit_adjustments",
+    {
+        id: serial("id").primaryKey(),
+        user: integer("user_id")
+            .notNull()
+            .references(() => users.id, {
+                onDelete: "set null",
+            }),
+        subscription: integer("subscription_id").references(
+            () => subscriptions.id,
+            {
+                onDelete: "set null",
+            },
+        ),
+        creditType:
+            enum_credit_adjustments_credit_type("credit_type").notNull(),
+        amount: numeric("amount", { mode: "number" }).notNull(),
+        date: timestamp("date", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }).notNull(),
+        periodStart: timestamp("period_start", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }).notNull(),
+        periodEnd: timestamp("period_end", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }).notNull(),
+        source: enum_credit_adjustments_source("source")
+            .notNull()
+            .default("manual"),
+        reason: varchar("reason"),
+        addedBy: integer("added_by_id").references(() => users.id, {
+            onDelete: "set null",
+        }),
+        updatedAt: timestamp("updated_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+        createdAt: timestamp("created_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+    },
+    (columns) => [
+        index("credit_adjustments_user_idx").on(columns.user),
+        index("credit_adjustments_subscription_idx").on(columns.subscription),
+        index("credit_adjustments_period_start_idx").on(columns.periodStart),
+        index("credit_adjustments_added_by_idx").on(columns.addedBy),
+        index("credit_adjustments_updated_at_idx").on(columns.updatedAt),
+        index("credit_adjustments_created_at_idx").on(columns.createdAt),
+        index("user_creditType_periodStart_idx").on(
+            columns.user,
+            columns.creditType,
+            columns.periodStart,
+        ),
+    ],
+);
+
 export const lesson_enrollments = pgTable(
     "lesson_enrollments",
     {
@@ -2267,6 +2533,11 @@ export const lesson_enrollments = pgTable(
             precision: 3,
         }),
         waitlistNotifiedAt: timestamp("waitlist_notified_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
+        cancelledAt: timestamp("cancelled_at", {
             mode: "string",
             withTimezone: true,
             precision: 3,
@@ -2912,6 +3183,52 @@ export const form_submissions = pgTable(
     ],
 );
 
+export const payload_mcp_api_keys = pgTable(
+    "payload_mcp_api_keys",
+    {
+        id: serial("id").primaryKey(),
+        user: integer("user_id")
+            .notNull()
+            .references(() => users.id, {
+                onDelete: "set null",
+            }),
+        label: varchar("label"),
+        description: varchar("description"),
+        pages_find: boolean("pages_find").default(false),
+        pages_update: boolean("pages_update").default(false),
+        lessons_find: boolean("lessons_find").default(false),
+        lessons_create: boolean("lessons_create").default(false),
+        lessons_update: boolean("lessons_update").default(false),
+        lessons_delete: boolean("lessons_delete").default(false),
+        exercises_find: boolean("exercises_find").default(false),
+        exercises_create: boolean("exercises_create").default(false),
+        exercises_update: boolean("exercises_update").default(false),
+        exercises_delete: boolean("exercises_delete").default(false),
+        updatedAt: timestamp("updated_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+        createdAt: timestamp("created_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+        enableAPIKey: boolean("enable_a_p_i_key"),
+        apiKey: varchar("api_key"),
+        apiKeyIndex: varchar("api_key_index"),
+    },
+    (columns) => [
+        index("payload_mcp_api_keys_user_idx").on(columns.user),
+        index("payload_mcp_api_keys_updated_at_idx").on(columns.updatedAt),
+        index("payload_mcp_api_keys_created_at_idx").on(columns.createdAt),
+    ],
+);
+
 export const payload_kv = pgTable(
     "payload_kv",
     {
@@ -3051,6 +3368,10 @@ export const payload_locked_documents_rels = pgTable(
         eventsID: integer("events_id"),
         exercisesID: integer("exercises_id"),
         programsID: integer("programs_id"),
+        "subscription-plansID": integer("subscription_plans_id"),
+        "subscription-plan-pricesID": integer("subscription_plan_prices_id"),
+        subscriptionsID: integer("subscriptions_id"),
+        "credit-adjustmentsID": integer("credit_adjustments_id"),
         "lesson-enrollmentsID": integer("lesson_enrollments_id"),
         "lesson-exercise-trackingID": integer("lesson_exercise_tracking_id"),
         "program-enrollmentsID": integer("program_enrollments_id"),
@@ -3059,6 +3380,7 @@ export const payload_locked_documents_rels = pgTable(
         redirectsID: integer("redirects_id"),
         formsID: integer("forms_id"),
         "form-submissionsID": integer("form_submissions_id"),
+        "payload-mcp-api-keysID": integer("payload_mcp_api_keys_id"),
     },
     (columns) => [
         index("payload_locked_documents_rels_order_idx").on(columns.order),
@@ -3086,6 +3408,18 @@ export const payload_locked_documents_rels = pgTable(
         index("payload_locked_documents_rels_programs_id_idx").on(
             columns.programsID,
         ),
+        index("payload_locked_documents_rels_subscription_plans_id_idx").on(
+            columns["subscription-plansID"],
+        ),
+        index(
+            "payload_locked_documents_rels_subscription_plan_prices_i_idx",
+        ).on(columns["subscription-plan-pricesID"]),
+        index("payload_locked_documents_rels_subscriptions_id_idx").on(
+            columns.subscriptionsID,
+        ),
+        index("payload_locked_documents_rels_credit_adjustments_id_idx").on(
+            columns["credit-adjustmentsID"],
+        ),
         index("payload_locked_documents_rels_lesson_enrollments_id_idx").on(
             columns["lesson-enrollmentsID"],
         ),
@@ -3107,6 +3441,9 @@ export const payload_locked_documents_rels = pgTable(
         index("payload_locked_documents_rels_forms_id_idx").on(columns.formsID),
         index("payload_locked_documents_rels_form_submissions_id_idx").on(
             columns["form-submissionsID"],
+        ),
+        index("payload_locked_documents_rels_payload_mcp_api_keys_id_idx").on(
+            columns["payload-mcp-api-keysID"],
         ),
         foreignKey({
             columns: [columns["parent"]],
@@ -3164,6 +3501,26 @@ export const payload_locked_documents_rels = pgTable(
             name: "payload_locked_documents_rels_programs_fk",
         }).onDelete("cascade"),
         foreignKey({
+            columns: [columns["subscription-plansID"]],
+            foreignColumns: [subscription_plans.id],
+            name: "payload_locked_documents_rels_subscription_plans_fk",
+        }).onDelete("cascade"),
+        foreignKey({
+            columns: [columns["subscription-plan-pricesID"]],
+            foreignColumns: [subscription_plan_prices.id],
+            name: "payload_locked_documents_rels_subscription_plan_prices_fk",
+        }).onDelete("cascade"),
+        foreignKey({
+            columns: [columns["subscriptionsID"]],
+            foreignColumns: [subscriptions.id],
+            name: "payload_locked_documents_rels_subscriptions_fk",
+        }).onDelete("cascade"),
+        foreignKey({
+            columns: [columns["credit-adjustmentsID"]],
+            foreignColumns: [credit_adjustments.id],
+            name: "payload_locked_documents_rels_credit_adjustments_fk",
+        }).onDelete("cascade"),
+        foreignKey({
             columns: [columns["lesson-enrollmentsID"]],
             foreignColumns: [lesson_enrollments.id],
             name: "payload_locked_documents_rels_lesson_enrollments_fk",
@@ -3202,6 +3559,11 @@ export const payload_locked_documents_rels = pgTable(
             columns: [columns["form-submissionsID"]],
             foreignColumns: [form_submissions.id],
             name: "payload_locked_documents_rels_form_submissions_fk",
+        }).onDelete("cascade"),
+        foreignKey({
+            columns: [columns["payload-mcp-api-keysID"]],
+            foreignColumns: [payload_mcp_api_keys.id],
+            name: "payload_locked_documents_rels_payload_mcp_api_keys_fk",
         }).onDelete("cascade"),
     ],
 );
@@ -3242,12 +3604,16 @@ export const payload_preferences_rels = pgTable(
         parent: integer("parent_id").notNull(),
         path: varchar("path").notNull(),
         usersID: integer("users_id"),
+        "payload-mcp-api-keysID": integer("payload_mcp_api_keys_id"),
     },
     (columns) => [
         index("payload_preferences_rels_order_idx").on(columns.order),
         index("payload_preferences_rels_parent_idx").on(columns.parent),
         index("payload_preferences_rels_path_idx").on(columns.path),
         index("payload_preferences_rels_users_id_idx").on(columns.usersID),
+        index("payload_preferences_rels_payload_mcp_api_keys_id_idx").on(
+            columns["payload-mcp-api-keysID"],
+        ),
         foreignKey({
             columns: [columns["parent"]],
             foreignColumns: [payload_preferences.id],
@@ -3257,6 +3623,11 @@ export const payload_preferences_rels = pgTable(
             columns: [columns["usersID"]],
             foreignColumns: [users.id],
             name: "payload_preferences_rels_users_fk",
+        }).onDelete("cascade"),
+        foreignKey({
+            columns: [columns["payload-mcp-api-keysID"]],
+            foreignColumns: [payload_mcp_api_keys.id],
+            name: "payload_preferences_rels_payload_mcp_api_keys_fk",
         }).onDelete("cascade"),
     ],
 );
@@ -3647,6 +4018,22 @@ export const organization = pgTable(
     },
     (columns) => [index("organization_logo_idx").on(columns.logo)],
 );
+
+export const tv_access = pgTable("tv_access", {
+    id: serial("id").primaryKey(),
+    enabled: boolean("enabled").default(false),
+    pin: varchar("pin"),
+    updatedAt: timestamp("updated_at", {
+        mode: "string",
+        withTimezone: true,
+        precision: 3,
+    }),
+    createdAt: timestamp("created_at", {
+        mode: "string",
+        withTimezone: true,
+        precision: 3,
+    }),
+});
 
 export const relations_users_roles = relations(users_roles, ({ one }) => ({
     parent: one(users, {
@@ -4418,6 +4805,63 @@ export const relations_programs = relations(programs, ({ one }) => ({
         relationName: "finalEvent",
     }),
 }));
+export const relations_subscription_plans = relations(
+    subscription_plans,
+    ({ one }) => ({
+        currentPrice: one(subscription_plan_prices, {
+            fields: [subscription_plans.currentPrice],
+            references: [subscription_plan_prices.id],
+            relationName: "currentPrice",
+        }),
+    }),
+);
+export const relations_subscription_plan_prices = relations(
+    subscription_plan_prices,
+    ({ one }) => ({
+        plan: one(subscription_plans, {
+            fields: [subscription_plan_prices.plan],
+            references: [subscription_plans.id],
+            relationName: "plan",
+        }),
+    }),
+);
+export const relations_subscriptions = relations(subscriptions, ({ one }) => ({
+    user: one(users, {
+        fields: [subscriptions.user],
+        references: [users.id],
+        relationName: "user",
+    }),
+    plan: one(subscription_plans, {
+        fields: [subscriptions.plan],
+        references: [subscription_plans.id],
+        relationName: "plan",
+    }),
+    price: one(subscription_plan_prices, {
+        fields: [subscriptions.price],
+        references: [subscription_plan_prices.id],
+        relationName: "price",
+    }),
+}));
+export const relations_credit_adjustments = relations(
+    credit_adjustments,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [credit_adjustments.user],
+            references: [users.id],
+            relationName: "user",
+        }),
+        subscription: one(subscriptions, {
+            fields: [credit_adjustments.subscription],
+            references: [subscriptions.id],
+            relationName: "subscription",
+        }),
+        addedBy: one(users, {
+            fields: [credit_adjustments.addedBy],
+            references: [users.id],
+            relationName: "addedBy",
+        }),
+    }),
+);
 export const relations_lesson_enrollments = relations(
     lesson_enrollments,
     ({ one }) => ({
@@ -4693,6 +5137,16 @@ export const relations_form_submissions = relations(
         }),
     }),
 );
+export const relations_payload_mcp_api_keys = relations(
+    payload_mcp_api_keys,
+    ({ one }) => ({
+        user: one(users, {
+            fields: [payload_mcp_api_keys.user],
+            references: [users.id],
+            relationName: "user",
+        }),
+    }),
+);
 export const relations_payload_kv = relations(payload_kv, () => ({}));
 export const relations_payload_jobs_log = relations(
     payload_jobs_log,
@@ -4767,6 +5221,28 @@ export const relations_payload_locked_documents_rels = relations(
             references: [programs.id],
             relationName: "programs",
         }),
+        "subscription-plansID": one(subscription_plans, {
+            fields: [payload_locked_documents_rels["subscription-plansID"]],
+            references: [subscription_plans.id],
+            relationName: "subscription-plans",
+        }),
+        "subscription-plan-pricesID": one(subscription_plan_prices, {
+            fields: [
+                payload_locked_documents_rels["subscription-plan-pricesID"],
+            ],
+            references: [subscription_plan_prices.id],
+            relationName: "subscription-plan-prices",
+        }),
+        subscriptionsID: one(subscriptions, {
+            fields: [payload_locked_documents_rels.subscriptionsID],
+            references: [subscriptions.id],
+            relationName: "subscriptions",
+        }),
+        "credit-adjustmentsID": one(credit_adjustments, {
+            fields: [payload_locked_documents_rels["credit-adjustmentsID"]],
+            references: [credit_adjustments.id],
+            relationName: "credit-adjustments",
+        }),
         "lesson-enrollmentsID": one(lesson_enrollments, {
             fields: [payload_locked_documents_rels["lesson-enrollmentsID"]],
             references: [lesson_enrollments.id],
@@ -4809,6 +5285,11 @@ export const relations_payload_locked_documents_rels = relations(
             references: [form_submissions.id],
             relationName: "form-submissions",
         }),
+        "payload-mcp-api-keysID": one(payload_mcp_api_keys, {
+            fields: [payload_locked_documents_rels["payload-mcp-api-keysID"]],
+            references: [payload_mcp_api_keys.id],
+            relationName: "payload-mcp-api-keys",
+        }),
     }),
 );
 export const relations_payload_locked_documents = relations(
@@ -4831,6 +5312,11 @@ export const relations_payload_preferences_rels = relations(
             fields: [payload_preferences_rels.usersID],
             references: [users.id],
             relationName: "users",
+        }),
+        "payload-mcp-api-keysID": one(payload_mcp_api_keys, {
+            fields: [payload_preferences_rels["payload-mcp-api-keysID"]],
+            references: [payload_mcp_api_keys.id],
+            relationName: "payload-mcp-api-keys",
         }),
     }),
 );
@@ -5017,10 +5503,12 @@ export const relations_organization = relations(
         }),
     }),
 );
+export const relations_tv_access = relations(tv_access, () => ({}));
 
 type DatabaseSchema = {
     enum_users_roles: typeof enum_users_roles;
     enum_users_status: typeof enum_users_status;
+    enum_users_language: typeof enum_users_language;
     enum_media_object_position_desktop: typeof enum_media_object_position_desktop;
     enum_media_object_position_mobile: typeof enum_media_object_position_mobile;
     enum_pages_blocks_content_columns_background_color: typeof enum_pages_blocks_content_columns_background_color;
@@ -5072,6 +5560,10 @@ type DatabaseSchema = {
     enum_lesson_templates_default_workout_blocks_timer_mode: typeof enum_lesson_templates_default_workout_blocks_timer_mode;
     enum_lesson_templates_type: typeof enum_lesson_templates_type;
     enum_events_event_type: typeof enum_events_event_type;
+    enum_subscription_plan_prices_interval: typeof enum_subscription_plan_prices_interval;
+    enum_subscriptions_status: typeof enum_subscriptions_status;
+    enum_credit_adjustments_credit_type: typeof enum_credit_adjustments_credit_type;
+    enum_credit_adjustments_source: typeof enum_credit_adjustments_source;
     enum_lesson_enrollments_status: typeof enum_lesson_enrollments_status;
     enum_program_enrollments_status: typeof enum_program_enrollments_status;
     enum_event_registrations_status: typeof enum_event_registrations_status;
@@ -5142,6 +5634,10 @@ type DatabaseSchema = {
     events: typeof events;
     exercises: typeof exercises;
     programs: typeof programs;
+    subscription_plans: typeof subscription_plans;
+    subscription_plan_prices: typeof subscription_plan_prices;
+    subscriptions: typeof subscriptions;
+    credit_adjustments: typeof credit_adjustments;
     lesson_enrollments: typeof lesson_enrollments;
     lesson_exercise_tracking_workout_blocks_exercises: typeof lesson_exercise_tracking_workout_blocks_exercises;
     lesson_exercise_tracking_workout_blocks: typeof lesson_exercise_tracking_workout_blocks;
@@ -5163,6 +5659,7 @@ type DatabaseSchema = {
     forms: typeof forms;
     form_submissions_submission_data: typeof form_submissions_submission_data;
     form_submissions: typeof form_submissions;
+    payload_mcp_api_keys: typeof payload_mcp_api_keys;
     payload_kv: typeof payload_kv;
     payload_jobs_log: typeof payload_jobs_log;
     payload_jobs: typeof payload_jobs;
@@ -5184,6 +5681,7 @@ type DatabaseSchema = {
     organization_opening_hours: typeof organization_opening_hours;
     organization_images: typeof organization_images;
     organization: typeof organization;
+    tv_access: typeof tv_access;
     relations_users_roles: typeof relations_users_roles;
     relations_users_sessions: typeof relations_users_sessions;
     relations_users: typeof relations_users;
@@ -5237,6 +5735,10 @@ type DatabaseSchema = {
     relations_events: typeof relations_events;
     relations_exercises: typeof relations_exercises;
     relations_programs: typeof relations_programs;
+    relations_subscription_plans: typeof relations_subscription_plans;
+    relations_subscription_plan_prices: typeof relations_subscription_plan_prices;
+    relations_subscriptions: typeof relations_subscriptions;
+    relations_credit_adjustments: typeof relations_credit_adjustments;
     relations_lesson_enrollments: typeof relations_lesson_enrollments;
     relations_lesson_exercise_tracking_workout_blocks_exercises: typeof relations_lesson_exercise_tracking_workout_blocks_exercises;
     relations_lesson_exercise_tracking_workout_blocks: typeof relations_lesson_exercise_tracking_workout_blocks;
@@ -5258,6 +5760,7 @@ type DatabaseSchema = {
     relations_forms: typeof relations_forms;
     relations_form_submissions_submission_data: typeof relations_form_submissions_submission_data;
     relations_form_submissions: typeof relations_form_submissions;
+    relations_payload_mcp_api_keys: typeof relations_payload_mcp_api_keys;
     relations_payload_kv: typeof relations_payload_kv;
     relations_payload_jobs_log: typeof relations_payload_jobs_log;
     relations_payload_jobs: typeof relations_payload_jobs;
@@ -5279,6 +5782,7 @@ type DatabaseSchema = {
     relations_organization_opening_hours: typeof relations_organization_opening_hours;
     relations_organization_images: typeof relations_organization_images;
     relations_organization: typeof relations_organization;
+    relations_tv_access: typeof relations_tv_access;
 };
 
 declare module "@payloadcms/db-postgres" {
