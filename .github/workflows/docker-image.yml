@@ -76,9 +76,10 @@ jobs:
               env:
                   COOLIFY_WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
                   COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+                  CF_DEPLOY_SECRET: ${{ secrets.CF_DEPLOY_SECRET }}
               run: |
                   if [ -z "$COOLIFY_WEBHOOK" ]; then
                       echo "COOLIFY_WEBHOOK not set, skipping deploy trigger"
                       exit 0
                   fi
-                  curl --fail-with-body -sS -X POST -H "Authorization: Bearer $COOLIFY_TOKEN" "$COOLIFY_WEBHOOK"
+                  curl --fail-with-body -sS -X POST -H "Authorization: Bearer $COOLIFY_TOKEN" -H "X-Deploy-Secret: $CF_DEPLOY_SECRET" "$COOLIFY_WEBHOOK"
