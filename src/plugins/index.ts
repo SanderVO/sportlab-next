@@ -4,6 +4,7 @@ import { revalidateRedirects } from "@/hooks/revalidateRedirects";
 import { verifyTurnstile } from "@/hooks/verifyTurnstile";
 import { Page, Post } from "@/payload-types";
 import { getServerSideURL } from "@/utilities/getURL";
+import { relationshipID } from "@/utilities/relationshipID";
 import { formBuilderPlugin } from "@payloadcms/plugin-form-builder";
 import { mcpPlugin } from "@payloadcms/plugin-mcp";
 import { redirectsPlugin } from "@payloadcms/plugin-redirects";
@@ -121,6 +122,32 @@ export const plugins: Plugin[] = [
                 description: "Exercises that can be used in workout blocks.",
                 enabled: true,
             },
+        },
+        // The plugin loads the key's user at depth 1, and Users limits populated users to a few
+        // fields (`defaultPopulate`), so the user arrives without `roles` and every role-based
+        // access check (lessons, exercises) would refuse. Load the whole user instead, so MCP acts
+        // with the roles of the user the key belongs to.
+        overrideAuth: async (req, getDefaultMcpAccessSettings) => {
+            const settings = await getDefaultMcpAccessSettings();
+            const userID = relationshipID(settings.user);
+
+            if (!userID) return settings;
+
+            const user = await req.payload.findByID({
+                collection: "users",
+                id: userID,
+                depth: 0,
+                overrideAccess: true,
+            });
+
+            return {
+                ...settings,
+                user: {
+                    ...user,
+                    collection: "users",
+                    _strategy: "mcp-api-key",
+                },
+            } as typeof settings;
         },
         overrideApiKeyCollection: (collection) => {
             const translated = translateMcpApiKeyCollection(collection);
