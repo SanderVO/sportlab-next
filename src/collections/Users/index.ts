@@ -5,6 +5,7 @@ import {
 } from "@/emails/resetPassword";
 import { defaultLexical } from "@/fields/defaultLexical";
 import { getServerSideURL } from "@/utilities/getURL";
+import { languageOf } from "@/utilities/messages";
 import {
   slugField,
   type Access,
@@ -69,7 +70,7 @@ const adminOnlyFieldUpdate: FieldAccess = ({ req }) => {
 };
 
 // Fields that non-admins may update on their own account (the password is managed by auth).
-const SELF_EDITABLE_FIELDS = new Set(["avatar"]);
+const SELF_EDITABLE_FIELDS = new Set(["avatar", "language"]);
 
 /** Makes every named field read-only for non-admins, except SELF_EDITABLE_FIELDS. */
 const restrictUpdatesToAdmins = (fields: Field[]): Field[] =>
@@ -107,10 +108,12 @@ export const Users: CollectionConfig = {
   slug: "users",
   auth: {
     forgotPassword: {
-      generateEmailSubject: () => resetPasswordSubject,
+      generateEmailSubject: (args) =>
+        resetPasswordSubject(languageOf(args?.user)),
       generateEmailHTML: (args) =>
         resetPasswordEmail(
           `${getServerSideURL()}/reset-password?token=${args?.token}`,
+          languageOf(args?.user),
         ),
     },
   },
@@ -290,6 +293,23 @@ export const Users: CollectionConfig = {
           value: "inactive",
         },
       ],
+    },
+    {
+      label: { en: "Language", nl: "Taal" },
+      name: "language",
+      type: "select",
+      defaultValue: "nl",
+      required: true,
+      options: [
+        { label: "Nederlands", value: "nl" },
+        { label: "English", value: "en" },
+      ],
+      admin: {
+        description: {
+          en: "The language of emails and messages sent to this user. The language chosen in the CMS only applies to the CMS itself.",
+          nl: "De taal van e-mails en berichten voor deze gebruiker. De taal die je in het CMS kiest, geldt alleen voor het CMS zelf.",
+        },
+      },
     },
     {
       label: { en: "Roles", nl: "Rollen" },

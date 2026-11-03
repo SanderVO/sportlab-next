@@ -1,5 +1,6 @@
 import { isAdmin } from "@/access/admin";
 import { adminOrSelf } from "@/access/adminOrSelf";
+import { offerSpotsOnCreditChange } from "@/hooks/offerSpotsOnCreditChange";
 import type { CollectionConfig } from "payload";
 import { defaultPriceFromPlan } from "./hooks/defaultPriceFromPlan";
 
@@ -31,6 +32,7 @@ export const Subscriptions: CollectionConfig = {
     },
     hooks: {
         beforeValidate: [defaultPriceFromPlan],
+        afterChange: [offerSpotsOnCreditChange],
     },
     fields: [
         {

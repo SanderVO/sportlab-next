@@ -1,4 +1,5 @@
 import { APIError, type CollectionBeforeValidateHook } from "payload";
+import { languageOf, message } from "@/utilities/messages";
 import { TURNSTILE_HEADER } from "./turnstileHeader";
 
 const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
@@ -22,7 +23,7 @@ export const verifyTurnstile: CollectionBeforeValidateHook = async ({
       req.payload.logger.error(
         "TURNSTILE_SECRET_KEY is not set: rejecting form submission",
       );
-      throw new APIError("Formulier tijdelijk niet beschikbaar.", 503);
+      throw new APIError(message(languageOf(null, req.headers), "turnstileUnavailable"), 503);
     }
 
     return data;
@@ -31,7 +32,7 @@ export const verifyTurnstile: CollectionBeforeValidateHook = async ({
   const token = req.headers.get(TURNSTILE_HEADER);
 
   if (!token) {
-    throw new APIError("Bevestig dat je geen robot bent.", 400);
+    throw new APIError(message(languageOf(null, req.headers), "turnstileRequired"), 400);
   }
 
   const body = new URLSearchParams({ secret, response: token });
@@ -56,7 +57,7 @@ export const verifyTurnstile: CollectionBeforeValidateHook = async ({
   }
 
   if (!success) {
-    throw new APIError("Verificatie mislukt, probeer het opnieuw.", 400);
+    throw new APIError(message(languageOf(null, req.headers), "turnstileFailed"), 400);
   }
 
   return data;

@@ -2,6 +2,7 @@ import { adminCoachOrSelf } from "@/access/adminCoachOrSelf";
 import { staffOnlyField } from "@/access/staffOnlyField";
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
 import type { CollectionConfig } from "payload";
+import { enforceCredits } from "./hooks/enforceCredits";
 import { enforceLessonCapacity } from "./hooks/enforceLessonCapacity";
 import {
     notifyWaitlistOnEnrollmentChange,
@@ -27,7 +28,7 @@ export const LessonEnrollments: CollectionConfig = {
         defaultColumns: ["user", "lesson", "status", "updatedAt"],
     },
     hooks: {
-        beforeChange: [setCancelledAt, enforceLessonCapacity],
+        beforeChange: [setCancelledAt, enforceLessonCapacity, enforceCredits],
         afterChange: [
             syncExerciseTrackingOnEnrollment,
             notifyWaitlistOnEnrollmentChange,

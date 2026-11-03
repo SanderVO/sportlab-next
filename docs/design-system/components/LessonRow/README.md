@@ -15,9 +15,10 @@ On Lessen the same states are shown as LessonCard (with the lesson image); Lesso
 | Open | room left, no enrollment | "Inschrijven" `sl-btn-ghost-light` |
 | Vol | no room, no enrollment | "Op wachtlijst" `sl-btn-ghost-light` → creates status `waitlisted` |
 | Op de wachtlijst | status `waitlisted` | `.app-tag.line` "Wachtlijst · 2e" (place = order by `waitlistedAt`) |
-| Plek aangeboden | `waitlisted` + `waitlistNotifiedAt` set | "Bevestig plek" `sl-btn-ink` (and the WaitlistNotice on top) |
+| Plek aangeboden | `waitlisted` + `waitlistNotifiedAt` set (only offered to members who have a credit for the lesson) | "Bevestig plek" `sl-btn-ink` (and the WaitlistNotice on top) |
 | Geen credits | room left, 0 credits of the lesson's type in its period | disabled `sl-btn.app-btn-off` "Geen PT-credits" / "Geen groepscredits" |
 | Niet in abonnement | the member has no credits of that type | disabled "Niet in abonnement" |
+| Abonnement niet actief | the member's latest subscription isn't `active` or `trialing` and no credits are left | disabled "Abonnement niet actief" |
 
 - Spots text: "5 van 10 plekken vrij", "Vol · 3 op de wachtlijst", "Vol · jij bent 2e op de wachtlijst", "Er is een plek voor je vrij". Free spots = `spots` − enrollments that aren't `cancelled` or `waitlisted`.
 - Enrolled lessons show "Gratis afmelden tot 18:25" (start − 5 minutes) as the spots text; cancelling later keeps the credit used.

@@ -1,3 +1,4 @@
+import { adminLanguage, message } from "@/utilities/messages";
 import { APIError } from "payload";
 import { relationshipID } from "@/utilities/relationshipID";
 import type { CollectionBeforeValidateHook } from "payload";
@@ -37,7 +38,10 @@ export const validateSubscriptionOwner: CollectionBeforeValidateHook = async ({
     }
 
     if (String(relationshipID(subscription.user)) !== String(userID)) {
-        throw new APIError("Dit abonnement hoort bij een ander lid.", 400);
+        throw new APIError(
+            message(adminLanguage(req.headers), "subscriptionOfOtherMember"),
+            400,
+        );
     }
 
     return data;

@@ -16,6 +16,7 @@ Gebruiker · auth
 - `generateSlug` (checkbox, default true): Generate Slug
 - `slug` (text): Slug
 - `status` (select, required, one of: active, inactive, default "active"): Status
+- `language` (select, required, one of: nl, en, default "nl"): Taal
 - `roles` (select, required, many, one of: admin, editor, user, coach, default "user"): Rollen
 - `isCoach` (checkbox, default false): Is Coach
 - `avatar` (upload, → media): Foto

@@ -16,6 +16,7 @@ A lesson as a card with its image on Lessen: the image and time on top, title, c
 | Open | room left, credits left | "4 van 10 plekken vrij" | "Inschrijven" ghost |
 | Geen credits | room left, 0 credits of that type in the lesson's period | free spots | `button.sl-btn.app-btn-off` disabled: "Geen PT-credits" / "Geen groepscredits" |
 | Niet in abonnement | the member has no credits of that type | free spots | disabled: "Niet in abonnement" |
+| Abonnement niet actief | the member's latest subscription isn't `active` or `trialing` and no credits are left | free spots | disabled: "Abonnement niet actief" |
 | Vol | no room | "Vol · 2 op de wachtlijst" | "Op wachtlijst" ghost |
 | Op de wachtlijst | `waitlisted` | "Vol · jij bent 2e op de wachtlijst" | `.app-tag.line` "Wachtlijst · 2e" |
 | Plek aangeboden | `waitlisted` + `waitlistNotifiedAt` | "Er is een plek voor je vrij" | "Bevestig plek" `sl-btn-ink` (disabled with "Geen credits" when none are left) |

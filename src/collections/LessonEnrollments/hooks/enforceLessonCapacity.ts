@@ -1,5 +1,6 @@
 import { rolesOf } from "@/access/rolesOf";
 import { RolesEnum } from "@/collections/Users/roles";
+import { languageOf, message } from "@/utilities/messages";
 import { APIError, type CollectionBeforeChangeHook } from "payload";
 import { isLessonFull, isOccupyingStatus, lockLesson, toId } from "../waitlist";
 
@@ -41,7 +42,7 @@ export const enforceLessonCapacity: CollectionBeforeChangeHook = async ({
         !originalDoc?.waitlistNotifiedAt
     ) {
         throw new APIError(
-            "Er is nog geen plek voor je vrijgekomen.",
+            message(languageOf(req.user, req.headers), "noSpotYet"),
             400,
             undefined,
             true,
@@ -55,7 +56,7 @@ export const enforceLessonCapacity: CollectionBeforeChangeHook = async ({
 
     if (await isLessonFull(context, lessonId, toId(originalDoc?.id))) {
         throw new APIError(
-            "Deze les is vol. Je kunt je op de wachtlijst zetten.",
+            message(languageOf(req.user, req.headers), "lessonFull"),
             400,
             undefined,
             true,

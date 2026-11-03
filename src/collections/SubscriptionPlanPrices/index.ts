@@ -1,6 +1,7 @@
 import { isAdmin } from "@/access/admin";
 import { authenticated } from "@/access/authenticated";
 import { relationshipID } from "@/utilities/relationshipID";
+import { adminLanguage, message } from "@/utilities/messages";
 import { APIError, type CollectionConfig } from "payload";
 
 /**
@@ -74,7 +75,7 @@ export const SubscriptionPlanPrices: CollectionConfig = {
 
                 if (subscriptions.totalDocs > 0 || plans.totalDocs > 0) {
                     throw new APIError(
-                        "Dit tarief is nog gekoppeld aan een abonnement of is het huidige tarief van een plan. Zet het tarief op inactief in plaats van het te verwijderen.",
+                        message(adminLanguage(req.headers), "priceInUse"),
                         400,
                     );
                 }

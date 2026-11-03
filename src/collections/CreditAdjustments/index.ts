@@ -1,6 +1,7 @@
 import { adminCoachOrSelf } from "@/access/adminCoachOrSelf";
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
 import { staffOnlyField } from "@/access/staffOnlyField";
+import { offerSpotsOnCreditChange } from "@/hooks/offerSpotsOnCreditChange";
 import type { CollectionConfig } from "payload";
 import { setCreditPeriod } from "./hooks/setCreditPeriod";
 import { validateSubscriptionOwner } from "./hooks/validateSubscriptionOwner";
@@ -34,6 +35,7 @@ export const CreditAdjustments: CollectionConfig = {
     },
     hooks: {
         beforeValidate: [validateSubscriptionOwner, setCreditPeriod],
+        afterChange: [offerSpotsOnCreditChange],
     },
     fields: [
         {

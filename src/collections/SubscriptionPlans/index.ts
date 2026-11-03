@@ -1,6 +1,7 @@
 import { isAdmin } from "@/access/admin";
 import { authenticated } from "@/access/authenticated";
 import { relationshipID } from "@/utilities/relationshipID";
+import { adminLanguage, message } from "@/utilities/messages";
 import { APIError, type CollectionConfig } from "payload";
 
 /**
@@ -55,7 +56,7 @@ export const SubscriptionPlans: CollectionConfig = {
                         String(originalDoc.id)
                 ) {
                     throw new APIError(
-                        "Dit tarief hoort bij een ander abonnementplan.",
+                        message(adminLanguage(req.headers), "priceOfOtherPlan"),
                         400,
                     );
                 }
@@ -80,14 +81,14 @@ export const SubscriptionPlans: CollectionConfig = {
 
                 if (subscriptions.totalDocs > 0) {
                     throw new APIError(
-                        "Dit plan is nog aan leden gekoppeld. Zet het plan op inactief in plaats van het te verwijderen.",
+                        message(adminLanguage(req.headers), "planHasMembers"),
                         400,
                     );
                 }
 
                 if (prices.totalDocs > 0) {
                     throw new APIError(
-                        "Dit plan heeft nog tarieven. Zet het plan op inactief in plaats van het te verwijderen.",
+                        message(adminLanguage(req.headers), "planHasPrices"),
                         400,
                     );
                 }

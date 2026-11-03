@@ -230,6 +230,10 @@ export interface User {
    */
   slug?: string | null;
   status: 'active' | 'inactive';
+  /**
+   * The language of emails and messages sent to this user. The language chosen in the CMS only applies to the CMS itself.
+   */
+  language: 'nl' | 'en';
   roles: ('admin' | 'editor' | 'user' | 'coach')[];
   isCoach?: boolean | null;
   avatar?: (number | null) | Media;
@@ -1837,6 +1841,7 @@ export interface UsersSelect<T extends boolean = true> {
   generateSlug?: T;
   slug?: T;
   status?: T;
+  language?: T;
   roles?: T;
   isCoach?: T;
   avatar?: T;
