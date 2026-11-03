@@ -7,6 +7,7 @@ import {
     notifyWaitlistOnEnrollmentChange,
     notifyWaitlistOnEnrollmentDelete,
 } from "./hooks/notifyWaitlist";
+import { setCancelledAt } from "./hooks/setCancelledAt";
 import { syncExerciseTrackingOnEnrollment } from "./hooks/syncExerciseTrackingOnEnrollment";
 
 export const LessonEnrollments: CollectionConfig = {
@@ -26,7 +27,7 @@ export const LessonEnrollments: CollectionConfig = {
         defaultColumns: ["user", "lesson", "status", "updatedAt"],
     },
     hooks: {
-        beforeChange: [enforceLessonCapacity],
+        beforeChange: [setCancelledAt, enforceLessonCapacity],
         afterChange: [
             syncExerciseTrackingOnEnrollment,
             notifyWaitlistOnEnrollmentChange,
@@ -97,6 +98,19 @@ export const LessonEnrollments: CollectionConfig = {
                 description: {
                     en: "Set when the user was notified that a spot became free. The spot is reserved for them.",
                     nl: "Wordt gezet zodra de gebruiker bericht kreeg dat er een plek vrij is. De plek is voor hen gereserveerd.",
+                },
+                date: { pickerAppearance: "dayAndTime" },
+            },
+        },
+        {
+            label: { en: "Cancelled at", nl: "Afgemeld op" },
+            name: "cancelledAt",
+            type: "date",
+            admin: {
+                condition: (_, siblingData) => siblingData?.status === "cancelled",
+                description: {
+                    en: "Set automatically when the status becomes cancelled. Cancelling less than 5 minutes before the lesson starts keeps the credit used.",
+                    nl: "Wordt automatisch gezet zodra de status geannuleerd wordt. Afmelden minder dan 5 minuten voor de start van de les houdt de credit in gebruik.",
                 },
                 date: { pickerAppearance: "dayAndTime" },
             },

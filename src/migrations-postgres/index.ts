@@ -14,6 +14,7 @@ import * as migration_20261020_155608_add_user_names_and_lesson_waitlist from '.
 import * as migration_20261028_164809_add_tv_access from './20261028_164809_add_tv_access';
 import * as migration_20261102_202600_add_mcp_api_keys from './20261102_202600_add_mcp_api_keys';
 import * as migration_20261103_204827_add_subscription_plan_prices from './20261103_204827_add_subscription_plan_prices';
+import * as migration_20261103_210335_add_lesson_enrollment_cancelled_at from './20261103_210335_add_lesson_enrollment_cancelled_at';
 
 export const migrations = [
   {
@@ -94,6 +95,11 @@ export const migrations = [
   {
     up: migration_20261103_204827_add_subscription_plan_prices.up,
     down: migration_20261103_204827_add_subscription_plan_prices.down,
-    name: '20261103_204827_add_subscription_plan_prices'
+    name: '20261103_204827_add_subscription_plan_prices',
+  },
+  {
+    up: migration_20261103_210335_add_lesson_enrollment_cancelled_at.up,
+    down: migration_20261103_210335_add_lesson_enrollment_cancelled_at.down,
+    name: '20261103_210335_add_lesson_enrollment_cancelled_at'
   },
 ];

@@ -1164,6 +1164,10 @@ export interface LessonEnrollment {
    */
   waitlistNotifiedAt?: string | null;
   /**
+   * Set automatically when the status becomes cancelled. Cancelling less than 5 minutes before the lesson starts keeps the credit used.
+   */
+  cancelledAt?: string | null;
+  /**
    * Automatically set via a hook.
    */
   addedBy?: (number | null) | User;
@@ -2346,6 +2350,7 @@ export interface LessonEnrollmentsSelect<T extends boolean = true> {
   status?: T;
   waitlistedAt?: T;
   waitlistNotifiedAt?: T;
+  cancelledAt?: T;
   addedBy?: T;
   updatedAt?: T;
   createdAt?: T;

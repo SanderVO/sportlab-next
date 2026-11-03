@@ -20,7 +20,7 @@ A read-only copy of the **One More Reason** design system for Sportlab Groningen
 - `components/bundle.css` and the `sl-*` / `tv-*` / `app-*` / `web-*` classes it defines. They are not in this repo: recreate components with Tailwind utilities and the tokens (see `AGENTS.md`).
 - The `preview.html` of every component. They are markup-only (the artifact viewer injects the CSS), so they don't render outside the artifact, and they use `sl-*` / `app-*` classes that aren't in this repo. Left out for now so models work from the READMEs and the tokens; open the artifact to see them. The READMEs and `SNAPSHOT.md` stay the reference.
 - The photos, the lesson fallback image and the PDF toolkit.
-- `data-schema.md`. The repo copy is `docs/data-schema.md`, generated from the Payload config. The artifact's copy has an extra hand-written section, "Proposed: credits (not yet in Payload)" (subscriptions, credit adjustments and the credit rules behind the Credits, LessonCard and LessonRow components). It is a design proposal, not part of the current schema.
+- `data-schema.md`. The repo copy is `docs/data-schema.md`, generated from the Payload config; the artifact's copy is published from it. It is the only file in the artifact that the repo overwrites (see `AGENTS.md`).
 
 ## Refreshing this snapshot
 

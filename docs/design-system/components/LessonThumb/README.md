@@ -9,6 +9,6 @@ The lesson's image as a small square with the date on top, used in the compact l
 - **Gevolgde lessen** (`li.app-trow`, grouped per month): thumb, title, "07:00 · Groepsles · Noor", status with `check` or `x`, action.
   - "Gevolgd · 6 van 8 gelogd" → "Bekijk workout →" (on phones a `chevron-right` icon link with an `aria-label`).
   - Not everything logged → "Aanvullen" (ghost).
-  - "Afgemeld · credit terug" (cancelled ≥ 5 min before the start) or "Te laat afgemeld · geen credit terug" (< 5 min) → no action.
+  - "Afgemeld · credit terug" (`cancelledAt` ≥ 5 min before `lesson.startDate`, or no `cancelledAt`) or "Te laat afgemeld · geen credit terug" (< 5 min) → no action.
 - Newest first, 20 at a time, then "Toon oudere lessen" (ghost; on phones full width).
 - On phones the status moves under the title (`.sm`) and the row never wraps.

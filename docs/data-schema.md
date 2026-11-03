@@ -406,6 +406,7 @@ Les deelname
 - `status` (select, required, one of: assigned, started, completed, cancelled, waitlisted, default "assigned"): Status
 - `waitlistedAt` (date): Op wachtlijst sinds
 - `waitlistNotifiedAt` (date): Plek aangeboden op
+- `cancelledAt` (date): Afgemeld op
 - `addedBy` (relationship, → users): Toegevoegd door
 - `updatedAt` (date)
 - `createdAt` (date)
