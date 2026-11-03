@@ -131,6 +131,8 @@ export const Users: CollectionConfig = {
   hooks: {
     afterChange: [revalidateUser],
     beforeDelete: [
+      deleteUserRecords("credit-adjustments"),
+      deleteUserRecords("subscriptions"),
       deleteUserRecords("health-measurements"),
       deleteUserRecords("lesson-exercise-tracking"),
       deleteUserRecords("lesson-enrollments"),
@@ -329,6 +331,41 @@ export const Users: CollectionConfig = {
       type: "upload",
       relationTo: "media",
       required: false,
+    },
+    {
+      label: { en: "Stripe customer ID", nl: "Stripe-klant-ID" },
+      name: "stripeCustomerId",
+      type: "text",
+      required: false,
+      index: true,
+      access: {
+        read: adminOnlyFieldUpdate,
+        create: adminOnlyFieldUpdate,
+        update: adminOnlyFieldUpdate,
+      },
+      admin: {
+        position: "sidebar",
+        description: {
+          en: "Stripe customer ID (cus_...). Used to match subscriptions and invoices to this member.",
+          nl: "Stripe-klant-ID (cus_...). Hiermee worden abonnementen en facturen aan dit lid gekoppeld.",
+        },
+      },
+    },
+    {
+      label: { en: "Subscriptions", nl: "Abonnementen" },
+      name: "subscriptions",
+      type: "join",
+      collection: "subscriptions",
+      on: "user",
+      defaultSort: "-createdAt",
+      admin: {
+        allowCreate: false,
+        defaultColumns: ["plan", "status", "currentPeriodEnd"],
+        description: {
+          en: "Subscriptions linked to this member. Create them from the Subscriptions collection.",
+          nl: "Abonnementen van dit lid. Maak ze aan via de collectie Abonnementen.",
+        },
+      },
     },
     {
       label: { en: "Subtitle", nl: "Ondertitel" },

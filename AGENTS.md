@@ -55,6 +55,11 @@ On **every schema change** (a collection or global added, removed or renamed; a 
 2. Publish it to the design system: read `project/data-schema.md` from the artifact (so you build on the live version), copy `docs/data-schema.md` over it under a scratch folder as `project/data-schema.md`, and publish with the Artifact tool (`url`: the design system artifact, `root`: that folder, `file_path`: the absolute path of the copy). Send only this file. Leave `project/design-system.json` alone: its `lastChange.at` is the token version that [sportlab-theme.css](<src/app/(frontend)/sportlab-theme.css>) snapshots, and a schema change is not a token change.
 3. If the artifact can't be written, say so and flag that the design system's schema is out of date.
 
+### Migrations
+
+- Never apply migrations locally. Do not run `payload migrate`, `payload migrate:fresh`, `payload migrate:down`, `payload migrate:reset` or `payload migrate:refresh`; `pnpm dev` applies pending migrations during local development.
+- To add a migration, generate it with `pnpm exec payload migrate:create <name>` (this only writes the migration files), then commit the `.ts`, its `.json` snapshot and the updated `src/migrations-postgres/index.ts`. Let the dev server apply it.
+
 ## Workflow
 
 - Before changing styling, read the design system README and the relevant component README (from the artifact, or from `docs/design-system/` when you can't open it).

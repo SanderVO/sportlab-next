@@ -19,6 +19,8 @@ Gebruiker · auth
 - `roles` (select, required, many, one of: admin, editor, user, coach, default "user"): Rollen
 - `isCoach` (checkbox, default false): Is Coach
 - `avatar` (upload, → media): Foto
+- `stripeCustomerId` (text): Stripe-klant-ID
+- `subscriptions` (join): Abonnementen
 - `subtitle` (text): Ondertitel
 - `about` (textarea): Over
 - `position` (number): Positie
@@ -326,6 +328,72 @@ Programma
 - `finalEvent` (relationship, → events): Eindevent
 - `generateSlug` (checkbox, default true): Generate Slug
 - `slug` (text): Slug
+- `updatedAt` (date)
+- `createdAt` (date)
+
+### subscription-plans
+
+Abonnementplan
+
+- `name` (text, required): Naam
+- `description` (textarea): Omschrijving
+- `groupCreditsPerMonth` (number, required, min 0, default 0): Groepscredits per maand
+- `ptCreditsPerWeek` (number, required, min 0, default 0): PT-credits per week
+- `currentPrice` (relationship, → subscription-plan-prices): Huidig tarief
+- `stripeProductId` (text): Stripe-product-ID
+- `active` (checkbox, required, default true): Actief
+- `prices` (join): Tarieven
+- `subscriptions` (join): Abonnementen
+- `updatedAt` (date)
+- `createdAt` (date)
+
+### subscription-plan-prices
+
+Abonnementstarief
+
+- `plan` (relationship, required, → subscription-plans): Abonnementplan
+- `stripePriceId` (text): Stripe-prijs-ID
+- `amountCents` (number, required, min 0, default 0): Bedrag
+- `currency` (text, required, default "eur"): Valuta
+- `interval` (select, required, one of: week, month, year, default "month"): Betaalperiode
+- `active` (checkbox, required, default true): Actief
+- `subscriptions` (join): Abonnementen
+- `updatedAt` (date)
+- `createdAt` (date)
+
+### subscriptions
+
+Abonnement
+
+- `user` (relationship, required, → users): Lid
+- `plan` (relationship, required, → subscription-plans): Abonnementplan
+- `price` (relationship, → subscription-plan-prices): Tarief
+- `status` (select, required, one of: trialing, active, past_due, canceled, unpaid, incomplete, incomplete_expired, paused, default "active"): Status
+- `stripeSubscriptionId` (text): Stripe-abonnement-ID
+- `currentPeriodStart` (date): Start huidige periode
+- `currentPeriodEnd` (date): Einde huidige periode
+- `cancelAtPeriodEnd` (checkbox, default false): Opzeggen per periode-einde
+- `canceledAt` (date): Opgezegd op
+- `trialEndsAt` (date): Einde proefperiode
+- `startedAt` (date): Gestart op
+- `notes` (textarea): Notities
+- `updatedAt` (date)
+- `createdAt` (date)
+
+### credit-adjustments
+
+Creditaanpassing
+
+- `user` (relationship, required, → users): Lid
+- `subscription` (relationship, → subscriptions): Abonnement
+- `creditType` (select, required, one of: group, pt): Soort credit
+- `amount` (number, required): Aantal credits
+- `date` (date, required): Datum in periode
+- `periodStart` (date, required): Start periode
+- `periodEnd` (date, required): Einde periode
+- `source` (select, required, one of: manual, stripe, system, default "manual"): Bron
+- `reason` (textarea): Reden
+- `addedBy` (relationship, → users): Toegevoegd door
 - `updatedAt` (date)
 - `createdAt` (date)
 

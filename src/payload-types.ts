@@ -78,6 +78,10 @@ export interface Config {
     events: Event;
     exercises: Exercise;
     programs: Program;
+    'subscription-plans': SubscriptionPlan;
+    'subscription-plan-prices': SubscriptionPlanPrice;
+    subscriptions: Subscription;
+    'credit-adjustments': CreditAdjustment;
     'lesson-enrollments': LessonEnrollment;
     'lesson-exercise-tracking': LessonExerciseTracking;
     'program-enrollments': ProgramEnrollment;
@@ -94,8 +98,18 @@ export interface Config {
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    users: {
+      subscriptions: 'subscriptions';
+    };
     programs: {
       lessons: 'lessons';
+    };
+    'subscription-plans': {
+      prices: 'subscription-plan-prices';
+      subscriptions: 'subscriptions';
+    };
+    'subscription-plan-prices': {
+      subscriptions: 'subscriptions';
     };
   };
   collectionsSelect: {
@@ -109,6 +123,10 @@ export interface Config {
     events: EventsSelect<false> | EventsSelect<true>;
     exercises: ExercisesSelect<false> | ExercisesSelect<true>;
     programs: ProgramsSelect<false> | ProgramsSelect<true>;
+    'subscription-plans': SubscriptionPlansSelect<false> | SubscriptionPlansSelect<true>;
+    'subscription-plan-prices': SubscriptionPlanPricesSelect<false> | SubscriptionPlanPricesSelect<true>;
+    subscriptions: SubscriptionsSelect<false> | SubscriptionsSelect<true>;
+    'credit-adjustments': CreditAdjustmentsSelect<false> | CreditAdjustmentsSelect<true>;
     'lesson-enrollments': LessonEnrollmentsSelect<false> | LessonEnrollmentsSelect<true>;
     'lesson-exercise-tracking': LessonExerciseTrackingSelect<false> | LessonExerciseTrackingSelect<true>;
     'program-enrollments': ProgramEnrollmentsSelect<false> | ProgramEnrollmentsSelect<true>;
@@ -216,6 +234,18 @@ export interface User {
   isCoach?: boolean | null;
   avatar?: (number | null) | Media;
   /**
+   * Stripe customer ID (cus_...). Used to match subscriptions and invoices to this member.
+   */
+  stripeCustomerId?: string | null;
+  /**
+   * Subscriptions linked to this member. Create them from the Subscriptions collection.
+   */
+  subscriptions?: {
+    docs?: (number | Subscription)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
    * Member role at Sportlab in one sentence.
    */
   subtitle?: string | null;
@@ -294,6 +324,139 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: number;
+  /**
+   * The member this subscription belongs to.
+   */
+  user: number | User;
+  /**
+   * The plan that defines the price and credit allowance.
+   */
+  plan: number | SubscriptionPlan;
+  /**
+   * The price this subscription is billed on. Defaults to the plan's current price; keep the old price when a plan changes price.
+   */
+  price?: (number | null) | SubscriptionPlanPrice;
+  /**
+   * Mirrors the Stripe subscription status.
+   */
+  status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'paused';
+  /**
+   * Stripe subscription ID (sub_...). Used to match webhook events.
+   */
+  stripeSubscriptionId?: string | null;
+  /**
+   * Start of the period Stripe has already charged for.
+   */
+  currentPeriodStart?: string | null;
+  /**
+   * End of the paid period. Credits top up again at the next period.
+   */
+  currentPeriodEnd?: string | null;
+  /**
+   * Set by Stripe when the member cancels at the end of the paid period.
+   */
+  cancelAtPeriodEnd?: boolean | null;
+  /**
+   * Set by Stripe when the subscription is cancelled.
+   */
+  canceledAt?: string | null;
+  trialEndsAt?: string | null;
+  startedAt?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription-plans".
+ */
+export interface SubscriptionPlan {
+  id: number;
+  /**
+   * For example '9 groepslessen' or 'Personal training 2x per week'.
+   */
+  name: string;
+  description?: string | null;
+  /**
+   * Group lesson credits included in this plan each calendar month.
+   */
+  groupCreditsPerMonth: number;
+  /**
+   * PT and semi-PT credits included each week (Monday–Sunday).
+   */
+  ptCreditsPerWeek: number;
+  /**
+   * Set automatically for the first price. To change the price, create the new price first, select it here, then archive the old one.
+   */
+  currentPrice?: (number | null) | SubscriptionPlanPrice;
+  /**
+   * Stripe product ID (prod_...) of this plan.
+   */
+  stripeProductId?: string | null;
+  /**
+   * Inactive plans stay on existing subscriptions but cannot be chosen for new ones.
+   */
+  active: boolean;
+  /**
+   * All prices for this plan. Archived prices stay for existing subscriptions.
+   */
+  prices?: {
+    docs?: (number | SubscriptionPlanPrice)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Members currently linked to this plan. Add a member here to assign the plan.
+   */
+  subscriptions?: {
+    docs?: (number | Subscription)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription-plan-prices".
+ */
+export interface SubscriptionPlanPrice {
+  id: number;
+  plan: number | SubscriptionPlan;
+  /**
+   * Stripe price ID (price_...). Leave empty until the Stripe price exists.
+   */
+  stripePriceId?: string | null;
+  /**
+   * The recurring amount in cents, for example 6450 for €64.50.
+   */
+  amountCents: number;
+  /**
+   * ISO currency code, for example eur.
+   */
+  currency: string;
+  interval: 'week' | 'month' | 'year';
+  /**
+   * Archived prices stay on existing subscriptions but cannot be chosen for new ones.
+   */
+  active: boolean;
+  /**
+   * Members currently billed on this price.
+   */
+  subscriptions?: {
+    docs?: (number | Subscription)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -951,6 +1114,43 @@ export interface Exercise {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "credit-adjustments".
+ */
+export interface CreditAdjustment {
+  id: number;
+  user: number | User;
+  /**
+   * Optional: the subscription this adjustment belongs to. Must be the member's own subscription.
+   */
+  subscription?: (number | null) | Subscription;
+  /**
+   * Group credits count per calendar month; PT credits per week (Monday–Sunday).
+   */
+  creditType: 'group' | 'pt';
+  /**
+   * Positive to add credits, negative to remove them.
+   */
+  amount: number;
+  /**
+   * Any date in the period the adjustment applies to. The period is calculated automatically.
+   */
+  date: string;
+  periodStart: string;
+  periodEnd: string;
+  source: 'manual' | 'stripe' | 'system';
+  /**
+   * Optional note, for example '1 extra credit van Jesse'.
+   */
+  reason?: string | null;
+  /**
+   * Automatically set via a hook.
+   */
+  addedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lesson-enrollments".
  */
 export interface LessonEnrollment {
@@ -1519,6 +1719,22 @@ export interface PayloadLockedDocument {
         value: number | Program;
       } | null)
     | ({
+        relationTo: 'subscription-plans';
+        value: number | SubscriptionPlan;
+      } | null)
+    | ({
+        relationTo: 'subscription-plan-prices';
+        value: number | SubscriptionPlanPrice;
+      } | null)
+    | ({
+        relationTo: 'subscriptions';
+        value: number | Subscription;
+      } | null)
+    | ({
+        relationTo: 'credit-adjustments';
+        value: number | CreditAdjustment;
+      } | null)
+    | ({
         relationTo: 'lesson-enrollments';
         value: number | LessonEnrollment;
       } | null)
@@ -1620,6 +1836,8 @@ export interface UsersSelect<T extends boolean = true> {
   roles?: T;
   isCoach?: T;
   avatar?: T;
+  stripeCustomerId?: T;
+  subscriptions?: T;
   subtitle?: T;
   about?: T;
   position?: T;
@@ -2045,6 +2263,76 @@ export interface ProgramsSelect<T extends boolean = true> {
   finalEvent?: T;
   generateSlug?: T;
   slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription-plans_select".
+ */
+export interface SubscriptionPlansSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  groupCreditsPerMonth?: T;
+  ptCreditsPerWeek?: T;
+  currentPrice?: T;
+  stripeProductId?: T;
+  active?: T;
+  prices?: T;
+  subscriptions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription-plan-prices_select".
+ */
+export interface SubscriptionPlanPricesSelect<T extends boolean = true> {
+  plan?: T;
+  stripePriceId?: T;
+  amountCents?: T;
+  currency?: T;
+  interval?: T;
+  active?: T;
+  subscriptions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions_select".
+ */
+export interface SubscriptionsSelect<T extends boolean = true> {
+  user?: T;
+  plan?: T;
+  price?: T;
+  status?: T;
+  stripeSubscriptionId?: T;
+  currentPeriodStart?: T;
+  currentPeriodEnd?: T;
+  cancelAtPeriodEnd?: T;
+  canceledAt?: T;
+  trialEndsAt?: T;
+  startedAt?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "credit-adjustments_select".
+ */
+export interface CreditAdjustmentsSelect<T extends boolean = true> {
+  user?: T;
+  subscription?: T;
+  creditType?: T;
+  amount?: T;
+  date?: T;
+  periodStart?: T;
+  periodEnd?: T;
+  source?: T;
+  reason?: T;
+  addedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }

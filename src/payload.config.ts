@@ -14,6 +14,7 @@ import {
 import sharp from "sharp";
 import { fileURLToPath } from "url";
 import { isCoachOnlyAdminUser } from "./access/isCoachOnlyAdminUser";
+import { CreditAdjustments } from "./collections/CreditAdjustments";
 import { Documents } from "./collections/Documents";
 import { EventRegistrations } from "./collections/EventRegistrations";
 import { Events } from "./collections/Events";
@@ -28,6 +29,9 @@ import { Pages } from "./collections/Pages";
 import { Posts } from "./collections/Posts";
 import { ProgramEnrollments } from "./collections/ProgramEnrollments";
 import { Programs } from "./collections/Programs";
+import { SubscriptionPlanPrices } from "./collections/SubscriptionPlanPrices";
+import { SubscriptionPlans } from "./collections/SubscriptionPlans";
+import { Subscriptions } from "./collections/Subscriptions";
 import { Users } from "./collections/Users";
 import { Footer } from "./components/Footer/config";
 import { Header } from "./components/Header/config";
@@ -135,6 +139,7 @@ const coachAccessibleCollections = new Set([
     "exercises",
     "events",
     "programs",
+    "credit-adjustments",
 ]);
 
 const withCoachCollectionVisibility = <T extends CollectionConfig>(
@@ -224,6 +229,10 @@ export default buildConfig({
         withCoachCollectionVisibility(Events),
         withCoachCollectionVisibility(Exercises),
         withCoachCollectionVisibility(Programs),
+        withCoachCollectionVisibility(SubscriptionPlans),
+        withCoachCollectionVisibility(SubscriptionPlanPrices),
+        withCoachCollectionVisibility(Subscriptions),
+        withCoachCollectionVisibility(CreditAdjustments),
         withCoachCollectionVisibility(LessonEnrollments),
         withCoachCollectionVisibility(LessonExerciseTracking),
         withCoachCollectionVisibility(ProgramEnrollments),
