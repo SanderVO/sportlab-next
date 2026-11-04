@@ -17,8 +17,10 @@ export const LessonTemplates: CollectionConfig = {
     admin: {
         useAsTitle: "title",
         defaultColumns: ["title", "type", "updatedAt"],
-        description:
-            "Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen.",
+        description: {
+            en: "Templates for recurring lessons. Create a template for each fixed lesson (e.g. 'Monday PT 09:00') and link it to individual lessons.",
+            nl: "Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen.",
+        },
         components: {
             views: {
                 list: {
@@ -232,6 +234,164 @@ export const LessonTemplates: CollectionConfig = {
                     required: false,
                 },
                 {
+                    label: { en: "Timer mode", nl: "Timermodus" },
+                    name: "timerMode",
+                    type: "select",
+                    required: false,
+                    defaultValue: "countdown",
+                    options: [
+                        {
+                            label: { en: "Countdown", nl: "Aftellen" },
+                            value: "countdown",
+                        },
+                        { label: { en: "EMOM", nl: "EMOM" }, value: "emom" },
+                        { label: { en: "AMRAP", nl: "AMRAP" }, value: "amrap" },
+                        {
+                            label: { en: "Rounds", nl: "Rondes" },
+                            value: "rounds",
+                        },
+                        {
+                            label: {
+                                en: "Intervals (work / rest)",
+                                nl: "Intervallen (werk / rust)",
+                            },
+                            value: "intervals",
+                        },
+                    ],
+                    admin: {
+                        description: {
+                            en: "How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: a sequence of work / rest / active rest rounds, each with its own timer.",
+                            nl: "Hoe de timer op de TV loopt. EMOM: elke oefening krijgt een eigen interval. AMRAP: tel rondes binnen de tijd. Rondes: een vast aantal rondes. Intervallen: een reeks werk- / rust- / actieve-rustrondes, elk met een eigen timer.",
+                        },
+                    },
+                },
+                {
+                    label: {
+                        en: "Highlight active exercise",
+                        nl: "Actieve oefening markeren",
+                    },
+                    name: "highlightExercises",
+                    type: "checkbox",
+                    defaultValue: false,
+                    admin: {
+                        condition: (_, siblingData) =>
+                            siblingData?.timerMode !== "countdown",
+                        description: {
+                            en: "On the TV, mark the exercise that is active and move to the next one when the timer runs out (EMOM, Intervals, and the rotating exercises of AMRAP / Rounds). Off: the exercises are only listed.",
+                            nl: "Markeer op de TV de actieve oefening en ga naar de volgende als de timer afloopt (EMOM, Intervallen en de wisselende oefeningen van AMRAP / Rondes). Uit: de oefeningen worden alleen getoond.",
+                        },
+                    },
+                },
+                {
+                    label: {
+                        en: "Interval (seconds)",
+                        nl: "Interval (seconden)",
+                    },
+                    name: "intervalSeconds",
+                    type: "number",
+                    required: false,
+                    min: 1,
+                    admin: {
+                        condition: (_, siblingData) =>
+                            siblingData?.timerMode === "emom",
+                        description: {
+                            en: "EMOM only. Default 60 (every minute). Use 120 for every 2 minutes.",
+                            nl: "Alleen voor EMOM. Standaard 60 (elke minuut). Gebruik 120 voor elke 2 minuten.",
+                        },
+                    },
+                },
+                {
+                    label: { en: "Number of rounds", nl: "Aantal rondes" },
+                    name: "rounds",
+                    type: "number",
+                    required: false,
+                    min: 1,
+                    admin: {
+                        condition: (_, siblingData) =>
+                            siblingData?.timerMode === "rounds" ||
+                            siblingData?.timerMode === "intervals",
+                        description: {
+                            en: "Intervals: how many times the whole round sequence is repeated. Leave empty to repeat until the time (minutes) runs out.",
+                            nl: "Intervallen: hoe vaak de hele reeks rondes wordt herhaald. Laat leeg om te herhalen tot de tijd (minuten) op is.",
+                        },
+                    },
+                },
+                {
+                    label: { en: "Round types", nl: "Rondetypes" },
+                    name: "roundTypes",
+                    type: "array",
+                    dbName: "round_types",
+                    required: false,
+                    minRows: 1,
+                    maxRows: 10,
+                    labels: {
+                        singular: { en: "Round type", nl: "Rondetype" },
+                        plural: { en: "Round types", nl: "Rondetypes" },
+                    },
+                    admin: {
+                        condition: (_, siblingData) =>
+                            siblingData?.timerMode === "intervals",
+                        description: {
+                            en: "Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer. Active rest is light movement: add its exercise to the exercise list, in order with the work rounds.",
+                            nl: "Alleen voor intervallen. Voeg 1 tot 10 rondes toe in de volgorde waarin ze lopen, elk met een eigen timer. Actieve rust is lichte beweging: voeg de oefening hiervoor toe aan de oefeningenlijst, in volgorde met de werkrondes.",
+                        },
+                    },
+                    fields: [
+                        {
+                            label: { en: "Type", nl: "Type" },
+                            name: "type",
+                            type: "select",
+                            required: true,
+                            defaultValue: "work",
+                            options: [
+                                {
+                                    label: { en: "Work", nl: "Werk" },
+                                    value: "work",
+                                },
+                                {
+                                    label: { en: "Rest", nl: "Rust" },
+                                    value: "rest",
+                                },
+                                {
+                                    label: {
+                                        en: "Active rest",
+                                        nl: "Actieve rust",
+                                    },
+                                    value: "active_rest",
+                                },
+                            ],
+                        },
+                        {
+                            label: {
+                                en: "Time (seconds)",
+                                nl: "Tijd (seconden)",
+                            },
+                            name: "seconds",
+                            type: "number",
+                            required: true,
+                            min: 1,
+                            admin: {
+                                description: {
+                                    en: "How long this round lasts, e.g. 40.",
+                                    nl: "Hoe lang deze ronde duurt, bijv. 40.",
+                                },
+                            },
+                        },
+                    ],
+                },
+                {
+                    label: { en: "Points of attention", nl: "POA's" },
+                    name: "poa",
+                    type: "text",
+                    required: false,
+                    admin: {
+                        description: {
+                            en: "Optional. Shown on the TV in the workout block popup, not on the lesson page.",
+                            nl: "Optioneel. Getoond op de TV in het workoutblok-venster, niet op de lespagina.",
+                        },
+                    },
+                },
+                {
                     label: { en: "Exercises", nl: "Oefeningen" },
                     name: "exercises",
                     type: "array",
@@ -252,6 +412,21 @@ export const LessonTemplates: CollectionConfig = {
                             name: "description",
                             type: "textarea",
                             required: false,
+                        },
+                        {
+                            label: {
+                                en: "Changes every round",
+                                nl: "Wisselt per ronde",
+                            },
+                            name: "rotating",
+                            type: "checkbox",
+                            defaultValue: false,
+                            admin: {
+                                description: {
+                                    en: 'AMRAP / rounds: exercises with this checked take turns, one per round ("Elke ronde wisselend"). The others are done every round.',
+                                    nl: 'AMRAP / rondes: oefeningen met dit vinkje wisselen elkaar af, één per ronde ("Elke ronde wisselend"). De overige worden elke ronde gedaan.',
+                                },
+                            },
                         },
                     ],
                 },

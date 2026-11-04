@@ -4,8 +4,8 @@ export const VirtuagymRosterBlock: Block = {
     slug: "virtuagymRosterBlock",
     interfaceName: "VirtuagymRosterBlock",
     labels: {
-        singular: "Virtuagym Rooster Blok",
-        plural: "Virtuagym Rooster Blokken",
+        singular: { en: "Virtuagym schedule block", nl: "Virtuagym Rooster Blok" },
+        plural: { en: "Virtuagym schedule blocks", nl: "Virtuagym Rooster Blokken" },
     },
     fields: [],
 };

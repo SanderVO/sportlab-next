@@ -1,13 +1,24 @@
+import type { Metadata } from "next";
+import { hasTvAccess } from "@/utilities/tvAccess";
+import { redirect } from "next/navigation";
 import React from "react";
+import { TvStage } from "./TvStage";
+
+export const metadata: Metadata = {
+    robots: {
+        index: false,
+        follow: false,
+    },
+};
 
 export default async function TvDashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    return (
-        <div className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(255,153,51,0.22),transparent_34%),radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_26%),linear-gradient(135deg,#06090f_0%,#0c121d_45%,#05070c_100%)] text-white">
-            {children}
-        </div>
-    );
+    if (!(await hasTvAccess())) {
+        redirect("/tv-unlock");
+    }
+
+    return <TvStage>{children}</TvStage>;
 }

@@ -53,8 +53,18 @@ const buildWorkoutBlocks = async (
         name: string;
         description?: string;
         duration?: number;
+        poa?: string;
+        timerMode?: "countdown" | "emom" | "amrap" | "rounds" | "intervals";
+        highlightExercises?: boolean;
+        intervalSeconds?: number;
+        rounds?: number;
+        roundTypes?: Array<{
+            type: "work" | "rest" | "active_rest";
+            seconds: number;
+        }>;
         exercises: Array<{
             name: string;
+            rotating?: boolean;
             description?: string;
         }>;
     }> = [];
@@ -67,10 +77,21 @@ const buildWorkoutBlocks = async (
             description: block.description ?? undefined,
             duration:
                 typeof block.duration === "number" ? block.duration : undefined,
+            poa: block.poa ?? undefined,
+            timerMode: block.timerMode ?? undefined,
+            highlightExercises: block.highlightExercises ?? undefined,
+            intervalSeconds: block.intervalSeconds ?? undefined,
+            rounds: block.rounds ?? undefined,
+            roundTypes: (block.roundTypes ?? []).flatMap((round) =>
+                round.type && typeof round.seconds === "number"
+                    ? [{ type: round.type, seconds: round.seconds }]
+                    : [],
+            ),
             exercises: (Array.isArray(block.exercises) ? block.exercises : [])
                 .filter((exercise) => Boolean(exercise?.name))
                 .map((exercise) => ({
                     name: exercise?.name ?? "",
+                    rotating: exercise?.rotating ?? undefined,
                     description: exercise?.description ?? undefined,
                 })),
         });

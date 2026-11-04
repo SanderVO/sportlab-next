@@ -3,52 +3,52 @@ import type { Block, Field } from "payload";
 
 const columnFields: Field[] = [
     {
-        label: "Achtergrondkleur",
+        label: { en: "Background color", nl: "Achtergrondkleur" },
         name: "backgroundColor",
         type: "select",
         required: false,
         options: [
             {
-                label: "Zwart",
+                label: { en: "Black", nl: "Zwart" },
                 value: "backgroundDark",
             },
             {
-                label: "Beige",
+                label: { en: "Beige", nl: "Beige" },
                 value: "backgroundLight",
             },
             {
-                label: "Wit",
+                label: { en: "White", nl: "Wit" },
                 value: "backgroundWhite",
             },
         ],
     },
     {
-        label: "Content Type",
+        label: { en: "Content Type", nl: "Content Type" },
         name: "contentPosition",
         type: "select",
         defaultValue: "contentRight",
         required: true,
         options: [
             {
-                label: "Alleen content",
+                label: { en: "Content only", nl: "Alleen content" },
                 value: "contentOnly",
             },
             {
-                label: "Afbeelding Boven, Tekst Onder",
+                label: { en: "Image top, text bottom", nl: "Afbeelding Boven, Tekst Onder" },
                 value: "contentBottom",
             },
             {
-                label: "Afbeelding Links, Tekst Rechts",
+                label: { en: "Image left, text right", nl: "Afbeelding Links, Tekst Rechts" },
                 value: "contentRight",
             },
             {
-                label: "Afbeelding Rechts, Tekst Links",
+                label: { en: "Image right, text left", nl: "Afbeelding Rechts, Tekst Links" },
                 value: "contentLeft",
             },
         ],
     },
     {
-        label: "Afbeelding",
+        label: { en: "Image", nl: "Afbeelding" },
         name: "media",
         type: "upload",
         relationTo: "media",
@@ -60,22 +60,22 @@ const columnFields: Field[] = [
         },
     },
     {
-        label: "Afbeeldingsgrootte",
+        label: { en: "Image size", nl: "Afbeeldingsgrootte" },
         name: "imageSize",
         type: "select",
         defaultValue: "imageCenter",
         required: true,
         options: [
             {
-                label: "Volledig (Top Gecropt)",
+                label: { en: "Full (top cropped)", nl: "Volledig (Top Gecropt)" },
                 value: "imageTopCut",
             },
             {
-                label: "Volledig",
+                label: { en: "Full", nl: "Volledig" },
                 value: "imageFull",
             },
             {
-                label: "Gecentreerd",
+                label: { en: "Centered", nl: "Gecentreerd" },
                 value: "imageCenter",
             },
         ],
@@ -86,7 +86,7 @@ const columnFields: Field[] = [
         },
     },
     {
-        label: "Content",
+        label: { en: "Content", nl: "Content" },
         name: "richText",
         type: "richText",
         required: true,
@@ -99,80 +99,80 @@ export const Content: Block = {
     interfaceName: "ContentBlock",
     fields: [
         {
-            label: "Achtergrondkleur",
+            label: { en: "Background color", nl: "Achtergrondkleur" },
             name: "backgroundColor",
             type: "select",
             defaultValue: "backgroundDark",
             required: true,
             options: [
                 {
-                    label: "Zwart",
+                    label: { en: "Black", nl: "Zwart" },
                     value: "backgroundDark",
                 },
                 {
-                    label: "Beige",
+                    label: { en: "Beige", nl: "Beige" },
                     value: "backgroundLight",
                 },
                 {
-                    label: "Wit",
+                    label: { en: "White", nl: "Wit" },
                     value: "backgroundWhite",
                 },
             ],
         },
         {
-            label: "Hoogte",
+            label: { en: "Height", nl: "Hoogte" },
             name: "blockHeight",
             type: "select",
             defaultValue: "fixed",
             required: true,
             options: [
                 {
-                    label: "Vast",
+                    label: { en: "Fixed", nl: "Vast" },
                     value: "fixed",
                 },
                 {
-                    label: "Automatisch (op basis van inhoud)",
+                    label: { en: "Automatic (based on content)", nl: "Automatisch (op basis van inhoud)" },
                     value: "auto",
                 },
             ],
             admin: {
                 description:
-                    "Vast gebruikt de standaard blokhoogte. Automatisch past de hoogte aan op de inhoud.",
+                    { en: "Fixed uses the default block height. Automatic adjusts the height to the content.", nl: "Vast gebruikt de standaard blokhoogte. Automatisch past de hoogte aan op de inhoud." },
             },
         },
         {
-            label: "Titel",
+            label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: false,
             admin: {
                 description:
-                    "Optioneel: Voeg een titel toe boven de kolommen. Laat leeg als je geen titel wilt.",
+                    { en: "Optional: add a title above the columns. Leave empty if you don't want a title.", nl: "Optioneel: Voeg een titel toe boven de kolommen. Laat leeg als je geen titel wilt." },
             },
         },
         {
-            label: "Introductie",
+            label: { en: "Introduction", nl: "Introductie" },
             name: "introduction",
             type: "richText",
             required: false,
             editor: defaultLexical,
             admin: {
                 description:
-                    "Optioneel: Voeg een introductie toe boven de kolommen. Laat leeg als je geen introductie wilt.",
+                    { en: "Optional: add an introduction above the columns. Leave empty if you don't want an introduction.", nl: "Optioneel: Voeg een introductie toe boven de kolommen. Laat leeg als je geen introductie wilt." },
             },
         },
         {
-            label: "Kolommen",
+            label: { en: "Columns", nl: "Kolommen" },
             name: "columns",
             type: "array",
             labels: {
-                singular: "Kolom",
-                plural: "Kolommen",
+                singular: { en: "Column", nl: "Kolom" },
+                plural: { en: "Columns", nl: "Kolommen" },
             },
             admin: {
                 initCollapsed: true,
                 description:
-                    "Voeg kolommen toe en configureer de inhoud voor elke kolom.",
+                    { en: "Add columns and configure the content for each column.", nl: "Voeg kolommen toe en configureer de inhoud voor elke kolom." },
             },
             fields: columnFields,
         },

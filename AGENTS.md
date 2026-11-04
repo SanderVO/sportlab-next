@@ -1,92 +1,83 @@
 # AGENTS
 
-This repository’s styling instructions are based on the visual design source in `oNe More Reason.pdf`.
+This repository's styling follows the **One More Reason** design system for Sportlab Groningen.
 
 ## Source of truth
 
-- The PDF is the visual authority for brand styling, spacing, typography, and UI patterns.
-- The repository should treat the Markdown style guide in [docs/style-guide.md](docs/style-guide.md) as the agent-friendly working summary of that design.
-- If the PDF and implementation differ, prefer the PDF and update the tokenized styles in the codebase to match it.
+- The design system artifact on claude.ai is the visual authority: https://claude.ai/code/artifact/b85d45fc-1044-491b-ab0c-827f00966109
+- [docs/design-system/](docs/design-system/SNAPSHOT.md) is a read-only snapshot of the artifact, for tools that can't open it (OpenCode and other LLMs). Read `docs/design-system/README.md` for the brand rules and `docs/design-system/components/<Name>/README.md` per component before writing UI. The snapshot version is in [docs/design-system/SNAPSHOT.md](docs/design-system/SNAPSHOT.md). Never edit the snapshot by hand.
+- If you can read the artifact (Claude Code, Claude on the web), read it instead of the snapshot: it is newer if they differ. Compare its `project/design-system.json` `lastChange.at` with the snapshot's, and if the snapshot is behind, refresh it (steps in `SNAPSHOT.md`) and flag that `sportlab-theme.css` may need a token update.
+- If neither can be read, say so and flag that the result is unverified. The snapshot has the READMEs only, no `preview.html` files: they don't render outside the artifact and use `sl-*` / `app-*` classes that aren't in this repo.
+- [src/app/(frontend)/sportlab-theme.css](<src/app/(frontend)/sportlab-theme.css>) is the only token layer in the repo: a hand-maintained Tailwind snapshot of the artifact's `tokens.json` (see its header for the `lastChange.at` it matches). When the artifact's tokens change, update this file by hand.
+- [docs/style-guide.md](docs/style-guide.md) predates the design system. If it conflicts with the artifact, the artifact wins.
 
 ## Styling rules for AI-generated UI changes
 
-When making or updating UI styling, agents must:
+1. **Use the tokens.** Never hard-code hex values, font sizes or spacing that exist as tokens. Colour utilities (`bg-ink`, `text-cta`, `bg-surface-card`, `text-text-on-panel-muted`, `border-line-tv`, `bg-orange-300`), spacing (`p-space-24`, `gap-tv-gap`), radii (`rounded-card`, `rounded-tv`, `rounded-pill`), fonts (`font-display`, `font-sans`, `font-label`) and type styles (`type-tv-body`, `type-display-l`, `type-eyebrow`) live in [src/app/(frontend)/sportlab-theme.css](<src/app/(frontend)/sportlab-theme.css>). If something is missing, propose adding it to the design system instead of inventing a value.
+2. **Start from the design system's component.** Recreate it in React with Tailwind utilities and the tokens, following its README (and its `preview.html` when you can open the artifact). The `sl-*` / `tv-*` / `app-*` / `web-*` classes the READMEs mention are not in this repo: map them to the tokens instead of using the class names.
+3. **Orange rule.** `cta` (#e8842b) is only for buttons and links, with `on-cta` (ink) text, never white. The one exception is `/tv`, which uses the orange family (`orange-200/300/700` and the ember glows) for details and keeps solid `cta` for the single action and the main block.
+4. **Fonts.**
+   - Anton (`font-display`) is for display text and is always uppercase.
+   - Poppins (`font-sans`) is for body text, warm headings and buttons.
+   - Archivo (`font-label`) is for the wordmark (`SPORTLAB`, 800, 0.25em tracking) and spaced-caps labels.
+   - Never mix the roles.
+5. **Contrast.** Every text/background pair must meet WCAG AA. Use `text-*` tokens on light grounds and `text-on-panel-*` tokens on dark.
+6. **Focus.** Use the `focus-ring` outline: 2px on the web, 6px with a 6px offset on TV (`.tv-focusable`).
+7. **Content stays as entered.** Content comes from Payload as written: Dutch UI copy in sentence case, English UPPERCASE campaign lines in Anton.
+8. **No drop shadows, extra icon sets or emoji**, per the design system README.
+9. **Keep changes minimal and intentional.** Favour consistency over novelty.
 
-1. Use existing design tokens first.
-    - Prefer the variables defined in [src/app/(frontend)/globals.css](<src/app/(frontend)/globals.css>).
-    - Prefer classes such as `bg-cta`, `bg-cta-dark`, `text-ink`, `text-warm-white`, `border-cta`, and the brand font classes.
+### `/tv` screens
 
-2. Match the approved brand palette.
-    - CTA orange: `#e8842b`
-    - CTA dark: `#d7741f`
-    - Ink: `#14110d`
-    - Charcoal: `#241e17`
-    - Sand: `#e8e0ce`
-    - Warm white: `#f6f2ea`
-    - Steel: `#46555f`
-    - Olive: `#5e5f47`
+- 1920×1080 and always dark: `.tv-screen.sl-dark`.
+- Keep content inside the `tv-safe-x` / `tv-safe-y` safe area, and nothing smaller than 24px.
+- Block accents alternate `.acc-ember` / `.acc-peach`, with `.acc-cta` for the main block.
+- The current timer station is a `sand` fill.
+- If content doesn't fit, split it over pages or columns instead of shrinking the type.
 
-3. Respect the visual language in the PDF.
-    - Keep buttons and actions confident and high-contrast.
-    - Preserve the warm, premium brand aesthetic rather than introducing generic neutral UI styles.
-    - Avoid arbitrary colors, shadows, border radii, or spacing values that are not aligned with the approved design system.
+### Legacy tokens
 
-4. Use layout and type conventions already established in the app.
-    - Prefer the existing breakpoints in [src/cssVariables.js](src/cssVariables.js).
-    - Prefer the existing font families configured in [src/app/(frontend)/globals.css](<src/app/(frontend)/globals.css>).
-    - Keep spacing and proportions consistent with the rest of the UI instead of inventing a new pattern.
+[src/app/(frontend)/globals.css](<src/app/(frontend)/globals.css>) still carries tokens from before the design system, used by existing pages and components:
 
-5. Prefer tokenized updates over ad hoc styling.
-    - If a new style is required, add it to the shared theme tokens first when it is clearly part of the approved brand system.
-    - Avoid repeated one-off hex values spread across files.
+- `cta-dark` (hover state of `bg-cta` buttons)
+- the `font-sl-*` families (Montserrat, Open Sans, Bebas, plus Anton, Archivo and Poppins aliases)
+- the Montserrat body font and the charcoal page background
 
-6. Keep changes minimal and intentional.
-    - Do not add decorative styling just because it looks modern if it is not in the approved design direction.
-    - Favor consistency over novelty.
+Don't use these in new design-system UI. Prefer the design-system equivalents, and migrate old usages when you touch them.
+
+## Data schema in the design system
+
+The design system carries the Payload data schema as `project/data-schema.md`, so new pages are designed around real fields. The repo copy is [docs/data-schema.md](docs/data-schema.md), generated from the Payload config (never edit it by hand).
+
+On **every schema change** (a collection or global added, removed or renamed; a field added, removed or changed; a `payload.config.ts` collection list change), before finishing:
+
+1. Run `pnpm generate:schema-doc` and include the updated `docs/data-schema.md` in the diff.
+2. Publish it to the design system: read `project/data-schema.md` from the artifact (so you build on the live version), copy `docs/data-schema.md` over it under a scratch folder as `project/data-schema.md`, and publish with the Artifact tool (`url`: the design system artifact, `root`: that folder, `file_path`: the absolute path of the copy). Send only this file. Leave `project/design-system.json` alone: its `lastChange.at` is the token version that [sportlab-theme.css](<src/app/(frontend)/sportlab-theme.css>) snapshots, and a schema change is not a token change.
+3. If the artifact can't be written, say so and flag that the design system's schema is out of date.
+
+### Migrations
+
+- Never apply migrations locally. Do not run `payload migrate`, `payload migrate:fresh`, `payload migrate:down`, `payload migrate:reset` or `payload migrate:refresh`; `pnpm dev` applies pending migrations during local development.
+- To add a migration, generate it with `pnpm exec payload migrate:create <name>` (this only writes the migration files), then commit the `.ts`, its `.json` snapshot and the updated `src/migrations-postgres/index.ts`. Let the dev server apply it.
 
 ## Workflow
 
-- Before changing styling, review both the PDF and the style guide summary.
-- Implement the styling using the shared tokens and existing classes where possible.
-- If a component is missing a style token that is clearly required by the design, add the token in the central theme file and then apply it consistently.
+- Before changing styling, read the design system README and the relevant component README (from the artifact, or from `docs/design-system/` when you can't open it).
+- Prefer the existing breakpoints in [src/cssVariables.js](src/cssVariables.js).
+- Before finishing, grep your diff for raw hex codes and px font sizes that should be tokens, check orange usage and contrast, and on `/tv` check 1920×1080 for overflow and text under 24px.
+- Mention which design-system version (`lastChange.at`, from the artifact or the snapshot) you built against, and which of the two it came from.
 
-## Files to consult first
+# This is NOT the Next.js you know
 
-- [src/app/(frontend)/globals.css](<src/app/(frontend)/globals.css>)
-- [src/cssVariables.js](src/cssVariables.js)
-- [docs/style-guide.md](docs/style-guide.md)
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 
-## Testing Cloudflare Worker bundle size
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
-Cloudflare Workers has a 10MiB gzip limit on the deployed script. To check the current size:
-
-1. `pnpm deploy:build` — runs `opennextjs-cloudflare build --env=production`, producing `.open-next/worker.js` and `.open-next/server-functions/default/`.
-2. `pnpx wrangler deploy --dry-run --env production` — reports the real deploy size, e.g. `Total Upload: 45730.31 KiB / gzip: 10094.71 KiB`. This is the number to compare against the 10MiB limit.
-
-Both commands need real filesystem/network access (wrangler writes to `~/Library/Preferences/.wrangler` and needs to reach Cloudflare), so in sandboxed environments run them with unsandboxed execution enabled.
-
-To find what's contributing to size, parse esbuild's metafile instead of guessing:
-
-```js
-const meta = JSON.parse(
-    fs.readFileSync(
-        ".open-next/server-functions/default/handler.mjs.meta.json",
-        "utf8",
-    ),
-);
-const entries = Object.entries(meta.inputs)
-    .map(([k, v]) => [k, v.bytes])
-    .sort((a, b) => b[1] - a[1]);
-```
-
-Known findings so far (see `/memories/repo/worker-bundle-size.md` for full detail):
-
-- `drizzle-kit` (~18MB) must stay excluded from Next's `outputFileTracingExcludes`; it's aliased away via a Turbopack `resolveAlias` stub for Cloudflare builds in [next.config.ts](next.config.ts) instead.
-- Several ~2.7MB near-duplicate SSR chunks exist in the bundle. Merging the `(tv-dashboard)` and `(frontend)` route groups did **not** reduce this — the duplication isn't caused by separate route-group root layouts, so don't assume consolidating layouts will shrink the bundle without measuring first.
+<!-- END:nextjs-agent-rules -->
 
 <!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+## This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 

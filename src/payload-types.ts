@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations;
   };
   blocks: {};
   collections: {
@@ -77,20 +78,40 @@ export interface Config {
     events: Event;
     exercises: Exercise;
     programs: Program;
+    'subscription-plans': SubscriptionPlan;
+    'subscription-plan-prices': SubscriptionPlanPrice;
+    subscriptions: Subscription;
+    'credit-adjustments': CreditAdjustment;
     'lesson-enrollments': LessonEnrollment;
     'lesson-exercise-tracking': LessonExerciseTracking;
     'program-enrollments': ProgramEnrollment;
     'event-registrations': EventRegistration;
+    'health-measurements': HealthMeasurement;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
+    'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    users: {
+      subscriptions: 'subscriptions';
+    };
+    programs: {
+      lessons: 'lessons';
+    };
+    'subscription-plans': {
+      prices: 'subscription-plan-prices';
+      subscriptions: 'subscriptions';
+    };
+    'subscription-plan-prices': {
+      subscriptions: 'subscriptions';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -102,13 +123,19 @@ export interface Config {
     events: EventsSelect<false> | EventsSelect<true>;
     exercises: ExercisesSelect<false> | ExercisesSelect<true>;
     programs: ProgramsSelect<false> | ProgramsSelect<true>;
+    'subscription-plans': SubscriptionPlansSelect<false> | SubscriptionPlansSelect<true>;
+    'subscription-plan-prices': SubscriptionPlanPricesSelect<false> | SubscriptionPlanPricesSelect<true>;
+    subscriptions: SubscriptionsSelect<false> | SubscriptionsSelect<true>;
+    'credit-adjustments': CreditAdjustmentsSelect<false> | CreditAdjustmentsSelect<true>;
     'lesson-enrollments': LessonEnrollmentsSelect<false> | LessonEnrollmentsSelect<true>;
     'lesson-exercise-tracking': LessonExerciseTrackingSelect<false> | LessonExerciseTrackingSelect<true>;
     'program-enrollments': ProgramEnrollmentsSelect<false> | ProgramEnrollmentsSelect<true>;
     'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
+    'health-measurements': HealthMeasurementsSelect<false> | HealthMeasurementsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
+    'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -124,18 +151,20 @@ export interface Config {
     footer: Footer;
     whatsApp: WhatsApp;
     organization: Organization;
+    tvAccess: TvAccess;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
     whatsApp: WhatsAppSelect<false> | WhatsAppSelect<true>;
     organization: OrganizationSelect<false> | OrganizationSelect<true>;
+    tvAccess: TvAccessSelect<false> | TvAccessSelect<true>;
   };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | PayloadMcpApiKey;
   jobs: {
     tasks: {
       schedulePublish: TaskSchedulePublish;
@@ -165,12 +194,32 @@ export interface UserAuthOperations {
     password: string;
   };
 }
+export interface PayloadMcpApiKeyAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
+  firstName?: string | null;
+  lastName?: string | null;
   name?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
@@ -181,9 +230,25 @@ export interface User {
    */
   slug?: string | null;
   status: 'active' | 'inactive';
+  /**
+   * The language of emails and messages sent to this user. The language chosen in the CMS only applies to the CMS itself.
+   */
+  language: 'nl' | 'en';
   roles: ('admin' | 'editor' | 'user' | 'coach')[];
   isCoach?: boolean | null;
   avatar?: (number | null) | Media;
+  /**
+   * Stripe customer ID (cus_...). Used to match subscriptions and invoices to this member.
+   */
+  stripeCustomerId?: string | null;
+  /**
+   * Subscriptions linked to this member. Create them from the Subscriptions collection.
+   */
+  subscriptions?: {
+    docs?: (number | Subscription)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   /**
    * Member role at Sportlab in one sentence.
    */
@@ -261,6 +326,141 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: number;
+  /**
+   * The member this subscription belongs to.
+   */
+  user: number | User;
+  /**
+   * The plan that defines the price and credit allowance.
+   */
+  plan: number | SubscriptionPlan;
+  /**
+   * The price this subscription is billed on. Defaults to the plan's current price; keep the old price when a plan changes price.
+   */
+  price?: (number | null) | SubscriptionPlanPrice;
+  /**
+   * Mirrors the Stripe subscription status.
+   */
+  status: 'trialing' | 'active' | 'past_due' | 'canceled' | 'unpaid' | 'incomplete' | 'incomplete_expired' | 'paused';
+  /**
+   * Stripe subscription ID (sub_...). Used to match webhook events.
+   */
+  stripeSubscriptionId?: string | null;
+  /**
+   * Start of the period Stripe has already charged for.
+   */
+  currentPeriodStart?: string | null;
+  /**
+   * End of the paid period. Credits top up again at the next period.
+   */
+  currentPeriodEnd?: string | null;
+  /**
+   * Set by Stripe when the member cancels at the end of the paid period.
+   */
+  cancelAtPeriodEnd?: boolean | null;
+  /**
+   * Set by Stripe when the subscription is cancelled.
+   */
+  canceledAt?: string | null;
+  trialEndsAt?: string | null;
+  startedAt?: string | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription-plans".
+ */
+export interface SubscriptionPlan {
+  id: number;
+  /**
+   * For example '9 groepslessen' or 'Personal training 2x per week'.
+   */
+  name: string;
+  description?: string | null;
+  /**
+   * Group lesson credits included in this plan each calendar month.
+   */
+  groupCreditsPerMonth: number;
+  /**
+   * PT and semi-PT credits included each week (Monday–Sunday).
+   */
+  ptCreditsPerWeek: number;
+  /**
+   * Set automatically for the first price. To change the price, create the new price first, select it here, then archive the old one.
+   */
+  currentPrice?: (number | null) | SubscriptionPlanPrice;
+  /**
+   * Stripe product ID (prod_...) of this plan.
+   */
+  stripeProductId?: string | null;
+  /**
+   * Inactive plans stay on existing subscriptions but cannot be chosen for new ones.
+   */
+  active: boolean;
+  /**
+   * All prices for this plan. Archived prices stay for existing subscriptions.
+   */
+  prices?: {
+    docs?: (number | SubscriptionPlanPrice)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Members currently linked to this plan. Add a member here to assign the plan.
+   */
+  subscriptions?: {
+    docs?: (number | Subscription)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription-plan-prices".
+ */
+export interface SubscriptionPlanPrice {
+  id: number;
+  plan: number | SubscriptionPlan;
+  /**
+   * Stripe price ID (price_...). Leave empty until the Stripe price exists.
+   */
+  stripePriceId?: string | null;
+  /**
+   * The recurring amount in cents, for example 6450 for €64.50.
+   */
+  amountCents: number;
+  /**
+   * ISO currency code, for example eur.
+   */
+  currency: string;
+  interval: 'week' | 'month' | 'year';
+  /**
+   * Archived prices stay on existing subscriptions but cannot be chosen for new ones.
+   */
+  active: boolean;
+  /**
+   * Members currently billed on this price.
+   */
+  subscriptions?: {
+    docs?: (number | Subscription)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -354,15 +554,15 @@ export interface Page {
 export interface ContentBlock {
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
   /**
-   * Vast gebruikt de standaard blokhoogte. Automatisch past de hoogte aan op de inhoud.
+   * Fixed uses the default block height. Automatic adjusts the height to the content.
    */
   blockHeight: 'fixed' | 'auto';
   /**
-   * Optioneel: Voeg een titel toe boven de kolommen. Laat leeg als je geen titel wilt.
+   * Optional: add a title above the columns. Leave empty if you don't want a title.
    */
   title?: string | null;
   /**
-   * Optioneel: Voeg een introductie toe boven de kolommen. Laat leeg als je geen introductie wilt.
+   * Optional: add an introduction above the columns. Leave empty if you don't want an introduction.
    */
   introduction?: {
     root: {
@@ -380,7 +580,7 @@ export interface ContentBlock {
     [k: string]: unknown;
   } | null;
   /**
-   * Voeg kolommen toe en configureer de inhoud voor elke kolom.
+   * Add columns and configure the content for each column.
    */
   columns?:
     | {
@@ -442,22 +642,22 @@ export interface TeamBlock {
   type: 'carousel' | 'grid';
   backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
   /**
-   * Optioneel: kies specifieke coaches om te tonen. Laat leeg om automatisch alle coaches te tonen.
+   * Optional: choose specific coaches to display. Leave empty to automatically show all coaches.
    */
   selectedCoaches?: (number | User)[] | null;
   enableLink?: boolean | null;
   link?: {
     type?: ('reference' | 'custom') | null;
     /**
-     * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+     * Enable if you want the link to open in a new tab.
      */
     newTab?: boolean | null;
     /**
-     * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+     * Enable if you want a label to be added to the link.
      */
     addLabel?: boolean | null;
     /**
-     * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+     * Choose a page, blog post or user to link to.
      */
     reference?:
       | ({
@@ -561,15 +761,15 @@ export interface InstagramBlock {
         link?: {
           type?: ('reference' | 'custom') | null;
           /**
-           * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+           * Enable if you want the link to open in a new tab.
            */
           newTab?: boolean | null;
           /**
-           * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+           * Enable if you want a label to be added to the link.
            */
           addLabel?: boolean | null;
           /**
-           * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+           * Choose a page, blog post or user to link to.
            */
           reference?:
             | ({
@@ -661,6 +861,10 @@ export interface Lesson {
    * Select a template to automatically apply its type, coaches, and default exercises.
    */
   template?: (number | null) | LessonTemplate;
+  /**
+   * Optional: the program this lesson belongs to. Selected automatically based on the start date.
+   */
+  program?: (number | null) | Program;
   title?: string | null;
   type?: ('pt' | 'semi_pt' | 'group' | 'open_gym') | null;
   /**
@@ -688,11 +892,48 @@ export interface Lesson {
     | {
         name: string;
         description?: string | null;
-        duration: number;
+        duration?: number | null;
+        /**
+         * How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: a sequence of work / rest / active rest rounds, each with its own timer.
+         */
+        timerMode?: ('countdown' | 'emom' | 'amrap' | 'rounds' | 'intervals') | null;
+        /**
+         * On the TV, mark the exercise that is active and move to the next one when the timer runs out (EMOM, Intervals, and the rotating exercises of AMRAP / Rounds). Off: the exercises are only listed.
+         */
+        highlightExercises?: boolean | null;
+        /**
+         * EMOM only. Default 60 (every minute). Use 120 for every 2 minutes.
+         */
+        intervalSeconds?: number | null;
+        /**
+         * Intervals: how many times the whole round sequence is repeated. Leave empty to repeat until the time (minutes) runs out.
+         */
+        rounds?: number | null;
+        /**
+         * Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer. Active rest is light movement: add its exercise to the exercise list, in order with the work rounds.
+         */
+        roundTypes?:
+          | {
+              type: 'work' | 'rest' | 'active_rest';
+              /**
+               * How long this round lasts, e.g. 40.
+               */
+              seconds: number;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Optional. Shown on the TV in the workout block popup, not on the lesson page.
+         */
+        poa?: string | null;
         exercises?:
           | {
               name: string;
               description?: string | null;
+              /**
+               * AMRAP / rounds: exercises with this checked take turns, one per round ("Elke ronde wisselend"). The others are done every round.
+               */
+              rotating?: boolean | null;
               id?: string | null;
             }[]
           | null;
@@ -703,7 +944,7 @@ export interface Lesson {
   createdAt: string;
 }
 /**
- * Sjablonen voor terugkerende lessen. Maak een sjabloon aan voor elke vaste les (bijv. 'Maandag PT 09:00') en koppel het aan individuele lessen.
+ * Templates for recurring lessons. Create a template for each fixed lesson (e.g. 'Monday PT 09:00') and link it to individual lessons.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lesson-templates".
@@ -745,10 +986,47 @@ export interface LessonTemplate {
         name: string;
         description?: string | null;
         duration?: number | null;
+        /**
+         * How the TV timer runs. EMOM: every exercise gets its own interval. AMRAP: count rounds within the time. Rounds: a fixed number of rounds. Intervals: a sequence of work / rest / active rest rounds, each with its own timer.
+         */
+        timerMode?: ('countdown' | 'emom' | 'amrap' | 'rounds' | 'intervals') | null;
+        /**
+         * On the TV, mark the exercise that is active and move to the next one when the timer runs out (EMOM, Intervals, and the rotating exercises of AMRAP / Rounds). Off: the exercises are only listed.
+         */
+        highlightExercises?: boolean | null;
+        /**
+         * EMOM only. Default 60 (every minute). Use 120 for every 2 minutes.
+         */
+        intervalSeconds?: number | null;
+        /**
+         * Intervals: how many times the whole round sequence is repeated. Leave empty to repeat until the time (minutes) runs out.
+         */
+        rounds?: number | null;
+        /**
+         * Intervals only. Add 1 to 10 rounds in the order they run, each with its own timer. Active rest is light movement: add its exercise to the exercise list, in order with the work rounds.
+         */
+        roundTypes?:
+          | {
+              type: 'work' | 'rest' | 'active_rest';
+              /**
+               * How long this round lasts, e.g. 40.
+               */
+              seconds: number;
+              id?: string | null;
+            }[]
+          | null;
+        /**
+         * Optional. Shown on the TV in the workout block popup, not on the lesson page.
+         */
+        poa?: string | null;
         exercises?:
           | {
               name: string;
               description?: string | null;
+              /**
+               * AMRAP / rounds: exercises with this checked take turns, one per round ("Elke ronde wisselend"). The others are done every round.
+               */
+              rotating?: boolean | null;
               id?: string | null;
             }[]
           | null;
@@ -759,7 +1037,51 @@ export interface LessonTemplate {
   createdAt: string;
 }
 /**
- * Beheer evenementen zoals hardloopwedstrijden, hyrox en speciale events.
+ * Manage programs with a start and end date, lessons and an optional final event (for example: Performance Cycle).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "programs".
+ */
+export interface Program {
+  id: number;
+  title: string;
+  startDate: string;
+  endDate: string;
+  bannerImage: number | Media;
+  description: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Lessons linked to this program. Link a lesson to a program from the lesson form.
+   */
+  lessons?: {
+    docs?: (number | Lesson)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  finalEvent?: (number | null) | Event;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Manage events such as running races, Hyrox and special events.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
@@ -795,46 +1117,39 @@ export interface Exercise {
   createdAt: string;
 }
 /**
- * Beheer programma's met een start- en einddatum, lessen en een optioneel eindevent (bijvoorbeeld: Performance Cycle).
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "programs".
+ * via the `definition` "credit-adjustments".
  */
-export interface Program {
+export interface CreditAdjustment {
   id: number;
-  title: string;
-  startDate: string;
-  endDate: string;
-  bannerImage: number | Media;
-  description: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  schedule: {
-    /**
-     * Choose a date within the program's start and end date.
-     */
-    date: string;
-    lessons: number | Lesson;
-    id?: string | null;
-  }[];
-  finalEvent?: (number | null) | Event;
+  user: number | User;
   /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   * Optional: the subscription this adjustment belongs to. Must be the member's own subscription.
    */
-  generateSlug?: boolean | null;
-  slug?: string | null;
+  subscription?: (number | null) | Subscription;
+  /**
+   * Group credits count per calendar month; PT credits per week (Monday–Sunday).
+   */
+  creditType: 'group' | 'pt';
+  /**
+   * Positive to add credits, negative to remove them.
+   */
+  amount: number;
+  /**
+   * Any date in the period the adjustment applies to. The period is calculated automatically.
+   */
+  date: string;
+  periodStart: string;
+  periodEnd: string;
+  source: 'manual' | 'stripe' | 'system';
+  /**
+   * Optional note, for example '1 extra credit van Jesse'.
+   */
+  reason?: string | null;
+  /**
+   * Automatically set via a hook.
+   */
+  addedBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -846,7 +1161,16 @@ export interface LessonEnrollment {
   id: number;
   user: number | User;
   lesson: number | Lesson;
-  status: 'assigned' | 'started' | 'completed' | 'cancelled';
+  status: 'assigned' | 'started' | 'completed' | 'cancelled' | 'waitlisted';
+  waitlistedAt?: string | null;
+  /**
+   * Set when the user was notified that a spot became free. The spot is reserved for them.
+   */
+  waitlistNotifiedAt?: string | null;
+  /**
+   * Set automatically when the status becomes cancelled. Cancelling less than 5 minutes before the lesson starts keeps the credit used.
+   */
+  cancelledAt?: string | null;
   /**
    * Automatically set via a hook.
    */
@@ -922,6 +1246,57 @@ export interface EventRegistration {
    * Automatically set via a hook.
    */
   addedBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "health-measurements".
+ */
+export interface HealthMeasurement {
+  id: number;
+  user: number | User;
+  measuredAt: string;
+  /**
+   * cm
+   */
+  height?: number | null;
+  /**
+   * kg
+   */
+  weight?: number | null;
+  /**
+   * %
+   */
+  bodyFatPercentage?: number | null;
+  /**
+   * kg
+   */
+  muscleMass?: number | null;
+  /**
+   * rating
+   */
+  visceralFat?: number | null;
+  /**
+   * kg
+   */
+  boneMass?: number | null;
+  /**
+   * kg/m²
+   */
+  bmi?: number | null;
+  /**
+   * kcal / day
+   */
+  bmr?: number | null;
+  /**
+   * years
+   */
+  metabolicAge?: number | null;
+  /**
+   * %
+   */
+  bodyWaterPercentage?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1051,7 +1426,7 @@ export interface Form {
     | null;
   submitButtonLabel?: string | null;
   /**
-   * Geef aan wat voor type bevestiging de gebruiker moet krijgen
+   * Indicate what type of confirmation the user should receive
    */
   confirmationType?: ('message' | 'redirect') | null;
   confirmationMessage?: {
@@ -1073,7 +1448,7 @@ export interface Form {
     url: string;
   };
   /**
-   * Stuur aangepaste e-mails wanneer het formulier wordt ingediend. Gebruik komma-gescheiden lijsten om dezelfde e-mail naar meerdere ontvangers te sturen. Om een waarde uit deze vorm te verwijzen, wikkel je de naam van dat veld in met dubbele krulhaken, bijvoorbeeld {{firstName}}. Je kunt een wildcard {{*}} gebruiken om alle data uit te voeren en {{*:table}} om het als een HTML-tabel in de e-mail te formatteren.
+   * Send custom emails when the form is submitted. Use comma-separated lists to send the same email to multiple recipients. To reference a value from this form, wrap the name of that field in double curly braces, for example {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.
    */
   emails?:
     | {
@@ -1120,6 +1495,80 @@ export interface FormSubmission {
     | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * API keys control which collections MCP clients can access.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys".
+ */
+export interface PayloadMcpApiKey {
+  id: number;
+  /**
+   * The user that the API key is associated with.
+   */
+  user: number | User;
+  /**
+   * A useful label for the API key.
+   */
+  label?: string | null;
+  /**
+   * The purpose of the API key.
+   */
+  description?: string | null;
+  pages?: {
+    /**
+     * Allow clients to find pages.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update pages.
+     */
+    update?: boolean | null;
+  };
+  lessons?: {
+    /**
+     * Allow clients to find lessons (including workout blocks).
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create lessons (including workout blocks).
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update lessons (including workout blocks).
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete lessons (including workout blocks).
+     */
+    delete?: boolean | null;
+  };
+  exercises?: {
+    /**
+     * Allow clients to find exercises.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create exercises.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update exercises.
+     */
+    update?: boolean | null;
+    /**
+     * Allow clients to delete exercises.
+     */
+    delete?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  hasAPIKey?: boolean | null;
+  collection: 'payload-mcp-api-keys';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1278,6 +1727,22 @@ export interface PayloadLockedDocument {
         value: number | Program;
       } | null)
     | ({
+        relationTo: 'subscription-plans';
+        value: number | SubscriptionPlan;
+      } | null)
+    | ({
+        relationTo: 'subscription-plan-prices';
+        value: number | SubscriptionPlanPrice;
+      } | null)
+    | ({
+        relationTo: 'subscriptions';
+        value: number | Subscription;
+      } | null)
+    | ({
+        relationTo: 'credit-adjustments';
+        value: number | CreditAdjustment;
+      } | null)
+    | ({
         relationTo: 'lesson-enrollments';
         value: number | LessonEnrollment;
       } | null)
@@ -1294,6 +1759,10 @@ export interface PayloadLockedDocument {
         value: number | EventRegistration;
       } | null)
     | ({
+        relationTo: 'health-measurements';
+        value: number | HealthMeasurement;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1304,12 +1773,21 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'form-submissions';
         value: number | FormSubmission;
+      } | null)
+    | ({
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -1319,10 +1797,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
+      };
   key?: string | null;
   value?:
     | {
@@ -1352,13 +1835,18 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  firstName?: T;
+  lastName?: T;
   name?: T;
   generateSlug?: T;
   slug?: T;
   status?: T;
+  language?: T;
   roles?: T;
   isCoach?: T;
   avatar?: T;
+  stripeCustomerId?: T;
+  subscriptions?: T;
   subtitle?: T;
   about?: T;
   position?: T;
@@ -1401,6 +1889,8 @@ export interface MediaSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1649,6 +2139,7 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface LessonsSelect<T extends boolean = true> {
   template?: T;
+  program?: T;
   title?: T;
   type?: T;
   status?: T;
@@ -1663,11 +2154,24 @@ export interface LessonsSelect<T extends boolean = true> {
         name?: T;
         description?: T;
         duration?: T;
+        timerMode?: T;
+        highlightExercises?: T;
+        intervalSeconds?: T;
+        rounds?: T;
+        roundTypes?:
+          | T
+          | {
+              type?: T;
+              seconds?: T;
+              id?: T;
+            };
+        poa?: T;
         exercises?:
           | T
           | {
               name?: T;
               description?: T;
+              rotating?: T;
               id?: T;
             };
         id?: T;
@@ -1700,11 +2204,24 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
         name?: T;
         description?: T;
         duration?: T;
+        timerMode?: T;
+        highlightExercises?: T;
+        intervalSeconds?: T;
+        rounds?: T;
+        roundTypes?:
+          | T
+          | {
+              type?: T;
+              seconds?: T;
+              id?: T;
+            };
+        poa?: T;
         exercises?:
           | T
           | {
               name?: T;
               description?: T;
+              rotating?: T;
               id?: T;
             };
         id?: T;
@@ -1751,16 +2268,80 @@ export interface ProgramsSelect<T extends boolean = true> {
   endDate?: T;
   bannerImage?: T;
   description?: T;
-  schedule?:
-    | T
-    | {
-        date?: T;
-        lessons?: T;
-        id?: T;
-      };
+  lessons?: T;
   finalEvent?: T;
   generateSlug?: T;
   slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription-plans_select".
+ */
+export interface SubscriptionPlansSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  groupCreditsPerMonth?: T;
+  ptCreditsPerWeek?: T;
+  currentPrice?: T;
+  stripeProductId?: T;
+  active?: T;
+  prices?: T;
+  subscriptions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscription-plan-prices_select".
+ */
+export interface SubscriptionPlanPricesSelect<T extends boolean = true> {
+  plan?: T;
+  stripePriceId?: T;
+  amountCents?: T;
+  currency?: T;
+  interval?: T;
+  active?: T;
+  subscriptions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions_select".
+ */
+export interface SubscriptionsSelect<T extends boolean = true> {
+  user?: T;
+  plan?: T;
+  price?: T;
+  status?: T;
+  stripeSubscriptionId?: T;
+  currentPeriodStart?: T;
+  currentPeriodEnd?: T;
+  cancelAtPeriodEnd?: T;
+  canceledAt?: T;
+  trialEndsAt?: T;
+  startedAt?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "credit-adjustments_select".
+ */
+export interface CreditAdjustmentsSelect<T extends boolean = true> {
+  user?: T;
+  subscription?: T;
+  creditType?: T;
+  amount?: T;
+  date?: T;
+  periodStart?: T;
+  periodEnd?: T;
+  source?: T;
+  reason?: T;
+  addedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1772,6 +2353,9 @@ export interface LessonEnrollmentsSelect<T extends boolean = true> {
   user?: T;
   lesson?: T;
   status?: T;
+  waitlistedAt?: T;
+  waitlistNotifiedAt?: T;
+  cancelledAt?: T;
   addedBy?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1829,6 +2413,26 @@ export interface EventRegistrationsSelect<T extends boolean = true> {
   event?: T;
   status?: T;
   addedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "health-measurements_select".
+ */
+export interface HealthMeasurementsSelect<T extends boolean = true> {
+  user?: T;
+  measuredAt?: T;
+  height?: T;
+  weight?: T;
+  bodyFatPercentage?: T;
+  muscleMass?: T;
+  visceralFat?: T;
+  boneMass?: T;
+  bmi?: T;
+  bmr?: T;
+  metabolicAge?: T;
+  bodyWaterPercentage?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1979,6 +2583,43 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys_select".
+ */
+export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
+  user?: T;
+  label?: T;
+  description?: T;
+  pages?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  lessons?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  exercises?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+        delete?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
+  hasAPIKey?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -2056,26 +2697,26 @@ export interface Header {
   id: number;
   headerLogo: number | Media;
   /**
-   * Voeg navigatie items toe aan de header
+   * Add navigation items to the header
    */
   navItems?:
     | {
         /**
-         * Bepaalt of dit item standaard zichtbaar is in de header navigatie
+         * Determines whether this item is visible by default in the header navigation
          */
         initiallyVisible?: boolean | null;
         link?: {
           type?: ('reference' | 'custom') | null;
           /**
-           * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+           * Enable if you want the link to open in a new tab.
            */
           newTab?: boolean | null;
           /**
-           * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+           * Enable if you want a label to be added to the link.
            */
           addLabel?: boolean | null;
           /**
-           * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+           * Choose a page, blog post or user to link to.
            */
           reference?:
             | ({
@@ -2111,15 +2752,15 @@ export interface Footer {
   link?: {
     type?: ('reference' | 'custom') | null;
     /**
-     * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+     * Enable if you want the link to open in a new tab.
      */
     newTab?: boolean | null;
     /**
-     * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+     * Enable if you want a label to be added to the link.
      */
     addLabel?: boolean | null;
     /**
-     * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+     * Choose a page, blog post or user to link to.
      */
     reference?:
       | ({
@@ -2162,29 +2803,29 @@ export interface Footer {
       }[]
     | null;
   /**
-   * Voeg kolommen toe met links of rich text voor in de footer
+   * Add columns with links or rich text to the footer
    */
   footerColumns?:
     | {
         columnTitle: string;
         contentType: 'links' | 'richText';
         /**
-         * Voeg links toe voor deze kolom
+         * Add links for this column
          */
         links?:
           | {
               link?: {
                 type?: ('reference' | 'custom') | null;
                 /**
-                 * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+                 * Enable if you want the link to open in a new tab.
                  */
                 newTab?: boolean | null;
                 /**
-                 * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+                 * Enable if you want a label to be added to the link.
                  */
                 addLabel?: boolean | null;
                 /**
-                 * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+                 * Choose a page, blog post or user to link to.
                  */
                 reference?:
                   | ({
@@ -2234,7 +2875,7 @@ export interface Footer {
 export interface WhatsApp {
   id: number;
   /**
-   * Voer het telefoonnummer in in internationaal formaat, bijvoorbeeld: +31612345678
+   * Enter the phone number in international format, for example: +31612345678
    */
   phoneNumber: string;
   textPreFilled: string;
@@ -2318,6 +2959,23 @@ export interface Organization {
         id?: string | null;
       }[]
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tvAccess".
+ */
+export interface TvAccess {
+  id: number;
+  /**
+   * When enabled, the TV dashboard can only be opened after entering the PIN.
+   */
+  enabled?: boolean | null;
+  /**
+   * 4 digits. Changing the PIN locks every TV that is currently unlocked.
+   */
+  pin?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2472,6 +3130,17 @@ export interface OrganizationSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tvAccess_select".
+ */
+export interface TvAccessSelect<T extends boolean = true> {
+  enabled?: T;
+  pin?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -2498,10 +3167,15 @@ export interface TaskSchedulePublish {
           value: number | Post;
         } | null);
     global?: string | null;
-    user?: {
-      relationTo: 'users';
-      value: number | User;
-    } | null;
+    user?:
+      | ({
+          relationTo: 'users';
+          value: number | User;
+        } | null)
+      | ({
+          relationTo: 'payload-mcp-api-keys';
+          value: number | PayloadMcpApiKey;
+        } | null);
   };
   output?: unknown;
 }
@@ -2600,15 +3274,15 @@ export interface ServiceCardBlock {
     link?: {
       type?: ('reference' | 'custom') | null;
       /**
-       * Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.
+       * Enable if you want the link to open in a new tab.
        */
       newTab?: boolean | null;
       /**
-       * Schakel in als je wilt dat er een label aan de link wordt toegevoegd.
+       * Enable if you want a label to be added to the link.
        */
       addLabel?: boolean | null;
       /**
-       * Kies een pagina, blogpost of gebruiker om naartoe te linken.
+       * Choose a page, blog post or user to link to.
        */
       reference?:
         | ({

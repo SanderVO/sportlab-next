@@ -87,6 +87,7 @@ export const MediaCarouselBlock: React.FC<MediaCarouselBlockProps> = (
                             pictureClassName="relative aspect-[16/9] w-full overflow-hidden rounded-sm"
                             imgClassName="h-full w-full object-cover"
                             videoClassName="h-full w-full object-cover"
+                            size="(max-width: 1366px) 100vw, 1366px"
                             imgWidth={1600}
                             imgHeight={900}
                         />
@@ -121,6 +122,7 @@ export const MediaCarouselBlock: React.FC<MediaCarouselBlockProps> = (
                                                         htmlElement={null}
                                                         pictureClassName="relative aspect-[4/3] w-full overflow-hidden rounded-sm"
                                                         imgClassName="h-full w-full object-cover"
+                                                        size="(max-width: 640px) 80vw, (max-width: 1024px) 45vw, 25vw"
                                                         imgWidth={640}
                                                         imgHeight={480}
                                                     />
@@ -200,6 +202,7 @@ export const MediaCarouselBlock: React.FC<MediaCarouselBlockProps> = (
                                 htmlElement={null}
                                 pictureClassName="relative max-h-[85vh] w-full overflow-hidden rounded-sm"
                                 imgClassName="max-h-[85vh] w-full bg-background object-contain"
+                                size="100vw"
                                 imgWidth={2000}
                                 imgHeight={1333}
                             />

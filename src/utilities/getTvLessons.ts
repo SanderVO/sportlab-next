@@ -1,13 +1,6 @@
-import type { BasePayload } from "payload";
+import type { BasePayload, SelectType } from "payload";
 
 export const TV_LESSON_PAGE_SIZE = 12;
-export const TV_DATE_WINDOW_DAYS = 14;
-
-type TvDateRange = {
-    today: string;
-    min: string;
-    max: string;
-};
 
 function toDateParam(date: Date) {
     const year = date.getUTCFullYear();
@@ -42,29 +35,8 @@ export function parseTvDateParam(value?: string | null) {
     return value;
 }
 
-export function getTvDateRange(
-    referenceDate = new Date(),
-    windowDays = TV_DATE_WINDOW_DAYS,
-): TvDateRange {
-    const today = toDateParam(referenceDate);
-
-    return {
-        today,
-        min: addDays(today, -windowDays),
-        max: addDays(today, windowDays),
-    };
-}
-
-export function clampTvDateParam(dateParam: string, range: TvDateRange) {
-    if (dateParam < range.min) {
-        return range.min;
-    }
-
-    if (dateParam > range.max) {
-        return range.max;
-    }
-
-    return dateParam;
+export function getTvDateRange(referenceDate = new Date()) {
+    return { today: toDateParam(referenceDate) };
 }
 
 export const tvLessonSelect = {
@@ -74,23 +46,91 @@ export const tvLessonSelect = {
     startDate: true,
     endDate: true,
     image: true,
+    program: {
+        title: true,
+    },
     coaches: {
-        name: true,
+        firstName: true,
         slug: true,
-        avatar: true,
         position: true,
     },
     workoutBlocks: {
         name: true,
         description: true,
         duration: true,
+        poa: true,
+        timerMode: true,
+        highlightExercises: true,
+        intervalSeconds: true,
+        rounds: true,
+        roundTypes: {
+            type: true,
+            seconds: true,
+        },
         exercises: {
             name: true,
+            rotating: true,
             description: true,
             videoUrl: true,
         },
     },
 } as const;
+
+/**
+ * Populated coaches would otherwise use the Users `defaultPopulate`, which carries the full name.
+ * The TV only shows first names.
+ */
+export const tvPopulate = {
+    users: { firstName: true, slug: true, position: true },
+} as const;
+
+/** Fields the lesson detail page renders; keeps coach emails out of the page payload. */
+export const tvLessonDetailSelect = {
+    title: true,
+    startDate: true,
+    image: true,
+    program: { title: true },
+    coaches: { firstName: true },
+    workoutBlocks: true,
+} as const;
+
+/** Drops row ids so two lessons with the same content produce the same string. */
+function withoutIds(value: unknown): unknown {
+    if (Array.isArray(value)) return value.map(withoutIds);
+
+    if (value && typeof value === "object") {
+        return Object.fromEntries(
+            Object.entries(value)
+                .filter(([key]) => key !== "id")
+                .map(([key, entry]) => [key, withoutIds(entry)]),
+        );
+    }
+
+    return value;
+}
+
+/**
+ * Lessons on one day that only differ by time (morning / evening) carry the
+ * same workout. The TV shows the earliest of each; enrolment keeps both.
+ * Input must be sorted by startDate.
+ */
+export function dedupeTvLessons<
+    T extends { title?: string | null; type?: string | null },
+>(lessons: T[]): T[] {
+    const seen = new Set<string>();
+
+    return lessons.filter((lesson) => {
+        const key = JSON.stringify([
+            lesson.title,
+            lesson.type,
+            withoutIds((lesson as { workoutBlocks?: unknown }).workoutBlocks),
+        ]);
+
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
 
 export async function getTvLessons(
     payload: BasePayload,
@@ -104,15 +144,16 @@ export async function getTvLessons(
     const dayStart = `${dateParam}T00:00:00.000Z`;
     const dayEnd = `${addDays(dateParam, 1)}T00:00:00.000Z`;
 
-    return payload.find({
+    // A day has a handful of lessons, so dedupe first and paginate in memory.
+    const result = await payload.find({
         collection: "lessons",
-        depth: 2,
-        limit: TV_LESSON_PAGE_SIZE,
-        page,
-        pagination: true,
+        depth: 1,
+        limit: 100,
+        pagination: false,
         overrideAccess: true,
         sort: "startDate",
-        select: tvLessonSelect as any,
+        select: tvLessonSelect as SelectType,
+        populate: tvPopulate,
         where: {
             and: [
                 {
@@ -128,4 +169,78 @@ export async function getTvLessons(
             ],
         },
     });
+
+    const unique = dedupeTvLessons(result.docs);
+    const start = (page - 1) * TV_LESSON_PAGE_SIZE;
+    const hasNextPage = start + TV_LESSON_PAGE_SIZE < unique.length;
+
+    return {
+        docs: unique.slice(start, start + TV_LESSON_PAGE_SIZE),
+        hasNextPage,
+        nextPage: hasNextPage ? page + 1 : null,
+        page,
+    };
+}
+
+export function parseTvMonthParam(value?: string | null) {
+    if (!value || !/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) {
+        return null;
+    }
+
+    return value;
+}
+
+export type TvDaySummary = Record<string, Array<{ title: string }>>;
+
+/** Lessons of a whole month, grouped by day (same UTC day boundaries as getTvLessons). */
+export async function getTvMonthSummary(
+    payload: BasePayload,
+    monthParam: string,
+): Promise<TvDaySummary> {
+    const monthStart = `${monthParam}-01`;
+    const [year, month] = monthParam.split("-").map(Number);
+    const nextMonthStart = toDateParam(new Date(Date.UTC(year, month, 1)));
+
+    const result = await payload.find({
+        collection: "lessons",
+        depth: 0,
+        limit: 500,
+        pagination: false,
+        overrideAccess: true,
+        sort: "startDate",
+        select: {
+            title: true,
+            type: true,
+            startDate: true,
+            workoutBlocks: true,
+        },
+        where: {
+            and: [
+                {
+                    startDate: {
+                        greater_than_equal: `${monthStart}T00:00:00.000Z`,
+                    },
+                },
+                { startDate: { less_than: `${nextMonthStart}T00:00:00.000Z` } },
+            ],
+        },
+    });
+
+    const summary: TvDaySummary = {};
+
+    const byDay: Record<string, typeof result.docs> = {};
+
+    for (const lesson of result.docs) {
+        if (!lesson.startDate) continue;
+
+        (byDay[toDateParam(new Date(lesson.startDate))] ??= []).push(lesson);
+    }
+
+    for (const [key, lessons] of Object.entries(byDay)) {
+        summary[key] = dedupeTvLessons(lessons).map((lesson) => ({
+            title: lesson.title || `Les ${lesson.id}`,
+        }));
+    }
+
+    return summary;
 }

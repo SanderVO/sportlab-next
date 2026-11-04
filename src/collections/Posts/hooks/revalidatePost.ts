@@ -4,8 +4,9 @@ import type {
     CollectionAfterDeleteHook,
 } from "payload";
 import type { Post } from "../../../payload-types";
+import { purgeCloudflarePaths } from "../../../utilities/purgeCloudflare";
 
-export const revalidatePost: CollectionAfterChangeHook<Post> = ({
+export const revalidatePost: CollectionAfterChangeHook<Post> = async ({
     doc,
     previousDoc,
     req: { payload, context },
@@ -18,6 +19,7 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
 
             revalidatePath(path);
             revalidateTag("blog-sitemap", "max");
+            await purgeCloudflarePaths([path, "/blog"], payload.logger);
         }
 
         // If the post was previously published, we need to revalidate the old path
@@ -31,20 +33,22 @@ export const revalidatePost: CollectionAfterChangeHook<Post> = ({
 
             revalidatePath(oldPath);
             revalidateTag("blog-sitemap", "max");
+            await purgeCloudflarePaths([oldPath, "/blog"], payload.logger);
         }
     }
     return doc;
 };
 
-export const revalidateDelete: CollectionAfterDeleteHook<Post> = ({
+export const revalidateDelete: CollectionAfterDeleteHook<Post> = async ({
     doc,
-    req: { context },
+    req: { context, payload },
 }) => {
     if (!context.disableRevalidate) {
         const path = `/blog/${doc?.slug}`;
 
         revalidatePath(path);
         revalidateTag("blog-sitemap", "max");
+        await purgeCloudflarePaths([path, "/blog"], payload.logger);
     }
 
     return doc;

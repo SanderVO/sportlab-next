@@ -1,16 +1,13 @@
-@import "tailwindcss";
+/* sportlab-theme.css holds the One More Reason tokens and already imports tailwindcss.
+   It provides the brand colours (ink, charcoal, sand, warm-white, cta, steel, olive, orange-*,
+   surface-*, text-*), spacing, radii and the display/sans/label fonts. */
+@import "./sportlab-theme.css";
 
 @plugin "@tailwindcss/typography";
 
 @theme {
-    --color-cta: #e8842b;
+    /* Legacy: hover state for existing buttons; not part of the design system */
     --color-cta-dark: #d7741f;
-    --color-ink: #14110d;
-    --color-charcoal: #241e17;
-    --color-sand: #e8e0ce;
-    --color-warm-white: #f6f2ea;
-    --color-steel: #46555f;
-    --color-olive: #5e5f47;
 
     --font-sl-montserrat: var(--font-montserrat), sans-serif;
     --font-sl-open-sans: var(--font-open-sans), sans-serif;
@@ -28,8 +25,6 @@
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
 }
 
 body {

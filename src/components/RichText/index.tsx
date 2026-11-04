@@ -163,7 +163,12 @@ const textConverter: JSXConverter<SerializedTextNode> = ({
                 ) {
                     Object.assign(
                         styles,
-                        (stateOptions as Record<string, any>)[stateValue].css,
+                        (
+                            stateOptions as Record<
+                                string,
+                                { css: React.CSSProperties }
+                            >
+                        )[stateValue].css,
                     );
                 }
             }

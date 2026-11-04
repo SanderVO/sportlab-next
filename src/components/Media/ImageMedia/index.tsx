@@ -1,13 +1,10 @@
 "use client";
 
-import { cssVariables } from "@/cssVariables";
 import OptimizedImage from "@/images/OptimizedImage";
 import { cn } from "@/utilities/ui";
 import type { StaticImageData } from "next/image";
 import React from "react";
 import type { Props as MediaProps } from "../types";
-
-const { breakpoints } = cssVariables;
 
 const placeholderBlur =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='8' height='8' fill='%23f6f2ea'/%3E%3C/svg%3E";
@@ -61,11 +58,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
 
     const loading = loadingFromProps || (!priority ? "lazy" : undefined);
 
-    const sizes = sizeFromProps
-        ? sizeFromProps
-        : Object.entries(breakpoints)
-              .map(([, value]) => `(max-width: ${value}px) ${value * 2}w`)
-              .join(", ");
+    const sizes = sizeFromProps || "100vw";
 
     return (
         <picture className={cn(pictureClassName)}>
@@ -78,7 +71,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
                 blurDataURL={priority ? undefined : placeholderBlur}
                 priority={priority}
                 fetchPriority={priority ? "high" : "auto"}
-                quality={85}
+                quality={75}
                 loading={loading}
                 sizes={sizes}
                 src={src}

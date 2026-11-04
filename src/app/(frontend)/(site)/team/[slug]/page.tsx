@@ -14,7 +14,13 @@ type Args = {
     }>;
 };
 
-export const revalidate = 300;
+// Revalidated on edit via revalidatePath in the Users hook; this is the fallback window.
+export const revalidate = 86400;
+
+// Render on first visit instead of at build time, so the build needs no database.
+export async function generateStaticParams() {
+    return [];
+}
 
 const queryUserBySlug = cache(async ({ slug }: { slug: string }) => {
     const { isEnabled: draft } = await draftMode();
@@ -37,43 +43,14 @@ const queryUserBySlug = cache(async ({ slug }: { slug: string }) => {
     return result.docs?.[0] || null;
 });
 
-export async function generateStaticParams() {
-    const payload = await getPayload({ config: configPromise });
-
-    const users = await payload.find({
-        collection: "users",
-        draft: false,
-        limit: 1000,
-        overrideAccess: false,
-        pagination: false,
-        select: {
-            slug: true,
-        },
-        where: {
-            status: {
-                equals: "active",
-            },
-            slug: {
-                exists: true,
-            },
-        },
-    });
-
-    const params = users.docs
-        .filter((user) => user.slug)
-        .map(({ slug }) => {
-            return { slug };
-        });
-
-    return params ?? [];
-}
-
 export async function generateMetadata({
     params: paramsPromise,
 }: Args): Promise<Metadata> {
     const { slug = "" } = await paramsPromise;
     const decodedSlug = decodeURIComponent(slug);
     const user = await queryUserBySlug({ slug: decodedSlug });
+
+    if (!user) return {};
 
     return {
         title: user.name + " - Coach bij Sportlab Groningen",
@@ -101,7 +78,7 @@ export default async function Coach({ params: paramsPromise }: Args) {
                 {user.avatar && (
                     <Media
                         resource={user.avatar}
-                        size="(max-width: 768px) 400px, 480px"
+                        size="(max-width: 640px) 100vw, (max-width: 1024px) 250px, 480px"
                         htmlElement={null}
                         pictureClassName="relative md:absolute left-0 bottom-0 w-full sm:w-[250px] lg:w-[480px] h-[400px] md:h-full"
                         imgClassName="h-full object-cover object-top md:object-center"

@@ -11,7 +11,7 @@ export const link = (overrides?: Partial<GroupField>): GroupField => ({
             type: "row",
             fields: [
                 {
-                    label: "Link type",
+                    label: { en: "Link type", nl: "Link type" },
                     name: "type",
                     type: "radio",
                     admin: {
@@ -21,22 +21,22 @@ export const link = (overrides?: Partial<GroupField>): GroupField => ({
                     defaultValue: "reference",
                     options: [
                         {
-                            label: "Interne link",
+                            label: { en: "Internal link", nl: "Interne link" },
                             value: "reference",
                         },
                         {
-                            label: "Externe URL",
+                            label: { en: "External URL", nl: "Externe URL" },
                             value: "custom",
                         },
                     ],
                 },
                 {
-                    label: "Openen in nieuw tabblad",
+                    label: { en: "Open in new tab", nl: "Openen in nieuw tabblad" },
                     name: "newTab",
                     type: "checkbox",
                     admin: {
                         description:
-                            "Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend.",
+                            { en: "Enable if you want the link to open in a new tab.", nl: "Schakel in als je wilt dat de link in een nieuw tabblad wordt geopend." },
                         style: {
                             alignSelf: "flex-end",
                         },
@@ -44,12 +44,12 @@ export const link = (overrides?: Partial<GroupField>): GroupField => ({
                     },
                 },
                 {
-                    label: "Label toevoegen",
+                    label: { en: "Add label", nl: "Label toevoegen" },
                     name: "addLabel",
                     type: "checkbox",
                     admin: {
                         description:
-                            "Schakel in als je wilt dat er een label aan de link wordt toegevoegd.",
+                            { en: "Enable if you want a label to be added to the link.", nl: "Schakel in als je wilt dat er een label aan de link wordt toegevoegd." },
                         style: {
                             alignSelf: "flex-end",
                         },
@@ -59,12 +59,12 @@ export const link = (overrides?: Partial<GroupField>): GroupField => ({
             ],
         },
         {
-            label: "Interne link",
+            label: { en: "Internal link", nl: "Interne link" },
             name: "reference",
             type: "relationship",
             admin: {
                 description:
-                    "Kies een pagina, blogpost of gebruiker om naartoe te linken.",
+                    { en: "Choose a page, blog post or user to link to.", nl: "Kies een pagina, blogpost of gebruiker om naartoe te linken." },
                 condition: (_, siblingData) =>
                     siblingData?.type === "reference",
             },
@@ -82,7 +82,7 @@ export const link = (overrides?: Partial<GroupField>): GroupField => ({
             required: true,
         },
         {
-            label: "Externe URL",
+            label: { en: "External URL", nl: "Externe URL" },
             name: "url",
             type: "text",
             admin: {
@@ -96,11 +96,11 @@ export const link = (overrides?: Partial<GroupField>): GroupField => ({
             admin: {
                 condition: (_, siblingData) => siblingData?.addLabel === true,
             },
-            label: "Label",
+            label: { en: "Label", nl: "Label" },
             required: true,
         },
         {
-            label: "Label kleur",
+            label: { en: "Label color", nl: "Label kleur" },
             name: "labelColor",
             type: "select",
             defaultValue: "default",
@@ -108,11 +108,11 @@ export const link = (overrides?: Partial<GroupField>): GroupField => ({
                 condition: (_, siblingData) => siblingData?.addLabel === true,
             },
             options: [
-                { label: "Standaard", value: "default" },
-                { label: "Beige", value: "beige" },
-                { label: "Oranje", value: "orange" },
-                { label: "Grijs", value: "neutral" },
-                { label: "Wit", value: "white" },
+                { label: { en: "Default", nl: "Standaard" }, value: "default" },
+                { label: { en: "Beige", nl: "Beige" }, value: "beige" },
+                { label: { en: "Orange", nl: "Oranje" }, value: "orange" },
+                { label: { en: "Gray", nl: "Grijs" }, value: "neutral" },
+                { label: { en: "White", nl: "Wit" }, value: "white" },
             ],
         },
     ],

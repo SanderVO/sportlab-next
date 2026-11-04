@@ -1,36 +1,30 @@
 import { withPayload } from "@payloadcms/next/withPayload";
 import type { NextConfig } from "next";
 
-// @payloadcms/drizzle lazily requires drizzle-kit/api to push dev schema, a
-// path that never runs in production. Alias it to a stub for Cloudflare
-// builds so the ~18MB drizzle-kit package isn't pulled into the Worker.
-const isCloudflareDeployEnv =
-    process.env.CLOUDFLARE_ENV === "production" ||
-    process.env.CLOUDFLARE_ENV === "preview";
+// A strict script/style CSP would break GTM, Turnstile and the Payload admin, so only
+// framing is restricted. The admin live preview embeds the site from the same origin.
+const securityHeaders = [
+    {
+        key: "Strict-Transport-Security",
+        value: "max-age=63072000; includeSubDomains",
+    },
+    { key: "X-Content-Type-Options", value: "nosniff" },
+    { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+    {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=(), payment=()",
+    },
+    { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+];
 
 const nextConfig: NextConfig = {
-    cacheComponents: process.env.PAYLOAD_CACHE_COMPONENTS === "true",
-    basePath: process.env?.NEXT_BASE_PATH || undefined,
-    typescript: {
-        ignoreBuildErrors: true,
-    },
+    cacheComponents: false,
+    output: "standalone",
     trailingSlash: false,
-    turbopack: isCloudflareDeployEnv
-        ? {
-              resolveAlias: {
-                  "drizzle-kit/api": "./src/utilities/drizzleKitApiStub.ts",
-              },
-          }
-        : undefined,
     experimental: {
         serverActions: {
             bodySizeLimit: "5mb",
         },
-        // Limit to 1 worker during static generation to prevent concurrent workerd
-        // instances from competing for the same SQLite state file (SQLITE_BUSY).
-        // Each Next.js build worker starts its own local miniflare/workerd instance,
-        // and multiple concurrent instances deadlock on shared SQLite state.
-        cpus: 1,
     },
     images: {
         remotePatterns: [
@@ -46,13 +40,8 @@ const nextConfig: NextConfig = {
     headers: async () => {
         return [
             {
-                source: "/(.*).(jpg|jpeg|png|webp|avif|gif|svg)",
-                headers: [
-                    {
-                        key: "Cache-Control",
-                        value: "public, s-maxage=31536000, max-age=31536000, immutable",
-                    },
-                ],
+                source: "/(.*)",
+                headers: securityHeaders,
             },
         ];
     },
@@ -113,26 +102,4 @@ const nextConfig: NextConfig = {
 };
 
 const payloadNextConfig = withPayload(nextConfig);
-
-const originalHeaders = payloadNextConfig.headers;
-
-// withPayload() adds Vary/Accept-CH/Critical-CH: Sec-CH-Prefers-Color-Scheme to
-// every route ("/:path*") for the admin theme, but a Vary other than
-// Accept-Encoding makes Cloudflare treat all public pages as uncacheable.
-// Scope that rule to /admin only.
-payloadNextConfig.headers = async () => {
-    const rules = (await originalHeaders?.()) ?? [];
-
-    return rules.map((rule: { source: string; headers: any[] }) =>
-        rule.source === "/:path*" &&
-        rule.headers.some(
-            (header) =>
-                header.key === "Vary" &&
-                header.value === "Sec-CH-Prefers-Color-Scheme",
-        )
-            ? { ...rule, source: "/admin/:path*" }
-            : rule,
-    );
-};
-
 export default payloadNextConfig;

@@ -6,7 +6,7 @@ import SocialIcon from "../Social/Icons";
 import { CMSLink } from "../ui/Link";
 
 export async function Footer() {
-    const footerData: Footer = (await getCachedGlobal("footer", 1)()) as Footer;
+    const footerData: Footer = (await getCachedGlobal("footer", 1)) as Footer;
 
     return (
         <footer className="container mx-auto my-20">
@@ -27,6 +27,7 @@ export async function Footer() {
                         {footerData.footerLogo && (
                             <Media
                                 imgHeight={40}
+                                size="200px"
                                 imgWidth={200}
                                 className="relative w-full lg:w-50 h-12.5 flex justify-center"
                                 resource={footerData.footerLogo}

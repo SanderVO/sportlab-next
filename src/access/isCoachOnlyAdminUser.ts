@@ -1,4 +1,4 @@
-import { RolesEnum } from "@/collections/Users";
+import { RolesEnum } from "@/collections/Users/roles";
 import type { ClientUser } from "payload";
 
 export const isCoachOnlyAdminUser = (

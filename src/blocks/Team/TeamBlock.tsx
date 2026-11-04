@@ -18,10 +18,6 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
 
     const payload = await getPayload({ config: configPromise });
 
-    // When specific coaches are selected, filter only by their IDs (no roles JOIN needed —
-    // they were already validated as coaches via filterOptions in the admin config).
-    // This avoids a SELECT DISTINCT + duplicate-column bug in Payload's SQLite/D1 adapter
-    // that occurs when a LEFT JOIN on users_roles is combined with ORDER BY on already-selected columns.
     const where: Where = hasSelectedCoaches
         ? { id: { in: selectedCoachIds } }
         : {
@@ -37,6 +33,14 @@ export const TeamBlock: React.FC<TeamBlockProps> = async (props) => {
         limit: hasSelectedCoaches ? 0 : type === "carousel" ? (limit ?? 0) : 0,
         sort: sortBy,
         where,
+        // These users are passed to a client component: only send what the cards render.
+        select: {
+            name: true,
+            slug: true,
+            subtitle: true,
+            about: true,
+            avatar: true,
+        },
     });
 
     const orderedUsers = hasSelectedCoaches

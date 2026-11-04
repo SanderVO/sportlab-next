@@ -38,6 +38,7 @@ export const ServiceCardBlock: React.FC<ServiceCardBlockProps> = (props) => {
                             <div className="w-full h-64 relative">
                                 <Media
                                     fill
+                                    size="(max-width: 640px) 256px, 384px"
                                     resource={column.image}
                                     imgClassName="object-cover object-center w-full"
                                 />

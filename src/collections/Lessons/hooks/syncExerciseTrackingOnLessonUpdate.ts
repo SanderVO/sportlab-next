@@ -5,7 +5,11 @@ import {
 import type { CollectionAfterChangeHook } from "payload";
 
 export const syncExerciseTrackingOnLessonUpdate: CollectionAfterChangeHook =
-    async ({ doc, previousDoc, req, operation }) => {
+    async ({ doc, previousDoc, req, operation, context }) => {
+        if (context.skipImportSideEffects) {
+            return doc;
+        }
+
         if (operation !== "update") {
             return doc;
         }

@@ -1,21 +1,16 @@
 import { TVLessonDashboard } from "@/components/TVLessonDashboard/TVLessonDashboard";
 import {
-    clampTvDateParam,
     getTvDateRange,
-    getTvLessons,
     parseTvDateParam,
 } from "@/utilities/getTvLessons";
-import configPromise from "@payload-config";
+import { getCachedTvLessons } from "@/utilities/getCachedTvLessons";
 import { redirect } from "next/navigation";
-import { getPayload } from "payload";
 
 type PageProps = {
     searchParams: Promise<{
         date?: string | string[];
     }>;
 };
-
-export const revalidate = 60;
 
 export default async function TvDashboardPage({ searchParams }: PageProps) {
     const params = await searchParams;
@@ -32,27 +27,20 @@ export default async function TvDashboardPage({ searchParams }: PageProps) {
         redirect(`/tv?date=${range.today}`);
     }
 
-    const selectedDate = clampTvDateParam(parsedDate, range);
+    const selectedDate = parsedDate;
 
-    if (selectedDate !== parsedDate) {
-        redirect(`/tv?date=${selectedDate}`);
-    }
-
-    const payload = await getPayload({ config: configPromise });
-
-    const lessonsResult = await getTvLessons(payload, {
+    const lessonsResult = await getCachedTvLessons({
         page: 1,
         dateParam: selectedDate,
     });
 
     return (
         <TVLessonDashboard
+            key={selectedDate}
             lessons={lessonsResult.docs}
             initialHasNextPage={lessonsResult.hasNextPage}
             initialNextPage={lessonsResult.nextPage ?? null}
             selectedDate={selectedDate}
-            minDate={range.min}
-            maxDate={range.max}
         />
     );
 }

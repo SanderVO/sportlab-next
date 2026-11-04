@@ -1,11 +1,7 @@
-import {
-    CloudflareContext,
-    getCloudflareContext,
-} from "@opennextjs/cloudflare";
-import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
-import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
+import { postgresAdapter } from "@payloadcms/db-postgres";
+import { resendAdapter } from "@payloadcms/email-resend";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
-import { r2Storage } from "@payloadcms/storage-r2";
+import { s3Storage } from "@payloadcms/storage-s3";
 import { en as baseEn } from "@payloadcms/translations/languages/en";
 import { nl as baseNl } from "@payloadcms/translations/languages/nl";
 import path from "path";
@@ -15,13 +11,15 @@ import {
     type CollectionConfig,
     type GlobalConfig,
 } from "payload";
+import sharp from "sharp";
 import { fileURLToPath } from "url";
-import type { GetPlatformProxyOptions } from "wrangler";
 import { isCoachOnlyAdminUser } from "./access/isCoachOnlyAdminUser";
+import { CreditAdjustments } from "./collections/CreditAdjustments";
 import { Documents } from "./collections/Documents";
 import { EventRegistrations } from "./collections/EventRegistrations";
 import { Events } from "./collections/Events";
 import { Exercises } from "./collections/Exercises";
+import { HealthMeasurements } from "./collections/HealthMeasurements";
 import { LessonEnrollments } from "./collections/LessonEnrollments";
 import { LessonExerciseTracking } from "./collections/LessonExerciseTracking";
 import { LessonTemplates } from "./collections/LessonTemplates";
@@ -31,11 +29,16 @@ import { Pages } from "./collections/Pages";
 import { Posts } from "./collections/Posts";
 import { ProgramEnrollments } from "./collections/ProgramEnrollments";
 import { Programs } from "./collections/Programs";
+import { SubscriptionPlanPrices } from "./collections/SubscriptionPlanPrices";
+import { SubscriptionPlans } from "./collections/SubscriptionPlans";
+import { Subscriptions } from "./collections/Subscriptions";
 import { Users } from "./collections/Users";
 import { Footer } from "./components/Footer/config";
 import { Header } from "./components/Header/config";
 import { Organization } from "./components/Organization/config";
+import { TvAccess } from "./components/TvAccess/config";
 import { WhatsApp } from "./components/WhatsApp/config";
+import { migrations } from "./migrations-postgres";
 import { plugins } from "./plugins";
 import { getServerSideURL } from "./utilities/getURL";
 
@@ -66,73 +69,68 @@ const en = {
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
-const isProduction = process.env.NODE_ENV === "production";
-const isDevelopment = process.env.NODE_ENV === "development";
-const isPreviewBuild = process.env.CLOUDFLARE_ENV === "preview";
+const r2PublicURL = process.env.R2_PUBLIC_URL?.replace(/\/$/, "");
+const r2ImagesPrefix = process.env.R2_IMAGES_PREFIX || "images/";
+const r2DocumentsPrefix = process.env.R2_DOCUMENTS_PREFIX || "documents/";
+const r2Prefix = (prefix: string | undefined, filename: string) =>
+    [prefix?.replace(/^\/+|\/+$/g, ""), filename].filter(Boolean).join("/");
 
-const cloudflare =
-    process.argv.find((value) => value.match(/^(generate|migrate):?/)) ||
-    isPreviewBuild ||
-    isDevelopment
-        ? await getCloudflareContextFromWrangler()
-        : await getCloudflareContext({ async: true });
-
-const r2ProductionStorage = () =>
-    r2Storage({
-        bucket: cloudflare.env.R2,
-        collections: {
-            media: {
-                disableLocalStorage: true,
-                prefix: cloudflare.env.R2_IMAGES_PREFIX,
-                generateFileURL: ({ filename }) =>
-                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_IMAGES_PREFIX}${filename}`,
-            },
-            documents: {
-                disableLocalStorage: true,
-                prefix: cloudflare.env.R2_DOCUMENTS_PREFIX,
-                generateFileURL: ({ filename }) =>
-                    `${cloudflare.env.R2_PUBLIC_URL}/${cloudflare.env.R2_DOCUMENTS_PREFIX}${filename}`,
-            },
+const r2StoragePlugin = s3Storage({
+    enabled: Boolean(
+        process.env.R2_BUCKET &&
+        process.env.R2_ENDPOINT &&
+        r2PublicURL &&
+        process.env.R2_ACCESS_KEY_ID &&
+        process.env.R2_SECRET_ACCESS_KEY,
+    ),
+    bucket: process.env.R2_BUCKET || "",
+    config: {
+        credentials: {
+            accessKeyId: process.env.R2_ACCESS_KEY_ID || "",
+            secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
         },
-    });
+        region: "auto",
+        endpoint: process.env.R2_ENDPOINT,
+        forcePathStyle: true,
+    },
+    collections: {
+        media: {
+            prefix: r2ImagesPrefix,
+            disablePayloadAccessControl: true,
+            generateFileURL: ({ filename, prefix }) =>
+                `${r2PublicURL}/${r2Prefix(prefix, filename)}`,
+        },
+        documents: {
+            prefix: r2DocumentsPrefix,
+            disablePayloadAccessControl: true,
+            generateFileURL: ({ filename, prefix }) =>
+                `${r2PublicURL}/${r2Prefix(prefix, filename)}`,
+        },
+    },
+});
 
-const r2StoragePlugin = r2ProductionStorage();
+const payloadSecret = process.env.PAYLOAD_SECRET;
 
-const smtpEnabled = cloudflare.env.SMTP_ENABLED?.toString() === "true";
-const smtpHost = cloudflare.env.SMTP_HOST;
-const smtpUser = cloudflare.env.SMTP_USER;
-const smtpPass = cloudflare.env.SMTP_PASS;
-const smtpFromAddress = cloudflare.env.SMTP_FROM_ADDRESS;
-const smtpFromName = cloudflare.env.SMTP_FROM_NAME;
-
-let missingVars: string[] = [];
-
-if (smtpEnabled) {
-    missingVars = [
-        ["SMTP_HOST", smtpHost],
-        ["SMTP_USER", smtpUser],
-        ["SMTP_PASS", smtpPass],
-        ["SMTP_FROM_ADDRESS", smtpFromAddress],
-        ["SMTP_FROM_NAME", smtpFromName],
-    ]
-        .filter(([, value]) => !value)
-        .map(([key]) => key);
+// Without a real secret anyone could forge login tokens, so never fall back at runtime in
+// production. `next build` has no runtime secrets (the Docker build passes none), so skip it there.
+if (
+    !payloadSecret &&
+    process.env.NODE_ENV === "production" &&
+    process.env.NEXT_PHASE !== "phase-production-build"
+) {
+    throw new Error("PAYLOAD_SECRET must be set in production");
 }
 
+const resendApiKey = process.env.RESEND_API_KEY;
+const emailFromAddress = process.env.EMAIL_FROM_ADDRESS;
+const emailFromName = process.env.EMAIL_FROM_NAME;
+
 const emailAdapter =
-    smtpEnabled && missingVars.length === 0
-        ? nodemailerAdapter({
-              defaultFromAddress: smtpFromAddress || "",
-              defaultFromName: smtpFromName || "",
-              transportOptions: {
-                  host: smtpHost,
-                  port: 465,
-                  secure: true,
-                  auth: {
-                      user: smtpUser,
-                      pass: smtpPass,
-                  },
-              },
+    resendApiKey && emailFromAddress && emailFromName
+        ? resendAdapter({
+              apiKey: resendApiKey,
+              defaultFromAddress: emailFromAddress,
+              defaultFromName: emailFromName,
           })
         : undefined;
 
@@ -141,6 +139,7 @@ const coachAccessibleCollections = new Set([
     "exercises",
     "events",
     "programs",
+    "credit-adjustments",
 ]);
 
 const withCoachCollectionVisibility = <T extends CollectionConfig>(
@@ -178,6 +177,11 @@ const withCoachGlobalVisibility = <T extends GlobalConfig>(global: T): T => {
         },
     } as T;
 };
+
+// Exact string match against the request Origin, so strip stray whitespace and trailing slashes.
+const allowedOrigins = [getServerSideURL()]
+    .map((url) => url.trim().replace(/\/+$/, ""))
+    .filter(Boolean);
 
 export default buildConfig({
     admin: {
@@ -225,24 +229,39 @@ export default buildConfig({
         withCoachCollectionVisibility(Events),
         withCoachCollectionVisibility(Exercises),
         withCoachCollectionVisibility(Programs),
+        withCoachCollectionVisibility(SubscriptionPlans),
+        withCoachCollectionVisibility(SubscriptionPlanPrices),
+        withCoachCollectionVisibility(Subscriptions),
+        withCoachCollectionVisibility(CreditAdjustments),
         withCoachCollectionVisibility(LessonEnrollments),
         withCoachCollectionVisibility(LessonExerciseTracking),
         withCoachCollectionVisibility(ProgramEnrollments),
         withCoachCollectionVisibility(EventRegistrations),
+        withCoachCollectionVisibility(HealthMeasurements),
     ],
     globals: [
         withCoachGlobalVisibility(Header),
         withCoachGlobalVisibility(Footer),
         withCoachGlobalVisibility(WhatsApp),
         withCoachGlobalVisibility(Organization),
+        TvAccess,
     ],
-    cors: [getServerSideURL()].filter(Boolean),
+    cors: allowedOrigins,
+    csrf: allowedOrigins,
     editor: lexicalEditor(),
-    secret: cloudflare.env.PAYLOAD_SECRET || "ignore",
+    secret: payloadSecret || "ignore",
+    sharp,
     typescript: {
         outputFile: path.resolve(dirname, "payload-types.ts"),
     },
-    db: sqliteD1Adapter({ binding: cloudflare.env.D1 }),
+    db: postgresAdapter({
+        allowIDOnCreate: true,
+        pool: {
+            connectionString: process.env.DATABASE_URL,
+        },
+        migrationDir: path.resolve(dirname, "migrations-postgres"),
+        prodMigrations: migrations,
+    }),
     plugins: [...plugins, r2StoragePlugin],
     i18n: {
         supportedLanguages: { nl, en },
@@ -254,15 +273,3 @@ export default buildConfig({
         },
     },
 });
-
-// Adapted from https://github.com/opennextjs/opennextjs-cloudflare/blob/d00b3a13e42e65aad76fba41774815726422cc39/packages/cloudflare/src/api/cloudflare-context.ts#L328C36-L328C46
-function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
-    return import(
-        /* webpackIgnore: true */ `${"__wrangler".replaceAll("_", "")}`
-    ).then(({ getPlatformProxy }) =>
-        getPlatformProxy({
-            environment: process.env.CLOUDFLARE_ENV,
-            remoteBindings: isProduction,
-        } satisfies GetPlatformProxyOptions),
-    );
-}

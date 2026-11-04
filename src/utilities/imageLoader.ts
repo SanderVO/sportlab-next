@@ -19,7 +19,7 @@ export default function customImageLoader({
     const params = [
         `width=${width}`,
         `format=auto`,
-        `quality=${quality || 85}`,
+        `quality=${quality || 75}`,
     ];
 
     if (height) params.push(`height=${height}`);

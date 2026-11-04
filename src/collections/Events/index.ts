@@ -17,7 +17,7 @@ export const Events: CollectionConfig = {
         useAsTitle: "title",
         defaultColumns: ["title", "eventType", "startsAt", "updatedAt"],
         description:
-            "Beheer evenementen zoals hardloopwedstrijden, hyrox en speciale events.",
+            { en: "Manage events such as running races, Hyrox and special events.", nl: "Beheer evenementen zoals hardloopwedstrijden, hyrox en speciale events." },
     },
     fields: [
         {

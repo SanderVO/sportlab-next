@@ -1,6 +1,14 @@
 import { adminCoachOrSelf } from "@/access/adminCoachOrSelf";
+import { staffOnlyField } from "@/access/staffOnlyField";
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
 import type { CollectionConfig } from "payload";
+import { enforceCredits } from "./hooks/enforceCredits";
+import { enforceLessonCapacity } from "./hooks/enforceLessonCapacity";
+import {
+    notifyWaitlistOnEnrollmentChange,
+    notifyWaitlistOnEnrollmentDelete,
+} from "./hooks/notifyWaitlist";
+import { setCancelledAt } from "./hooks/setCancelledAt";
 import { syncExerciseTrackingOnEnrollment } from "./hooks/syncExerciseTrackingOnEnrollment";
 
 export const LessonEnrollments: CollectionConfig = {
@@ -20,13 +28,19 @@ export const LessonEnrollments: CollectionConfig = {
         defaultColumns: ["user", "lesson", "status", "updatedAt"],
     },
     hooks: {
-        afterChange: [syncExerciseTrackingOnEnrollment],
+        beforeChange: [setCancelledAt, enforceLessonCapacity, enforceCredits],
+        afterChange: [
+            syncExerciseTrackingOnEnrollment,
+            notifyWaitlistOnEnrollmentChange,
+        ],
+        afterDelete: [notifyWaitlistOnEnrollmentDelete],
     },
     fields: [
         {
             label: { en: "User", nl: "Gebruiker" },
             name: "user",
             type: "relationship",
+            access: { create: staffOnlyField, update: staffOnlyField },
             relationTo: "users",
             required: true,
         },
@@ -34,6 +48,7 @@ export const LessonEnrollments: CollectionConfig = {
             label: { en: "Lesson", nl: "Les" },
             name: "lesson",
             type: "relationship",
+            access: { create: staffOnlyField, update: staffOnlyField },
             relationTo: "lessons",
             required: true,
         },
@@ -57,12 +72,55 @@ export const LessonEnrollments: CollectionConfig = {
                     label: { en: "Cancelled", nl: "Geannuleerd" },
                     value: "cancelled",
                 },
+                {
+                    label: { en: "Waitlisted", nl: "Wachtlijst" },
+                    value: "waitlisted",
+                },
             ],
+        },
+        {
+            label: { en: "On waitlist since", nl: "Op wachtlijst sinds" },
+            name: "waitlistedAt",
+            type: "date",
+            admin: {
+                readOnly: true,
+                condition: (_, siblingData) => siblingData?.status === "waitlisted",
+                date: { pickerAppearance: "dayAndTime" },
+            },
+        },
+        {
+            label: { en: "Spot offered at", nl: "Plek aangeboden op" },
+            name: "waitlistNotifiedAt",
+            type: "date",
+            access: { create: staffOnlyField, update: staffOnlyField },
+            admin: {
+                readOnly: true,
+                condition: (_, siblingData) => siblingData?.status === "waitlisted",
+                description: {
+                    en: "Set when the user was notified that a spot became free. The spot is reserved for them.",
+                    nl: "Wordt gezet zodra de gebruiker bericht kreeg dat er een plek vrij is. De plek is voor hen gereserveerd.",
+                },
+                date: { pickerAppearance: "dayAndTime" },
+            },
+        },
+        {
+            label: { en: "Cancelled at", nl: "Afgemeld op" },
+            name: "cancelledAt",
+            type: "date",
+            admin: {
+                condition: (_, siblingData) => siblingData?.status === "cancelled",
+                description: {
+                    en: "Set automatically when the status becomes cancelled. Cancelling less than 5 minutes before the lesson starts keeps the credit used.",
+                    nl: "Wordt automatisch gezet zodra de status geannuleerd wordt. Afmelden minder dan 5 minuten voor de start van de les houdt de credit in gebruik.",
+                },
+                date: { pickerAppearance: "dayAndTime" },
+            },
         },
         {
             label: { en: "Added by", nl: "Toegevoegd door" },
             name: "addedBy",
             type: "relationship",
+            access: { create: staffOnlyField, update: staffOnlyField },
             relationTo: "users",
             required: false,
             admin: {

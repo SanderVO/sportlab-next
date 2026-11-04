@@ -1,6 +1,7 @@
 "use client";
 
 import { User } from "@/payload-types";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -111,13 +112,13 @@ export function SideNav({ user }: { user: User }) {
 
                     {/* Menu Items */}
                     <nav className="space-y-2">
-                        <a
+                        <Link
                             href="/dashboard"
                             className="block rounded-lg px-3 py-2 text-sand/70 transition hover:bg-warm-white/10 hover:text-warm-white"
                             onClick={() => setIsOpen(false)}
                         >
                             Dashboard
-                        </a>
+                        </Link>
                     </nav>
                 </div>
 

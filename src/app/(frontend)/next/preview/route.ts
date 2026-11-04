@@ -27,20 +27,21 @@ export async function GET(req: NextRequest): Promise<Response> {
         return new Response("Insufficient search params", { status: 404 });
     }
 
-    if (!path.startsWith("/")) {
+    // "//host" and "/\\host" are protocol-relative and would redirect off-site.
+    if (!path.startsWith("/") || path.startsWith("//") || path.includes("\\")) {
         return new Response(
             "This endpoint can only be used for relative previews",
-            { status: 500 },
+            { status: 400 },
         );
     }
 
     let user;
 
     try {
-        user = await payload.auth({
+        ({ user } = await payload.auth({
             req: req as unknown as PayloadRequest,
             headers: req.headers,
-        });
+        }));
     } catch (error) {
         payload.logger.error(
             { err: error },
@@ -59,8 +60,6 @@ export async function GET(req: NextRequest): Promise<Response> {
             status: 403,
         });
     }
-
-    // You can add additional checks here to see if the user is allowed to preview this page
 
     draft.enable();
 

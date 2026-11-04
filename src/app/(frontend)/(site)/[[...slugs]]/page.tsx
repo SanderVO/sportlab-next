@@ -1,0 +1,178 @@
+import { RenderBlocks } from "@/blocks/RenderBlocks";
+import { SetHeroMode } from "@/components/Header/SetHeroMode";
+import { Hero } from "@/components/Hero/Hero";
+import { LivePreviewListener } from "@/components/LivePreviewListener";
+import { PayloadRedirects } from "@/components/PayloadRedirects";
+import { generateMeta } from "@/utilities/generateMeta";
+import configPromise from "@payload-config";
+import type { Metadata } from "next";
+import { draftMode } from "next/headers";
+import Script from "next/script";
+import { getPayload } from "payload";
+import { cache } from "react";
+import PageClient from "./page.client";
+
+type Args = {
+    params: Promise<{
+        slugs?: string[];
+    }>;
+};
+
+// Revalidated on edit via revalidatePath in the Pages hooks; this is the fallback window.
+export const revalidate = 86400;
+
+// Render on first visit instead of at build time, so the build needs no database.
+export async function generateStaticParams() {
+    return [];
+}
+
+const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
+    const { isEnabled: draft } = await draftMode();
+
+    const payload = await getPayload({ config: configPromise });
+
+    const result = await payload.find({
+        collection: "pages",
+        draft,
+        limit: 1,
+        pagination: false,
+        overrideAccess: draft,
+        where: {
+            slug: {
+                equals: slug,
+            },
+        },
+    });
+
+    return result.docs?.[0] || null;
+});
+
+// One query for every breadcrumb segment instead of one per segment.
+const queryPageTitlesBySlugs = cache(async (slugs: string[]) => {
+    const { isEnabled: draft } = await draftMode();
+
+    const payload = await getPayload({ config: configPromise });
+
+    const result = await payload.find({
+        collection: "pages",
+        draft,
+        limit: slugs.length,
+        pagination: false,
+        overrideAccess: draft,
+        select: { title: true, slug: true },
+        where: {
+            slug: {
+                in: slugs,
+            },
+        },
+    });
+
+    return new Map(result.docs.map((doc) => [doc.slug, doc.title]));
+});
+
+export async function generateMetadata({ params }: Args): Promise<Metadata> {
+    const { slugs = ["home"] } = await params;
+    const slug = slugs.at(-1) || "home";
+
+    const decodedSlug = decodeURIComponent(slug);
+
+    const page = await queryPageBySlug({
+        slug: decodedSlug,
+    });
+
+    return generateMeta({ doc: page });
+}
+
+export default async function Page({ params }: Args) {
+    const { isEnabled: draft } = await draftMode();
+    const { slugs = ["home"] } = await params;
+    const slug = slugs.at(-1) || "home";
+
+    const decodedSlug = decodeURIComponent(slug);
+    const url = "/" + decodedSlug;
+
+    const page = await queryPageBySlug({
+        slug: decodedSlug,
+    });
+
+    if (!page) {
+        return <PayloadRedirects url={url} />;
+    }
+
+    const { hero, layout, meta, hasHero } = page;
+
+    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "";
+
+    const titles =
+        slugs.length > 1
+            ? await queryPageTitlesBySlugs(slugs.map(decodeURIComponent))
+            : new Map<string, string>();
+
+    const breadcrumbItems = slugs.map((slug, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: titles.get(decodeURIComponent(slug)) ?? decodeURIComponent(slug),
+        item: `${baseUrl}/${slugs.slice(0, index + 1).join("/")}`,
+    }));
+
+    const breadcrumbJsonLd =
+        slugs.length > 1
+            ? {
+                  "@context": "https://schema.org",
+                  "@type": "BreadcrumbList",
+                  itemListElement: breadcrumbItems,
+              }
+            : null;
+
+    return (
+        <>
+            <PageClient />
+
+            <PayloadRedirects disableNotFound url={url} />
+
+            {draft && <LivePreviewListener />}
+
+            {hasHero && <SetHeroMode />}
+            {hasHero && <Hero {...hero} />}
+
+            <RenderBlocks blocks={layout} />
+
+            {meta?.richSnippets && (
+                <>
+                    {meta.richSnippets.map((snippet, index) => {
+                        if (snippet?.jsonLd) {
+                            return (
+                                <Script
+                                    id={`rich-snippet-${snippet.id}`}
+                                    key={index}
+                                    type="application/ld+json"
+                                    strategy="afterInteractive"
+                                    dangerouslySetInnerHTML={{
+                                        __html: JSON.stringify(
+                                            snippet.jsonLd,
+                                        ).replace(/</g, "\\u003c"),
+                                    }}
+                                />
+                            );
+                        }
+                        return null;
+                    })}
+                </>
+            )}
+
+            {breadcrumbJsonLd && (
+                <Script
+                    id="breadcrumb-jsonld"
+                    type="application/ld+json"
+                    strategy="afterInteractive"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify(breadcrumbJsonLd).replace(
+                            /</g,
+                            "\\u003c",
+                        ),
+                    }}
+                />
+            )}
+        </>
+    );
+}

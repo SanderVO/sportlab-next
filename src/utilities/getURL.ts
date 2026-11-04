@@ -1,7 +1,7 @@
 import canUseDOM from "./canUseDOM";
 
 export const getServerSideURL = () => {
-    return process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+    return process.env.NEXT_PUBLIC_SERVER_URL || "https://sportlabgroningen.nl";
 };
 
 export const getClientSideURL = () => {

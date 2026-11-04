@@ -3,7 +3,7 @@ import type { SelectField } from "payload";
 export const variantField = (
     variants: { label: string; value: string }[],
 ): SelectField => ({
-    label: "Variant",
+    label: { en: "Variant", nl: "Variant" },
     name: "variant",
     type: "select",
     defaultValue: "orange",
@@ -13,7 +13,7 @@ export const variantField = (
 export const sizeField = (
     sizes: { label: string; value: string }[],
 ): SelectField => ({
-    label: "Grootte",
+    label: { en: "Size", nl: "Grootte" },
     name: "size",
     type: "select",
     defaultValue: "md",
@@ -23,7 +23,7 @@ export const sizeField = (
 export const buttonSpacingField = (
     spacingOptions: { label: string; value: string }[],
 ): SelectField => ({
-    label: "Knop marge",
+    label: { en: "Button spacing", nl: "Knop marge" },
     name: "buttonSpacing",
     type: "select",
     defaultValue: "md",
@@ -34,13 +34,13 @@ export const buttonSpacingField = (
 });
 
 export const alignmentField = (): SelectField => ({
-    label: "Uitlijning",
+    label: { en: "Alignment", nl: "Uitlijning" },
     name: "alignment",
     type: "select",
     defaultValue: "left",
     options: [
-        { label: "Links", value: "left" },
-        { label: "Gecentreerd", value: "center" },
+        { label: { en: "Left", nl: "Links" }, value: "left" },
+        { label: { en: "Centered", nl: "Gecentreerd" }, value: "center" },
     ],
     admin: {
         condition: (_data, siblingData) => siblingData?.variant !== "inline",

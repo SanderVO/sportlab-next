@@ -1,10 +1,11 @@
-import { RolesEnum } from "@/collections/Users";
-import type { User } from "@/payload-types";
+import { rolesOf } from "@/access/rolesOf";
+import { RolesEnum } from "@/collections/Users/roles";
+import type { PayloadMcpApiKey, User } from "@/payload-types";
 import type { Access, Payload } from "payload";
 
 type UserHasAdminAccessArgs = {
     payload: Payload;
-    user: null | User;
+    user: null | PayloadMcpApiKey | User;
 };
 
 export const userHasAdminAccess = async ({
@@ -15,7 +16,12 @@ export const userHasAdminAccess = async ({
         return false;
     }
 
-    const jwtRoles = Array.isArray(user.roles) ? user.roles : [];
+    // An MCP API key document has its own id space; never look its id up as a user.
+    if ("collection" in user && user.collection === "payload-mcp-api-keys") {
+        return false;
+    }
+
+    const jwtRoles = rolesOf(user);
 
     if (jwtRoles.includes(RolesEnum.ADMIN)) {
         return true;
@@ -36,6 +42,6 @@ export const userHasAdminAccess = async ({
 export const isAdmin: Access = async ({ req }) => {
     return userHasAdminAccess({
         payload: req.payload,
-        user: (req.user as User | null) ?? null,
+        user: req.user ?? null,
     });
 };

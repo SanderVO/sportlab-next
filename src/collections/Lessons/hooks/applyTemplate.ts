@@ -5,11 +5,7 @@ import {
 } from "payload";
 
 type TemplateRelation =
-    | { id?: string | number }
-    | string
-    | number
-    | null
-    | undefined;
+    { id?: string | number } | string | number | null | undefined;
 
 type LessonData = {
     template?: TemplateRelation;
@@ -25,8 +21,18 @@ type WorkoutTemplateBlock = {
     name?: string | null;
     description?: string | null;
     duration?: number | null;
+    poa?: string | null;
+    timerMode?: "countdown" | "emom" | "amrap" | "rounds" | "intervals" | null;
+    highlightExercises?: boolean | null;
+    intervalSeconds?: number | null;
+    rounds?: number | null;
+    roundTypes?: Array<{
+        type?: "work" | "rest" | "active_rest" | null;
+        seconds?: number | null;
+    }> | null;
     exercises?: Array<{
         name?: string | null;
+        rotating?: boolean | null;
         description?: string | null;
         videoUrl?: string | null;
     }>;
@@ -84,8 +90,18 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
         name: string;
         description?: string;
         duration?: number;
+        poa?: string;
+        timerMode?: "countdown" | "emom" | "amrap" | "rounds" | "intervals";
+        highlightExercises?: boolean;
+        intervalSeconds?: number;
+        rounds?: number;
+        roundTypes?: Array<{
+            type: "work" | "rest" | "active_rest";
+            seconds: number;
+        }>;
         exercises: Array<{
             name: string;
+            rotating?: boolean;
             description?: string;
             videoUrl?: string;
         }>;
@@ -102,6 +118,7 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
             .filter((exercise) => Boolean(exercise?.name))
             .map((exercise) => ({
                 name: exercise?.name ?? "",
+                rotating: exercise?.rotating ?? undefined,
                 description: exercise?.description ?? undefined,
                 videoUrl: exercise?.videoUrl ?? undefined,
             }));
@@ -115,6 +132,16 @@ const applyTemplateValues = async ({ data, req, operation }: HookArgs) => {
             description: block.description ?? undefined,
             duration:
                 typeof block.duration === "number" ? block.duration : undefined,
+            poa: block.poa ?? undefined,
+            timerMode: block.timerMode ?? undefined,
+            highlightExercises: block.highlightExercises ?? undefined,
+            intervalSeconds: block.intervalSeconds ?? undefined,
+            rounds: block.rounds ?? undefined,
+            roundTypes: (block.roundTypes ?? []).flatMap((round) =>
+                round.type && typeof round.seconds === "number"
+                    ? [{ type: round.type, seconds: round.seconds }]
+                    : [],
+            ),
             exercises,
         });
     }

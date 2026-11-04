@@ -1,0 +1,96 @@
+{
+  "v": 3,
+  "assetGroups": {
+    "Reference": {
+      "files": {
+        "one-more-reason-toolkit.pdf": {
+          "blob": "dff3b1675bd76ca8a3506c3e1d6b7dda",
+          "name": "one-more-reason-toolkit.pdf",
+          "size": 4486048,
+          "type": "application/pdf"
+        }
+      },
+      "name": "Reference",
+      "order": [
+        "one-more-reason-toolkit.pdf"
+      ],
+      "tile": "m"
+    },
+    "Photography": {
+      "name": "Photography",
+      "tile": "l",
+      "order": [
+        "group-class-in-action.jpg",
+        "high-five-after-class.jpg",
+        "team-on-the-rowerg.jpg",
+        "coaching-dumbbell-row.jpg"
+      ],
+      "files": {
+        "group-class-in-action.jpg": {
+          "name": "group-class-in-action.jpg",
+          "blob": "c8db41706085e31c84a46e6d170f23c5",
+          "size": 1185144,
+          "type": "image/jpeg"
+        },
+        "high-five-after-class.jpg": {
+          "name": "high-five-after-class.jpg",
+          "blob": "d3afc7d282a69a4c9c157e447d31a96d",
+          "size": 818385,
+          "type": "image/jpeg"
+        },
+        "team-on-the-rowerg.jpg": {
+          "name": "team-on-the-rowerg.jpg",
+          "blob": "b59bfc0fc97ec885a69c1e0d5cd942d1",
+          "size": 470036,
+          "type": "image/jpeg"
+        },
+        "coaching-dumbbell-row.jpg": {
+          "name": "coaching-dumbbell-row.jpg",
+          "blob": "49b3a9cdab351d7797fe21c5d7b337c8",
+          "size": 565638,
+          "type": "image/jpeg"
+        }
+      }
+    },
+    "Fallbacks": {
+      "name": "Fallbacks",
+      "tile": "m",
+      "order": [
+        "lesson-fallback.webp"
+      ],
+      "files": {
+        "lesson-fallback.webp": {
+          "name": "lesson-fallback.webp",
+          "blob": "e866055d01788e8de33850a0a426a8ea",
+          "size": 5814,
+          "type": "image/webp"
+        }
+      }
+    }
+  },
+  "blobs": {},
+  "createdOnFiles": {
+    "at": "2026-10-04T12:38:19Z",
+    "v": 1
+  },
+  "docs": {
+    "readme": "project/README.md",
+    "sections": []
+  },
+  "groups": [
+    "Photography",
+    "Fallbacks",
+    "Reference"
+  ],
+  "lastChange": {
+    "by": "Sander",
+    "at": "2026-11-03T18:48:00Z",
+    "via": "Claude",
+    "note": "Credits rules confirmed in data-schema.md: a credit counts for the week/month of the lesson; a waitlist spot only costs a credit once confirmed."
+  },
+  "layout": "files",
+  "libraries": [],
+  "namespace": "Sportlab",
+  "sections": {},
+  "title": "One More Reason"
+}
