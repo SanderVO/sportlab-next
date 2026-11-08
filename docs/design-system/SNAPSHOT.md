@@ -3,7 +3,7 @@
 A read-only copy of the **One More Reason** design system for Sportlab Groningen, so tools that cannot open the claude.ai artifact (OpenCode, other LLMs, reviewers) can still read it.
 
 - **Authority:** the artifact, https://claude.ai/code/artifact/b85d45fc-1044-491b-ab0c-827f00966109. This folder is a copy; if they differ, the artifact wins.
-- **Snapshot of:** `lastChange.at` `2026-11-03T18:48:00Z` (see `design-system.json`).
+- **Snapshot of:** `lastChange.at` `2026-11-08T20:01:00Z` (see `design-system.json`).
 - **Do not edit by hand.** Refresh it from the artifact (see below).
 
 ## What is in here

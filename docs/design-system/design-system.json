@@ -84,9 +84,9 @@
   ],
   "lastChange": {
     "by": "Sander",
-    "at": "2026-11-03T18:48:00Z",
+    "at": "2026-11-08T20:01:00Z",
     "via": "Claude",
-    "note": "Credits rules confirmed in data-schema.md: a credit counts for the week/month of the lesson; a waitlist spot only costs a credit once confirmed."
+    "note": "CoachNotes: a note without an author shows \"Oud coach\" as the name."
   },
   "layout": "files",
   "libraries": [],

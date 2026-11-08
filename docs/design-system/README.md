@@ -137,6 +137,21 @@ The logged-in environment for members: login, Overzicht (home), Lessen, Events, 
 - **Performance (app, 60fps):** flat surfaces only: no shadows, blur or animated gradients. Ship the dark panel's radial glow as one pre-rendered image (or a single static `react-native-svg` gradient). Lists use FlashList; the event row is a horizontal FlashList with snapping. The weight line is a plain SVG polyline. Photos are sized to their frame (no full-resolution images in lists).
 - **Screens:** Login, MemberHome (web), MemberHomeNew (web, new member), MemberHomeApp (both, phone), MemberLessons (web), MemberLessonsApp (both, phone). **Parts:** MemberNav, NextLesson, LessonRow, WaitlistNotice, ProgramCard, EventCard, ProgressStats, Credits, WeekStrip, LessonCard, LessonThumb. Field names follow the Payload data schema (`data-schema.md`).
 
+## Coachomgeving (coaches: app)
+
+Coaches use the same app and login as members. When `users.roles` contains `coach` (or `isCoach` is on), the app shows the coach screens. They use their phone on the gym floor, so everything is built for one hand and a few seconds: big rows, one tap per action, no confirmation dialogs except for cancelling a lesson. Writing and editing lessons and workouts stays in Payload; the app is for what happens in and around a lesson.
+
+- **Navigation, five items:** Overzicht · Lessen · Leden · Events · Ik (Lucide `house`, `calendar-days`, `users`, `flag`, `user-round`). Leden takes the place of Voortgang; a coach's own progress sits under Ik › Mijn voortgang. Same native tab bar and tint as members. A `Coach` outline tag in the top bar shows which mode you're in.
+- **Overzicht** (CoachHome): the lesson that's on now or next in the dark panel, the rest of today, the coach's own training ("Jij traint mee") and Aandacht (signals that need an action).
+- **Lessons start by themselves.** There is no "start les": the fase is computed from `startDate`/`endDate` (*Straks* · *Bezig* · *Afgelopen*). Attendance opens 15 minutes before the start and stays editable afterwards (AttendanceList).
+- **Cancelling** is possible until the start, with a reason the participants read (CancelLessonSheet). It notifies everyone, refunds credits and clears the waitlist.
+- **Coaches train along** by booking like any member. They have **unlimited credits**: no credit check and nothing counted, only a free spot is needed. In participant lists they get the label *Coach* and "Traint mee · geen credits nodig".
+- **Leden** (CoachMembers, CoachMember): coaches see all members. A member's page has quick actions (Meting, Credits, Inschrijven), the coach notes, credits, upcoming lessons, progress and the logbook.
+- **Coach notes** (CoachNotes) are shared: every coach and admin can read and add them, each note shows its author and date, and only the author or an admin can edit or delete one. A note stays when its author's account is deleted; it then has no author and only an admin can edit or delete it. The member never sees them. Members only see their own notes (the notes they write on exercises), which coaches see in the logbook as "Notitie van {naam}".
+- **Orange:** none on coach screens. Actions are `sl-btn-ink`, `sl-btn-sand` (on the dark panel) or ghost; nothing here sells.
+- **Performance:** the same rules as the member app (flat, FlashList, sized images). Attendance taps save optimistically and queue offline, because gym Wi-Fi is unreliable.
+- **Screens:** CoachHome, CoachLesson, CoachMembers, CoachMember. **Parts:** AttendanceList, CancelLessonSheet, CoachNotes. Fields: `lessons` (cancel fields), `lesson-enrollments` (`attendance`), `coach-notes`, see `data-schema.md`.
+
 ## Components
 
 Pure CSS in `components/bundle.css` (class prefixes `sl-`, `tv-`, `web-`, `app-`); load it after `tokens.css`. It imports Anton, Poppins and Archivo from Google Fonts.
@@ -149,6 +164,7 @@ Pure CSS in `components/bundle.css` (class prefixes `sl-`, `tv-`, `web-`, `app-`
 - **Website · blog:** BlogIndex, BlogPost, BlogMobile (see above).
 - **Email:** transactional emails for Resend (see above).
 - **Ledenomgeving (web + app):** Login, MemberHome, MemberHomeNew, MemberHomeApp, MemberLessons, MemberLessonsApp; MemberNav, NextLesson, LessonRow, WaitlistNotice, ProgramCard, EventCard, ProgressStats, Credits, WeekStrip, LessonCard, LessonThumb (see above).
+- **Coachomgeving (app):** CoachHome, CoachLesson, CoachMembers, CoachMember; AttendanceList, CancelLessonSheet, CoachNotes (see above).
 - **Social templates:** Story 9:16, CarouselSlide 4:5, FeedPost 1:1 / 4:5. Every one has the wordmark top-left, white type, at most one orange CTA.
 
 The original campaign toolkit (PDF) is under **Assets → Reference**.
