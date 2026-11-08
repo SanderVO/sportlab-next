@@ -102,25 +102,78 @@ const replaceSelectValuesWithLabels: CollectionBeforeChangeHook = async ({
     };
 };
 
+const mcpCrudWithoutDelete = {
+    create: true,
+    find: true,
+    update: true,
+    delete: false,
+};
+
 export const plugins: Plugin[] = [
-    // Lets LLM clients work with content over MCP (POST /api/mcp). Only the collections below
-    // are exposed, no globals. Workout blocks are part of lessons, so they follow `lessons`.
+    // Lets LLM clients work with content over MCP (POST /api/mcp). Collections can be created, read
+    // and updated, never deleted. Left out: users, and everything related to subscriptions and
+    // credits (subscription plans, plan prices, subscriptions, credit adjustments, lesson
+    // enrollments, which enforce credits). No globals. Workout blocks are part of lessons.
     // Keys act as the user they belong to, so each collection's access control still applies.
     mcpPlugin({
         collections: {
             pages: {
                 description:
-                    "Website pages of Sportlab Groningen, including their content blocks, hero and SEO fields. Can be read and updated, not created or deleted.",
-                enabled: { find: true, update: true },
+                    "Website pages of Sportlab Groningen, including their content blocks, hero and SEO fields. New pages and changes are always saved as a draft (concept) that a person publishes in the CMS.",
+                enabled: mcpCrudWithoutDelete,
+            },
+            posts: {
+                description: "Blog posts of Sportlab Groningen.",
+                enabled: mcpCrudWithoutDelete,
+            },
+            media: {
+                description: "Images and other media files.",
+                enabled: mcpCrudWithoutDelete,
+            },
+            documents: {
+                description: "Downloadable documents.",
+                enabled: mcpCrudWithoutDelete,
             },
             lessons: {
                 description:
                     "Lessons of Sportlab Groningen, including their workout blocks (workout details and exercises).",
-                enabled: true,
+                enabled: mcpCrudWithoutDelete,
+            },
+            "lesson-templates": {
+                description: "Templates that lessons are created from.",
+                enabled: mcpCrudWithoutDelete,
+            },
+            events: {
+                description: "Events of Sportlab Groningen.",
+                enabled: mcpCrudWithoutDelete,
             },
             exercises: {
                 description: "Exercises that can be used in workout blocks.",
-                enabled: true,
+                enabled: mcpCrudWithoutDelete,
+            },
+            programs: {
+                description: "Training programs of Sportlab Groningen.",
+                enabled: mcpCrudWithoutDelete,
+            },
+            "lesson-exercise-tracking": {
+                description: "Exercise results tracked per lesson.",
+                enabled: mcpCrudWithoutDelete,
+            },
+            "program-enrollments": {
+                description: "Enrollments of members in programs.",
+                enabled: mcpCrudWithoutDelete,
+            },
+            "event-registrations": {
+                description: "Registrations of members for events.",
+                enabled: mcpCrudWithoutDelete,
+            },
+            "health-measurements": {
+                description: "Health measurements of members.",
+                enabled: mcpCrudWithoutDelete,
+            },
+            "coach-notes": {
+                description: "Notes coaches keep about members.",
+                enabled: mcpCrudWithoutDelete,
             },
         },
         // The plugin loads the key's user at depth 1, and Users limits populated users to a few

@@ -19,7 +19,7 @@ import { authenticatedOrPublished } from "../../access/authenticatedOrPublished"
 import { Content } from "../../blocks/Content/config";
 import { populatePublishedAt } from "../../hooks/populatePublishedAt";
 import { generatePreviewPath } from "../../utilities/generatePreviewPath";
-import { draftOnMcpUpdate } from "./hooks/draftOnMcpUpdate";
+import { draftOnMcpWrite } from "./hooks/draftOnMcpWrite";
 import { revalidateDelete, revalidatePage } from "./hooks/revalidatePage";
 
 export const Pages: CollectionConfig<"pages"> = {
@@ -57,7 +57,7 @@ export const Pages: CollectionConfig<"pages"> = {
         useAsTitle: "title",
     },
     hooks: {
-        beforeOperation: [draftOnMcpUpdate],
+        beforeOperation: [draftOnMcpWrite],
         afterChange: [revalidatePage],
         beforeChange: [populatePublishedAt],
         afterDelete: [revalidateDelete],
