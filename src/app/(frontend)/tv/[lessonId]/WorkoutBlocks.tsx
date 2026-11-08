@@ -612,7 +612,25 @@ function BlockModal({
                     <div className="type-tv-label truncate text-sand uppercase">
                         Blok {index + 1} / {total} · {lessonTitle}
                     </div>
-                    <h2 className="type-tv-title mt-3.5 leading-none text-[110px]">
+                    <h2
+                        className="type-tv-title mt-3.5 line-clamp-2 leading-none"
+                        style={{
+                            fontSize: `${Math.max(
+                                48,
+                                Math.min(
+                                    110,
+                                    Math.floor(
+                                        3000 /
+                                            Math.max(
+                                                (block.name || "Workout")
+                                                    .length,
+                                                1,
+                                            ),
+                                    ),
+                                ),
+                            )}px`,
+                        }}
+                    >
                         {block.name || "Workout"}
                     </h2>
                     {block.description ? (
