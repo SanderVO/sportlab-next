@@ -84,9 +84,9 @@
   ],
   "lastChange": {
     "by": "Sander",
-    "at": "2026-11-08T20:01:00Z",
+    "at": "2026-11-08T20:17:00Z",
     "via": "Claude",
-    "note": "CoachNotes: a note without an author shows \"Oud coach\" as the name."
+    "note": "EventTimeline: upcoming events as a timeline on website pages; events.description in data-schema.md."
   },
   "layout": "files",
   "libraries": [],

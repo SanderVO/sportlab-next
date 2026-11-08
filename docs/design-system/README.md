@@ -104,6 +104,10 @@ The concept pages for the blog (BlogIndex, BlogPost, BlogMobile) apply this syst
 - **Orange:** only the header button and one CTA per page. Links on light are `ink` and underlined (`.web-link`), and selected filters are `ink`.
 - **Haakjes:** a sticker on a photo (`.sl-sticker-label`, `.sl-sticker-ticket`) can tie an article to the campaign. Use at most one per page (see Dosage).
 
+## Website · evenementen
+
+EventTimeline shows the upcoming `events` on a website page as a timeline: a large date, one continuous line, title and description, and square photos stepping between two lanes. Only upcoming events appear, it follows the page's Zwart, Beige or Wit ground, and it uses no orange.
+
 ## Email (transactional)
 
 Service emails (proefles, account, lidmaatschap, webshop) are letters, not campaign pieces: light and quiet, so the one orange button is the only thing that lights up.
@@ -162,6 +166,7 @@ Pure CSS in `components/bundle.css` (class prefixes `sl-`, `tv-`, `web-`, `app-`
 - **Stickers:** ticket, seal, label, rep counter, dot pill. Always monochrome.
 - **TV dashboard:** TvPin, TvSchedule, TvWorkout, TvBlockTimer (see above).
 - **Website · blog:** BlogIndex, BlogPost, BlogMobile (see above).
+- **Website · evenementen:** EventTimeline (see above).
 - **Email:** transactional emails for Resend (see above).
 - **Ledenomgeving (web + app):** Login, MemberHome, MemberHomeNew, MemberHomeApp, MemberLessons, MemberLessonsApp; MemberNav, NextLesson, LessonRow, WaitlistNotice, ProgramCard, EventCard, ProgressStats, Credits, WeekStrip, LessonCard, LessonThumb (see above).
 - **Coachomgeving (app):** CoachHome, CoachLesson, CoachMembers, CoachMember; AttendanceList, CancelLessonSheet, CoachNotes (see above).
