@@ -1575,7 +1575,53 @@ export interface PayloadMcpApiKey {
      */
     find?: boolean | null;
     /**
+     * Allow clients to create pages.
+     */
+    create?: boolean | null;
+    /**
      * Allow clients to update pages.
+     */
+    update?: boolean | null;
+  };
+  posts?: {
+    /**
+     * Allow clients to find posts.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create posts.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update posts.
+     */
+    update?: boolean | null;
+  };
+  media?: {
+    /**
+     * Allow clients to find media.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create media.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update media.
+     */
+    update?: boolean | null;
+  };
+  documents?: {
+    /**
+     * Allow clients to find documents.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create documents.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update documents.
      */
     update?: boolean | null;
   };
@@ -1592,10 +1638,34 @@ export interface PayloadMcpApiKey {
      * Allow clients to update lessons (including workout blocks).
      */
     update?: boolean | null;
+  };
+  lessonTemplates?: {
     /**
-     * Allow clients to delete lessons (including workout blocks).
+     * Allow clients to find lesson-templates.
      */
-    delete?: boolean | null;
+    find?: boolean | null;
+    /**
+     * Allow clients to create lesson-templates.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update lesson-templates.
+     */
+    update?: boolean | null;
+  };
+  events?: {
+    /**
+     * Allow clients to find events.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create events.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update events.
+     */
+    update?: boolean | null;
   };
   exercises?: {
     /**
@@ -1610,10 +1680,90 @@ export interface PayloadMcpApiKey {
      * Allow clients to update exercises.
      */
     update?: boolean | null;
+  };
+  programs?: {
     /**
-     * Allow clients to delete exercises.
+     * Allow clients to find programs.
      */
-    delete?: boolean | null;
+    find?: boolean | null;
+    /**
+     * Allow clients to create programs.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update programs.
+     */
+    update?: boolean | null;
+  };
+  lessonExerciseTracking?: {
+    /**
+     * Allow clients to find lesson-exercise-tracking.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create lesson-exercise-tracking.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update lesson-exercise-tracking.
+     */
+    update?: boolean | null;
+  };
+  programEnrollments?: {
+    /**
+     * Allow clients to find program-enrollments.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create program-enrollments.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update program-enrollments.
+     */
+    update?: boolean | null;
+  };
+  eventRegistrations?: {
+    /**
+     * Allow clients to find event-registrations.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create event-registrations.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update event-registrations.
+     */
+    update?: boolean | null;
+  };
+  healthMeasurements?: {
+    /**
+     * Allow clients to find health-measurements.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create health-measurements.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update health-measurements.
+     */
+    update?: boolean | null;
+  };
+  coachNotes?: {
+    /**
+     * Allow clients to find coach-notes.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create coach-notes.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update coach-notes.
+     */
+    update?: boolean | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -2680,6 +2830,28 @@ export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
     | T
     | {
         find?: T;
+        create?: T;
+        update?: T;
+      };
+  posts?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  media?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  documents?:
+    | T
+    | {
+        find?: T;
+        create?: T;
         update?: T;
       };
   lessons?:
@@ -2688,7 +2860,20 @@ export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
         find?: T;
         create?: T;
         update?: T;
-        delete?: T;
+      };
+  lessonTemplates?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  events?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
       };
   exercises?:
     | T
@@ -2696,7 +2881,48 @@ export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
         find?: T;
         create?: T;
         update?: T;
-        delete?: T;
+      };
+  programs?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  lessonExerciseTracking?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  programEnrollments?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  eventRegistrations?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  healthMeasurements?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  coachNotes?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
       };
   updatedAt?: T;
   createdAt?: T;

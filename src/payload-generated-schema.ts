@@ -3329,15 +3329,75 @@ export const payload_mcp_api_keys = pgTable(
         label: varchar("label"),
         description: varchar("description"),
         pages_find: boolean("pages_find").default(false),
+        pages_create: boolean("pages_create").default(false),
         pages_update: boolean("pages_update").default(false),
+        posts_find: boolean("posts_find").default(false),
+        posts_create: boolean("posts_create").default(false),
+        posts_update: boolean("posts_update").default(false),
+        media_find: boolean("media_find").default(false),
+        media_create: boolean("media_create").default(false),
+        media_update: boolean("media_update").default(false),
+        documents_find: boolean("documents_find").default(false),
+        documents_create: boolean("documents_create").default(false),
+        documents_update: boolean("documents_update").default(false),
         lessons_find: boolean("lessons_find").default(false),
         lessons_create: boolean("lessons_create").default(false),
         lessons_update: boolean("lessons_update").default(false),
-        lessons_delete: boolean("lessons_delete").default(false),
+        lessonTemplates_find: boolean("lesson_templates_find").default(false),
+        lessonTemplates_create: boolean("lesson_templates_create").default(
+            false,
+        ),
+        lessonTemplates_update: boolean("lesson_templates_update").default(
+            false,
+        ),
+        events_find: boolean("events_find").default(false),
+        events_create: boolean("events_create").default(false),
+        events_update: boolean("events_update").default(false),
         exercises_find: boolean("exercises_find").default(false),
         exercises_create: boolean("exercises_create").default(false),
         exercises_update: boolean("exercises_update").default(false),
-        exercises_delete: boolean("exercises_delete").default(false),
+        programs_find: boolean("programs_find").default(false),
+        programs_create: boolean("programs_create").default(false),
+        programs_update: boolean("programs_update").default(false),
+        lessonExerciseTracking_find: boolean(
+            "lesson_exercise_tracking_find",
+        ).default(false),
+        lessonExerciseTracking_create: boolean(
+            "lesson_exercise_tracking_create",
+        ).default(false),
+        lessonExerciseTracking_update: boolean(
+            "lesson_exercise_tracking_update",
+        ).default(false),
+        programEnrollments_find: boolean("program_enrollments_find").default(
+            false,
+        ),
+        programEnrollments_create: boolean(
+            "program_enrollments_create",
+        ).default(false),
+        programEnrollments_update: boolean(
+            "program_enrollments_update",
+        ).default(false),
+        eventRegistrations_find: boolean("event_registrations_find").default(
+            false,
+        ),
+        eventRegistrations_create: boolean(
+            "event_registrations_create",
+        ).default(false),
+        eventRegistrations_update: boolean(
+            "event_registrations_update",
+        ).default(false),
+        healthMeasurements_find: boolean("health_measurements_find").default(
+            false,
+        ),
+        healthMeasurements_create: boolean(
+            "health_measurements_create",
+        ).default(false),
+        healthMeasurements_update: boolean(
+            "health_measurements_update",
+        ).default(false),
+        coachNotes_find: boolean("coach_notes_find").default(false),
+        coachNotes_create: boolean("coach_notes_create").default(false),
+        coachNotes_update: boolean("coach_notes_update").default(false),
         updatedAt: timestamp("updated_at", {
             mode: "string",
             withTimezone: true,

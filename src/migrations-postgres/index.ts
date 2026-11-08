@@ -18,6 +18,7 @@ import * as migration_20261103_210335_add_lesson_enrollment_cancelled_at from '.
 import * as migration_20261103_213233_add_user_language from './20261103_213233_add_user_language';
 import * as migration_20261108_195432_add_coach_environment from './20261108_195432_add_coach_environment';
 import * as migration_20261108_201509_add_event_timeline from './20261108_201509_add_event_timeline';
+import * as migration_20261108_210727_mcp_create_permissions from './20261108_210727_mcp_create_permissions';
 
 export const migrations = [
   {
@@ -119,5 +120,10 @@ export const migrations = [
     up: migration_20261108_201509_add_event_timeline.up,
     down: migration_20261108_201509_add_event_timeline.down,
     name: '20261108_201509_add_event_timeline',
+  },
+  {
+    up: migration_20261108_210727_mcp_create_permissions.up,
+    down: migration_20261108_210727_mcp_create_permissions.down,
+    name: '20261108_210727_mcp_create_permissions'
   },
 ];
