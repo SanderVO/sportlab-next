@@ -516,7 +516,15 @@ export interface Page {
     } | null;
     contentPosition?: ('left' | 'center') | null;
   };
-  layout: (ContentBlock | CarouselBlock | TeamBlock | InstagramBlock | CycleTimelineBlock | MediaCarouselBlock)[];
+  layout: (
+    | ContentBlock
+    | CarouselBlock
+    | TeamBlock
+    | InstagramBlock
+    | CycleTimelineBlock
+    | EventTimelineBlock
+    | MediaCarouselBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -834,6 +842,24 @@ export interface CycleTimelineBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventTimelineBlock".
+ */
+export interface EventTimelineBlock {
+  backgroundColor: 'backgroundDark' | 'backgroundLight' | 'backgroundWhite';
+  /**
+   * Title for block.
+   */
+  title: string;
+  /**
+   * Optional. The events come from Events; only upcoming events are shown.
+   */
+  subtitle?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'eventTimeline';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "MediaCarouselBlock".
  */
 export interface MediaCarouselBlock {
@@ -1097,6 +1123,7 @@ export interface Program {
 export interface Event {
   id: number;
   title: string;
+  description?: string | null;
   eventType: 'running' | 'hyrox' | 'special';
   bannerImage?: (number | null) | Media;
   startsAt: string;
@@ -1965,6 +1992,7 @@ export interface PagesSelect<T extends boolean = true> {
         team?: T | TeamBlockSelect<T>;
         instagram?: T | InstagramBlockSelect<T>;
         cycleTimeline?: T | CycleTimelineBlockSelect<T>;
+        eventTimeline?: T | EventTimelineBlockSelect<T>;
         mediaCarousel?: T | MediaCarouselBlockSelect<T>;
       };
   meta?:
@@ -2104,6 +2132,17 @@ export interface CycleTimelineBlockSelect<T extends boolean = true> {
       };
   footerText?: T;
   footerContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EventTimelineBlock_select".
+ */
+export interface EventTimelineBlockSelect<T extends boolean = true> {
+  backgroundColor?: T;
+  title?: T;
+  subtitle?: T;
   id?: T;
   blockName?: T;
 }
@@ -2268,6 +2307,7 @@ export interface LessonTemplatesSelect<T extends boolean = true> {
  */
 export interface EventsSelect<T extends boolean = true> {
   title?: T;
+  description?: T;
   eventType?: T;
   bannerImage?: T;
   startsAt?: T;

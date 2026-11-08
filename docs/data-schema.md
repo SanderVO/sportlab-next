@@ -161,6 +161,12 @@ Pagina · drafts
     - `footerContent` (richText): Voettekst content
     - `id` (text): ID
     - `blockName` (text): Block Name
+  - block `eventTimeline`
+    - `backgroundColor` (select, required, one of: backgroundDark, backgroundLight, backgroundWhite, default "backgroundWhite"): Achtergrondkleur
+    - `title` (text, required): Titel
+    - `subtitle` (text): Ondertitel
+    - `id` (text): ID
+    - `blockName` (text): Block Name
   - block `mediaCarousel`
     - `backgroundColor` (select, required, one of: backgroundDark, backgroundLight, backgroundWhite, default "backgroundLight"): Achtergrondkleur
     - `title` (text, required): Titel
@@ -297,6 +303,7 @@ Les sjabloon
 Evenement
 
 - `title` (text, required): Titel
+- `description` (textarea): Omschrijving
 - `eventType` (select, required, one of: running, hyrox, special): Type
 - `bannerImage` (upload, → media): Banner afbeelding
 - `startsAt` (date, required): Startdatum

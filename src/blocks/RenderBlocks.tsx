@@ -1,6 +1,7 @@
 import { CarouselBlock } from "@/blocks/Carousel/CarouselBlock";
 import { ContentBlock } from "@/blocks/Content/ContentBlock";
 import { CycleTimelineBlock } from "@/blocks/CycleTimeline/CycleTimelineBlock";
+import { EventTimelineBlock } from "@/blocks/EventTimeline/EventTimelineBlock";
 import { FormBlock } from "@/blocks/Form/FormBlock";
 import { InstagramBlock } from "@/blocks/Instagram/InstagramBlock";
 import { MediaCarouselBlock } from "@/blocks/MediaCarousel/MediaCarouselBlock";
@@ -16,6 +17,7 @@ const blockComponents = {
     team: TeamBlock,
     instagram: InstagramBlock,
     cycleTimeline: CycleTimelineBlock,
+    eventTimeline: EventTimelineBlock,
     form: FormBlock,
     columns: ColumnsBlock,
     mediaCarousel: MediaCarouselBlock,
@@ -33,7 +35,11 @@ export const RenderBlocks: React.FC<{
             <Fragment>
                 {blocks.map((block, index) => {
                     const { blockType, backgroundColor } = block;
-                    const autoHeightBlockSlugs = ["carousel", "mediaCarousel"];
+                    const autoHeightBlockSlugs = [
+                        "carousel",
+                        "mediaCarousel",
+                        "eventTimeline",
+                    ];
                     const blockHeight = (
                         block as { blockHeight?: "auto" | "fixed" }
                     ).blockHeight;

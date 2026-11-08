@@ -17,6 +17,7 @@ import * as migration_20261103_204827_add_subscription_plan_prices from './20261
 import * as migration_20261103_210335_add_lesson_enrollment_cancelled_at from './20261103_210335_add_lesson_enrollment_cancelled_at';
 import * as migration_20261103_213233_add_user_language from './20261103_213233_add_user_language';
 import * as migration_20261108_195432_add_coach_environment from './20261108_195432_add_coach_environment';
+import * as migration_20261108_201509_add_event_timeline from './20261108_201509_add_event_timeline';
 
 export const migrations = [
   {
@@ -112,6 +113,11 @@ export const migrations = [
   {
     up: migration_20261108_195432_add_coach_environment.up,
     down: migration_20261108_195432_add_coach_environment.down,
-    name: '20261108_195432_add_coach_environment'
+    name: '20261108_195432_add_coach_environment',
+  },
+  {
+    up: migration_20261108_201509_add_event_timeline.up,
+    down: migration_20261108_201509_add_event_timeline.down,
+    name: '20261108_201509_add_event_timeline',
   },
 ];

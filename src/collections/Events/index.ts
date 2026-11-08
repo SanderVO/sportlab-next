@@ -1,5 +1,9 @@
 import { isAdminOrCoach } from "@/access/isAdminOrCoach";
 import { slugField, type CollectionConfig } from "payload";
+import {
+    revalidateEventTimelineOnChange,
+    revalidateEventTimelineOnDelete,
+} from "./hooks/revalidateEventTimelinePages";
 
 export const Events: CollectionConfig = {
     slug: "events",
@@ -19,12 +23,22 @@ export const Events: CollectionConfig = {
         description:
             { en: "Manage events such as running races, Hyrox and special events.", nl: "Beheer evenementen zoals hardloopwedstrijden, hyrox en speciale events." },
     },
+    hooks: {
+        afterChange: [revalidateEventTimelineOnChange],
+        afterDelete: [revalidateEventTimelineOnDelete],
+    },
     fields: [
         {
             label: { en: "Title", nl: "Titel" },
             name: "title",
             type: "text",
             required: true,
+        },
+        {
+            label: { en: "Description", nl: "Omschrijving" },
+            name: "description",
+            type: "textarea",
+            required: false,
         },
         {
             label: { en: "Type", nl: "Type" },

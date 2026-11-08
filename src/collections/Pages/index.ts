@@ -1,6 +1,7 @@
 import { isAdmin } from "@/access/admin";
 import { Carousel } from "@/blocks/Carousel/config";
 import { CycleTimeline } from "@/blocks/CycleTimeline/config";
+import { EventTimeline } from "@/blocks/EventTimeline/config";
 import { Instagram } from "@/blocks/Instagram/config";
 import { MediaCarousel } from "@/blocks/MediaCarousel/config";
 import { Team } from "@/blocks/Team/config";
@@ -123,6 +124,7 @@ export const Pages: CollectionConfig<"pages"> = {
                                 Team,
                                 Instagram,
                                 CycleTimeline,
+                                EventTimeline,
                                 MediaCarousel,
                             ],
                             required: true,
