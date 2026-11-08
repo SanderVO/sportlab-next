@@ -6,11 +6,11 @@ import type { CollectionBeforeDeleteHook, CollectionSlug } from "payload";
  * to go first; `req` keeps this in the delete's transaction.
  */
 export const deleteUserRecords =
-    (collection: CollectionSlug): CollectionBeforeDeleteHook =>
+    (collection: CollectionSlug, field = "user"): CollectionBeforeDeleteHook =>
     async ({ id, req }) => {
         await req.payload.delete({
             collection,
-            where: { user: { equals: id } },
+            where: { [field]: { equals: id } },
             req,
             overrideAccess: true,
         });

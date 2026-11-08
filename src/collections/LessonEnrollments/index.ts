@@ -117,6 +117,40 @@ export const LessonEnrollments: CollectionConfig = {
             },
         },
         {
+            label: { en: "Attendance", nl: "Aanwezigheid" },
+            name: "attendance",
+            type: "select",
+            required: false,
+            access: { create: staffOnlyField, update: staffOnlyField },
+            options: [
+                { label: { en: "Present", nl: "Aanwezig" }, value: "present" },
+                { label: { en: "No-show", nl: "Niet gekomen" }, value: "absent" },
+            ],
+            admin: {
+                description: {
+                    en: "Empty means not marked yet. A no-show keeps the credit used.",
+                    nl: "Leeg betekent nog niet gemarkeerd. Bij niet gekomen blijft de credit gebruikt.",
+                },
+            },
+        },
+        {
+            label: { en: "Attendance marked at", nl: "Aanwezigheid gemarkeerd op" },
+            name: "attendanceMarkedAt",
+            type: "date",
+            access: { create: staffOnlyField, update: staffOnlyField },
+            admin: {
+                date: { pickerAppearance: "dayAndTime" },
+            },
+        },
+        {
+            label: { en: "Attendance marked by", nl: "Aanwezigheid gemarkeerd door" },
+            name: "attendanceMarkedBy",
+            type: "relationship",
+            access: { create: staffOnlyField, update: staffOnlyField },
+            relationTo: "users",
+            required: false,
+        },
+        {
             label: { en: "Added by", nl: "Toegevoegd door" },
             name: "addedBy",
             type: "relationship",

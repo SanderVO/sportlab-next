@@ -135,10 +135,18 @@ export const Lessons: CollectionConfig = {
                     label: { en: "Closed", nl: "Gesloten" },
                     value: "closed",
                 },
+                {
+                    label: { en: "Cancelled", nl: "Geannuleerd" },
+                    value: "cancelled",
+                },
             ],
             hooks: {
                 beforeValidate: [
-                    ({ data, value }) => {
+                    ({ data, originalDoc, value }) => {
+                        // A cancelled PT lesson must stay cancelled.
+                        if ((value ?? originalDoc?.status) === "cancelled") {
+                            return value;
+                        }
                         if (data?.type === "pt" || data?.type === "semi_pt") {
                             return "closed";
                         }
@@ -156,6 +164,41 @@ export const Lessons: CollectionConfig = {
                 description: {
                     en: "PT and Semi PT lessons are always closed. Group lessons and Open Gym can be open or closed.",
                     nl: "PT en Semi PT lessen zijn altijd gesloten. Groepslessen en Open Gym kunnen open of gesloten zijn.",
+                },
+            },
+        },
+        {
+            label: { en: "Cancelled at", nl: "Geannuleerd op" },
+            name: "cancelledAt",
+            type: "date",
+            admin: {
+                condition: (_, siblingData) =>
+                    siblingData?.status === "cancelled",
+                date: { pickerAppearance: "dayAndTime" },
+            },
+        },
+        {
+            label: { en: "Cancelled by", nl: "Geannuleerd door" },
+            name: "cancelledBy",
+            type: "relationship",
+            relationTo: "users",
+            required: false,
+            admin: {
+                condition: (_, siblingData) =>
+                    siblingData?.status === "cancelled",
+            },
+        },
+        {
+            label: { en: "Cancellation reason", nl: "Reden annulering" },
+            name: "cancelReason",
+            type: "textarea",
+            required: false,
+            admin: {
+                condition: (_, siblingData) =>
+                    siblingData?.status === "cancelled",
+                description: {
+                    en: "Shown to participants.",
+                    nl: "Zichtbaar voor deelnemers.",
                 },
             },
         },

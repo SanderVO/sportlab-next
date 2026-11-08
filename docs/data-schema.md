@@ -224,7 +224,10 @@ Les
 - `program` (relationship, → programs): Programma
 - `title` (text, required): Titel
 - `type` (select, required, one of: pt, semi_pt, group, open_gym): Type
-- `status` (select, required, one of: open, closed, default "closed"): Status
+- `status` (select, required, one of: open, closed, cancelled, default "closed"): Status
+- `cancelledAt` (date): Geannuleerd op
+- `cancelledBy` (relationship, → users): Geannuleerd door
+- `cancelReason` (textarea): Reden annulering
 - `startDate` (date): Startdatum & -tijd
 - `endDate` (date): Einddatum & -tijd
 - `spots` (number): Aantal plekken
@@ -408,6 +411,9 @@ Les deelname
 - `waitlistedAt` (date): Op wachtlijst sinds
 - `waitlistNotifiedAt` (date): Plek aangeboden op
 - `cancelledAt` (date): Afgemeld op
+- `attendance` (select, one of: present, absent): Aanwezigheid
+- `attendanceMarkedAt` (date): Aanwezigheid gemarkeerd op
+- `attendanceMarkedBy` (relationship, → users): Aanwezigheid gemarkeerd door
 - `addedBy` (relationship, → users): Toegevoegd door
 - `updatedAt` (date)
 - `createdAt` (date)
@@ -475,6 +481,16 @@ Gezondheidsmeting
 - `bmr` (number, min 500, max 6000): Basaal metabolisme (BMR)
 - `metabolicAge` (number, min 5, max 120): Metabolische leeftijd
 - `bodyWaterPercentage` (number, min 10, max 90): Vochtpercentage
+- `updatedAt` (date)
+- `createdAt` (date)
+
+### coach-notes *(dashboard only)*
+
+Coachnotitie
+
+- `member` (relationship, required, → users): Lid
+- `author` (relationship, → users): Auteur
+- `body` (textarea, required): Notitie
 - `updatedAt` (date)
 - `createdAt` (date)
 

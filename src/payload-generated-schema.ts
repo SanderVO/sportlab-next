@@ -220,6 +220,7 @@ export const enum_lessons_type = pgEnum("enum_lessons_type", [
 export const enum_lessons_status = pgEnum("enum_lessons_status", [
     "open",
     "closed",
+    "cancelled",
 ]);
 export const enum_lesson_templates_schedule_day_of_week = pgEnum(
     "enum_lesson_templates_schedule_day_of_week",
@@ -278,6 +279,10 @@ export const enum_credit_adjustments_source = pgEnum(
 export const enum_lesson_enrollments_status = pgEnum(
     "enum_lesson_enrollments_status",
     ["assigned", "started", "completed", "cancelled", "waitlisted"],
+);
+export const enum_lesson_enrollments_attendance = pgEnum(
+    "enum_lesson_enrollments_attendance",
+    ["present", "absent"],
 );
 export const enum_program_enrollments_status = pgEnum(
     "enum_program_enrollments_status",
@@ -1903,6 +1908,15 @@ export const lessons = pgTable(
         title: varchar("title"),
         type: enum_lessons_type("type"),
         status: enum_lessons_status("status").default("closed"),
+        cancelledAt: timestamp("cancelled_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
+        cancelledBy: integer("cancelled_by_id").references(() => users.id, {
+            onDelete: "set null",
+        }),
+        cancelReason: varchar("cancel_reason"),
         startDate: timestamp("start_date", {
             mode: "string",
             withTimezone: true,
@@ -1935,6 +1949,7 @@ export const lessons = pgTable(
     (columns) => [
         index("lessons_template_idx").on(columns.template),
         index("lessons_program_idx").on(columns.program),
+        index("lessons_cancelled_by_idx").on(columns.cancelledBy),
         index("lessons_start_date_idx").on(columns.startDate),
         index("lessons_image_idx").on(columns.image),
         index("lessons_updated_at_idx").on(columns.updatedAt),
@@ -2542,6 +2557,18 @@ export const lesson_enrollments = pgTable(
             withTimezone: true,
             precision: 3,
         }),
+        attendance: enum_lesson_enrollments_attendance("attendance"),
+        attendanceMarkedAt: timestamp("attendance_marked_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        }),
+        attendanceMarkedBy: integer("attendance_marked_by_id").references(
+            () => users.id,
+            {
+                onDelete: "set null",
+            },
+        ),
         addedBy: integer("added_by_id").references(() => users.id, {
             onDelete: "set null",
         }),
@@ -2563,6 +2590,9 @@ export const lesson_enrollments = pgTable(
     (columns) => [
         index("lesson_enrollments_user_idx").on(columns.user),
         index("lesson_enrollments_lesson_idx").on(columns.lesson),
+        index("lesson_enrollments_attendance_marked_by_idx").on(
+            columns.attendanceMarkedBy,
+        ),
         index("lesson_enrollments_added_by_idx").on(columns.addedBy),
         index("lesson_enrollments_updated_at_idx").on(columns.updatedAt),
         index("lesson_enrollments_created_at_idx").on(columns.createdAt),
@@ -2804,6 +2834,42 @@ export const health_measurements = pgTable(
         index("health_measurements_updated_at_idx").on(columns.updatedAt),
         index("health_measurements_created_at_idx").on(columns.createdAt),
         index("user_measuredAt_idx").on(columns.user, columns.measuredAt),
+    ],
+);
+
+export const coach_notes = pgTable(
+    "coach_notes",
+    {
+        id: serial("id").primaryKey(),
+        member: integer("member_id")
+            .notNull()
+            .references(() => users.id, {
+                onDelete: "set null",
+            }),
+        author: integer("author_id").references(() => users.id, {
+            onDelete: "set null",
+        }),
+        body: varchar("body").notNull(),
+        updatedAt: timestamp("updated_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+        createdAt: timestamp("created_at", {
+            mode: "string",
+            withTimezone: true,
+            precision: 3,
+        })
+            .defaultNow()
+            .notNull(),
+    },
+    (columns) => [
+        index("coach_notes_member_idx").on(columns.member),
+        index("coach_notes_author_idx").on(columns.author),
+        index("coach_notes_updated_at_idx").on(columns.updatedAt),
+        index("coach_notes_created_at_idx").on(columns.createdAt),
     ],
 );
 
@@ -3377,6 +3443,7 @@ export const payload_locked_documents_rels = pgTable(
         "program-enrollmentsID": integer("program_enrollments_id"),
         "event-registrationsID": integer("event_registrations_id"),
         "health-measurementsID": integer("health_measurements_id"),
+        "coach-notesID": integer("coach_notes_id"),
         redirectsID: integer("redirects_id"),
         formsID: integer("forms_id"),
         "form-submissionsID": integer("form_submissions_id"),
@@ -3434,6 +3501,9 @@ export const payload_locked_documents_rels = pgTable(
         ),
         index("payload_locked_documents_rels_health_measurements_id_idx").on(
             columns["health-measurementsID"],
+        ),
+        index("payload_locked_documents_rels_coach_notes_id_idx").on(
+            columns["coach-notesID"],
         ),
         index("payload_locked_documents_rels_redirects_id_idx").on(
             columns.redirectsID,
@@ -3544,6 +3614,11 @@ export const payload_locked_documents_rels = pgTable(
             columns: [columns["health-measurementsID"]],
             foreignColumns: [health_measurements.id],
             name: "payload_locked_documents_rels_health_measurements_fk",
+        }).onDelete("cascade"),
+        foreignKey({
+            columns: [columns["coach-notesID"]],
+            foreignColumns: [coach_notes.id],
+            name: "payload_locked_documents_rels_coach_notes_fk",
         }).onDelete("cascade"),
         foreignKey({
             columns: [columns["redirectsID"]],
@@ -4696,6 +4771,11 @@ export const relations_lessons = relations(lessons, ({ one, many }) => ({
         references: [programs.id],
         relationName: "program",
     }),
+    cancelledBy: one(users, {
+        fields: [lessons.cancelledBy],
+        references: [users.id],
+        relationName: "cancelledBy",
+    }),
     image: one(media, {
         fields: [lessons.image],
         references: [media.id],
@@ -4875,6 +4955,11 @@ export const relations_lesson_enrollments = relations(
             references: [lessons.id],
             relationName: "lesson",
         }),
+        attendanceMarkedBy: one(users, {
+            fields: [lesson_enrollments.attendanceMarkedBy],
+            references: [users.id],
+            relationName: "attendanceMarkedBy",
+        }),
         addedBy: one(users, {
             fields: [lesson_enrollments.addedBy],
             references: [users.id],
@@ -4973,6 +5058,18 @@ export const relations_health_measurements = relations(
         }),
     }),
 );
+export const relations_coach_notes = relations(coach_notes, ({ one }) => ({
+    member: one(users, {
+        fields: [coach_notes.member],
+        references: [users.id],
+        relationName: "member",
+    }),
+    author: one(users, {
+        fields: [coach_notes.author],
+        references: [users.id],
+        relationName: "author",
+    }),
+}));
 export const relations_redirects_rels = relations(
     redirects_rels,
     ({ one }) => ({
@@ -5270,6 +5367,11 @@ export const relations_payload_locked_documents_rels = relations(
             references: [health_measurements.id],
             relationName: "health-measurements",
         }),
+        "coach-notesID": one(coach_notes, {
+            fields: [payload_locked_documents_rels["coach-notesID"]],
+            references: [coach_notes.id],
+            relationName: "coach-notes",
+        }),
         redirectsID: one(redirects, {
             fields: [payload_locked_documents_rels.redirectsID],
             references: [redirects.id],
@@ -5565,6 +5667,7 @@ type DatabaseSchema = {
     enum_credit_adjustments_credit_type: typeof enum_credit_adjustments_credit_type;
     enum_credit_adjustments_source: typeof enum_credit_adjustments_source;
     enum_lesson_enrollments_status: typeof enum_lesson_enrollments_status;
+    enum_lesson_enrollments_attendance: typeof enum_lesson_enrollments_attendance;
     enum_program_enrollments_status: typeof enum_program_enrollments_status;
     enum_event_registrations_status: typeof enum_event_registrations_status;
     enum_redirects_to_type: typeof enum_redirects_to_type;
@@ -5645,6 +5748,7 @@ type DatabaseSchema = {
     program_enrollments: typeof program_enrollments;
     event_registrations: typeof event_registrations;
     health_measurements: typeof health_measurements;
+    coach_notes: typeof coach_notes;
     redirects: typeof redirects;
     redirects_rels: typeof redirects_rels;
     forms_blocks_checkbox: typeof forms_blocks_checkbox;
@@ -5746,6 +5850,7 @@ type DatabaseSchema = {
     relations_program_enrollments: typeof relations_program_enrollments;
     relations_event_registrations: typeof relations_event_registrations;
     relations_health_measurements: typeof relations_health_measurements;
+    relations_coach_notes: typeof relations_coach_notes;
     relations_redirects_rels: typeof relations_redirects_rels;
     relations_redirects: typeof relations_redirects;
     relations_forms_blocks_checkbox: typeof relations_forms_blocks_checkbox;

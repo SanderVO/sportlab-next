@@ -141,6 +141,7 @@ export const Users: CollectionConfig = {
       deleteUserRecords("lesson-enrollments"),
       deleteUserRecords("program-enrollments"),
       deleteUserRecords("event-registrations"),
+      deleteUserRecords("coach-notes", "member"),
     ],
     beforeValidate: [
       // `name` is the full name, derived from firstName + lastName so sorting, titles and

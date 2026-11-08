@@ -14,6 +14,7 @@ import {
 import sharp from "sharp";
 import { fileURLToPath } from "url";
 import { isCoachOnlyAdminUser } from "./access/isCoachOnlyAdminUser";
+import { CoachNotes } from "./collections/CoachNotes";
 import { CreditAdjustments } from "./collections/CreditAdjustments";
 import { Documents } from "./collections/Documents";
 import { EventRegistrations } from "./collections/EventRegistrations";
@@ -238,6 +239,7 @@ export default buildConfig({
         withCoachCollectionVisibility(ProgramEnrollments),
         withCoachCollectionVisibility(EventRegistrations),
         withCoachCollectionVisibility(HealthMeasurements),
+        withCoachCollectionVisibility(CoachNotes),
     ],
     globals: [
         withCoachGlobalVisibility(Header),

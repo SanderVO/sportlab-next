@@ -87,6 +87,7 @@ export interface Config {
     'program-enrollments': ProgramEnrollment;
     'event-registrations': EventRegistration;
     'health-measurements': HealthMeasurement;
+    'coach-notes': CoachNote;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -132,6 +133,7 @@ export interface Config {
     'program-enrollments': ProgramEnrollmentsSelect<false> | ProgramEnrollmentsSelect<true>;
     'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     'health-measurements': HealthMeasurementsSelect<false> | HealthMeasurementsSelect<true>;
+    'coach-notes': CoachNotesSelect<false> | CoachNotesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -870,7 +872,13 @@ export interface Lesson {
   /**
    * PT and Semi PT lessons are always closed. Group lessons and Open Gym can be open or closed.
    */
-  status?: ('open' | 'closed') | null;
+  status?: ('open' | 'closed' | 'cancelled') | null;
+  cancelledAt?: string | null;
+  cancelledBy?: (number | null) | User;
+  /**
+   * Shown to participants.
+   */
+  cancelReason?: string | null;
   startDate?: string | null;
   endDate?: string | null;
   /**
@@ -1172,6 +1180,12 @@ export interface LessonEnrollment {
    */
   cancelledAt?: string | null;
   /**
+   * Empty means not marked yet. A no-show keeps the credit used.
+   */
+  attendance?: ('present' | 'absent') | null;
+  attendanceMarkedAt?: string | null;
+  attendanceMarkedBy?: (number | null) | User;
+  /**
    * Automatically set via a hook.
    */
   addedBy?: (number | null) | User;
@@ -1297,6 +1311,18 @@ export interface HealthMeasurement {
    * %
    */
   bodyWaterPercentage?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coach-notes".
+ */
+export interface CoachNote {
+  id: number;
+  member: number | User;
+  author?: (number | null) | User;
+  body: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -1763,6 +1789,10 @@ export interface PayloadLockedDocument {
         value: number | HealthMeasurement;
       } | null)
     | ({
+        relationTo: 'coach-notes';
+        value: number | CoachNote;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -2143,6 +2173,9 @@ export interface LessonsSelect<T extends boolean = true> {
   title?: T;
   type?: T;
   status?: T;
+  cancelledAt?: T;
+  cancelledBy?: T;
+  cancelReason?: T;
   startDate?: T;
   endDate?: T;
   spots?: T;
@@ -2356,6 +2389,9 @@ export interface LessonEnrollmentsSelect<T extends boolean = true> {
   waitlistedAt?: T;
   waitlistNotifiedAt?: T;
   cancelledAt?: T;
+  attendance?: T;
+  attendanceMarkedAt?: T;
+  attendanceMarkedBy?: T;
   addedBy?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2433,6 +2469,17 @@ export interface HealthMeasurementsSelect<T extends boolean = true> {
   bmr?: T;
   metabolicAge?: T;
   bodyWaterPercentage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coach-notes_select".
+ */
+export interface CoachNotesSelect<T extends boolean = true> {
+  member?: T;
+  author?: T;
+  body?: T;
   updatedAt?: T;
   createdAt?: T;
 }
