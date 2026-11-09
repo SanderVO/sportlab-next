@@ -6,7 +6,9 @@ import { PayloadRedirects } from "@/components/PayloadRedirects";
 import { generateMeta } from "@/utilities/generateMeta";
 import configPromise from "@payload-config";
 import type { Metadata } from "next";
+import { buildFullSlug } from "@/utilities/buildFullSlug";
 import { draftMode } from "next/headers";
+import { permanentRedirect } from "next/navigation";
 import Script from "next/script";
 import { getPayload } from "payload";
 import { cache } from "react";
@@ -80,12 +82,27 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
         slug: decodedSlug,
     });
 
-    return generateMeta({ doc: page });
+    return generateMeta({
+        doc: page,
+        // Pages are linked, listed in the sitemap and revalidated at /{slug},
+        // so that is the canonical URL, also when served under a parent path.
+        path: page ? canonicalPathFor(page.slug) : undefined,
+    });
 }
+
+// The homepage is the page with slug "home", served at "/".
+const canonicalPathFor = (slug: string) => (slug === "home" ? "/" : `/${slug}`);
 
 export default async function Page({ params }: Args) {
     const { isEnabled: draft } = await draftMode();
-    const { slugs = ["home"] } = await params;
+    const { slugs: rawSlugs } = await params;
+
+    // "/home" duplicates "/".
+    if (rawSlugs?.length === 1 && rawSlugs[0] === "home") {
+        permanentRedirect("/");
+    }
+
+    const slugs = rawSlugs ?? ["home"];
     const slug = slugs.at(-1) || "home";
 
     const decodedSlug = decodeURIComponent(slug);
@@ -97,6 +114,20 @@ export default async function Page({ params }: Args) {
 
     if (!page) {
         return <PayloadRedirects url={url} />;
+    }
+
+    // Only the last segment selects the page, so "/anything/over-ons" would
+    // otherwise serve "/over-ons" a second time. Multi-segment paths are only
+    // valid when they match the page's real parent chain; everything else
+    // permanently redirects to the canonical URL.
+    if (slugs.length > 1) {
+        const payload = await getPayload({ config: configPromise });
+        const realPath = await buildFullSlug(page, payload);
+        const requestedPath = "/" + slugs.map(decodeURIComponent).join("/");
+
+        if (requestedPath !== realPath) {
+            permanentRedirect(canonicalPathFor(page.slug));
+        }
     }
 
     const { hero, layout, meta, hasHero } = page;

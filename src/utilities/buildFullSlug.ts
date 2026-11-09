@@ -9,9 +9,16 @@ export async function buildFullSlug(
     let current = page;
 
     while (current.parent) {
+        // `parent` is an id, or a populated document depending on query depth.
+        const parentId =
+            typeof current.parent === "object"
+                ? current.parent.id
+                : current.parent;
+
         current = await payload.findByID({
             collection: "pages",
-            id: current.parent,
+            id: parentId,
+            depth: 0,
         });
         segments.unshift(current.slug);
     }

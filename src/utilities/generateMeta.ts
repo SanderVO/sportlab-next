@@ -18,8 +18,12 @@ const getImageURL = (image?: Media | Config["db"]["defaultIDType"] | null) => {
 
 export const generateMeta = async (args: {
     doc: Partial<Page> | Partial<Post> | null;
+    /** Canonical path of the page, e.g. "/over-ons" or "/" for the homepage. */
+    path?: string;
 }): Promise<Metadata> => {
-    const { doc } = args;
+    const { doc, path } = args;
+
+    const canonicalUrl = path ? `${getServerSideURL()}${path}` : undefined;
 
     const ogImage = getImageURL(doc?.meta?.image);
 
@@ -30,6 +34,7 @@ export const generateMeta = async (args: {
     return {
         title,
         description: doc?.meta?.description,
+        ...(canonicalUrl && { alternates: { canonical: canonicalUrl } }),
         openGraph: mergeOpenGraph({
             description: doc?.meta?.description || "",
             images: ogImage
@@ -40,9 +45,7 @@ export const generateMeta = async (args: {
                   ]
                 : undefined,
             title,
-            url: Array.isArray(doc?.slug)
-                ? doc?.slug.join("/")
-                : getServerSideURL(),
+            url: canonicalUrl ?? getServerSideURL(),
         }),
     };
 };
