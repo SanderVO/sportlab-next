@@ -10,10 +10,12 @@ interface Props {
     url: string;
 }
 
-export const PayloadRedirects: React.FC<Props> = async ({
+// Follows a matching redirect, otherwise calls notFound() unless disabled.
+// Call it directly from a page so notFound() runs before the response starts.
+export async function applyPayloadRedirects({
     disableNotFound,
     url,
-}) => {
+}: Props): Promise<void> {
     const redirects = await getCachedRedirects();
 
     const redirectItem = redirects.find((redirect) => redirect.from === url);
@@ -46,7 +48,13 @@ export const PayloadRedirects: React.FC<Props> = async ({
         if (redirectUrl) redirect(redirectUrl);
     }
 
-    if (disableNotFound) return null;
+    if (disableNotFound) return;
 
     notFound();
+}
+
+export const PayloadRedirects: React.FC<Props> = async (props) => {
+    await applyPayloadRedirects(props);
+
+    return null;
 };

@@ -64,12 +64,11 @@ export default async function SiteLayout({
 
             {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
 
-            <Script
+            <script
                 id="organization-schema"
                 type="application/ld+json"
-                strategy="afterInteractive"
-            >
-                {JSON.stringify({
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
                     "@context": "https://schema.org",
                     "@type": ["LocalBusiness", "ExerciseGym"],
                     name: organization.name,
@@ -129,8 +128,9 @@ export default async function SiteLayout({
                     ...(organization.openingHours && {
                         openingHoursSpecification: organization.openingHours,
                     }),
-                })}
-            </Script>
+                }).replace(/</g, "\\u003c"),
+                }}
+            />
         </>
     );
 }

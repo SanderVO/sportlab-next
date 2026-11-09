@@ -27,8 +27,10 @@ export const generateMeta = async (args: {
 
     const ogImage = getImageURL(doc?.meta?.image);
 
-    const title = doc?.meta?.title
-        ? doc?.meta?.title + " | Sportlab Groningen"
+    const pageTitle = doc?.meta?.title || doc?.title;
+
+    const title = pageTitle
+        ? pageTitle + " | Sportlab Groningen"
         : "Sportlab Groningen";
 
     return {

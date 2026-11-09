@@ -2,14 +2,17 @@ import { RenderBlocks } from "@/blocks/RenderBlocks";
 import { SetHeroMode } from "@/components/Header/SetHeroMode";
 import { Hero } from "@/components/Hero/Hero";
 import { LivePreviewListener } from "@/components/LivePreviewListener";
-import { PayloadRedirects } from "@/components/PayloadRedirects";
+import {
+    PayloadRedirects,
+    applyPayloadRedirects,
+} from "@/components/PayloadRedirects";
 import { generateMeta } from "@/utilities/generateMeta";
+import { getServerSideURL } from "@/utilities/getURL";
 import configPromise from "@payload-config";
 import type { Metadata } from "next";
 import { buildFullSlug } from "@/utilities/buildFullSlug";
 import { draftMode } from "next/headers";
 import { permanentRedirect } from "next/navigation";
-import Script from "next/script";
 import { getPayload } from "payload";
 import { cache } from "react";
 import PageClient from "./page.client";
@@ -113,7 +116,11 @@ export default async function Page({ params }: Args) {
     });
 
     if (!page) {
-        return <PayloadRedirects url={url} />;
+        // Redirects if one matches, otherwise throws notFound() right here so
+        // the response is a real 404.
+        await applyPayloadRedirects({ url });
+
+        return null;
     }
 
     // Only the last segment selects the page, so "/anything/over-ons" would
@@ -132,7 +139,7 @@ export default async function Page({ params }: Args) {
 
     const { hero, layout, meta, hasHero } = page;
 
-    const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || "";
+    const baseUrl = getServerSideURL();
 
     const titles =
         slugs.length > 1
@@ -173,11 +180,10 @@ export default async function Page({ params }: Args) {
                     {meta.richSnippets.map((snippet, index) => {
                         if (snippet?.jsonLd) {
                             return (
-                                <Script
+                                <script
                                     id={`rich-snippet-${snippet.id}`}
                                     key={index}
                                     type="application/ld+json"
-                                    strategy="afterInteractive"
                                     dangerouslySetInnerHTML={{
                                         __html: JSON.stringify(
                                             snippet.jsonLd,
@@ -192,10 +198,9 @@ export default async function Page({ params }: Args) {
             )}
 
             {breadcrumbJsonLd && (
-                <Script
+                <script
                     id="breadcrumb-jsonld"
                     type="application/ld+json"
-                    strategy="afterInteractive"
                     dangerouslySetInnerHTML={{
                         __html: JSON.stringify(breadcrumbJsonLd).replace(
                             /</g,

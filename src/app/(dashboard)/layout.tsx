@@ -1,4 +1,5 @@
 import { Anton, Archivo, Poppins } from "next/font/google";
+import type { Metadata } from "next";
 import React from "react";
 
 import "../(frontend)/globals.css";
@@ -23,6 +24,12 @@ const archivo = Archivo({
     variable: "--font-archivo",
     display: "swap",
 });
+
+// Login and member dashboard: keep out of search results. Not disallowed in
+// robots.txt, so crawlers can still read this noindex.
+export const metadata: Metadata = {
+    robots: { index: false, follow: false },
+};
 
 export default function DashboardRootLayout({
     children,

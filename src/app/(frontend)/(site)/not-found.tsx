@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/Button";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+    title: "Pagina niet gevonden | Sportlab Groningen",
+};
 
 export default function NotFound() {
     return (

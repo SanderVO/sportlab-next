@@ -1,6 +1,9 @@
 import { LivePreviewListener } from "@/components/LivePreviewListener";
 import { Media } from "@/components/Media";
-import { PayloadRedirects } from "@/components/PayloadRedirects";
+import {
+    PayloadRedirects,
+    applyPayloadRedirects,
+} from "@/components/PayloadRedirects";
 import RichText from "@/components/RichText";
 import configPromise from "@payload-config";
 import type { Metadata } from "next";
@@ -66,7 +69,11 @@ export default async function Coach({ params: paramsPromise }: Args) {
     const url = "/team/" + decodedSlug;
     const user = await queryUserBySlug({ slug: decodedSlug });
 
-    if (!user) return <PayloadRedirects url={url} />;
+    if (!user) {
+        await applyPayloadRedirects({ url });
+
+        return null;
+    }
 
     return (
         <article className="bg-background">
