@@ -1,3 +1,4 @@
+import { editorOrAdmin } from "@/access/editorOrAdmin";
 import type { GlobalConfig } from "payload";
 import { revalidateOrganization } from "./hooks/revalidateOrganization";
 
@@ -6,6 +7,7 @@ export const Organization: GlobalConfig = {
     label: { en: "Organization", nl: "Organisatie" },
     access: {
         read: () => true,
+        update: editorOrAdmin,
     },
     fields: [
         {

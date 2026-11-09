@@ -24,6 +24,7 @@ export const Posts: CollectionConfig<"posts"> = {
         create: editorOrAdmin,
         delete: editorOrAdmin,
         read: authenticatedOrPublished,
+        readVersions: editorOrAdmin,
         update: editorOrAdmin,
     },
     defaultPopulate: {

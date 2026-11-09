@@ -1,3 +1,4 @@
+import { editorOrAdmin } from "@/access/editorOrAdmin";
 import type { GlobalConfig } from "payload";
 import { revalidateWhatsapp } from "./hooks/revalidateWhatsapp";
 
@@ -6,6 +7,7 @@ export const WhatsApp: GlobalConfig = {
     label: { en: "WhatsApp", nl: "WhatsApp" },
     access: {
         read: () => true,
+        update: editorOrAdmin,
     },
     fields: [
         {

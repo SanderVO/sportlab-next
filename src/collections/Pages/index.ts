@@ -32,6 +32,7 @@ export const Pages: CollectionConfig<"pages"> = {
         create: isAdmin,
         delete: isAdmin,
         read: authenticatedOrPublished,
+        readVersions: isAdmin,
         update: isAdmin,
     },
     defaultPopulate: {

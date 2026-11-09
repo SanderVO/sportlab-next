@@ -1,4 +1,7 @@
+import { editorOrAdmin } from "@/access/editorOrAdmin";
 import { isCoachOnlyAdminUser } from "@/access/isCoachOnlyAdminUser";
+import { rolesOf } from "@/access/rolesOf";
+import { RolesEnum } from "@/collections/Users/roles";
 import { emailLayout } from "@/emails/layout";
 import { revalidateRedirects } from "@/hooks/revalidateRedirects";
 import { verifyTurnstile } from "@/hooks/verifyTurnstile";
@@ -15,7 +18,15 @@ import {
     lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 import { translateMcpApiKeyCollection } from "./mcpApiKeyCollection";
-import type { CollectionBeforeChangeHook, Field, Plugin } from "payload";
+import { APIError } from "payload";
+import type {
+    Access,
+    CollectionBeforeChangeHook,
+    CollectionBeforeValidateHook,
+    Field,
+    FieldAccess,
+    Plugin,
+} from "payload";
 
 const generateURL: GenerateURL<Post | Page> = ({
     doc,
@@ -107,6 +118,117 @@ const mcpCrudWithoutDelete = {
     find: true,
     update: true,
     delete: false,
+};
+
+/** Staff roles that may edit forms, view submissions and issue MCP keys. */
+const isStaff: Access = ({ req: { user } }) => {
+    const roles = rolesOf(user);
+
+    return (
+        roles.includes(RolesEnum.ADMIN) ||
+        roles.includes(RolesEnum.EDITOR) ||
+        roles.includes(RolesEnum.COACH)
+    );
+};
+
+/** Field-level variant for the notification recipients of a form. */
+const editorOrAdminField: FieldAccess = ({ req }) => {
+    const roles = rolesOf(req.user);
+
+    return roles.includes(RolesEnum.ADMIN) || roles.includes(RolesEnum.EDITOR);
+};
+
+// Redirects are followed for every public visitor, and the plugin stores `to.url` as free text.
+// Only allow internal paths or absolute https URLs on the site's own hosts.
+const redirectHosts = new Set<string>();
+
+try {
+    const siteURL = new URL(getServerSideURL());
+    const bareHost = siteURL.hostname.replace(/^www\./, "");
+
+    redirectHosts.add(bareHost);
+    redirectHosts.add(`www.${bareHost}`);
+} catch {
+    // getServerSideURL returns a URL string; a malformed override disables external redirects.
+}
+
+const isSafeRedirectTarget = (value: string): boolean => {
+    const url = value.trim();
+
+    if (!url) {
+        return false;
+    }
+
+    // Check both the raw value and its percent-decoded form: browsers can treat
+    // "%5C" / "%2F" sequences as path separators (e.g. "/%5Cevil.com").
+    const candidates = [url];
+
+    try {
+        candidates.push(decodeURIComponent(url));
+    } catch {
+        return false;
+    }
+
+    for (const candidate of candidates) {
+        if (
+            candidate.includes("\\") ||
+            /[\u0000-\u001f\u007f]/.test(candidate)
+        ) {
+            return false;
+        }
+    }
+
+    if (url.startsWith("/")) {
+        return !candidates.some((candidate) => candidate.startsWith("//"));
+    }
+
+    try {
+        const parsed = new URL(url);
+
+        return (
+            parsed.protocol === "https:" &&
+            !parsed.username &&
+            !parsed.password &&
+            redirectHosts.has(parsed.hostname)
+        );
+    } catch {
+        return false;
+    }
+};
+
+const validateRedirectTarget: CollectionBeforeValidateHook = ({
+    data,
+    originalDoc,
+}) => {
+    const dataTarget = data?.to as
+        | { type?: unknown; url?: unknown }
+        | undefined;
+    const originalTarget = (
+        originalDoc as { to?: { type?: unknown; url?: unknown } } | undefined
+    )?.to;
+    const targetType = dataTarget?.type ?? originalTarget?.type;
+
+    // Only custom URLs are free text; reference targets are checked by Payload.
+    if (targetType !== "custom") {
+        return data;
+    }
+
+    const url = dataTarget?.url ?? originalTarget?.url;
+
+    if (typeof url !== "string" || url.length === 0) {
+        return data;
+    }
+
+    if (!isSafeRedirectTarget(url)) {
+        throw new APIError(
+            "Redirect target must be an internal path or an https URL on this site.",
+            400,
+            undefined,
+            true,
+        );
+    }
+
+    return data;
 };
 
 export const plugins: Plugin[] = [
@@ -207,6 +329,12 @@ export const plugins: Plugin[] = [
 
             return {
                 ...translated,
+                access: {
+                    ...translated.access,
+                    // Members must not self-issue long-lived API keys. Keys act as the
+                    // user they belong to, so only staff may create them.
+                    create: isStaff,
+                },
                 admin: {
                     ...translated.admin,
                     hidden: ({ user }) => isCoachOnlyAdminUser(user),
@@ -217,6 +345,12 @@ export const plugins: Plugin[] = [
     redirectsPlugin({
         collections: ["pages", "posts"],
         overrides: {
+            access: {
+                read: () => true,
+                create: editorOrAdmin,
+                update: editorOrAdmin,
+                delete: editorOrAdmin,
+            },
             admin: {
                 hidden: ({ user }) => isCoachOnlyAdminUser(user),
             },
@@ -235,6 +369,7 @@ export const plugins: Plugin[] = [
                 }) as Field[];
             },
             hooks: {
+                beforeValidate: [validateRedirectTarget],
                 afterChange: [revalidateRedirects],
             },
         },
@@ -308,6 +443,14 @@ export const plugins: Plugin[] = [
             },
         },
         formSubmissionOverrides: {
+            access: {
+                // Public visitors may still submit (Turnstile-gated below); the stored
+                // submissions contain personal data, so only staff may read or delete them.
+                create: () => true,
+                read: editorOrAdmin,
+                update: () => false,
+                delete: editorOrAdmin,
+            },
             admin: {
                 hidden: ({ user }) => isCoachOnlyAdminUser(user),
             },
@@ -321,6 +464,13 @@ export const plugins: Plugin[] = [
             },
         },
         formOverrides: {
+            access: {
+                // Forms are public content: anyone may read the definition to render it,
+                // but only staff may change fields, recipients or delete a form.
+                create: editorOrAdmin,
+                update: editorOrAdmin,
+                delete: editorOrAdmin,
+            },
             admin: {
                 hidden: ({ user }) => isCoachOnlyAdminUser(user),
             },
@@ -404,6 +554,13 @@ export const plugins: Plugin[] = [
                     if ("name" in field && field.name === "emails") {
                         return {
                             ...field,
+                            access: {
+                                ...("access" in field
+                                    ? field.access
+                                    : undefined),
+                                read: editorOrAdminField,
+                                update: editorOrAdminField,
+                            },
                             admin: {
                                 ...field.admin,
                                 description:

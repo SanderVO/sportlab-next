@@ -1,3 +1,5 @@
+import { rolesOf } from "@/access/rolesOf";
+import { RolesEnum } from "@/collections/Users/roles";
 import type { CollectionSlug, PayloadRequest } from "payload";
 import { getPayload } from "payload";
 
@@ -16,8 +18,11 @@ export async function GET(req: NextRequest): Promise<Response> {
     const collection = searchParams.get("collection") as CollectionSlug;
     const slug = searchParams.get("slug");
     const previewSecret = searchParams.get("previewSecret");
+    const expectedPreviewSecret = process.env.PREVIEW_SECRET;
 
-    if (previewSecret !== process.env.PREVIEW_SECRET) {
+    // An unset or empty PREVIEW_SECRET is not a secret: reject both instead of
+    // letting "?previewSecret=" match an empty configured value.
+    if (!expectedPreviewSecret || previewSecret !== expectedPreviewSecret) {
         return new Response("You are not allowed to preview this page", {
             status: 403,
         });
@@ -55,6 +60,20 @@ export async function GET(req: NextRequest): Promise<Response> {
     const draft = await draftMode();
 
     if (!user) {
+        draft.disable();
+        return new Response("You are not allowed to preview this page", {
+            status: 403,
+        });
+    }
+
+    // Draft mode bypasses the published-only read filter, so only content staff
+    // (not ordinary members) may enable it.
+    const roles = rolesOf(user);
+
+    if (
+        !roles.includes(RolesEnum.ADMIN) &&
+        !roles.includes(RolesEnum.EDITOR)
+    ) {
         draft.disable();
         return new Response("You are not allowed to preview this page", {
             status: 403,

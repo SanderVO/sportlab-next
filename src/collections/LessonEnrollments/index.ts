@@ -82,6 +82,7 @@ export const LessonEnrollments: CollectionConfig = {
             label: { en: "On waitlist since", nl: "Op wachtlijst sinds" },
             name: "waitlistedAt",
             type: "date",
+            access: { create: staffOnlyField, update: staffOnlyField },
             admin: {
                 readOnly: true,
                 condition: (_, siblingData) => siblingData?.status === "waitlisted",

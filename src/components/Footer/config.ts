@@ -1,3 +1,4 @@
+import { editorOrAdmin } from "@/access/editorOrAdmin";
 import { link } from "@/fields/link";
 import {
     AlignFeature,
@@ -12,6 +13,7 @@ export const Footer: GlobalConfig = {
     slug: "footer",
     access: {
         read: () => true,
+        update: editorOrAdmin,
     },
     fields: [
         {

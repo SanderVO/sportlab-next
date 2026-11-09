@@ -19,6 +19,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
     cacheComponents: false,
+    poweredByHeader: false,
     output: "standalone",
     trailingSlash: false,
     experimental: {
