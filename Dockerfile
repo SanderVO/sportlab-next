@@ -6,7 +6,8 @@ FROM node:${NODE_VERSION} AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 WORKDIR /app
-RUN corepack enable && corepack prepare pnpm@10.6.3 --activate
+# Node 25+ no longer ships corepack, so install pnpm through npm instead.
+RUN npm install -g pnpm@10.6.3
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
