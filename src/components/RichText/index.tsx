@@ -225,120 +225,126 @@ const applyTextFormat = (
     return formattedContent;
 };
 
-const headingConverter: JSXConverter<SerializedHeadingNode> = ({
-    node,
-}: {
-    node: SerializedHeadingNode;
-}) => {
-    const headingSize = node.children.find((child) => child?.$?.headingSize)?.$
-        ?.headingSize as "sm" | "md" | "lg" | "xl" | undefined;
-
-    const content = node.children.map(
-        (child: SerializedLexicalNodeWithParent, index: number) => {
-            const textNode = (
-                child && "text" in child
-                    ? child
-                    : {
-                          text: "",
-                          type: "text",
-                          version: 1,
-                      }
-            ) as SerializedTextNode;
-
-            const text = textNode.text as string;
-
-            const headingFont = child?.$?.fontFamily as
-                | "montserrat"
-                | "openSans"
-                | "bebas"
-                | "anton"
-                | "archivo"
-                | "poppins"
-                | undefined;
-
-            let colorClass = "text-warm-white";
-
-            switch (child?.$?.color) {
-                case "black":
-                    colorClass = "text-ink";
-                    break;
-                case "beige":
-                    colorClass = "text-sand";
-                    break;
-                case "orange":
-                    colorClass = "text-cta";
-                    break;
-                default:
-                    colorClass = "text-warm-white";
-                    break;
-            }
-
-            return (
-                <span
-                    key={"child-" + index}
-                    className={cn(colorClass, "block")}
-                    style={
-                        headingFont
-                            ? (textState.fontFamily[headingFont]
-                                  ?.css as React.CSSProperties)
-                            : undefined
-                    }
-                >
-                    {applyTextFormat(textNode, text)}
-                </span>
-            );
-        },
-    );
-
-    switch (node.tag) {
-        case "h1":
-            return (
-                <h1
-                    className={cn(
-                        "font-sl-bebas",
-                        headingSizeClasses.h1[headingSize ?? "md"],
-                    )}
-                >
-                    {content}
-                </h1>
-            );
-        case "h2":
-            return (
-                <h2
-                    className={cn(
-                        "font-sl-bebas",
-                        headingSizeClasses.h2[headingSize ?? "md"],
-                    )}
-                >
-                    {content}
-                </h2>
-            );
-        case "h3":
-            return (
-                <h3
-                    className={cn(
-                        "font-sl-bebas",
-                        headingSizeClasses.h3[headingSize ?? "md"],
-                    )}
-                >
-                    {content}
-                </h3>
-            );
-        case "h4":
-            return (
-                <h4
-                    className={cn(
-                        "font-sl-bebas",
-                        headingSizeClasses.h4[headingSize ?? "md"],
-                    )}
-                >
-                    {content}
-                </h4>
-            );
-        default:
-            return <h5>{content}</h5>;
-    }
+type HeadingConverterOptions = {
+    /** Whether the first h1 in this rich text may stay the page H1. */
+    allowH1: boolean;
+    /** Tracks the H1 already emitted by this RichText instance. */
+    hasH1: { current: boolean };
 };
+
+const createHeadingConverter =
+    ({
+        allowH1,
+        hasH1,
+    }: HeadingConverterOptions): JSXConverter<SerializedHeadingNode> =>
+    ({ node }: { node: SerializedHeadingNode }) => {
+        const headingSize = node.children.find((child) => child?.$?.headingSize)
+            ?.$?.headingSize as "sm" | "md" | "lg" | "xl" | undefined;
+
+        const content = node.children.map(
+            (child: SerializedLexicalNodeWithParent, index: number) => {
+                const textNode = (
+                    child && "text" in child
+                        ? child
+                        : {
+                              text: "",
+                              type: "text",
+                              version: 1,
+                          }
+                ) as SerializedTextNode;
+
+                const text = textNode.text as string;
+
+                const headingFont = child?.$?.fontFamily as
+                    | "montserrat"
+                    | "openSans"
+                    | "bebas"
+                    | "anton"
+                    | "archivo"
+                    | "poppins"
+                    | undefined;
+
+                let colorClass = "text-warm-white";
+
+                switch (child?.$?.color) {
+                    case "black":
+                        colorClass = "text-ink";
+                        break;
+                    case "beige":
+                        colorClass = "text-sand";
+                        break;
+                    case "orange":
+                        colorClass = "text-cta";
+                        break;
+                    default:
+                        colorClass = "text-warm-white";
+                        break;
+                }
+
+                return (
+                    <span
+                        key={"child-" + index}
+                        className={cn(colorClass, "block")}
+                        style={
+                            headingFont
+                                ? (textState.fontFamily[headingFont]
+                                      ?.css as React.CSSProperties)
+                                : undefined
+                        }
+                    >
+                        {applyTextFormat(textNode, text)}
+                    </span>
+                );
+            },
+        );
+
+        const authoredTag = node.tag;
+        // Editors use h1 for the large display style in almost every block.
+        // Only the first heading of the hero may stay an <h1>; everything else
+        // is demoted to <h2> but keeps the authored size classes.
+        const renderedTag =
+            authoredTag === "h1" && (!allowH1 || hasH1.current)
+                ? "h2"
+                : authoredTag;
+
+        const sizeClass =
+            authoredTag in headingSizeClasses
+                ? headingSizeClasses[
+                      authoredTag as keyof typeof headingSizeClasses
+                  ][headingSize ?? "md"]
+                : undefined;
+
+        if (renderedTag === "h1") hasH1.current = true;
+
+        switch (renderedTag) {
+            case "h1":
+                return (
+                    <h1 className={cn("font-sl-bebas", sizeClass)}>
+                        {content}
+                    </h1>
+                );
+            case "h2":
+                return (
+                    <h2 className={cn("font-sl-bebas", sizeClass)}>
+                        {content}
+                    </h2>
+                );
+            case "h3":
+                return (
+                    <h3 className={cn("font-sl-bebas", sizeClass)}>
+                        {content}
+                    </h3>
+                );
+            case "h4":
+                return (
+                    <h4 className={cn("font-sl-bebas", sizeClass)}>
+                        {content}
+                    </h4>
+                );
+            default:
+                return <h5>{content}</h5>;
+        }
+    };
 
 const linkConverter: JSXConverter<SerializedLinkNode> = ({
     node,
@@ -417,58 +423,74 @@ const listItemConverter: JSXConverter<SerializedListItemNode> = ({
     return <li>{children}</li>;
 };
 
-const jsxConverters: JSXConvertersFunction<NodeTypes> = ({
-    defaultConverters,
-}) => ({
-    ...defaultConverters,
-    ...LinkJSXConverter({ internalDocToHref }),
-    text: textConverter,
-    heading: headingConverter,
-    link: linkConverter,
-    button: linkConverter,
-    list: listConverter,
-    listitem: listItemConverter,
-    blocks: {
-        formBlock: ({ node }: { node: SerializedBlockNode<FormBlockType> }) => (
-            <FormBlock {...node.fields} />
-        ),
-        columnsBlock: ({
-            node,
-        }: {
-            node: SerializedBlockNode<ColumnsBlock>;
-        }) => {
-            const columns = node.fields.columns || [];
+const createJsxConverters = (
+    allowH1: boolean,
+): JSXConvertersFunction<NodeTypes> => {
+    // One H1 per rich text instance; nested RichText components get their own.
+    const hasH1 = { current: false };
 
-            return (
-                <div className="grid grid-cols-2 gap-4">
-                    {columns.map((column, index: number) => (
-                        <div key={index} className="flex flex-col gap-4">
-                            <RichText data={column.richText} />
-                        </div>
-                    ))}
-                </div>
-            );
+    return ({ defaultConverters }) => ({
+        ...defaultConverters,
+        ...LinkJSXConverter({ internalDocToHref }),
+        text: textConverter,
+        heading: createHeadingConverter({ allowH1, hasH1 }),
+        link: linkConverter,
+        button: linkConverter,
+        list: listConverter,
+        listitem: listItemConverter,
+        blocks: {
+            formBlock: ({
+                node,
+            }: {
+                node: SerializedBlockNode<FormBlockType>;
+            }) => <FormBlock {...node.fields} />,
+            columnsBlock: ({
+                node,
+            }: {
+                node: SerializedBlockNode<ColumnsBlock>;
+            }) => {
+                const columns = node.fields.columns || [];
+
+                return (
+                    <div className="grid grid-cols-2 gap-4">
+                        {columns.map((column, index: number) => (
+                            <div key={index} className="flex flex-col gap-4">
+                                <RichText data={column.richText} />
+                            </div>
+                        ))}
+                    </div>
+                );
+            },
+            virtuagymRosterBlock: () => {
+                return <VirtuagymRosterBlock />;
+            },
+            serviceCardBlock: ({
+                node,
+            }: {
+                node: SerializedBlockNode<ServiceCardBlockType>;
+            }) => {
+                return <ServiceCardBlock {...node.fields} />;
+            },
+            faqBlock: ({
+                node,
+            }: {
+                node: SerializedBlockNode<FAQBlockType>;
+            }) => {
+                return <FAQBlock {...node.fields} />;
+            },
         },
-        virtuagymRosterBlock: () => {
-            return <VirtuagymRosterBlock />;
-        },
-        serviceCardBlock: ({
-            node,
-        }: {
-            node: SerializedBlockNode<ServiceCardBlockType>;
-        }) => {
-            return <ServiceCardBlock {...node.fields} />;
-        },
-        faqBlock: ({ node }: { node: SerializedBlockNode<FAQBlockType> }) => {
-            return <FAQBlock {...node.fields} />;
-        },
-    },
-});
+    });
+};
 
 type Props = {
     data: DefaultTypedEditorState;
     enableGutter?: boolean;
     enableProse?: boolean;
+    /**
+     * Keep the first h1 in this rich text as the page H1. Use it only for the
+     * page's hero; all other rich text demotes h1 to a visually identical h2.
+     */
+    allowH1?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export default function RichText(props: Props) {
@@ -476,12 +498,13 @@ export default function RichText(props: Props) {
         className,
         enableProse = true,
         enableGutter = true,
+        allowH1 = false,
         ...rest
     } = props;
 
     return (
         <ConvertRichText
-            converters={jsxConverters}
+            converters={createJsxConverters(allowH1)}
             className={cn(
                 "payload-richtext",
                 {

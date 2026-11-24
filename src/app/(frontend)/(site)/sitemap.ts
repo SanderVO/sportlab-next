@@ -6,6 +6,10 @@ import { getPayload } from "payload";
 // Not prerendered at build (needs the DB); the data itself is cached below.
 export const dynamic = "force-dynamic";
 
+// Published working copies duplicate a real page, so keep them out of the
+// sitemap. Add slugs here when a "…-backup" page has to stay published.
+const EXCLUDED_SLUGS = new Set(["small-group-training-backup"]);
+
 // Fallback window in case a revalidateTag("pages-sitemap") call is ever missed
 const getPagesSitemap = unstable_cache(
     async () => {
@@ -35,7 +39,12 @@ const getPagesSitemap = unstable_cache(
 
         const sitemap = results.docs
             ? results.docs
-                  .filter((page) => Boolean(page?.slug))
+                  .filter(
+                      (page) =>
+                          typeof page?.slug === "string" &&
+                          page.slug.length > 0 &&
+                          !EXCLUDED_SLUGS.has(page.slug),
+                  )
                   .map((page) => {
                       return {
                           loc:

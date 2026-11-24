@@ -15,3 +15,14 @@ export const getClientSideURL = () => {
 
     return process.env.NEXT_PUBLIC_SERVER_URL || "";
 };
+
+// Structured data (and CMS URL fields) sometimes contain "www.example.com"
+// without a scheme. Make them absolute so crawlers and LLMs can resolve them.
+export const toAbsoluteUrl = (value?: string | null): string | undefined => {
+    const trimmed = value?.trim();
+    if (!trimmed) return undefined;
+
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+    return `https://${trimmed.replace(/^\/+/, "")}`;
+};

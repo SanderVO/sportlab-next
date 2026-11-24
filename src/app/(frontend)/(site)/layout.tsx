@@ -6,12 +6,21 @@ import { HeaderStateProvider } from "@/components/Header/HeaderContext";
 import { MainWrapper } from "@/components/MainWrapper";
 import { Organization } from "@/payload-types";
 import { getCachedGlobal } from "@/utilities/getGlobals";
+import { getServerSideURL, toAbsoluteUrl } from "@/utilities/getURL";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { draftMode } from "next/headers";
 import Script from "next/script";
 import React from "react";
 
-import { Media } from "@/components/Media";
+const SCHEMA_DAYS: Record<string, string> = {
+    monday: "Monday",
+    tuesday: "Tuesday",
+    wednesday: "Wednesday",
+    thursday: "Thursday",
+    friday: "Friday",
+    saturday: "Saturday",
+    sunday: "Sunday",
+};
 
 export default async function SiteLayout({
     children,
@@ -26,6 +35,22 @@ export default async function SiteLayout({
         "organization",
         1,
     )) as Organization;
+
+    const siteUrl = getServerSideURL();
+
+    const organizationImages = (organization.images ?? [])
+        .map((item) =>
+            item.image && typeof item.image === "object"
+                ? toAbsoluteUrl(item.image.url)
+                : undefined,
+        )
+        .filter((url): url is string => Boolean(url));
+
+    const sameAs = (organization.sameAs ?? [])
+        .map((item) => toAbsoluteUrl(item.url))
+        .filter((url): url is string => Boolean(url));
+
+    const openingHours = organization.openingHours ?? [];
 
     return (
         <>
@@ -69,66 +94,67 @@ export default async function SiteLayout({
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{
                     __html: JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": ["LocalBusiness", "ExerciseGym"],
-                    name: organization.name,
-                    url: organization.url,
-                    ...(organization.priceRange && {
-                        priceRange: organization.priceRange,
-                    }),
-                    ...(organization.images &&
-                        typeof organization.images === "object" && {
-                            image: organization.images
-                                .filter(
-                                    (img) =>
-                                        img.image &&
-                                        typeof img.image === "object" &&
-                                        "url" in img.image,
-                                )
-                                .map((img) =>
-                                    img.image instanceof Media
-                                        ? img.image.url
-                                        : img.image,
-                                ),
+                        "@context": "https://schema.org",
+                        "@type": ["LocalBusiness", "ExerciseGym"],
+                        "@id": `${siteUrl}/#organization`,
+                        name: organization.name,
+                        // The canonical origin, not the free-text CMS value:
+                        // that one can be missing the scheme or use www.
+                        url: siteUrl,
+                        ...(organization.priceRange && {
+                            priceRange: organization.priceRange,
                         }),
-                    ...(organization.logo &&
-                        typeof organization.logo === "object" && {
-                            logo: organization.logo.url,
+                        ...(organizationImages.length > 0 && {
+                            image: organizationImages,
                         }),
-                    ...(organization.email && {
-                        email: organization.email,
-                    }),
-                    ...(organization.description && {
-                        description: organization.description,
-                    }),
-                    ...(organization.contactPoint?.telephone && {
-                        telephone: organization.contactPoint.telephone,
-                    }),
-                    ...(organization.geo?.latitude != null &&
-                        organization.geo?.longitude != null && {
-                            geo: {
-                                "@type": "GeoCoordinates",
-                                latitude: organization.geo.latitude,
-                                longitude: organization.geo.longitude,
+                        ...(organization.logo &&
+                            typeof organization.logo === "object" &&
+                            organization.logo.url && {
+                                logo: toAbsoluteUrl(organization.logo.url),
+                            }),
+                        ...(organization.email && {
+                            email: organization.email,
+                        }),
+                        ...(organization.description && {
+                            description: organization.description,
+                        }),
+                        ...(organization.contactPoint?.telephone && {
+                            telephone: organization.contactPoint.telephone,
+                        }),
+                        ...(organization.geo?.latitude != null &&
+                            organization.geo?.longitude != null && {
+                                geo: {
+                                    "@type": "GeoCoordinates",
+                                    latitude: organization.geo.latitude,
+                                    longitude: organization.geo.longitude,
+                                },
+                            }),
+                        ...(organization.address?.streetAddress && {
+                            address: {
+                                "@type": "PostalAddress",
+                                streetAddress:
+                                    organization.address.streetAddress,
+                                addressLocality:
+                                    organization.address.addressLocality,
+                                postalCode: organization.address.postalCode,
+                                addressCountry:
+                                    organization.address.addressCountry,
                             },
                         }),
-                    ...(organization.address?.streetAddress && {
-                        address: {
-                            "@type": "PostalAddress",
-                            streetAddress: organization.address.streetAddress,
-                            addressLocality:
-                                organization.address.addressLocality,
-                            postalCode: organization.address.postalCode,
-                            addressCountry: organization.address.addressCountry,
-                        },
-                    }),
-                    ...(organization.sameAs?.length && {
-                        sameAs: organization.sameAs.map((s) => s.url),
-                    }),
-                    ...(organization.openingHours && {
-                        openingHoursSpecification: organization.openingHours,
-                    }),
-                }).replace(/</g, "\\u003c"),
+                        ...(sameAs.length > 0 && { sameAs }),
+                        ...(openingHours.length > 0 && {
+                            openingHoursSpecification: openingHours.map(
+                                ({ dayOfWeek, opens, closes }) => ({
+                                    "@type": "OpeningHoursSpecification",
+                                    dayOfWeek: `https://schema.org/${
+                                        SCHEMA_DAYS[dayOfWeek] ?? dayOfWeek
+                                    }`,
+                                    opens,
+                                    closes,
+                                }),
+                            ),
+                        }),
+                    }).replace(/</g, "\\u003c"),
                 }}
             />
         </>

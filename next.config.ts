@@ -78,9 +78,15 @@ const nextConfig: NextConfig = {
                 destination: "/small-group-training",
                 permanent: true,
             },
+            // "Over ons" lives at /team now; keep old links working.
             {
                 source: "/sfeerimpressie",
-                destination: "/over-ons",
+                destination: "/team",
+                permanent: true,
+            },
+            {
+                source: "/over-ons",
+                destination: "/team",
                 permanent: true,
             },
             {

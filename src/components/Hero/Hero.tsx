@@ -39,6 +39,7 @@ export const Hero: React.FC<Page["hero"]> = (props) => {
                                 data={text}
                                 enableGutter={false}
                                 enableProse={false}
+                                allowH1
                             />
                         </div>
                     )}

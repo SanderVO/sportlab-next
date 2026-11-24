@@ -137,7 +137,7 @@ export default async function Page({ params }: Args) {
         }
     }
 
-    const { hero, layout, meta, hasHero } = page;
+    const { hero, layout, meta, hasHero, title } = page;
 
     const baseUrl = getServerSideURL();
 
@@ -169,6 +169,10 @@ export default async function Page({ params }: Args) {
             <PayloadRedirects disableNotFound url={url} />
 
             {draft && <LivePreviewListener />}
+
+            {/* Pages without a hero have no visible H1; give them one for
+                screen readers, search engines and LLMs. */}
+            {!hasHero && <h1 className="sr-only">{title}</h1>}
 
             {hasHero && <SetHeroMode />}
             {hasHero && <Hero {...hero} />}
