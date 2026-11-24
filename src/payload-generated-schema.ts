@@ -21,6 +21,7 @@ import {
     jsonb,
     type AnyPgColumn,
     text,
+    type PgTableExtraConfigValue,
     pgEnum,
 } from "@payloadcms/db-postgres/drizzle/pg-core";
 import { sql, relations } from "@payloadcms/db-postgres/drizzle";
@@ -1403,9 +1404,7 @@ export const _pages_v_blocks_media_carousel_gallery_images = pgTable(
         _order: integer("_order").notNull(),
         _parentID: integer("_parent_id").notNull(),
         id: serial("id").primaryKey(),
-        media: integer("media_id").references(() => media.id, {
-            onDelete: "set null",
-        }),
+        media: integer("media_id"),
         caption: varchar("caption"),
         _uuid: varchar("_uuid"),
     },
@@ -1424,6 +1423,11 @@ export const _pages_v_blocks_media_carousel_gallery_images = pgTable(
             foreignColumns: [_pages_v_blocks_media_carousel.id],
             name: "_pages_v_blocks_media_carousel_gallery_images_parent_id_fk",
         }).onDelete("cascade"),
+        foreignKey({
+            columns: [columns["media"]],
+            foreignColumns: [media.id],
+            name: "_pages_v_blocks_media_carousel_gallery_images_media_54e6446c_fk",
+        }).onDelete("set null"),
     ],
 );
 
@@ -2367,12 +2371,7 @@ export const subscription_plans = pgTable(
         ptCreditsPerWeek: numeric("pt_credits_per_week", { mode: "number" })
             .notNull()
             .default(0),
-        currentPrice: integer("current_price_id").references(
-            (): AnyPgColumn => subscription_plan_prices.id,
-            {
-                onDelete: "set null",
-            },
-        ),
+        currentPrice: integer("current_price_id"),
         stripeProductId: varchar("stripe_product_id"),
         active: boolean("active").notNull().default(true),
         updatedAt: timestamp("updated_at", {
@@ -2390,13 +2389,18 @@ export const subscription_plans = pgTable(
             .defaultNow()
             .notNull(),
     },
-    (columns) => [
+    (columns): PgTableExtraConfigValue[] => [
         index("subscription_plans_current_price_idx").on(columns.currentPrice),
         index("subscription_plans_stripe_product_id_idx").on(
             columns.stripeProductId,
         ),
         index("subscription_plans_updated_at_idx").on(columns.updatedAt),
         index("subscription_plans_created_at_idx").on(columns.createdAt),
+        foreignKey({
+            columns: [columns["currentPrice"]],
+            foreignColumns: [subscription_plan_prices.id],
+            name: "subscription_plans_current_price_id_subscription_pl_03eb5230_fk",
+        }).onDelete("set null"),
     ],
 );
 
